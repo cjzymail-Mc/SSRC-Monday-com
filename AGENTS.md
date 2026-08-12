@@ -1,0 +1,88 @@
+# AGENTS.md — 本仓库的协作与 Agent 约定
+
+> 最后更新：2026-08-12
+> **定位**：这是给「在 Flowboard 这个 repo 里干活的 agent（planner / coder / mc-expert / 主 Claude）」看的操作约定——角色分工、交接契约、文件落点、红线。**只讲怎么协作，不讲产品功能**（产品见 `feature-00-build-up/PROJECT_MAINLINE.md`，状态见 `STATE.md`）。
+> **不是 agent 注册表**：本仓库不维护自定义 subagent 定义；可用的 agent 类型由运行环境提供（planner / coder / mc-expert / general-purpose / Explore / Plan 等）。
+
+---
+
+## 1. 当前采用的工作模式
+
+**double-workflow（planner ↔ coder 双 session 接力）**，目前处于**第一阶段完工后的交付态**：
+
+- 由 `.copilot-task.md`（全局 done_when 1～17）定权威范围；
+- planner 独立验收每个检查点，通过后自动交棒下一项，**不**在每个检查点调 Done；
+- 只有整条全局主线全部满足才允许结束；
+- 接力状态记在 `.copilot-state.json`（run_id / seq / turn / lease），持续任务记在 `temp.md`。
+
+> 现状：`.copilot-state.json` `status=done` / `last_action=Done` / `turn=planner` / `seq=58`。第一阶段已闭环。**新一轮编码必须由用户显式启动**（commit / 真机验收 / 选第三阶段方向），agent 不得 model-driven 自行开新阶段。
+
+---
+
+## 2. 角色分工
+
+| 角色 | 职责 | 边界 |
+|------|------|------|
+| **planner** | 拆检查点、独立验收、生成下一棒交接、纠偏 | 只规划+验收，不写实现代码；候选池不得擅自升级为任务 |
+| **coder** | 按已拍板的 plan 改代码、补测试 | 连失 2 次或 plan 不清即停报，不硬干，不碰编排 |
+| **mc-expert** | 跨 repo 经验陪审：重大选型 / 连续失败 / 改核心文件 / 拆分任务前咨询 | 给「依据+建议+风险+置信度」，低置信度建议升级用户 |
+| **主 Claude** | 编排权在手：决定何时派哪个 agent、何时停下来问用户 | 改 CLAUDE/STATE/AGENTS 等治理文件前先与用户对齐 |
+
+---
+
+## 3. 交接契约（handoff artifacts）
+
+- **`temp.md`**：当前「全项目持续开发总任务」的活文档——检查点、done_when、自主授权、禁止范围。**planner/coder 接力的主信息载体**，可随检查点变化。
+- **`.copilot-state.json`**：run/turn/seq/lease 的机器可读状态；读取它判断「现在该谁、卡在哪、是否 done」。
+- **`.copilot-task.md`**：权威任务定义（全局 done_when 1～17），**不要改实现性内容**。
+- **`.copilot-message.md`**：上一棒留给下一棒的消息。
+- **`mc-plan/`**：阶段性思考/决策记录（凝固态，陈述当时事实，勿回溯改写）。
+
+> 第一阶段的实现/验收过程档已归档进 `feature-00-build-up/`（只读冻结档），**不再作为交接载体**——新交接走 `temp.md` + `.copilot-*`。
+
+---
+
+## 4. 文件落点规约（防止冷会话乱放过程文件）
+
+| 文件类型 | 落点 |
+|----------|------|
+| 第一阶段过程文档（主线/架构/验收/subplan/运维/总结） | `feature-00-build-up/`（**已归档，勿新增/改写**） |
+| 代码 | 根目录（`server.py`、`app.js`、`flowboard/`、`*-ui.js`、`*.css`、`index.html`） |
+| 测试 | `tests/` |
+| 运行库 / 备份 / 附件 | `flowboard.db` / `backups/` / 配置的 attachment dir（不放 web 根） |
+| 阶段决策记录 | `mc-plan/` |
+| 交接 / 持续任务 | `temp.md` + `.copilot-*` |
+| 新建顶级文件夹 | **必须先与用户对齐并同步更新本表 + STATE.md §4** |
+
+> 硬底线：目标文件夹不存在先创建再放；过程文件按上表归类，不要平铺到根目录污染。
+
+---
+
+## 5. 不可触碰的红线（来自冻结主线 §5 + 历史教训）
+
+1. **权限必须服务端执行**——前端隐藏按钮不等于授权；不靠放松权限换表面完成。
+2. **数据变更可追踪，删除优先软删除；schema 迁移必须先备份并可恢复**——禁止手写 `DELETE` 绕过回收站/保留期流程。
+3. **运行库只读优先**——`flowboard.db` 可做只读 PRAGMA/计数；**禁止对运行库 purge/restore/重建**（运维操作走隔离目录 + `flowboard_ops.py` 离线 CLI）。
+4. **不扩范围**——不把「本轮不做」（工作负载/OKR/自动化/表单/Webhook/CRM/AI/SSO/原生 App…）偷偷变成本轮必做；候选池需用户拍板。
+5. **不删测试、不损坏旧数据**——不得通过删测试或损坏 legacy 数据取得表面 PASS。
+6. **每个检查点要齐**：数据层 + API + 可操作 UI + 测试 + 文档，不能只做静态界面。
+
+---
+
+## 6. 触发停下来的条件（停下来问用户，别硬干）
+
+- 连续 2 次实现失败 / 测试不过（coder 熔断）。
+- 发现 plan 与冻结主线冲突 / 范围漂移。
+- 需要改 `PROJECT_MAINLINE.md` 冻结范围（只有用户能调产品方向）。
+- 要把候选池里的第三阶段功能升级为实际任务。
+- 要对运行库做破坏性运维、对外发布、改机器级防火墙/服务配置。
+- 要执行 git commit/push/发布（当前 0 commit，需用户拍板）。
+
+---
+
+## 7. 与 STATE.md / 冻结主线的分工
+
+- **本文件（AGENTS.md）**= 怎么协作（角色/交接/落点/红线）——稳定，少改。
+- **`STATE.md`**= 项目现在到哪了（变更日志/feature 状态/近期决定）——随推进演进。
+- **`feature-00-build-up/PROJECT_MAINLINE.md`**= 产品做什么不做什么（冻结契约）——只在用户调方向时改。
+- 三者冲突时：用户指令 > 冻结主线 > temp.md > subplan > feature map > 架构文档（见 STATE.md §5）。

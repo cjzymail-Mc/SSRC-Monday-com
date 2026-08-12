@@ -1,0 +1,4 @@
+.mobile-dashboard{display:none}
+.dashboard-widget{position:relative}
+.widget-resize-handle{position:absolute;right:5px;bottom:5px;display:block;width:16px;height:16px;border-right:2px solid var(--purple);border-bottom:2px solid var(--purple);cursor:nwse-resize}
+@media(max-width:680px){.mobile-dashboard{display:inline-block}.widget-resize-handle{display:none}}

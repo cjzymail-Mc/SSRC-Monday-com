@@ -1,0 +1,2 @@
+"""Flowboard application package."""
+

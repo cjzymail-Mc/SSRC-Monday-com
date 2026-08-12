@@ -1,0 +1,9 @@
+.realtime-state{font-size:11px;color:var(--muted);white-space:nowrap}
+.notification-button b{display:inline-grid;place-items:center;min-width:16px;border-radius:9px;background:#ef7073;color:white;font-size:10px}
+.notification-list,.search-results,.audit-list{display:grid;gap:8px;margin-top:14px}
+.notification-item,.search-result,.audit-item{display:grid;gap:4px;text-align:left;border:1px solid var(--line);border-radius:8px;background:white;padding:11px;color:var(--ink)}
+.notification-item.unread{border-left:4px solid var(--purple);background:#f8f7ff}
+.notification-item span,.notification-item small,.audit-item span,.audit-item small{color:var(--muted)}
+.search-result{grid-template-columns:85px 1fr}.search-result b{text-transform:uppercase;color:var(--purple);font-size:11px}
+.i12-actions{display:flex;justify-content:flex-end;margin:8px 0}.i12-actions a{text-decoration:none;display:inline-block}
+@media(max-width:680px){.top-actions{gap:5px}.top-actions .tool-btn{padding:6px}.current-user span,.realtime-state{display:none}.task-modal{padding:20px}.notification-item,.search-result,.audit-item{min-height:44px}}

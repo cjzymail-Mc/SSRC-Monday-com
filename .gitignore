@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+backups/*.db
+flowboard.db-wal
+flowboard.db-shm
+flowboard-attachments/
+
+# 运行库（运行时数据，不进版本库；结构由迁移脚本保证）
+flowboard.db
+
+# double-session 接力状态机（易变机器状态，不入库）
+.copilot-message.md
+.copilot-state.json
+.copilot-task.md
+
+# double-session 持续任务活文档（随检查点频繁变化，不入库）
+temp.md
