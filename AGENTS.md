@@ -47,6 +47,7 @@
 | 文件类型 | 落点 |
 |----------|------|
 | 第一阶段过程文档（主线/架构/验收/subplan/运维/总结） | `feature-00-build-up/`（**已归档，勿新增/改写**） |
+| feature01 项目时间管理需求/主线/静态原型 | `feature-01-项目时间管理-仪表盘/`（需求调研中，正式实现仍按代码/测试落点） |
 | 代码 | 根目录（`server.py`、`app.js`、`flowboard/`、`*-ui.js`、`*.css`、`index.html`） |
 | 测试 | `tests/` |
 | 运行库 / 备份 / 附件 | `flowboard.db` / `backups/` / 配置的 attachment dir（不放 web 根） |
