@@ -92,6 +92,9 @@
   td.editable { cursor: text; }
   td.editable:hover { background: #fffbe6; }
   td.editable:focus { outline: 2px solid #2c7be5; background: #fff; }
+  /* Q2 推荐演示：轨道列下拉选择 */
+  select.lane-select { padding: 3px 6px; border: 1px solid var(--border); border-radius: 4px; background: #fff; font-size: 12px; cursor: pointer; }
+  select.lane-select:hover { background: #f5f8ff; }
   /* 间隔列样式：浅灰底 + 等宽字，暗示"这是算出来的" */
   td.gap-cell { background: #f6f8fa; font-family: "Consolas", monospace; color: #444; text-align: right; }
   td.gap-cell.editable:hover { background: #fff3cd; }
@@ -195,6 +198,10 @@
   .prototype-toast.show { display:block; }
 
   .hint { margin-top: 16px; padding: 12px 16px; background: #eef6ff; border-left: 3px solid #2c7be5; border-radius: 4px; font-size: 13px; color: #1c4966; }
+  /* Q5 推荐演示：克制色点（不染整条泳道） */
+  .dot-orange, .dot-red { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+  .dot-orange { background:#f0a43c; }
+  .dot-red { background:var(--today); }
   .hint ul { margin: 6px 0 0; padding-left: 18px; }
   .hint.warn { background: #fff3cd; border-left-color: #d4a72c; color: #6b5400; }
 
@@ -249,8 +256,8 @@
 <body>
 
 <div class="banner">
-  🔖 <b>静态样图 v3（假数据，不接后端）</b> —— 新增<b>重叠方案对比</b>；编辑器与原仪表盘仍保留为 v2 探索稿。
-  点【💾 保存】会真的触发计算并重画。改完请在 <code>PHASE2_REQUIREMENTS_DRAFT.md</code> 反馈。
+  🔖 <b>静态样图 v3.1（假数据，不接后端）</b> —— 本版新增 <b>Q2/Q5/Q6/Q7 推荐演示（均待拍板）</b>：编辑器【轨道】列改下拉选择、Excel 格式预览（编辑器页底部）、全项目仪表盘排序下拉可用 + 克制色点 + 每项目主线/并行两行。
+  Q7 展开↔多行 / Q8 重叠渲染三方案见对照稿 <code>dual-track-lane-options.html</code>。拍板请填 <code>3-UX_DETAIL_REQUIREMENTS.md</code>（速览表在其 §0）。
 </div>
 
 <div class="tabs">
@@ -315,6 +322,29 @@
     </ul>
   </div>
   <div class="hint warn" id="saveLog" style="display:none"></div>
+
+  <!-- Q6 推荐演示（待拍板）：Excel 导入导出格式预览 —— 单一 sheet 大表 -->
+  <details style="margin-top:16px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 16px">
+    <summary style="cursor:pointer;font-weight:600;font-size:14px">📥📤 Excel 导入导出格式预览（Q6 推荐演示：单一 sheet 大表 · 待拍板）</summary>
+    <p style="color:var(--muted);font-size:12px;margin:10px 0 8px">无论单项目还是全项目，永远是同一张 8 列大表；第一列恒为【项目名称】。单项目导出 = 同格式、只含该项目的行。</p>
+    <table class="sheet" style="font-size:12px">
+      <thead><tr><th>项目名称</th><th>项目阶段</th><th>轨道</th><th>项目节点</th><th>日期</th><th class="gap-cell">时间间隔（天）</th><th>状态</th><th>备注</th></tr></thead>
+      <tbody>
+        <tr><td>跑鞋 春夏</td><td><span class="phase-chip chip-创意">创意</span></td><td>主线</td><td>项目头脑风暴</td><td>2026-01-05</td><td class="gap-cell">—</td><td>已完成</td><td>全员参与</td></tr>
+        <tr><td>跑鞋 春夏</td><td><span class="phase-chip chip-创意">创意</span></td><td>主线</td><td>创意整合</td><td>2026-01-20</td><td class="gap-cell">15</td><td>已完成</td><td></td></tr>
+        <tr><td>跑鞋 春夏</td><td><span class="phase-chip chip-设计">设计</span></td><td>并行</td><td>市场同步评审</td><td>2026-02-12</td><td class="gap-cell">—</td><td>已完成</td><td>并行轨首节点</td></tr>
+        <tr><td>跑鞋 春夏</td><td><span class="phase-chip chip-设计">设计</span></td><td>主线</td><td>首轮设计图评审</td><td>2026-02-25</td><td class="gap-cell">36</td><td>已完成</td><td></td></tr>
+        <tr><td>篮球鞋 Q3</td><td><span class="phase-chip chip-创意">创意</span></td><td>主线</td><td>项目启动会</td><td>2026-07-20</td><td class="gap-cell">—</td><td>进行中</td><td></td></tr>
+        <tr><td>篮球鞋 Q3</td><td><span class="phase-chip chip-设计">设计</span></td><td>主线</td><td>设计 kickoff</td><td>2026-09-15</td><td class="gap-cell">57</td><td>未开始</td><td></td></tr>
+      </tbody>
+    </table>
+    <ul style="font-size:12px;color:var(--muted);margin:10px 0 0;padding-left:18px">
+      <li><b>间隔列</b>：导出 = 计算值；<b>导入时忽略</b>（间隔永远由日期链推出，手填值不作输入）</li>
+      <li><b>状态列</b>：只接受三态文本（未开始 / 进行中 / 已完成），其他值按行报错并给出行号</li>
+      <li><b>权限</b>：Excel 导入的项目 created_by = 导入操作者（已冻结契约 DRAG Q22）</li>
+      <li>行序 = 同日自然排序后的顺序；每个轨道首节点间隔为空（—）</li>
+    </ul>
+  </details>
 </div>
 
 <!-- ============================================================ 画面二：单项目仪表盘 ============================================================ -->
@@ -361,16 +391,16 @@
 <!-- ============================================================ 画面三：全项目仪表盘 ============================================================ -->
 <div id="all" class="page">
   <h2>全项目仪表盘</h2>
-  <p class="sub">10 个项目横向对齐同一条绝对日历标尺，每个项目是一条连续彩带，颜色一眼看出当前阶段。</p>
+  <p class="sub">10 个项目横向对齐同一条绝对日历标尺；<b>每项目固定两行：主线 / 并行（Q7 推荐演示 · 泳道=轨道）</b>，颜色一眼看出当前阶段。</p>
 
   <div class="controls">
     <span style="font-size:13px;color:var(--muted)">📅 2026 全年绝对标尺</span>
     <div class="spacer"></div>
     <select class="multi-select"><option>所有项目（10 个）</option></select>
-    <select class="multi-select">
-      <option>排序：按下一节点日期（轻重缓急）</option>
-      <option>排序：按项目名称</option>
-      <option>排序：按当前阶段</option>
+    <select class="multi-select" id="allSort" onchange="drawAll()">
+      <option value="next">排序：按下一节点日期（轻重缓急）</option>
+      <option value="name">排序：按项目名称</option>
+      <option value="phase">排序：按当前阶段</option>
     </select>
     <label class="toggle"><input type="checkbox"><span>☐ 延期偏差</span></label>
     <label class="toggle"><input type="checkbox" checked><span>☑ 只看延期/即将到期</span></label>
@@ -387,10 +417,14 @@
     <span><i style="background:var(--phase-测试)"></i>测试</span>
     <span><i style="background:var(--phase-量产)"></i>量产</span>
     <span><i style="background:var(--phase-应用迭代)"></i>应用迭代</span>
+    <span style="margin-left:20px"><span class="dot-orange"></span>= 30 天内临近节点</span>
+    <span><span class="dot-red"></span>= 有逾期未完成节点</span>
   </div>
   <div class="hint">
     <b>看什么：</b>
     <ul><li>每条泳道是一条连续彩带 → 比散点更直观地看出"项目在推进"</li>
+    <li><b>Q5 推荐演示（待拍板）</b>：排序下拉已可点（按下一节点 / 名称 / 当前阶段）；行内只用小色点提示轻重缓急，不染整条泳道</li>
+    <li><b>Q7 推荐演示（待拍板）</b>：每项目固定「主线 + 并行」两行（泳道=轨道）；有并行节点的项目才显示第二行。展开成多行的完整体验见对照稿 <code>dual-track-lane-options.html</code></li>
     <li>彩带最右端的颜色 = 该项目当前阶段</li>
     <li>红色今日线穿过所有泳道 → 一眼对比谁快谁慢</li></ul>
   </div>
@@ -610,7 +644,7 @@
       tr.innerHTML = `
         <td class="rownum">${displayIndex+1}</td>
         <td><span class="phase-chip chip-${n.phase}">${n.phase}</span></td>
-        <td class="editable ${isParallel?'parallel-cell':''}" contenteditable="true" data-i="${i}" data-k="lane">${n.lane}</td>
+        <td class="${isParallel?'parallel-cell':''}"><select class="lane-select" data-i="${i}" data-k="lane"><option${n.lane==='主线'?' selected':''}>主线</option><option${n.lane==='并行'?' selected':''}>并行</option></select></td>
         <td class="editable" contenteditable="true" data-i="${i}" data-k="name">${n.name}</td>
         <td class="editable actual" contenteditable="true" data-i="${i}" data-k="actual">${n.actual}</td>
         <td class="col-gap gap-cell editable" contenteditable="true" data-i="${i}" data-k="gap">${gap}</td>
@@ -628,7 +662,7 @@
     document.querySelectorAll('#sheetTable tbody tr').forEach((tr) => {
       const nodeIndex = Number(tr.querySelector('[data-i]').dataset.i);
       tr.querySelectorAll('[data-k]').forEach(td => {
-        const k = td.dataset.k, v = td.textContent.trim();
+        const k = td.dataset.k, v = td.tagName === 'SELECT' ? td.value : td.textContent.trim();
         if (k === 'gap') { gaps[nodeIndex] = (v === '' || isNaN(parseInt(v,10))) ? null : parseInt(v,10); }
         else { NODES[nodeIndex][k] = v; }
       });
@@ -686,7 +720,8 @@
   }
 
   // 给一组节点画一条泳道（保留既有连续条形视觉，节点增加拖动命中区）
-  function renderLane(label, sub, nodes, scope, laneKey) {
+  // dragEnabled=false：只读泳道（Q7 演示：并行轨暂不参与拖动草稿）
+  function renderLane(label, sub, nodes, scope, laneKey, dragEnabled = true) {
     let track = `<div class="track"><div class="today-line" style="left:${TODAY_PCT}%"></div>`;
     // 条：相邻两节点之间一条，颜色取左端节点阶段
     for (let i = 0; i < nodes.length - 1; i++) {
@@ -703,7 +738,8 @@
         track += `<div class="node-ghost" style="left:${oldPct}%" title="原日期 ${baseDate}"></div><div class="draft-shift" style="left:${Math.min(oldPct,newPct)}%;width:${Math.abs(newPct-oldPct)}%"></div>`;
       }
       const draftClass = changed ? (DRAG.direct.has(`${scope}:${n.key}`) ? 'draft-direct' : 'draft-cascade') : '';
-      track += `<div class="node-mark draggable ${n.delayed?'delayed':''} ${draftClass}" data-drag-scope="${scope}" data-node-key="${n.key}" data-lane-key="${laneKey}" style="left:${dayPct(n.date)}%" title="${n.name} · ${n.date}${changed?' · 待更新':''}${n.delayed?' · 延期':''}"><div class="node-tip">${n.name}</div></div>`;
+      const dragAttrs = dragEnabled ? ` draggable data-drag-scope="${scope}" data-node-key="${n.key}" data-lane-key="${laneKey}"` : '';
+      track += `<div class="node-mark ${dragEnabled?'draggable':''} ${n.delayed?'delayed':''} ${draftClass}"${dragAttrs} style="left:${dayPct(n.date)}%" title="${n.name} · ${n.date}${changed?' · 待更新':''}${n.delayed?' · 延期':''}"><div class="node-tip">${n.name}</div></div>`;
     });
     track += `</div>`;
     return `<div class="lane"><div class="lane-label">${label}<span class="sub-name">${sub}</span></div>${track}</div>`;
@@ -726,10 +762,10 @@
 
   const ALL_PROJECTS = [
     {name:'篮球鞋 Q3', sub:'创意阶段', nodes:[['2026-07-20','创意'],['2026-09-15','设计']]},
-    {name:'羽毛球鞋 2027', sub:'创意阶段', nodes:[['2026-06-10','创意'],['2026-08-30','创意'],['2026-10-20','设计']]},
-    {name:'跑鞋 春夏', sub:'开发阶段', nodes:[['2026-02-01','创意'],['2026-03-25','设计'],['2026-05-20','开发'],['2026-08-20','开发'],['2026-10-20','量产']]},
-    {name:'训练鞋 Pro', sub:'开发阶段', nodes:[['2026-01-15','创意'],['2026-03-10','设计'],['2026-06-05','开发'],['2026-09-10','测试']]},
-    {name:'休闲鞋 经典款', sub:'测试阶段', nodes:[['2025-11-01','创意'],['2026-01-20','设计'],['2026-04-15','开发'],['2026-07-30','测试'],['2026-10-01','量产']]},
+    {name:'羽毛球鞋 2027', sub:'创意阶段', par:[['2026-09-01','设计']], nodes:[['2026-06-10','创意'],['2026-08-30','创意'],['2026-10-20','设计']]},
+    {name:'跑鞋 春夏', sub:'开发阶段', overdue:true, par:[['2026-03-10','设计'],['2026-06-15','开发']], nodes:[['2026-02-01','创意'],['2026-03-25','设计'],['2026-05-20','开发'],['2026-08-20','开发'],['2026-10-20','量产']]},
+    {name:'训练鞋 Pro', sub:'开发阶段', overdue:true, nodes:[['2026-01-15','创意'],['2026-03-10','设计'],['2026-06-05','开发'],['2026-09-10','测试']]},
+    {name:'休闲鞋 经典款', sub:'测试阶段', par:[['2025-12-15','创意'],['2026-03-01','设计']], nodes:[['2025-11-01','创意'],['2026-01-20','设计'],['2026-04-15','开发'],['2026-07-30','测试'],['2026-10-01','量产']]},
     {name:'童鞋 春季', sub:'量产阶段', nodes:[['2025-09-01','创意'],['2025-11-20','设计'],['2026-02-15','开发'],['2026-05-10','测试'],['2026-08-05','量产']]},
     {name:'户外徒步鞋', sub:'测试阶段', nodes:[['2025-12-01','创意'],['2026-02-28','设计'],['2026-05-25','开发'],['2026-08-15','测试'],['2026-11-01','量产']]},
     {name:'凉鞋 夏季', sub:'应用迭代', nodes:[['2025-06-01','创意'],['2025-08-15','设计'],['2025-10-20','开发'],['2026-01-10','测试'],['2026-03-15','量产'],['2026-06-01','应用迭代']]},
@@ -775,13 +811,30 @@
     status.innerHTML=`<b>日期尚未写回原始数据。</b> 直接拖动 ${direct} 项，自动顺延 ${list.length-direct} 项；空心点表示原日期。`;
   }
 
+  const TODAY_STR = '2026-08-13';
   function drawAll() {
     const el = document.getElementById('allTimeline');
     const source=DRAG.allDraft || ALL_PROJECTS;
+    // Q5 推荐演示（待拍板）：排序下拉真正生效；克制色点提示轻重缓急
+    // Q7 推荐演示（待拍板）：每项目固定两行——主线 / 并行（泳道=轨道，不再按重叠猜行）
+    const sel=document.getElementById('allSort'), mode=sel?sel.value:'next';
+    const order=source.map((p,pi)=>({p,pi}));
+    const nextDate=p=>{const all=[...p.nodes,...(p.par||[])].map(n=>n[0]).sort();const f=all.find(d=>d>=TODAY_STR);return f||all[all.length-1];};
+    const lastPhase=p=>p.nodes[p.nodes.length-1][1];
+    if(mode==='name') order.sort((a,b)=>a.p.name.localeCompare(b.p.name,'zh-CN'));
+    else if(mode==='phase') order.sort((a,b)=>PHASE_ORDER[lastPhase(a.p)]-PHASE_ORDER[lastPhase(b.p)]);
+    else order.sort((a,b)=>nextDate(a.p).localeCompare(nextDate(b.p)));
     let html = buildAxis();
-    source.forEach((p,pi) => {
-      const nodes = p.nodes.map(([date, phase],ni) => ({date, phase, name:phase, key:`${pi}-${ni}`, delayed:false}));
-      html += renderLane(p.name, p.sub, nodes, 'all', String(pi));
+    order.forEach(({p,pi}) => {
+      const main = p.nodes.map(([date, phase],ni) => ({date, phase, name:phase, key:`${pi}-${ni}`, delayed:false}));
+      const next=nextDate(p);
+      const near=!p.overdue && next>=TODAY_STR && (parse(next)-parse(TODAY_STR))/DAY<=30;
+      const dot=p.overdue?'<span class="dot-red" title="有逾期未完成节点"></span>':(near?'<span class="dot-orange" title="30 天内临近节点"></span>':'');
+      html += renderLane(`${dot}${p.name}`, `主线 · ${p.sub}`, main, 'all', String(pi));
+      if (p.par && p.par.length) {
+        const par = p.par.map(([date, phase],ni) => ({date, phase, name:phase, key:`${pi}-p${ni}`, delayed:false}));
+        html += renderLane('└ 并行', p.name, par, 'all', `par-${pi}`, false);
+      }
     });
     el.innerHTML = html;
     renderDragChrome('all');

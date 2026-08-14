@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>双轨泳道 + 展开按钮 · 对照样图（Q7/Q8）</title>
+<style>
+  :root{
+    --c1:#8b5cf6; /* 创意 紫 */
+    --c2:#3b82f6; /* 设计 蓝 */
+    --c3:#06b6d4; /* 开发 青 */
+    --c4:#f59e0b; /* 测试 橙 */
+    --c5:#10b981; /* 量产 绿 */
+    --c6:#d4af37; /* 应用迭代 金 */
+    --today:#ef4444;
+  }
+  *{box-sizing:border-box}
+  body{font:14px/1.6 "Segoe UI","Microsoft YaHei",system-ui,sans-serif;background:#f5f6f8;color:#1f2937;margin:0;padding:24px}
+  h1{font-size:20px;margin:0 0 4px}
+  h2{font-size:16px;margin:36px 0 8px;border-left:4px solid #3b82f6;padding-left:8px}
+  .sub{color:#6b7280;font-size:12px;margin-bottom:14px}
+  .panel{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+
+  /* ---- 图例 ---- */
+  .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-bottom:10px}
+  .legend i{display:inline-block;width:22px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle}
+  .legend .today i{width:2px;height:12px;background:var(--today);border-radius:0}
+
+  /* ---- 日历轴 ---- */
+  .board{position:relative}
+  .axis{position:relative;height:16px;margin-left:78px}
+  .axis span{position:absolute;transform:translateX(-50%);font-size:10px;color:#9ca3af}
+  .grid{position:relative;margin-left:78px;border:1px solid #e5e7eb;border-radius:4px;background:#fff;padding:4px 0}
+  .gline{position:absolute;top:0;bottom:0;width:1px;background:#f0f1f3;z-index:0}
+  .todayline{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--today);z-index:6}
+  .todayline::after{content:"今天";position:absolute;top:-14px;left:4px;font-size:9px;color:var(--today);white-space:nowrap}
+
+  /* ---- 泳道 ---- */
+  .row{display:flex;align-items:stretch;position:relative;z-index:1}
+  .row .lbl{width:78px;flex:0 0 78px;font-size:11px;color:#6b7280;display:flex;align-items:center;justify-content:flex-end;padding-right:8px}
+  .row .lbl b{color:#374151}
+  .lane{position:relative;flex:1;height:28px;margin:1px 0}
+  .lane.empty{background:repeating-linear-gradient(45deg,#fafafa,#fafafa 6px,#f3f4f6 6px,#f3f4f6 12px);border-radius:3px}
+  .lane.empty::after{content:"（无并行节点）";position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:10px;color:#c0c4cc}
+
+  .bar{position:absolute;top:5px;height:18px;border-radius:2px;color:#fff;font-size:10px;line-height:18px;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:clip}
+  .bar.h-top{top:4px;height:10px;line-height:10px;font-size:8px;padding:0 4px}
+  .bar.h-bot{top:15px;height:10px;line-height:10px;font-size:8px;padding:0 4px}
+  .s1{background:var(--c1)} .s2{background:var(--c2)} .s3{background:var(--c3)}
+  .s4{background:var(--c4)} .s5{background:var(--c5)} .s6{background:var(--c6)}
+  .dot{position:absolute;top:50%;width:6px;height:6px;background:#fff;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+  .badge{position:absolute;top:2px;right:4px;background:#111827;color:#fff;font-size:8px;border-radius:6px;padding:0 4px;line-height:12px;z-index:4}
+
+  /* ---- 项目块 ---- */
+  .project{border:1px solid #e5e7eb;border-radius:6px;margin-bottom:12px;background:#fbfbfc}
+  .phead{display:flex;align-items:center;gap:10px;padding:6px 10px;border-bottom:1px solid #eee}
+  .phead b{font-size:13px}
+  .phead .meta{font-size:11px;color:#9ca3af}
+  .btn{margin-left:auto;font-size:11px;border:1px solid #3b82f6;color:#3b82f6;background:#fff;border-radius:4px;padding:2px 10px;cursor:pointer}
+  .btn:hover{background:#eff6ff}
+  .pbody{padding:8px 10px 10px}
+  .view-expanded{display:none}
+  .project.open .view-collapsed{display:none}
+  .project.open .view-expanded{display:block}
+  .project.open .btn{background:#3b82f6;color:#fff}
+
+  /* ---- 方案对比 ---- */
+  .cmp{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:1000px){.cmp{grid-template-columns:1fr}}
+  .cmp .card{border:1px solid #e5e7eb;border-radius:6px;padding:10px;background:#fff}
+  .cmp h3{font-size:13px;margin:2px 0 6px}
+  .cmp .rec{color:#059669;font-size:11px;font-weight:600}
+  .cmp .warn{color:#d97706;font-size:11px;font-weight:600}
+  .cmp .desc{font-size:11px;color:#6b7280;margin-top:8px}
+  .zoom{position:relative;height:40px;background:#fafafa;border-radius:4px;margin-top:6px}
+  .zoom .bar{top:6px;height:14px;line-height:14px}
+  .zoom .bar.h-top{top:5px;height:14px}
+  .zoom .bar.h-bot{top:21px;height:14px}
+  .note{background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:10px 12px;font-size:12px;color:#92400e;margin-top:8px}
+</style>
+</head>
+<body>
+
+<h1>双轨泳道 + 展开按钮 · 对照样图</h1>
+<div class="sub">对应 <b>UX_DETAIL_REQUIREMENTS.md</b> Q7（轨道行模型）与 Q8（默认行内重叠渲染）· 2026-08-14 · 静态假数据，不接后端 · 视觉语言沿用 mockup.html 基线（六阶段色 / 绝对日历标尺 / 红色今日线 / 2px 圆角）</div>
+
+<div class="legend">
+  <span><i style="background:var(--c1)"></i>创意</span>
+  <span><i style="background:var(--c2)"></i>设计</span>
+  <span><i style="background:var(--c3)"></i>开发</span>
+  <span><i style="background:var(--c4)"></i>测试</span>
+  <span><i style="background:var(--c5)"></i>量产</span>
+  <span><i style="background:var(--c6)"></i>应用迭代</span>
+  <span class="today"><i></i>今日线（假数据固定在 4/15）</span>
+  <span style="color:#6b7280">未展开行内重叠采用方案 A（仅重叠段分半）演示</span>
+</div>
+
+<!-- ============ 一、多项目仪表盘 ============ -->
+<h2>一、多项目仪表盘 · 默认每项目 2 行（主线 / 并行），按项目展开</h2>
+<div class="sub">点每项目的【展开重叠 ▾】按钮：该项目的主线行拆成「每阶段一行」，其他项目不受影响（monday.com / ProductPlan 惯例）。泳道 = 轨道列，不再按重叠猜行。</div>
+
+<div class="panel">
+  <!-- 轴 -->
+  <div class="axis">
+    <span style="left:0%">1月</span><span style="left:17.1%">2月</span><span style="left:32.6%">3月</span>
+    <span style="left:49.7%">4月</span><span style="left:66.3%">5月</span><span style="left:83.4%">6月</span><span style="left:100%">7月</span>
+  </div>
+  <div class="grid" id="grid-multi"></div>
+  <!-- 项目块由 JS 生成 -->
+</div>
+
+<!-- ============ 二、默认行内重叠渲染三方案 ============ -->
+<h2>二、Q8 · 未展开时，主线行内的阶段重叠怎么画？（放大对照）</h2>
+<div class="sub">场景：创意 1/1–1/30（紫）与设计 1/15–2/20（蓝）重叠 15 天。三方案都保持六阶段原色、行高不变、不新增泳道。</div>
+
+<div class="cmp">
+  <div class="card">
+    <h3>方案 A · 仅重叠段分半 <span class="rec">推荐</span></h3>
+    <div class="zoom">
+      <div class="bar s1" style="left:0%;width:25.7%">创意</div>
+      <div class="bar s1 h-top" style="left:25.7%;width:27.6%"></div>
+      <div class="bar s2 h-bot" style="left:25.7%;width:27.6%"></div>
+      <div class="bar s2" style="left:53.3%;width:38.7%">设计</div>
+    </div>
+    <div class="desc">非重叠段满高、重叠段两阶段各占半高。颜色纯净、信息完整、无遮挡。Google Calendar / ProductPlan 同类做法。展开按钮仍可看全高版本。</div>
+  </div>
+  <div class="card">
+    <h3>方案 B · 整段分半</h3>
+    <div class="zoom">
+      <div class="bar s1 h-top" style="left:0%;width:53.3%">创意</div>
+      <div class="bar s2 h-bot" style="left:25.7%;width:66.3%">设计</div>
+    </div>
+    <div class="desc">凡参与重叠的阶段整条降为半高。实现最简单（不用算重叠区间），但未重叠的部分也被压细，长项目读起来偏碎。</div>
+  </div>
+  <div class="card">
+    <h3>方案 C · 徽标提示 + 展开 <span class="warn">⚠️ 与主线红线有张力</span></h3>
+    <div class="zoom">
+      <div class="bar s1" style="left:0%;width:53.3%">创意（被盖住大半）</div>
+      <div class="bar s2" style="left:25.7%;width:66.3%">设计<span class="badge">⧉2</span></div>
+    </div>
+    <div class="desc">后画阶段覆盖先画阶段，重叠处只标 ⧉N 计数，点开才见真相。默认视图最干净，但 mainline §4.3 要求「不得掩盖重叠」——选 C 需显式接受默认视图看不到被盖阶段。</div>
+  </div>
+</div>
+
+<!-- ============ 三、单项目仪表盘 ============ -->
+<h2>三、单项目仪表盘 · 同一模型（默认 2 行 + 展开）</h2>
+<div class="sub">单项目与多项目共用同一行模型，只是行更高、带节点里程碑白点；展开后六阶段各自一行，今日线贯穿。</div>
+
+<div class="panel">
+  <div class="axis">
+    <span style="left:0%">1月</span><span style="left:17.1%">2月</span><span style="left:32.6%">3月</span>
+    <span style="left:49.7%">4月</span><span style="left:66.3%">5月</span><span style="left:83.4%">6月</span><span style="left:100%">7月</span>
+  </div>
+  <div class="grid" id="grid-single"></div>
+</div>
+
+<div class="note">⚠️ 本页为 Q7/Q8 对照稿：若采纳「默认两行 + 展开按钮」，将<b>改写</b> PHASE2 §14.6 已拍板的「单项目仪表盘按重叠无限自动分轨」（该拍板产生于【轨道】列出现之前）；多项目「最多两轨 + 局部展开」与既有拍板一致、不受影响。拍板结果回填 <b>UX_DETAIL_REQUIREMENTS.md</b> §0。</div>
+
+<script>
+/* ---------- 公共：月份网格线 + 今日线（今日=4/15→57.5%） ---------- */
+function paintGrid(el){
+  [0,17.1,32.6,49.7,66.3,83.4,100].forEach(p=>{
+    const g=document.createElement('div');g.className='gline';g.style.left=p+'%';el.appendChild(g);
+  });
+  const t=document.createElement('div');t.className='todayline';t.style.left='57.5%';el.appendChild(t);
+}
+
+/* ---------- 数据（百分比 = 1/1–6/30 日历轴位置） ---------- */
+const P=[ // [left,width,label,cls]
+  {l:0,w:16.0,n:'创意',c:'s1'},{l:7.7,w:19.9,n:'设计',c:'s2'},
+  {l:30.4,w:24.3,n:'开发',c:'s3'},{l:49.7,w:16.6,n:'测试',c:'s4'},
+  {l:68.5,w:19.9,n:'量产',c:'s5'},{l:91.2,w:8.2,n:'应用迭代',c:'s6'}
+];
+const projA={name:'项目A · 跑鞋',meta:'主线有 2 处阶段重叠',main:P,par:[
+  {l:17.1,w:23.2,n:'鞋底模具',c:'s3'},{l:43.1,w:17.7,n:'配色打样',c:'s4'}
+]};
+const projB={name:'项目B · 篮球鞋',meta:'阶段顺序无重叠（展开无额外信息，不提供按钮）',main:[
+  {l:17.1,w:10.5,n:'创意',c:'s1'},{l:27.6,w:12.7,n:'设计',c:'s2'},{l:40.3,w:17.2,n:'开发',c:'s3'},
+  {l:57.5,w:12.7,n:'测试',c:'s4'},{l:70.2,w:18.2,n:'量产',c:'s5'},{l:88.4,w:11.0,n:'应用迭代',c:'s6'}
+],par:[]};
+const projC={name:'项目C · 羽毛球鞋',meta:'创意/设计、设计/开发 双重重叠',main:[
+  {l:24.9,w:18.2,n:'创意',c:'s1'},{l:35.4,w:25.4,n:'设计',c:'s2'},{l:49.7,w:24.9,n:'开发',c:'s3'}
+],par:[{l:30.4,w:22.1,n:'楦头数据',c:'s2'},{l:66.3,w:18.7,n:'大货试做',c:'s5'}]};
+
+/* ---------- 行内重叠拆段（方案 A：仅重叠段分半） ---------- */
+function segs(bars){
+  const ev=[];bars.forEach(b=>{ev.push({x:b.l,s:1,b});ev.push({x:b.l+b.w,s:-1,b})});
+  ev.sort((a,z)=>a.x-z.x);
+  let act=[],cur=null,out=[];
+  ev.forEach(e=>{
+    if(cur!==null&&act.length){
+      const w=e.x-cur;const first=act[0],second=act[1];
+      if(w>0){
+        if(act.length===1)out.push({l:cur,w,full:first});
+        else{out.push({l:cur,w,top:first,bot:second});}
+      }
+    }
+    if(e.s>0)act.push(e.b);else act.splice(act.indexOf(e.b),1);
+    cur=e.x;
+  });
+  return out;
+}
+function barEl(b,pos,l,w){
+  const d=document.createElement('div');
+  d.className='bar '+b.c+(pos?' '+pos:'');
+  d.style.left=l+'%';d.style.width=w+'%';d.textContent=b.n||'';return d;
+}
+function lane(bars,small){
+  const el=document.createElement('div');el.className='lane';
+  segs(bars).forEach(s=>{
+    if(s.full){el.appendChild(barEl(s.full,null,s.l,s.w));}
+    else if(s.top&&s.bot){ /* 重叠段：上下各一条 */
+      el.appendChild(barEl(s.top,'h-top',s.l,s.w));
+      el.appendChild(barEl(s.bot,'h-bot',s.l,s.w));
+    }
+  });
+  return el;
+}
+function rowEl(label,bars,expanded){
+  const r=document.createElement('div');r.className='row';
+  const l=document.createElement('div');l.className='lbl';l.innerHTML=label;r.appendChild(l);
+  r.appendChild(lane(bars, !expanded));return r;
+}
+
+/* ---------- 项目块 ---------- */
+function project(p,allowExpand){
+  const box=document.createElement('div');box.className='project';
+  const head=document.createElement('div');head.className='phead';
+  head.innerHTML=`<b>${p.name}</b><span class="meta">${p.meta}</span>`;
+  if(allowExpand){
+    const btn=document.createElement('button');btn.className='btn';btn.textContent='展开重叠 ▾';
+    btn.onclick=()=>{box.classList.toggle('open');btn.textContent=box.classList.contains('open')?'收起 ▴':'展开重叠 ▾';};
+    head.appendChild(btn);
+  }
+  box.appendChild(head);
+  const body=document.createElement('div');body.className='pbody';
+
+  const col=document.createElement('div');col.className='view-collapsed';
+  col.appendChild(rowEl('<b>主线</b>',p.main,false));
+  if(p.par.length)col.appendChild(rowEl('并行',p.par,false));
+  else{const r=document.createElement('div');r.className='row';r.innerHTML='<div class="lbl">并行</div>';const e=document.createElement('div');e.className='lane empty';r.appendChild(e);col.appendChild(r);}
+  body.appendChild(col);
+
+  if(allowExpand){
+    const exp=document.createElement('div');exp.className='view-expanded';
+    p.main.forEach(b=>exp.appendChild(rowEl(b.n,[b],true)));
+    if(p.par.length)p.par.forEach(b=>exp.appendChild(rowEl('并行',[b],true)));
+    body.appendChild(exp);
+  }
+  box.appendChild(body);return box;
+}
+
+document.getElementById('grid-multi').append(project(projA,true),project(projB,false),project(projC,true));
+paintGrid(document.getElementById('grid-multi'));
+
+/* ---------- 单项目（行更高 + 里程碑白点） ---------- */
+(function(){
+  const g=document.getElementById('grid-single');
+  document.querySelectorAll('style')[0].sheet.insertRule('#grid-single .lane{height:44px}',0);
+  document.querySelectorAll('style')[0].sheet.insertRule('#grid-single .bar{top:13px;height:18px}',0);
+  document.querySelectorAll('style')[0].sheet.insertRule('#grid-single .bar.h-top{top:12px}',0);
+  document.querySelectorAll('style')[0].sheet.insertRule('#grid-single .bar.h-bot{top:24px}',0);
+  g.appendChild(project(projA,true));
+  // 里程碑白点
+  [[8,0],[16,0],[35,1],[52,2],[60,3],[75,4],[95,5]].forEach(([pct,bi])=>{
+    const b=projA.main[bi];const d=document.createElement('div');d.className='dot';
+    d.style.left=(b.l+ (pct-b.l))+'%';d.style.top='50%';
+    const lanes=g.querySelectorAll('.view-collapsed .lane');lanes[0].appendChild(d);
+  });
+  paintGrid(g);
+})();
+</script>
+</body>
+</html>
