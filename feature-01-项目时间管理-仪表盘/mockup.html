@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flowboard 第二阶段样图 v3 · 项目时间管理 + 仪表盘</title>
+<style>
+  /* ============================================================
+     纯静态样图 v2 · 假数据 · 不接后端
+     v2 改动：
+       1) 时间轴：散点 ● → 连续倒圆角矩形条（相邻节点间一条，按阶段着色）
+       2) 编辑器：新增隐藏的【时间间隔】列 + 【显示时间间隔】勾选框
+          - 保存时自动算相邻节点间隔
+          - 手编间隔保存 → 后续日期顺延
+          - 改任一日期保存 → 后续日期顺延（间隔不变）
+     6 阶段配色：创意=浅紫 / 设计=蓝 / 开发=青 / 测试=橙 / 量产=绿 / 应用迭代=金
+     ============================================================ */
+
+  :root {
+    --phase-创意: #9b8cf5;
+    --phase-设计: #4a90d9;
+    --phase-开发: #2bb6a8;
+    --phase-测试: #f0934a;
+    --phase-量产: #5bbf6a;
+    --phase-应用迭代: #d4a72c;
+    --today: #e53935;
+    --bg: #f5f6f8;
+    --panel: #ffffff;
+    --border: #e1e4e8;
+    --text: #24292e;
+    --muted: #6a737d;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  .banner {
+    background: #fff8e1; border-bottom: 1px solid #ffe082;
+    padding: 8px 20px; font-size: 13px; color: #8a6d00;
+  }
+  .banner b { color: #5d4900; }
+  .banner code { background: #fff; padding: 1px 5px; border-radius: 3px; }
+
+  .tabs {
+    display: flex; gap: 4px; padding: 12px 20px 0;
+    background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .tab {
+    padding: 10px 18px; cursor: pointer;
+    border: 1px solid transparent; border-bottom: none; border-radius: 6px 6px 0 0;
+    background: #f0f1f3; color: var(--muted); font-size: 14px;
+  }
+  .tab.active { background: var(--panel); color: var(--text); border-color: var(--border); font-weight: 600; }
+  .page { display: none; padding: 20px; }
+  .page.active { display: block; }
+
+  h2 { margin: 0 0 4px; font-size: 20px; }
+  .sub { color: var(--muted); margin: 0 0 16px; font-size: 13px; }
+
+  .phase-chip {
+    display: inline-block; padding: 2px 10px; border-radius: 10px;
+    color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap;
+  }
+  .chip-创意 { background: var(--phase-创意); }
+  .chip-设计 { background: var(--phase-设计); }
+  .chip-开发 { background: var(--phase-开发); }
+  .chip-测试 { background: var(--phase-测试); }
+  .chip-量产 { background: var(--phase-量产); }
+  .chip-应用迭代 { background: var(--phase-应用迭代); }
+
+  /* —— 编辑器工具栏 —— */
+  .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+  .project-select { font-weight: 600; padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; background: #fff; }
+  .btn { padding: 6px 14px; border: 1px solid var(--border); border-radius: 6px; background: #fff; cursor: pointer; font-size: 13px; }
+  .btn:hover { background: #f5f6f8; }
+  .btn-primary { background: #2c7be5; color: #fff; border-color: #2c7be5; }
+  .spacer { flex: 1; }
+  .toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; user-select: none; }
+  .toggle-group { display: inline-flex; gap: 14px; padding: 6px 12px; border: 1px dashed var(--border); border-radius: 6px; background: #fafbfc; }
+
+  /* —— 编辑器表格 —— */
+  table.sheet { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); font-size: 13px; }
+  table.sheet th, table.sheet td { border: 1px solid #e9ecef; padding: 7px 10px; text-align: left; vertical-align: middle; }
+  table.sheet thead th { background: #f6f8fa; font-weight: 600; color: #444; }
+  table.sheet td.rownum { background: #f6f8fa; color: #999; text-align: center; width: 36px; user-select: none; }
+  td.editable { cursor: text; }
+  td.editable:hover { background: #fffbe6; }
+  td.editable:focus { outline: 2px solid #2c7be5; background: #fff; }
+  /* 间隔列样式：浅灰底 + 等宽字，暗示"这是算出来的" */
+  td.gap-cell { background: #f6f8fa; font-family: "Consolas", monospace; color: #444; text-align: right; }
+  td.gap-cell.editable:hover { background: #fff3cd; }
+  /* 延期行 */
+  tr.delayed td.actual { color: var(--today); font-weight: 600; }
+  tr.delayed td.actual::after { content: " ⚠"; }
+  /* 隐藏列控制 */
+  .col-gap { display: none; }
+  body.show-gap .col-gap { display: table-cell; }
+  td.parallel-cell { background:#f3f8ff; }
+  tr.parallel-row td.rownum { border-left:3px solid #4a90d9; }
+  tr.invalid-row td { background:#fff0f0 !important; }
+  .parallel-badge { display:inline-block; padding:1px 5px; border-radius:3px; background:#e8f2ff; color:#1769c2; font-size:10px; margin-left:5px; }
+
+  .legend { margin-top: 14px; display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+  /* —— 仪表盘 —— */
+  .controls { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .multi-select { border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; background: #fff; font-size: 13px; }
+  .kpis { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .kpi { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; min-width: 130px; }
+  .kpi .label { color: var(--muted); font-size: 12px; }
+  .kpi .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  .kpi .value.red { color: var(--today); }
+  .kpi .value.green { color: var(--phase-量产); }
+
+  .timeline-wrap { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; }
+  .timeline { position: relative; min-width: 100%; }
+
+  .lane { display: grid; grid-template-columns: 140px 1fr; align-items: center; border-bottom: 1px solid #f0f1f3; min-height: 56px; }
+  .lane:last-child { border-bottom: none; }
+  .lane-label { padding: 8px 12px; font-weight: 600; font-size: 13px; border-right: 1px solid #f0f1f3; }
+  .lane-label .sub-name { display: block; font-weight: 400; color: var(--muted); font-size: 11px; }
+
+  .track { position: relative; height: 48px; }
+  .axis { display: grid; grid-template-columns: 140px 1fr; border-bottom: 2px solid var(--border); }
+  .axis .corner { background: #f6f8fa; border-right: 1px solid #f0f1f3; }
+  .axis-months { position: relative; height: 24px; display: flex; }
+  .axis-months span { flex: 1; text-align: center; font-size: 11px; color: var(--muted); border-left: 1px dashed #e1e4e8; line-height: 24px; }
+  .axis-months span:first-child { border-left: none; }
+
+  /* —— v2 核心：连续条形 —— */
+  .bar {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 16px;
+    border-radius: 2px;       /* v3 已拍板：小圆角矩形 */
+    opacity: 0.92;
+  }
+  /* 节点标记（条上的里程碑点） */
+  .node-mark {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 0 1.5px rgba(0,0,0,.25);
+    z-index: 3;
+  }
+  .node-mark.draggable { cursor: grab; touch-action: none; }
+  .node-mark.draggable:hover { width: 12px; height: 12px; box-shadow: 0 0 0 2px #2c7be5, 0 2px 7px rgba(44,123,229,.28); }
+  .node-mark.dragging { cursor: grabbing; width: 12px; height: 12px; box-shadow: 0 0 0 3px rgba(44,123,229,.28); }
+  .node-mark.draft-direct { box-shadow: 0 0 0 2px #2c7be5; }
+  .node-mark.draft-cascade { box-shadow: 0 0 0 1.5px #65758b; }
+  .node-ghost { position:absolute; top:50%; transform:translate(-50%,-50%); width:8px; height:8px; border:1.5px dashed #8b949e; border-radius:50%; background:#fff; z-index:2; }
+  .draft-shift { position:absolute; top:50%; border-top:1px dashed #9aa4b2; z-index:2; }
+  .node-mark.delayed { box-shadow: 0 0 0 2.5px var(--today); width: 10px; height: 10px; }
+  .node-tip {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--muted);
+    white-space: nowrap;
+    z-index: 4;
+  }
+
+  .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--today); z-index: 5; }
+  .today-line::after {
+    content: "今天"; position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+    background: var(--today); color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 3px; white-space: nowrap;
+  }
+
+  /* —— v4：仪表盘拖动日期草稿 —— */
+  .dashboard-actions { display:flex; align-items:center; gap:10px; margin-left:auto; }
+  .pending-count { color:#9b2c24; font-size:12px; font-weight:600; }
+  .btn-danger { background:#d92d20; color:#fff; border-color:#d92d20; font-weight:700; box-shadow:0 4px 12px rgba(217,45,32,.2); }
+  .btn-danger:hover { background:#b42318; }
+  .btn-quiet { border:0; background:transparent; color:var(--muted); padding:6px 3px; cursor:pointer; }
+  .btn-quiet:hover { color:var(--text); text-decoration:underline; }
+  .drag-status { display:none; margin:0 0 12px; padding:9px 12px; background:#f5f8ff; border:1px solid #d6e4ff; border-left:3px solid #2c7be5; border-radius:4px; color:#36536f; font-size:12px; }
+  .drag-status.show { display:block; }
+  .drag-float { display:none; position:fixed; z-index:100; pointer-events:none; padding:7px 10px; color:#fff; background:#24292e; border-radius:5px; box-shadow:0 5px 16px rgba(0,0,0,.22); font-size:11px; white-space:nowrap; }
+  .drag-float.show { display:block; }
+  .prototype-toast { display:none; position:fixed; right:22px; bottom:22px; z-index:110; padding:10px 14px; color:#fff; background:#254d32; border-radius:6px; box-shadow:0 6px 20px rgba(0,0,0,.2); font-size:12px; }
+  .prototype-toast.show { display:block; }
+
+  .hint { margin-top: 16px; padding: 12px 16px; background: #eef6ff; border-left: 3px solid #2c7be5; border-radius: 4px; font-size: 13px; color: #1c4966; }
+  .hint ul { margin: 6px 0 0; padding-left: 18px; }
+  .hint.warn { background: #fff3cd; border-left-color: #d4a72c; color: #6b5400; }
+
+  /* —— v3：重叠方案并排对比 —— */
+  .compare-grid { display: grid; grid-template-columns: repeat(3, minmax(300px, 1fr)); gap: 14px; align-items: start; }
+  .compare-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .compare-card.recommended { border: 2px solid #2c7be5; }
+  .compare-head { padding: 13px 14px 10px; border-bottom: 1px solid var(--border); min-height: 104px; }
+  .compare-head h3 { margin: 0 0 5px; font-size: 15px; }
+  .compare-head p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+  .recommend-tag { float: right; background: #e8f2ff; color: #1769c2; border-radius: 3px; padding: 2px 6px; font-size: 11px; }
+  .mini-axis { display: grid; grid-template-columns: 72px 1fr; border-bottom: 1px solid var(--border); background:#fafbfc; }
+  .mini-months { height: 22px; display:grid; grid-template-columns:repeat(6,1fr); }
+  .mini-months span { font-size:9px; color:var(--muted); text-align:center; line-height:22px; border-left:1px dashed #e4e7eb; }
+  .compare-body { padding-bottom: 6px; }
+  .demo-project { display:grid; grid-template-columns:72px 1fr; border-bottom:1px solid #f0f1f3; }
+  .demo-name { padding:8px 6px; font-size:11px; font-weight:600; border-right:1px solid #f0f1f3; }
+  .demo-name small { display:block; color:var(--muted); font-weight:400; margin-top:2px; }
+  .demo-track { position:relative; min-height:58px; background:repeating-linear-gradient(to right,transparent 0,transparent calc(16.666% - 1px),#f1f2f4 calc(16.666% - 1px),#f1f2f4 16.666%); }
+  .demo-bar { position:absolute; height:10px; border-radius:2px; color:#fff; font-size:8px; line-height:10px; padding:0 3px; overflow:hidden; white-space:nowrap; }
+  .demo-dot { position:absolute; width:5px; height:5px; border-radius:50%; background:#fff; box-shadow:0 0 0 1px #555; }
+  .more-badge { position:absolute; right:4px; bottom:4px; border:1px solid #9abce2; background:#eef6ff; color:#1769c2; border-radius:3px; padding:1px 5px; font-size:10px; cursor:pointer; }
+  .compare-card.expanded .compact-extra { display:block; }
+  .compact-extra { display:none; }
+  .stripe-bar { background: repeating-linear-gradient(135deg, var(--phase-设计) 0 5px, var(--phase-设计) 5px 8px, var(--phase-测试) 8px 13px, var(--phase-测试) 13px 16px); }
+  .compare-notes { padding:11px 14px 13px; font-size:11px; color:var(--muted); line-height:1.55; border-top:1px solid #f0f1f3; }
+  .compare-notes b { color:var(--text); }
+  .radius-compare { margin-top:16px; background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px; }
+  .radius-row { display:flex; gap:28px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+  .radius-sample { width:150px; height:18px; background:var(--phase-设计); color:#fff; text-align:center; line-height:18px; font-size:11px; }
+  .sort-demo { background:#fff; border:1px solid var(--border); border-radius:8px; margin-bottom:16px; overflow:hidden; }
+  .sort-demo-head { padding:13px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .sort-demo-head h3 { margin:0; font-size:15px; }
+  .sort-demo-head .explain { color:var(--muted); font-size:12px; flex:1; min-width:260px; }
+  .segmented { display:inline-flex; border:1px solid #b9c1ca; border-radius:5px; overflow:hidden; }
+  .segmented button { border:0; border-right:1px solid #b9c1ca; background:#fff; padding:6px 10px; cursor:pointer; font-size:12px; }
+  .segmented button:last-child { border-right:0; }
+  .segmented button.active { background:#2c7be5; color:#fff; }
+  .sort-demo table { width:100%; border-collapse:collapse; font-size:12px; }
+  .sort-demo th,.sort-demo td { padding:8px 10px; border-bottom:1px solid #edf0f2; text-align:left; }
+  .sort-demo th { background:#f7f8fa; color:#555; }
+  .sort-demo tr:last-child td { border-bottom:0; }
+  .interval-main { font-weight:700; color:#24292e; }
+  .interval-from { display:block; color:#1769c2; font-size:10px; margin-top:2px; }
+  .screen-prev { color:var(--muted); }
+  .mismatch { background:#fff8e1; }
+  .mismatch td:last-child { box-shadow:inset 3px 0 #f0a43c; }
+  .sort-demo-foot { padding:9px 12px; background:#eef6ff; color:#1c4966; font-size:11px; border-top:1px solid #d8eaff; }
+  @media (max-width: 1100px) { .compare-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<div class="banner">
+  🔖 <b>静态样图 v3（假数据，不接后端）</b> —— 新增<b>重叠方案对比</b>；编辑器与原仪表盘仍保留为 v2 探索稿。
+  点【💾 保存】会真的触发计算并重画。改完请在 <code>PHASE2_REQUIREMENTS_DRAFT.md</code> 反馈。
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-page="editor">① 时间表编辑器</div>
+  <div class="tab" data-page="single">② 单项目仪表盘</div>
+  <div class="tab" data-page="all">③ 全项目仪表盘</div>
+  <div class="tab" data-page="overlap">④ 重叠方案对比</div>
+</div>
+
+<!-- ============================================================ 画面一：编辑器 ============================================================ -->
+<div id="editor" class="page active">
+  <h2>时间表编辑器</h2>
+  <p class="sub">一行一个节点，一套【项目节点 + 日期 + 间隔】；用【轨道】区分主线/并行。两条轨道各自线性计算、各自顺延，互不影响。</p>
+
+  <div class="toolbar">
+    <div class="project-select">📄 项目：跑鞋 2026 春夏款</div>
+    <button class="btn">＋ 新增节点</button>
+    <button class="btn">⬆ 从 Excel 导入</button>
+    <button class="btn">⬇ 导出 Excel</button>
+    <button class="btn" id="sortModeBtn" onclick="toggleSortMode()">↕ 排序：按日期</button>
+    <div class="spacer"></div>
+    <div class="toggle-group">
+      <label class="toggle"><input type="checkbox" id="gapToggle" onchange="toggleGap(this)"><span>☐ 显示时间间隔</span></label>
+    </div>
+    <button class="btn btn-primary" onclick="saveSheet()">💾 保存（触发计算+顺延）</button>
+  </div>
+
+  <table class="sheet" id="sheetTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>项目阶段</th>
+        <th>轨道</th>
+        <th>项目节点</th>
+        <th>日期</th>
+        <th class="col-gap">时间间隔（天）</th>
+        <th>状态</th>
+        <th>备注</th>
+      </tr>
+    </thead>
+    <tbody><!-- JS 渲染 --></tbody>
+  </table>
+
+  <div class="legend">
+    <span><i style="background:var(--phase-创意)"></i>创意</span>
+    <span><i style="background:var(--phase-设计)"></i>设计</span>
+    <span><i style="background:var(--phase-开发)"></i>开发</span>
+    <span><i style="background:var(--phase-测试)"></i>测试</span>
+    <span><i style="background:var(--phase-量产)"></i>量产</span>
+    <span><i style="background:var(--phase-应用迭代)"></i>应用迭代</span>
+    <span style="margin-left:20px"><b style="color:#1769c2">蓝底</b> = 并行轨道节点</span>
+    <span><b style="font-family:monospace">间隔</b> = 与同轨道上一个节点的日期差</span>
+  </div>
+
+  <div class="hint">
+    <b>怎么试（点【💾 保存】才会触发计算）：</b>
+    <ul>
+      <li>主线：A→B→C，日期/间隔改动只顺延后续主线节点</li>
+      <li>并行：P1→P2→P3，沿用相同逻辑，但只顺延后续并行节点</li>
+      <li>两条轨道共用一列【间隔】，每行均表示“距本轨道上一节点”；两轨互不影响</li>
+      <li>排序可切换，但不会改变普通节点的线性间隔关系</li>
+    </ul>
+  </div>
+  <div class="hint warn" id="saveLog" style="display:none"></div>
+</div>
+
+<!-- ============================================================ 画面二：单项目仪表盘 ============================================================ -->
+<div id="single" class="page">
+  <h2>单项目仪表盘 · 跑鞋 2026 春夏款</h2>
+  <p class="sub">连续条形时间轴 —— 相邻节点之间一条倒圆角条，按阶段着色，整条轴看起来是连续的彩带。红色今日线 + 延期红圈。</p>
+
+  <div class="kpis">
+    <div class="kpi"><div class="label">当前阶段</div><div class="value" style="color:var(--phase-开发)">开发</div></div>
+    <div class="kpi"><div class="label">节点总数</div><div class="value">11</div></div>
+    <div class="kpi"><div class="label">已完成</div><div class="value green">7</div></div>
+    <div class="kpi"><div class="label">延期节点</div><div class="value red">1</div></div>
+    <div class="kpi"><div class="label">预计量产</div><div class="value">10/20</div></div>
+  </div>
+
+  <div class="controls">
+    <span style="font-size:13px;color:var(--muted)">📅 日历范围：2026 全年（绝对标尺）</span>
+    <div class="spacer"></div>
+    <label class="toggle"><input type="checkbox"><span>☐ 延期偏差（叠加计划日期条）</span></label>
+    <div class="dashboard-actions" id="singleActions"></div>
+  </div>
+
+  <div class="drag-status" id="singleDragStatus"></div>
+
+  <div class="timeline-wrap"><div class="timeline" id="singleTimeline"></div></div>
+  <div class="legend" style="margin-top:16px">
+    <span><i style="background:var(--phase-创意)"></i>创意</span>
+    <span><i style="background:var(--phase-设计)"></i>设计</span>
+    <span><i style="background:var(--phase-开发)"></i>开发</span>
+    <span><i style="background:var(--phase-测试)"></i>测试</span>
+    <span><i style="background:var(--phase-量产)"></i>量产</span>
+    <span><i style="background:var(--phase-应用迭代)"></i>应用迭代</span>
+    <span style="margin-left:20px"><b style="color:var(--today)">|</b> = 今天</span>
+    <span><b style="color:var(--today)">⬤</b> = 延期节点</span>
+  </div>
+  <div class="hint">
+    <b>看什么：</b>
+    <ul><li>条的颜色取<b>左端节点所属阶段</b> —— 同阶段连成一段同色，阶段切换处自然过渡</li>
+    <li>条上的小白点 = 节点里程碑；红圈 = 延期（实际晚于计划）</li>
+    <li>红色今日线穿过 → 今天左边的节点若未完成 = 已逾期</li></ul>
+  </div>
+</div>
+
+<!-- ============================================================ 画面三：全项目仪表盘 ============================================================ -->
+<div id="all" class="page">
+  <h2>全项目仪表盘</h2>
+  <p class="sub">10 个项目横向对齐同一条绝对日历标尺，每个项目是一条连续彩带，颜色一眼看出当前阶段。</p>
+
+  <div class="controls">
+    <span style="font-size:13px;color:var(--muted)">📅 2026 全年绝对标尺</span>
+    <div class="spacer"></div>
+    <select class="multi-select"><option>所有项目（10 个）</option></select>
+    <select class="multi-select">
+      <option>排序：按下一节点日期（轻重缓急）</option>
+      <option>排序：按项目名称</option>
+      <option>排序：按当前阶段</option>
+    </select>
+    <label class="toggle"><input type="checkbox"><span>☐ 延期偏差</span></label>
+    <label class="toggle"><input type="checkbox" checked><span>☑ 只看延期/即将到期</span></label>
+    <div class="dashboard-actions" id="allActions"></div>
+  </div>
+
+  <div class="drag-status" id="allDragStatus"></div>
+
+  <div class="timeline-wrap"><div class="timeline" id="allTimeline"></div></div>
+  <div class="legend" style="margin-top:16px">
+    <span><i style="background:var(--phase-创意)"></i>创意</span>
+    <span><i style="background:var(--phase-设计)"></i>设计</span>
+    <span><i style="background:var(--phase-开发)"></i>开发</span>
+    <span><i style="background:var(--phase-测试)"></i>测试</span>
+    <span><i style="background:var(--phase-量产)"></i>量产</span>
+    <span><i style="background:var(--phase-应用迭代)"></i>应用迭代</span>
+  </div>
+  <div class="hint">
+    <b>看什么：</b>
+    <ul><li>每条泳道是一条连续彩带 → 比散点更直观地看出"项目在推进"</li>
+    <li>彩带最右端的颜色 = 该项目当前阶段</li>
+    <li>红色今日线穿过所有泳道 → 一眼对比谁快谁慢</li></ul>
+  </div>
+</div>
+
+<div class="drag-float" id="dragFloat"></div>
+<div class="prototype-toast" id="prototypeToast"></div>
+
+<!-- ============================================================ 画面四：重叠方案对比 ============================================================ -->
+<div id="overlap" class="page">
+  <h2>多项目仪表盘 · 阶段重叠三方案并排对比</h2>
+  <p class="sub">相同假数据、相同绝对时间标尺。重点比较：能否看清阶段颜色、默认行高是否可控、重叠信息是否完整。</p>
+
+  <section class="sort-demo">
+    <div class="sort-demo-head">
+      <h3>先看清【间隔】在两种排序下是什么意思</h3>
+      <div class="explain">同一份数据：创意 A(1/1)、设计 B(1/15)、创意 C(1/30)、设计 D(2/20)。阶段发生交错。</div>
+      <div class="segmented">
+        <button id="demoDateBtn" class="active" onclick="renderIntervalDemo('date')">按日期（默认）</button>
+        <button id="demoPhaseBtn" onclick="renderIntervalDemo('phase')">按六大阶段</button>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>屏幕顺序</th><th>阶段</th><th>节点</th><th>日期</th><th>屏幕上一行</th><th>时间间隔（始终按日期链）</th></tr></thead>
+      <tbody id="intervalDemoBody"></tbody>
+    </table>
+    <div class="sort-demo-foot" id="intervalDemoFoot"></div>
+  </section>
+
+  <div class="compare-grid">
+    <section class="compare-card recommended" id="compareA">
+      <div class="compare-head"><span class="recommend-tag">推荐</span><h3>A · 两轨 + `+N` 局部展开</h3><p>默认最多显示两条微型轨道；第三层用 `+1`。点击可只展开当前项目。</p></div>
+      <div class="mini-axis"><div></div><div class="mini-months"><span>1月</span><span>2月</span><span>3月</span><span>4月</span><span>5月</span><span>6月</span></div></div>
+      <div class="compare-body">
+        <div class="demo-project"><div class="demo-name">跑鞋 Alpha<small>3 阶段重叠</small></div><div class="demo-track" style="min-height:56px">
+          <span class="demo-bar" style="left:4%;width:45%;top:12px;background:var(--phase-创意)">创意</span>
+          <span class="demo-bar" style="left:28%;width:50%;top:29px;background:var(--phase-设计)">设计</span>
+          <span class="demo-bar compact-extra" style="left:58%;width:35%;top:46px;background:var(--phase-开发)">开发</span>
+          <button class="more-badge" onclick="toggleCompareA(this)">+1 展开</button>
+        </div></div>
+        <div class="demo-project"><div class="demo-name">篮球鞋 Beta<small>2 阶段重叠</small></div><div class="demo-track">
+          <span class="demo-bar" style="left:10%;width:46%;top:15px;background:var(--phase-设计)">设计</span>
+          <span class="demo-bar" style="left:42%;width:44%;top:32px;background:var(--phase-测试)">测试</span>
+        </div></div>
+      </div>
+      <div class="compare-notes"><b>特点：</b>默认紧凑、颜色纯净；异常复杂的项目需要点击一次。最适合十个项目的全局视图。</div>
+    </section>
+
+    <section class="compare-card">
+      <div class="compare-head"><h3>B · 无限自动分轨</h3><p>有几层重叠就增加几条轨道，任何信息都不折叠。</p></div>
+      <div class="mini-axis"><div></div><div class="mini-months"><span>1月</span><span>2月</span><span>3月</span><span>4月</span><span>5月</span><span>6月</span></div></div>
+      <div class="compare-body">
+        <div class="demo-project"><div class="demo-name">跑鞋 Alpha<small>行高自动增加</small></div><div class="demo-track" style="min-height:78px">
+          <span class="demo-bar" style="left:4%;width:45%;top:12px;background:var(--phase-创意)">创意</span>
+          <span class="demo-bar" style="left:28%;width:50%;top:30px;background:var(--phase-设计)">设计</span>
+          <span class="demo-bar" style="left:58%;width:35%;top:48px;background:var(--phase-开发)">开发</span>
+        </div></div>
+        <div class="demo-project"><div class="demo-name">篮球鞋 Beta<small>2 阶段重叠</small></div><div class="demo-track">
+          <span class="demo-bar" style="left:10%;width:46%;top:15px;background:var(--phase-设计)">设计</span>
+          <span class="demo-bar" style="left:42%;width:44%;top:32px;background:var(--phase-测试)">测试</span>
+        </div></div>
+      </div>
+      <div class="compare-notes"><b>特点：</b>信息最完整、无需点击；项目越多、重叠越多，纵向高度越不可控。更适合单项目。</div>
+    </section>
+
+    <section class="compare-card">
+      <div class="compare-head"><h3>C · 严格单行分段 / 条纹</h3><p>每个项目始终一行；重叠区域压缩成半高条或双色条纹。</p></div>
+      <div class="mini-axis"><div></div><div class="mini-months"><span>1月</span><span>2月</span><span>3月</span><span>4月</span><span>5月</span><span>6月</span></div></div>
+      <div class="compare-body">
+        <div class="demo-project"><div class="demo-name">跑鞋 Alpha<small>严格单行</small></div><div class="demo-track" style="min-height:42px">
+          <span class="demo-bar" style="left:4%;width:24%;top:16px;background:var(--phase-创意)">创意</span>
+          <span class="demo-bar stripe-bar" style="left:28%;width:30%;top:16px">重叠</span>
+          <span class="demo-bar" style="left:58%;width:35%;top:16px;background:linear-gradient(to bottom,var(--phase-设计) 0 50%,var(--phase-开发) 50% 100%)"></span>
+        </div></div>
+        <div class="demo-project"><div class="demo-name">篮球鞋 Beta<small>严格单行</small></div><div class="demo-track" style="min-height:42px">
+          <span class="demo-bar" style="left:10%;width:32%;top:16px;background:var(--phase-设计)">设计</span>
+          <span class="demo-bar stripe-bar" style="left:42%;width:14%;top:16px"></span>
+          <span class="demo-bar" style="left:56%;width:30%;top:16px;background:var(--phase-测试)">测试</span>
+        </div></div>
+      </div>
+      <div class="compare-notes"><b>特点：</b>最省高度；颜色语义在重叠处变复杂，三重重叠很难表达，节点文字空间不足。</div>
+    </section>
+  </div>
+
+  <div class="radius-compare">
+    <b>顺便确认条形圆角（同尺寸对照）</b>
+    <div class="radius-row">
+      <div><div class="radius-sample" style="border-radius:5px">轻微圆角 · 5px</div></div>
+      <div><div class="radius-sample" style="border-radius:2px">小圆角矩形 · 2px</div></div>
+      <div><div class="radius-sample" style="border-radius:0">完全直角 · 0px</div></div>
+    </div>
+  </div>
+
+  <div class="hint"><b>请选择：</b>重叠方案 A / B / C，以及圆角 5px / 2px / 0px。A 卡片中的 `+1 展开` 可以点击体验局部展开。</div>
+</div>
+
+<script>
+  /* ============================================================
+     数据模型（前端模拟，真实后端会换成 API）
+     每个 node: {phase, name, plan, actual, status, note}
+     gap 不存，由 actual 相邻差值算出
+     ============================================================ */
+  const PHASE_COLOR = {'创意':'#9b8cf5','设计':'#4a90d9','开发':'#2bb6a8','测试':'#f0934a','量产':'#5bbf6a','应用迭代':'#d4a72c'};
+  let NODES = [
+    {phase:'创意', lane:'主线', name:'项目头脑风暴',  plan:'2026-01-05', actual:'2026-01-05', status:'已完成', note:'全员参与'},
+    {phase:'创意', lane:'主线', name:'创意整合',      plan:'2026-01-20', actual:'2026-01-22', status:'已完成', note:''},
+    {phase:'创意', lane:'主线', name:'正式立项',      plan:'2026-02-01', actual:'2026-02-01', status:'已完成', note:'已审批'},
+    {phase:'设计', lane:'并行', name:'市场同步评审', actual:'2026-02-12', status:'已完成', note:'与设计准备并行'},
+    {phase:'设计', name:'首轮设计图评审', plan:'2026-02-25', actual:'2026-03-02', status:'已完成', note:''},
+    {phase:'设计', name:'设计定稿',      plan:'2026-03-20', actual:'2026-03-25', status:'已完成', note:''},
+    {phase:'开发', name:'鞋楦开发',      plan:'2026-04-10', actual:'2026-04-15', status:'已完成', note:''},
+    {phase:'开发', lane:'并行', name:'材料供应商预沟通', actual:'2026-04-20', status:'进行中', note:'不占用主线间隔'},
+    {phase:'开发', name:'材料打样',      plan:'2026-05-05', actual:'2026-05-20', status:'已完成', note:'材料商延迟'},
+    {phase:'开发', name:'工程样件评审',  plan:'2026-07-15', actual:'2026-08-20', status:'进行中', note:'⚠ 已延期 35 天'},
+    {phase:'测试', name:'穿着性能测试',  plan:'2026-09-01', actual:'2026-09-05', status:'未开始', note:''},
+    {phase:'量产', name:'量产启动',      plan:'2026-10-15', actual:'2026-10-20', status:'未开始', note:''},
+    {phase:'应用迭代', name:'上市后反馈迭代', plan:'2026-12-01', actual:'2026-12-05', status:'未开始', note:''},
+  ];
+
+  // —— Tab 切换 ——
+  document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    const id = t.dataset.page;
+    document.getElementById(id).classList.add('active');
+    t.classList.add('active');
+    if (id === 'single') drawSingle();
+    if (id === 'all') drawAll();
+  });
+
+  function toggleCompareA(btn) {
+    const card = document.getElementById('compareA');
+    const expanded = card.classList.toggle('expanded');
+    btn.textContent = expanded ? '收起' : '+1 展开';
+    const track = btn.closest('.demo-track');
+    track.style.minHeight = expanded ? '74px' : '56px';
+  }
+
+  const INTERVAL_DEMO = [
+    {phase:'创意', name:'A', date:'01-01'},
+    {phase:'设计', name:'B', date:'01-15'},
+    {phase:'创意', name:'C', date:'01-30'},
+    {phase:'设计', name:'D', date:'02-20'}
+  ];
+  function demoDays(date) {
+    const [m,d] = date.split('-').map(Number);
+    return Math.round((new Date(2026,m-1,d)-new Date(2026,0,1))/DAY);
+  }
+  function renderIntervalDemo(mode) {
+    const chronological = [...INTERVAL_DEMO].sort((a,b)=>a.date.localeCompare(b.date));
+    const predecessor = new Map();
+    chronological.forEach((n,i)=>predecessor.set(n.name, i ? chronological[i-1] : null));
+    const rows = mode === 'date' ? chronological : [...INTERVAL_DEMO].sort((a,b)=>PHASE_ORDER[a.phase]-PHASE_ORDER[b.phase] || a.date.localeCompare(b.date));
+    document.getElementById('demoDateBtn').classList.toggle('active', mode==='date');
+    document.getElementById('demoPhaseBtn').classList.toggle('active', mode==='phase');
+    document.getElementById('intervalDemoBody').innerHTML = rows.map((n,i)=>{
+      const prev = predecessor.get(n.name), screenPrev = i ? rows[i-1] : null;
+      const gap = prev ? demoDays(n.date)-demoDays(prev.date) : null;
+      const mismatch = prev && screenPrev && prev.name !== screenPrev.name;
+      return `<tr class="${mismatch?'mismatch':''}">
+        <td>${i+1}</td><td><span class="phase-chip chip-${n.phase}">${n.phase}</span></td><td><b>${n.name}</b></td><td>2026-${n.date}</td>
+        <td class="screen-prev">${screenPrev ? screenPrev.name : '—'}</td>
+        <td>${gap===null ? '—' : `<span class="interval-main">${gap} 天</span><span class="interval-from">距时间前驱「${prev.name}」</span>`}</td>
+      </tr>`;
+    }).join('');
+    document.getElementById('intervalDemoFoot').innerHTML = mode === 'date'
+      ? '<b>按日期时：</b>屏幕上一行就是真正的时间前驱，所以“距哪个节点”只是辅助说明。'
+      : '<b>按阶段时：</b>C 被排在 A 后面，但时间上 C 的前驱仍是 B；黄色行正是在演示“屏幕上一行 ≠ 时间前驱”。切换排序不会把 C 的间隔从 15 天改成 29 天。';
+  }
+
+  // —— 列显隐 ——
+  function toggleGap(cb){ document.body.classList.toggle('show-gap', cb.checked); cb.nextElementSibling.textContent = (cb.checked?'☑':'☐') + ' 显示时间间隔'; }
+
+  const PHASE_ORDER = {'创意':0,'设计':1,'开发':2,'测试':3,'量产':4,'应用迭代':5};
+  let sortMode = 'date';
+  function toggleSortMode() {
+    sortMode = sortMode === 'date' ? 'phase' : 'date';
+    document.getElementById('sortModeBtn').textContent = sortMode === 'date' ? '↕ 排序：按日期' : '↕ 排序：按六大阶段';
+    renderSheet();
+  }
+
+  // —— 日期工具 ——
+  const DAY = 86400000;
+  const parse = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+  const fmt = dt => `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+  const gapOf = (a, b) => Math.round((parse(b) - parse(a)) / DAY); // a 到 b 的天数
+
+  // —— 渲染编辑表 ——
+  // snapshot：记录日期、轨道与显示间隔，用于判断本次用户实际改了什么
+  let actualSnapshot = [];
+  let laneSnapshot = [];
+  let gapSnapshot = [];
+  function renderSheet() {
+    const tb = document.querySelector('#sheetTable tbody');
+    tb.innerHTML = '';
+    NODES.forEach(n => { if (!n.lane) n.lane = '主线'; });
+    const lanePrev = new Map();
+    ['主线','并行'].forEach(lane => {
+      const chain = NODES.filter(n => n.lane === lane && n.name && n.actual).sort((a,b)=>a.actual.localeCompare(b.actual));
+      chain.forEach((n,i)=>lanePrev.set(n, i ? chain[i-1] : null));
+    });
+    actualSnapshot = NODES.map(n => n.actual || '');
+    laneSnapshot = NODES.map(n => n.lane);
+    gapSnapshot = NODES.map(n => { const prev=lanePrev.get(n); return prev ? gapOf(prev.actual,n.actual) : null; });
+    const displayRows = NODES.map((n, i) => ({n, i})).sort((a, b) => {
+      const ad=a.n.actual||'', bd=b.n.actual||'';
+      const an=a.n.name||'', bn=b.n.name||'';
+      if (sortMode === 'phase') return PHASE_ORDER[a.n.phase] - PHASE_ORDER[b.n.phase] || ad.localeCompare(bd) || an.localeCompare(bn, 'zh-CN', {numeric:true});
+      return ad.localeCompare(bd) || an.localeCompare(bn, 'zh-CN', {numeric:true});
+    });
+    displayRows.forEach(({n, i}, displayIndex) => {
+      const isParallel = n.lane === '并行';
+      const prev = lanePrev.get(n);
+      const gap = prev ? gapOf(prev.actual, n.actual) : '';
+      const tr = document.createElement('tr');
+      if (isParallel) tr.classList.add('parallel-row');
+      tr.innerHTML = `
+        <td class="rownum">${displayIndex+1}</td>
+        <td><span class="phase-chip chip-${n.phase}">${n.phase}</span></td>
+        <td class="editable ${isParallel?'parallel-cell':''}" contenteditable="true" data-i="${i}" data-k="lane">${n.lane}</td>
+        <td class="editable" contenteditable="true" data-i="${i}" data-k="name">${n.name}</td>
+        <td class="editable actual" contenteditable="true" data-i="${i}" data-k="actual">${n.actual}</td>
+        <td class="col-gap gap-cell editable" contenteditable="true" data-i="${i}" data-k="gap">${gap}</td>
+        <td class="editable" contenteditable="true" data-i="${i}" data-k="status">${n.status}</td>
+        <td class="editable" contenteditable="true" data-i="${i}" data-k="note">${n.note}</td>`;
+      tb.appendChild(tr);
+    });
+  }
+
+  // —— 保存：主线/并行分别作为独立线性链计算，互不顺延 ——
+  function saveSheet() {
+    const log = [];
+    // 1) 读回所有单元格到 NODES（actual/plan/name/status/note）和 gaps 数组
+    const gaps = [];
+    document.querySelectorAll('#sheetTable tbody tr').forEach((tr) => {
+      const nodeIndex = Number(tr.querySelector('[data-i]').dataset.i);
+      tr.querySelectorAll('[data-k]').forEach(td => {
+        const k = td.dataset.k, v = td.textContent.trim();
+        if (k === 'gap') { gaps[nodeIndex] = (v === '' || isNaN(parseInt(v,10))) ? null : parseInt(v,10); }
+        else { NODES[nodeIndex][k] = v; }
+      });
+    });
+    // 2) 每条轨道独立重算；同节点同时改日期与间隔时日期优先
+    ['主线','并行'].forEach(lane => {
+      const chain = NODES.map((n,i)=>({n,i})).filter(x => laneSnapshot[x.i]===lane && actualSnapshot[x.i]).sort((a,b)=>actualSnapshot[a.i].localeCompare(actualSnapshot[b.i]));
+      let offset = 0;
+      chain.forEach((item,pos) => {
+        const i=item.i, userDate=item.n.actual;
+        const dateChanged=userDate!==actualSnapshot[i];
+        const gapChanged=gaps[i]!==null && gaps[i]!==gapSnapshot[i];
+        if (dateChanged) {
+          offset=Math.round((parse(userDate)-parse(actualSnapshot[i]))/DAY);
+          log.push(`${lane}节点「${item.n.name}」日期调整 ${offset>=0?'+':''}${offset} 天`);
+        } else if (gapChanged && pos>0) {
+          const prev=chain[pos-1].n;
+          const desired=fmt(new Date(parse(prev.actual)+gaps[i]*DAY));
+          offset=Math.round((parse(desired)-parse(actualSnapshot[i]))/DAY);
+          item.n.actual=desired;
+          log.push(`${lane}节点「${item.n.name}」间隔改为 ${gaps[i]} 天`);
+        } else if (offset!==0) {
+          item.n.actual=fmt(new Date(parse(actualSnapshot[i])+offset*DAY));
+        }
+      });
+    });
+
+    // 4) 重渲染（会刷新间隔列 + 延期标红）
+    renderSheet();
+    document.body.classList.toggle('show-gap', document.getElementById('gapToggle').checked);
+
+    // 5) 日志
+    const box = document.getElementById('saveLog');
+    box.style.display = 'block';
+    if (log.length) {
+      box.innerHTML = `<b>💾 已保存 · 轨道内顺延结果：</b><ul>${log.map(x=>`<li>${x}</li>`).join('')}<li>主线与并行互不影响，各自后续间隔保持不变</li></ul>`;
+    } else {
+      box.innerHTML = `<b>💾 已保存。</b> 没有触发顺延的改动。主线与并行的相邻间隔已分别重算。`;
+    }
+  }
+
+  /* ============================================================
+     时间轴绘制（v2 连续条形）
+     ============================================================ */
+  function dayPct(dateStr) {
+    const d = parse(dateStr);
+    const start = new Date(2026, 0, 1), end = new Date(2026, 11, 31);
+    return (d - start) / (end - start) * 100;
+  }
+  const TODAY_PCT = dayPct('2026-08-13');
+
+  function buildAxis() {
+    const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    return `<div class="axis"><div class="corner"></div><div class="axis-months">${months.map(m=>`<span>${m}</span>`).join('')}</div></div>`;
+  }
+
+  // 给一组节点画一条泳道（保留既有连续条形视觉，节点增加拖动命中区）
+  function renderLane(label, sub, nodes, scope, laneKey) {
+    let track = `<div class="track"><div class="today-line" style="left:${TODAY_PCT}%"></div>`;
+    // 条：相邻两节点之间一条，颜色取左端节点阶段
+    for (let i = 0; i < nodes.length - 1; i++) {
+      const a = dayPct(nodes[i].date), b = dayPct(nodes[i+1].date);
+      const w = Math.max(b - a, 0.6); // 最小宽度避免退化为看不见
+      track += `<div class="bar" style="left:${a}%;width:${w}%;background:${PHASE_COLOR[nodes[i].phase]}" title="${nodes[i].name} → ${nodes[i+1].name}"></div>`;
+    }
+    // 节点点
+    nodes.forEach(n => {
+      const baseDate = dragBaseDate(scope, n.key);
+      const changed = baseDate && baseDate !== n.date;
+      if (changed) {
+        const oldPct=dayPct(baseDate), newPct=dayPct(n.date);
+        track += `<div class="node-ghost" style="left:${oldPct}%" title="原日期 ${baseDate}"></div><div class="draft-shift" style="left:${Math.min(oldPct,newPct)}%;width:${Math.abs(newPct-oldPct)}%"></div>`;
+      }
+      const draftClass = changed ? (DRAG.direct.has(`${scope}:${n.key}`) ? 'draft-direct' : 'draft-cascade') : '';
+      track += `<div class="node-mark draggable ${n.delayed?'delayed':''} ${draftClass}" data-drag-scope="${scope}" data-node-key="${n.key}" data-lane-key="${laneKey}" style="left:${dayPct(n.date)}%" title="${n.name} · ${n.date}${changed?' · 待更新':''}${n.delayed?' · 延期':''}"><div class="node-tip">${n.name}</div></div>`;
+    });
+    track += `</div>`;
+    return `<div class="lane"><div class="lane-label">${label}<span class="sub-name">${sub}</span></div>${track}</div>`;
+  }
+
+  function drawSingle() {
+    const el = document.getElementById('singleTimeline');
+    const source = DRAG.singleDraft || NODES;
+    const lanes = ['主线','并行'];
+    let html = buildAxis();
+    lanes.forEach(lane => {
+      const nodes = source.map((n,i)=>({n,i})).filter(x => (x.n.lane||'主线')===lane).sort((a,b)=>a.n.actual.localeCompare(b.n.actual)).map(x => ({
+        date:x.n.actual, phase:x.n.phase, name:x.n.name, key:String(x.i), delayed:!!x.n.plan && parse(x.n.actual)>parse(x.n.plan)+DAY
+      }));
+      if (nodes.length) html += renderLane(lane==='主线'?'跑鞋 春夏':'并行轨', `${nodes.length} 个节点`, nodes, 'single', lane);
+    });
+    el.innerHTML = html;
+    renderDragChrome('single');
+  }
+
+  const ALL_PROJECTS = [
+    {name:'篮球鞋 Q3', sub:'创意阶段', nodes:[['2026-07-20','创意'],['2026-09-15','设计']]},
+    {name:'羽毛球鞋 2027', sub:'创意阶段', nodes:[['2026-06-10','创意'],['2026-08-30','创意'],['2026-10-20','设计']]},
+    {name:'跑鞋 春夏', sub:'开发阶段', nodes:[['2026-02-01','创意'],['2026-03-25','设计'],['2026-05-20','开发'],['2026-08-20','开发'],['2026-10-20','量产']]},
+    {name:'训练鞋 Pro', sub:'开发阶段', nodes:[['2026-01-15','创意'],['2026-03-10','设计'],['2026-06-05','开发'],['2026-09-10','测试']]},
+    {name:'休闲鞋 经典款', sub:'测试阶段', nodes:[['2025-11-01','创意'],['2026-01-20','设计'],['2026-04-15','开发'],['2026-07-30','测试'],['2026-10-01','量产']]},
+    {name:'童鞋 春季', sub:'量产阶段', nodes:[['2025-09-01','创意'],['2025-11-20','设计'],['2026-02-15','开发'],['2026-05-10','测试'],['2026-08-05','量产']]},
+    {name:'户外徒步鞋', sub:'测试阶段', nodes:[['2025-12-01','创意'],['2026-02-28','设计'],['2026-05-25','开发'],['2026-08-15','测试'],['2026-11-01','量产']]},
+    {name:'凉鞋 夏季', sub:'应用迭代', nodes:[['2025-06-01','创意'],['2025-08-15','设计'],['2025-10-20','开发'],['2026-01-10','测试'],['2026-03-15','量产'],['2026-06-01','应用迭代']]},
+    {name:'足球鞋 旗舰', sub:'设计阶段', nodes:[['2026-05-01','创意'],['2026-07-25','设计'],['2026-10-30','开发']]},
+    {name:'高尔夫鞋', sub:'量产阶段', nodes:[['2025-08-01','创意'],['2025-10-30','设计'],['2026-01-20','开发'],['2026-04-10','测试'],['2026-07-05','量产']]},
+  ];
+  const cloneProjects = rows => rows.map(p => ({...p, nodes:p.nodes.map(n => [...n])}));
+  const DRAG = { singleBase:null, singleDraft:null, allBase:null, allDraft:null, direct:new Set(), active:null };
+
+  function dragBaseDate(scope, key) {
+    if (scope === 'single' && DRAG.singleBase) return DRAG.singleBase[Number(key)]?.actual;
+    if (scope === 'all' && DRAG.allBase) {
+      const [pi,ni]=key.split('-').map(Number);
+      return DRAG.allBase[pi]?.nodes[ni]?.[0];
+    }
+    return null;
+  }
+
+  function scopeChanges(scope) {
+    if (scope === 'single' && DRAG.singleDraft && DRAG.singleBase) {
+      return DRAG.singleDraft.map((n,i)=>({scope,key:String(i),name:n.name,oldDate:DRAG.singleBase[i].actual,newDate:n.actual})).filter(x=>x.oldDate!==x.newDate);
+    }
+    if (scope === 'all' && DRAG.allDraft && DRAG.allBase) {
+      const out=[];
+      DRAG.allDraft.forEach((p,pi)=>p.nodes.forEach((n,ni)=>{
+        const oldDate=DRAG.allBase[pi].nodes[ni][0];
+        if (oldDate!==n[0]) out.push({scope,key:`${pi}-${ni}`,name:`${p.name} · ${n[1]}`,oldDate,newDate:n[0]});
+      }));
+      return out;
+    }
+    return [];
+  }
+
+  function renderDragChrome(scope) {
+    const list=scopeChanges(scope), direct=list.filter(x=>DRAG.direct.has(`${scope}:${x.key}`)).length;
+    const actions=document.getElementById(`${scope}Actions`), status=document.getElementById(`${scope}DragStatus`);
+    if (!actions || !status) return;
+    if (!list.length) {
+      actions.innerHTML=''; status.className='drag-status'; status.innerHTML=''; return;
+    }
+    actions.innerHTML=`<span class="pending-count">${list.length} 个节点待更新</span><button class="btn-quiet" onclick="discardDashboardDates('${scope}')">放弃更改</button><button class="btn btn-danger" onclick="commitDashboardDates('${scope}')">更新日期</button>`;
+    status.className='drag-status show';
+    status.innerHTML=`<b>日期尚未写回原始数据。</b> 直接拖动 ${direct} 项，自动顺延 ${list.length-direct} 项；空心点表示原日期。`;
+  }
+
+  function drawAll() {
+    const el = document.getElementById('allTimeline');
+    const source=DRAG.allDraft || ALL_PROJECTS;
+    let html = buildAxis();
+    source.forEach((p,pi) => {
+      const nodes = p.nodes.map(([date, phase],ni) => ({date, phase, name:phase, key:`${pi}-${ni}`, delayed:false}));
+      html += renderLane(p.name, p.sub, nodes, 'all', String(pi));
+    });
+    el.innerHTML = html;
+    renderDragChrome('all');
+  }
+
+  function beginDashboardDrag(e, mark) {
+    if (e.button!==0) return;
+    const scope=mark.dataset.dragScope, key=mark.dataset.nodeKey;
+    if (scope==='single') {
+      if (!DRAG.singleBase) DRAG.singleBase=NODES.map(n=>({...n}));
+      if (!DRAG.singleDraft) DRAG.singleDraft=NODES.map(n=>({...n}));
+    } else {
+      if (!DRAG.allBase) DRAG.allBase=cloneProjects(ALL_PROJECTS);
+      if (!DRAG.allDraft) DRAG.allDraft=cloneProjects(ALL_PROJECTS);
+    }
+    const track=mark.closest('.track');
+    const snapshot=scope==='single' ? DRAG.singleDraft.map(n=>({...n})) : cloneProjects(DRAG.allDraft);
+    const currentDate=scope==='single' ? snapshot[Number(key)].actual : snapshot[Number(key.split('-')[0])].nodes[Number(key.split('-')[1])][0];
+    DRAG.active={scope,key,startX:e.clientX,rect:track.getBoundingClientRect(),snapshot,currentDate,delta:0};
+    mark.classList.add('dragging');
+    e.preventDefault();
+    window.addEventListener('pointermove', moveDashboardDrag);
+    window.addEventListener('pointerup', endDashboardDrag, {once:true});
+  }
+
+  function moveDashboardDrag(e) {
+    const a=DRAG.active; if (!a) return;
+    let delta=Math.round((e.clientX-a.startX)/a.rect.width*364);
+    if (a.scope==='single') {
+      const index=Number(a.key), selected=a.snapshot[index], lane=selected.lane||'主线';
+      const chain=a.snapshot.map((n,i)=>({n,i})).filter(x=>(x.n.lane||'主线')===lane).sort((x,y)=>x.n.actual.localeCompare(y.n.actual));
+      const pos=chain.findIndex(x=>x.i===index), previous=pos>0?chain[pos-1].n:null;
+      if (previous) delta=Math.max(delta,gapOf(selected.actual,previous.actual));
+      DRAG.singleDraft=a.snapshot.map(n=>({...n}));
+      chain.slice(pos).forEach(x=>DRAG.singleDraft[x.i].actual=fmt(new Date(parse(x.n.actual).getTime()+delta*DAY)));
+    } else {
+      const [pi,ni]=a.key.split('-').map(Number), project=a.snapshot[pi];
+      const selected=project.nodes[ni], previous=ni>0?project.nodes[ni-1]:null;
+      if (previous) delta=Math.max(delta,gapOf(selected[0],previous[0]));
+      DRAG.allDraft=cloneProjects(a.snapshot);
+      for(let i=ni;i<DRAG.allDraft[pi].nodes.length;i++) DRAG.allDraft[pi].nodes[i][0]=fmt(new Date(parse(project.nodes[i][0]).getTime()+delta*DAY));
+    }
+    a.delta=delta;
+    if (delta!==0) DRAG.direct.add(`${a.scope}:${a.key}`);
+    const tip=document.getElementById('dragFloat');
+    tip.className='drag-float show'; tip.style.left=`${Math.min(innerWidth-250,e.clientX+14)}px`; tip.style.top=`${Math.max(8,e.clientY-48)}px`;
+    tip.textContent=`${a.currentDate} → ${fmt(new Date(parse(a.currentDate).getTime()+delta*DAY))}（${delta>=0?'+':''}${delta} 天）`;
+    a.scope==='single' ? drawSingle() : drawAll();
+  }
+
+  function endDashboardDrag() {
+    const a=DRAG.active; if (!a) return;
+    DRAG.active=null; document.getElementById('dragFloat').className='drag-float';
+    window.removeEventListener('pointermove',moveDashboardDrag);
+    if (!scopeChanges(a.scope).length) discardDashboardDates(a.scope,false);
+    a.scope==='single' ? drawSingle() : drawAll();
+  }
+
+  function commitDashboardDates(scope) {
+    const count=scopeChanges(scope).length; if (!count) return;
+    if (scope==='single') {
+      NODES=DRAG.singleDraft.map(n=>({...n})); DRAG.singleBase=null; DRAG.singleDraft=null;
+      renderSheet(); drawSingle();
+    } else {
+      const next=cloneProjects(DRAG.allDraft);
+      ALL_PROJECTS.splice(0,ALL_PROJECTS.length,...next); DRAG.allBase=null; DRAG.allDraft=null; drawAll();
+    }
+    [...DRAG.direct].filter(x=>x.startsWith(`${scope}:`)).forEach(x=>DRAG.direct.delete(x));
+    showPrototypeToast(`已模拟同步原始数据：${count} 个节点日期已更新`);
+  }
+
+  function discardDashboardDates(scope,notify=true) {
+    if (scope==='single') { DRAG.singleBase=null; DRAG.singleDraft=null; drawSingle(); }
+    else { DRAG.allBase=null; DRAG.allDraft=null; drawAll(); }
+    [...DRAG.direct].filter(x=>x.startsWith(`${scope}:`)).forEach(x=>DRAG.direct.delete(x));
+    if (notify) showPrototypeToast('已放弃草稿，原始数据没有改写');
+  }
+
+  let prototypeToastTimer;
+  function showPrototypeToast(text) {
+    const toast=document.getElementById('prototypeToast'); toast.textContent=text; toast.className='prototype-toast show';
+    clearTimeout(prototypeToastTimer); prototypeToastTimer=setTimeout(()=>toast.className='prototype-toast',2400);
+  }
+
+  document.addEventListener('pointerdown',e=>{
+    const mark=e.target.closest('.node-mark.draggable'); if(mark) beginDashboardDrag(e,mark);
+  });
+  window.addEventListener('beforeunload',e=>{
+    if(scopeChanges('single').length||scopeChanges('all').length){ e.preventDefault(); e.returnValue=''; }
+  });
+
+  // 初次渲染
+  renderSheet();
+  renderIntervalDemo('date');
+</script>
+</body>
+</html>

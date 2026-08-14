@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flowboard · 仪表盘拖动更新日期视觉方案</title>
+<style>
+  :root {
+    --bg:#f4f5f8; --panel:#fff; --text:#20242b; --muted:#6f7782; --line:#dfe3e8;
+    --danger:#d92d20; --danger-dark:#b42318; --danger-soft:#fff1f0; --blue:#2f6fed;
+    --creative:#7656d6; --design:#2878d0; --develop:#1299a3; --test:#e57a21;
+    --production:#3d9951; --iterate:#c89b17; --today:#e02b2b;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; color:var(--text); background:var(--bg); font:14px/1.5 Inter,"Segoe UI","Microsoft YaHei",sans-serif; }
+  button, select { font:inherit; }
+  button { cursor:pointer; }
+  .page-header { position:sticky; top:0; z-index:40; min-height:76px; display:flex; justify-content:space-between; align-items:center; gap:24px; padding:14px 28px; background:rgba(255,255,255,.96); border-bottom:1px solid var(--line); backdrop-filter:blur(8px); }
+  .eyebrow { color:#737b87; font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+  h1 { margin:1px 0 0; font-size:21px; line-height:1.2; }
+  .header-actions { min-width:310px; display:flex; justify-content:flex-end; align-items:center; gap:10px; }
+  .save-state { color:var(--muted); font-size:13px; }
+  .pending-copy { color:#8e241b; font-weight:650; }
+  .btn { border:1px solid #cfd4db; border-radius:6px; padding:8px 13px; background:#fff; color:#323843; }
+  .btn:hover { background:#f7f8fa; }
+  .btn-danger { border-color:var(--danger); background:var(--danger); color:#fff; font-weight:700; box-shadow:0 5px 14px rgba(217,45,32,.22); }
+  .btn-danger:hover { background:var(--danger-dark); }
+  .btn-link { border:0; padding:7px 5px; background:transparent; color:#555e69; }
+  .btn-link:hover { color:#111; text-decoration:underline; }
+  .shell { max-width:1500px; margin:0 auto; padding:22px 28px 48px; }
+  .intro { display:flex; justify-content:space-between; gap:20px; align-items:flex-start; margin-bottom:14px; }
+  .intro h2 { margin:0 0 4px; font-size:18px; }
+  .intro p { margin:0; color:var(--muted); }
+  .prototype-tag { flex:none; border:1px solid #d5d9df; border-radius:99px; padding:4px 10px; color:#646c77; background:#fff; font-size:12px; }
+  .scheme-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
+  .scheme-card { position:relative; min-height:110px; text-align:left; border:1px solid #d8dce2; border-radius:9px; padding:14px 16px; background:#fff; color:inherit; }
+  .scheme-card:hover { border-color:#9ea6b1; }
+  .scheme-card.active { border:2px solid #2f3540; padding:13px 15px; box-shadow:0 5px 18px rgba(32,36,43,.08); }
+  .scheme-card b { display:block; font-size:15px; margin-bottom:5px; }
+  .scheme-card span { color:var(--muted); font-size:12px; }
+  .scheme-card em { display:inline-block; margin-top:9px; padding:2px 7px; border-radius:4px; color:#4d5560; background:#f1f3f5; font-style:normal; font-size:11px; }
+  .scheme-card.active::after { content:"当前预览"; position:absolute; right:10px; top:9px; color:#fff; background:#2f3540; border-radius:4px; padding:2px 6px; font-size:10px; }
+  .controlbar { display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:12px; padding:10px 12px; border:1px solid var(--line); background:#fff; border-radius:8px; }
+  .segmented { display:inline-flex; border:1px solid #cfd4db; border-radius:6px; overflow:hidden; }
+  .segmented button { border:0; border-right:1px solid #cfd4db; padding:7px 13px; background:#fff; color:#555e69; }
+  .segmented button:last-child { border-right:0; }
+  .segmented button.active { color:#fff; background:#394150; font-weight:650; }
+  .control-left, .control-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .project-select { border:1px solid #cfd4db; border-radius:6px; padding:7px 10px; background:#fff; }
+  .legend { display:flex; align-items:center; gap:11px; color:#676f7a; font-size:11px; }
+  .legend i { display:inline-block; width:9px; height:9px; margin-right:4px; border-radius:2px; vertical-align:-1px; }
+  .workspace { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; transition:grid-template-columns .2s; }
+  .workspace.with-review { grid-template-columns:minmax(0,1fr) 330px; }
+  .main-column { min-width:0; }
+  .change-strip { display:none; align-items:center; justify-content:space-between; gap:16px; margin-bottom:10px; padding:10px 12px; border:1px solid #efb4af; border-left:4px solid var(--danger); border-radius:7px; background:var(--danger-soft); }
+  .change-strip.show { display:flex; }
+  .change-strip strong { display:block; color:#7a251f; }
+  .change-strip small { color:#8e4a44; }
+  .change-strip .strip-actions { display:flex; align-items:center; gap:8px; flex:none; }
+  .timeline-card { overflow:hidden; border:1px solid var(--line); border-radius:9px; background:#fff; }
+  .timeline-title { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; padding:14px 16px 11px; border-bottom:1px solid #eceef1; }
+  .timeline-title h3 { margin:0 0 2px; font-size:16px; }
+  .timeline-title p { margin:0; color:var(--muted); font-size:12px; }
+  .drag-help { display:flex; align-items:center; gap:7px; color:#4e5661; white-space:nowrap; font-size:12px; }
+  .drag-help::before { content:"↔"; display:grid; place-items:center; width:24px; height:24px; border-radius:5px; color:#fff; background:#4a5360; font-weight:700; }
+  .timeline-scroll { overflow-x:auto; }
+  .timeline-grid { min-width:1080px; }
+  .axis-row, .project-row { display:grid; grid-template-columns:170px minmax(900px,1fr); }
+  .axis-label { padding:9px 15px; color:#7a828d; border-right:1px solid #eceef1; border-bottom:1px solid #eceef1; font-size:11px; }
+  .axis { position:relative; height:44px; border-bottom:1px solid #e6e9ed; background:#fafbfc; }
+  .axis-tick { position:absolute; inset:0 auto 0 0; border-left:1px solid #d9dde3; }
+  .axis-tick span { position:absolute; top:8px; left:7px; color:#68717c; white-space:nowrap; font-size:11px; }
+  .project-row { border-bottom:1px solid #e9ebee; }
+  .project-row:last-child { border-bottom:0; }
+  .project-name { display:flex; flex-direction:column; justify-content:center; gap:2px; padding:12px 15px; border-right:1px solid #eceef1; background:#fcfcfd; font-weight:700; }
+  .project-name small { color:#89919b; font-weight:400; }
+  .project-lanes { min-width:0; }
+  .lane { display:grid; grid-template-columns:56px minmax(0,1fr); min-height:63px; }
+  .lane + .lane { border-top:1px dashed #e9ebee; }
+  .lane-name { display:flex; align-items:center; justify-content:center; color:#747c87; background:#fafbfc; border-right:1px solid #f0f1f3; font-size:11px; }
+  .lane-name.parallel { color:#6f55a1; background:#fbf9ff; }
+  .lane-track { position:relative; min-height:63px; background-image:linear-gradient(to right,rgba(221,225,230,.45) 1px,transparent 1px); background-size:8.333333% 100%; }
+  .today-line { position:absolute; z-index:3; top:0; bottom:0; width:2px; background:var(--today); pointer-events:none; }
+  .today-line span { position:absolute; top:2px; left:4px; color:var(--today); font-size:9px; font-weight:700; }
+  .stage-segment { position:absolute; z-index:4; top:31px; height:6px; min-width:2px; border-radius:2px; opacity:.92; pointer-events:none; }
+  .node { position:absolute; z-index:10; top:24px; width:18px; height:18px; transform:translateX(-50%); border:3px solid #fff; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,.32); cursor:grab; touch-action:none; }
+  .node:hover { z-index:14; transform:translateX(-50%) scale(1.18); box-shadow:0 2px 8px rgba(0,0,0,.35); }
+  .node:active { cursor:grabbing; }
+  .node.direct { outline:3px solid rgba(47,111,237,.28); }
+  .node-label { position:absolute; z-index:8; top:5px; transform:translateX(-50%); max-width:90px; overflow:hidden; color:#5f6772; text-overflow:ellipsis; white-space:nowrap; font-size:10px; pointer-events:none; }
+  .original-marker { position:absolute; z-index:5; top:26px; width:14px; height:14px; transform:translateX(-50%); border:2px dashed #9aa2ad; border-radius:4px; background:#fff; pointer-events:none; }
+  .shift-line { position:absolute; z-index:4; top:33px; height:1px; border-top:1px dashed #aeb4bd; pointer-events:none; }
+  .review-panel { display:none; align-self:start; position:sticky; top:92px; overflow:hidden; border:1px solid #e0a7a2; border-radius:9px; background:#fff; box-shadow:0 9px 28px rgba(41,31,30,.11); }
+  .review-panel.show { display:block; }
+  .review-head { padding:14px 15px 12px; color:#fff; background:#3f3030; }
+  .review-head h3 { margin:0; font-size:15px; }
+  .review-head p { margin:3px 0 0; color:#dfd0d0; font-size:11px; }
+  .review-list { max-height:480px; overflow:auto; padding:6px 14px; }
+  .review-item { padding:10px 0; border-bottom:1px solid #eceef1; }
+  .review-item:last-child { border-bottom:0; }
+  .review-item b { display:block; margin-bottom:2px; font-size:12px; }
+  .review-item div { display:flex; justify-content:space-between; gap:9px; color:#6c7480; font-size:11px; }
+  .delta { color:#b42318!important; font-weight:700; }
+  .review-actions { display:grid; grid-template-columns:1fr 1.5fr; gap:8px; padding:12px 14px 14px; border-top:1px solid #eceef1; background:#fafafa; }
+  .source-card { margin-top:12px; border:1px solid var(--line); border-radius:9px; background:#fff; overflow:hidden; }
+  .source-head { display:flex; justify-content:space-between; gap:18px; align-items:center; padding:12px 15px; border-bottom:1px solid #eceef1; }
+  .source-head h3 { margin:0; font-size:14px; }
+  .source-head p { margin:2px 0 0; color:var(--muted); font-size:11px; }
+  .source-badge { flex:none; padding:4px 8px; color:#366444; background:#edf8f0; border:1px solid #cce7d3; border-radius:4px; font-size:11px; font-weight:650; }
+  .source-badge.pending { color:#8b2f27; background:#fff1f0; border-color:#efbbb6; }
+  .source-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .source-table th, .source-table td { padding:8px 12px; border-bottom:1px solid #eef0f2; text-align:left; }
+  .source-table tr:last-child td { border-bottom:0; }
+  .source-table th { color:#68717c; background:#fafbfc; font-weight:600; }
+  .draft-date { color:#a63a31; font-weight:650; }
+  .no-draft { color:#9aa1aa; }
+  .footnote { margin:11px 2px 0; color:#777f89; font-size:11px; }
+  .drag-tip { display:none; position:fixed; z-index:100; min-width:190px; padding:9px 11px; border-radius:6px; color:#fff; background:#24282f; box-shadow:0 6px 20px rgba(0,0,0,.2); pointer-events:none; font-size:12px; }
+  .drag-tip.show { display:block; }
+  .drag-tip b { display:block; margin-bottom:2px; }
+  .drag-tip span { color:#d9dde3; }
+  .toast { position:fixed; z-index:110; right:24px; bottom:24px; transform:translateY(20px); opacity:0; max-width:380px; padding:11px 14px; border-radius:7px; color:#fff; background:#24362a; box-shadow:0 8px 24px rgba(0,0,0,.22); transition:.2s; pointer-events:none; }
+  .toast.show { transform:translateY(0); opacity:1; }
+  @media (max-width:1000px) {
+    .scheme-grid { grid-template-columns:1fr; }
+    .workspace.with-review { grid-template-columns:1fr; }
+    .review-panel { position:static; }
+    .page-header { align-items:flex-start; padding:12px 16px; }
+    .header-actions { min-width:0; }
+    .shell { padding:16px; }
+  }
+</style>
+</head>
+<body>
+<header class="page-header">
+  <div>
+    <div class="eyebrow">Flowboard · feature01 需求样图</div>
+    <h1>拖动节点调整时间轴</h1>
+  </div>
+  <div class="header-actions" id="headerActions"></div>
+</header>
+
+<main class="shell">
+  <section class="intro">
+    <div>
+      <h2>选择“待更新”状态的视觉强度</h2>
+      <p>三个方案共享同一规则：拖动只改页面草稿；点击右上角红色【更新日期】后才模拟写回原始数据。</p>
+    </div>
+    <div class="prototype-tag">静态交互样图 · 不接后端</div>
+  </section>
+
+  <section class="scheme-grid" aria-label="视觉方案">
+    <button class="scheme-card active" data-scheme="a">
+      <b>A · 极简顶栏</b>
+      <span>红色提交按钮只在有草稿时出现；原位置以空心点保留。</span>
+      <em>轻量 / 低打扰</em>
+    </button>
+    <button class="scheme-card" data-scheme="b">
+      <b>B · 醒目变更带</b>
+      <span>除右上按钮外，再用横向状态带说明直接拖动、自动顺延和项目范围。</span>
+      <em>醒目 / 适合全项目</em>
+    </button>
+    <button class="scheme-card" data-scheme="c">
+      <b>C · 审阅侧栏</b>
+      <span>右侧逐项展示原日期、草稿日期和变化天数，提交边界最明确。</span>
+      <em>审慎 / 信息完整</em>
+    </button>
+  </section>
+
+  <section class="controlbar">
+    <div class="control-left">
+      <div class="segmented" aria-label="仪表盘范围">
+        <button class="active" data-view="single">单项目仪表盘</button>
+        <button data-view="all">全项目仪表盘</button>
+      </div>
+      <select class="project-select" id="projectSelect" aria-label="选择项目">
+        <option value="alpha">跑鞋 Alpha · 2026 春夏</option>
+        <option value="beta">篮球鞋 Beta · 城市系列</option>
+        <option value="gamma">羽毛球鞋 Gamma · 轻量版</option>
+      </select>
+    </div>
+    <div class="control-right">
+      <div class="legend">
+        <span><i style="background:var(--creative)"></i>创意</span>
+        <span><i style="background:var(--design)"></i>设计</span>
+        <span><i style="background:var(--develop)"></i>开发</span>
+        <span><i style="background:var(--test)"></i>测试</span>
+        <span><i style="background:var(--production)"></i>量产</span>
+        <span><i style="background:var(--iterate)"></i>应用迭代</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="workspace" id="workspace">
+    <div class="main-column">
+      <div class="change-strip" id="changeStrip"></div>
+      <div class="timeline-card">
+        <div class="timeline-title">
+          <div>
+            <h3 id="timelineHeading">单项目仪表盘</h3>
+            <p>拖动方形节点进行按日精调；同轨后续节点在本样图中保持间隔一起平移。</p>
+          </div>
+          <div class="drag-help">按住任意节点左右拖动</div>
+        </div>
+        <div class="timeline-scroll">
+          <div class="timeline-grid" id="timelineGrid"></div>
+        </div>
+      </div>
+
+      <div class="source-card">
+        <div class="source-head">
+          <div>
+            <h3>原始数据同步观察区</h3>
+            <p>用来验证“松开鼠标不写回；点击更新日期才同步”。</p>
+          </div>
+          <div class="source-badge" id="sourceBadge">原始数据未变化</div>
+        </div>
+        <div id="sourceTable"></div>
+      </div>
+      <p class="footnote">说明：本样图只在当前页面内模拟提交；刷新页面会恢复假数据。它用于确认交互与视觉，不代表技术实现已经确定。</p>
+    </div>
+    <aside class="review-panel" id="reviewPanel"></aside>
+  </section>
+</main>
+
+<div class="drag-tip" id="dragTip"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const RANGE_DAYS = 120;
+  const START = Date.UTC(2026, 7, 1);
+  const TODAY_DAY = 55;
+  const stageColors = {
+    '创意':'var(--creative)', '设计':'var(--design)', '开发':'var(--develop)',
+    '测试':'var(--test)', '量产':'var(--production)', '应用迭代':'var(--iterate)'
+  };
+  const projects = {
+    alpha:{ name:'跑鞋 Alpha · 2026 春夏', short:'跑鞋 Alpha' },
+    beta:{ name:'篮球鞋 Beta · 城市系列', short:'篮球鞋 Beta' },
+    gamma:{ name:'羽毛球鞋 Gamma · 轻量版', short:'羽毛球鞋 Gamma' }
+  };
+  const seed = [
+    ['a1','alpha','主线','创意','趋势洞察',5], ['a2','alpha','主线','设计','设计冻结',18],
+    ['a3','alpha','主线','开发','首轮样品',36], ['a4','alpha','主线','测试','穿着测试',59],
+    ['a5','alpha','主线','量产','量产确认',82], ['a6','alpha','主线','应用迭代','上市复盘',111],
+    ['ap1','alpha','并行','设计','材料预研',27], ['ap2','alpha','并行','开发','大底试制',44],
+    ['ap3','alpha','并行','测试','实验室验证',70], ['ap4','alpha','并行','量产','备料确认',95],
+    ['b1','beta','主线','创意','概念评审',1], ['b2','beta','主线','设计','外观定稿',15],
+    ['b3','beta','主线','开发','楦型确认',31], ['b4','beta','主线','测试','场地测试',52],
+    ['b5','beta','主线','量产','产前样',75], ['b6','beta','主线','应用迭代','销售复盘',102],
+    ['bp1','beta','并行','设计','配色支线',22], ['bp2','beta','并行','开发','鞋面试制',39],
+    ['bp3','beta','并行','测试','耐磨测试',62], ['bp4','beta','并行','量产','物料锁定',87],
+    ['g1','gamma','主线','创意','用户访谈',12], ['g2','gamma','主线','设计','结构冻结',30],
+    ['g3','gamma','主线','开发','功能样',48], ['g4','gamma','主线','测试','运动员测试',66],
+    ['g5','gamma','主线','量产','订单确认',90], ['g6','gamma','主线','应用迭代','反馈复盘',116],
+    ['gp1','gamma','并行','设计','材料轻量化',38], ['gp2','gamma','并行','开发','缓震模块',57],
+    ['gp3','gamma','并行','测试','弯折测试',79], ['gp4','gamma','并行','量产','供应商确认',104]
+  ];
+  const makeNodes = () => seed.map(([id,project,lane,stage,name,day]) => ({id,project,lane,stage,name,day}));
+  const clone = nodes => nodes.map(n => ({...n}));
+  const state = {
+    scheme:'a', view:'single', project:'alpha', base:makeNodes(), draft:null,
+    directTouched:new Set(), drag:null, lastPointer:{x:0,y:0}
+  };
+
+  const el = id => document.getElementById(id);
+  const formatDate = day => {
+    const d = new Date(START + day * 86400000);
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+  };
+  const shortDate = day => {
+    const d = new Date(START + day * 86400000);
+    return `${d.getUTCMonth()+1}/${d.getUTCDate()}`;
+  };
+  const pct = day => Math.max(0, Math.min(100, day / RANGE_DAYS * 100));
+  const currentNodes = () => state.draft || state.base;
+  const baseMap = () => new Map(state.base.map(n => [n.id,n]));
+  const changes = () => {
+    if (!state.draft) return [];
+    const before = baseMap();
+    return state.draft.filter(n => n.day !== before.get(n.id).day).map(n => ({
+      ...n, oldDay:before.get(n.id).day, delta:n.day-before.get(n.id).day,
+      direct:state.directTouched.has(n.id)
+    }));
+  };
+  const visibleProjects = () => state.view === 'single' ? [state.project] : ['alpha','beta','gamma'];
+
+  function renderHeader(list) {
+    const target = el('headerActions');
+    if (!list.length) {
+      target.innerHTML = '<span class="save-state">当前没有待更新日期</span>';
+      return;
+    }
+    const direct = list.filter(x => x.direct).length;
+    target.innerHTML = `
+      <span class="pending-copy">${list.length} 个节点待更新</span>
+      <button class="btn-link" data-action="discard">放弃更改</button>
+      <button class="btn btn-danger" data-action="commit">更新日期${state.scheme==='c' ? `（${list.length}）` : ''}</button>`;
+  }
+
+  function renderStrip(list) {
+    const strip = el('changeStrip');
+    if (state.scheme !== 'b' || !list.length) {
+      strip.className = 'change-strip'; strip.innerHTML = ''; return;
+    }
+    const direct = list.filter(x => x.direct).length;
+    const projectsCount = new Set(list.map(x => x.project)).size;
+    strip.className = 'change-strip show';
+    strip.innerHTML = `
+      <div><strong>日期尚未写回原始数据</strong><small>直接拖动 ${direct} 个 · 自动顺延 ${list.length-direct} 个 · 涉及 ${projectsCount} 个项目</small></div>
+      <div class="strip-actions"><button class="btn" data-action="discard">放弃</button><button class="btn btn-danger" data-action="commit">更新日期</button></div>`;
+  }
+
+  function renderAxis() {
+    const ticks = [0,15,31,46,62,77,92,108,120];
+    return `<div class="axis-row"><div class="axis-label">绝对日历标尺</div><div class="axis">${ticks.map(day => `<div class="axis-tick" style="left:${pct(day)}%"><span>${shortDate(day)}</span></div>`).join('')}</div></div>`;
+  }
+
+  function renderLane(project, lane, list) {
+    const laneNodes = list.filter(n => n.project===project && n.lane===lane).sort((a,b) => a.day-b.day);
+    const before = baseMap();
+    const segments = laneNodes.slice(0,-1).map((n,i) => {
+      const next = laneNodes[i+1];
+      return `<span class="stage-segment" style="left:${pct(n.day)}%;width:${Math.max(.3,pct(next.day)-pct(n.day))}%;background:${stageColors[n.stage]}"></span>`;
+    }).join('');
+    const markers = laneNodes.map(n => {
+      const original = before.get(n.id);
+      const changed = original && original.day !== n.day;
+      const left = pct(n.day);
+      const direct = state.directTouched.has(n.id) && changed ? ' direct' : '';
+      const ghost = changed ? `<span class="original-marker" style="left:${pct(original.day)}%" title="原位置 ${formatDate(original.day)}"></span><span class="shift-line" style="left:${Math.min(pct(original.day),left)}%;width:${Math.abs(left-pct(original.day))}%"></span>` : '';
+      return `${ghost}<span class="node-label" style="left:${left}%">${n.name}</span><button class="node${direct}" data-node="${n.id}" style="left:${left}%;background:${stageColors[n.stage]}" title="${n.name} · ${formatDate(n.day)}"></button>`;
+    }).join('');
+    return `<div class="lane"><div class="lane-name ${lane==='并行'?'parallel':''}">${lane}</div><div class="lane-track" data-track="${project}|${lane}"><span class="today-line" style="left:${pct(TODAY_DAY)}%"><span>今天</span></span>${segments}${markers}</div></div>`;
+  }
+
+  function renderTimeline() {
+    const list = currentNodes();
+    const rows = visibleProjects().map(project => `
+      <div class="project-row">
+        <div class="project-name">${projects[project].short}<small>${state.view==='single'?'完整双轨时间轴':'共享日历标尺'}</small></div>
+        <div class="project-lanes">${renderLane(project,'主线',list)}${renderLane(project,'并行',list)}</div>
+      </div>`).join('');
+    el('timelineGrid').innerHTML = renderAxis() + rows;
+    el('timelineHeading').textContent = state.view === 'single' ? `单项目仪表盘 · ${projects[state.project].name}` : '全项目仪表盘 · 3 个项目';
+  }
+
+  function renderReview(list) {
+    const panel = el('reviewPanel');
+    const workspace = el('workspace');
+    if (state.scheme !== 'c' || !list.length) {
+      panel.className = 'review-panel'; panel.innerHTML = ''; workspace.className = 'workspace'; return;
+    }
+    workspace.className = 'workspace with-review';
+    panel.className = 'review-panel show';
+    panel.innerHTML = `
+      <div class="review-head"><h3>待更新日期 · ${list.length}</h3><p>以下只是页面草稿，尚未写回原始数据</p></div>
+      <div class="review-list">${list.map(n => `<div class="review-item"><b>${projects[n.project].short} / ${n.name}${n.direct?' · 直接拖动':' · 自动顺延'}</b><div><span>${formatDate(n.oldDay)} → ${formatDate(n.day)}</span><span class="delta">${n.delta>0?'+':''}${n.delta} 天</span></div></div>`).join('')}</div>
+      <div class="review-actions"><button class="btn" data-action="discard">放弃</button><button class="btn btn-danger" data-action="commit">更新日期</button></div>`;
+  }
+
+  function renderSource(list) {
+    const badge = el('sourceBadge');
+    badge.textContent = list.length ? '原始数据仍未变化' : '原始数据与仪表盘一致';
+    badge.className = `source-badge${list.length?' pending':''}`;
+    const draft = new Map(currentNodes().map(n => [n.id,n]));
+    const ids = visibleProjects().flatMap(p => state.base.filter(n => n.project===p && n.lane==='主线').slice(0,3));
+    el('sourceTable').innerHTML = `<table class="source-table"><thead><tr><th>项目</th><th>节点</th><th>原始数据日期</th><th>页面草稿日期</th></tr></thead><tbody>${ids.map(n => {
+      const d = draft.get(n.id); const changed = d.day!==n.day;
+      return `<tr><td>${projects[n.project].short}</td><td>${n.name}</td><td>${formatDate(n.day)}</td><td class="${changed?'draft-date':'no-draft'}">${changed?formatDate(d.day)+'（待更新）':'—'}</td></tr>`;
+    }).join('')}</tbody></table>`;
+  }
+
+  function render() {
+    const list = changes();
+    document.querySelectorAll('.scheme-card').forEach(b => b.classList.toggle('active', b.dataset.scheme===state.scheme));
+    document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view===state.view));
+    el('projectSelect').disabled = state.view === 'all';
+    el('projectSelect').value = state.project;
+    renderHeader(list); renderStrip(list); renderTimeline(); renderReview(list); renderSource(list);
+  }
+
+  function beginDrag(event, id) {
+    if (event.button !== 0) return;
+    const node = currentNodes().find(n => n.id===id);
+    const track = event.target.closest('.lane-track');
+    const snapshot = clone(currentNodes());
+    const affected = snapshot.filter(n => n.project===node.project && n.lane===node.lane && n.day>=node.day).map(n => n.id);
+    state.drag = { id, startX:event.clientX, snapshot, affected, rect:track.getBoundingClientRect(), delta:0 };
+    state.lastPointer = {x:event.clientX,y:event.clientY};
+    event.preventDefault();
+    window.addEventListener('pointermove', dragMove);
+    window.addEventListener('pointerup', endDrag, {once:true});
+  }
+
+  function dragMove(event) {
+    if (!state.drag) return;
+    const raw = Math.round((event.clientX-state.drag.startX)/state.drag.rect.width*RANGE_DAYS);
+    const affectedNodes = state.drag.snapshot.filter(n => state.drag.affected.includes(n.id));
+    const selectedAtStart = state.drag.snapshot.find(n => n.id===state.drag.id);
+    const previous = state.drag.snapshot
+      .filter(n => n.project===selectedAtStart.project && n.lane===selectedAtStart.lane && n.day<selectedAtStart.day)
+      .sort((a,b) => b.day-a.day)[0];
+    const chainMinDelta = previous ? previous.day-selectedAtStart.day : -selectedAtStart.day;
+    const minDelta = Math.max(-Math.min(...affectedNodes.map(n => n.day)),chainMinDelta);
+    const maxDelta = RANGE_DAYS-Math.max(...affectedNodes.map(n => n.day));
+    const delta = Math.max(minDelta,Math.min(maxDelta,raw));
+    state.drag.delta = delta;
+    state.lastPointer = {x:event.clientX,y:event.clientY};
+    const next = clone(state.drag.snapshot);
+    next.forEach(n => { if (state.drag.affected.includes(n.id)) n.day += delta; });
+    state.draft = next;
+    if (delta !== 0) state.directTouched.add(state.drag.id);
+    const moved = next.find(n => n.id===state.drag.id);
+    const original = state.drag.snapshot.find(n => n.id===state.drag.id);
+    el('dragTip').className = 'drag-tip show';
+    el('dragTip').style.left = `${Math.min(window.innerWidth-220,event.clientX+14)}px`;
+    el('dragTip').style.top = `${Math.max(10,event.clientY-64)}px`;
+    el('dragTip').innerHTML = `<b>${moved.name} · ${formatDate(moved.day)}</b><span>${formatDate(original.day)} → ${formatDate(moved.day)}（${delta>0?'+':''}${delta} 天）</span>`;
+    render();
+  }
+
+  function endDrag() {
+    if (!state.drag) return;
+    state.drag = null;
+    el('dragTip').className = 'drag-tip';
+    if (!changes().length) { state.draft=null; state.directTouched.clear(); }
+    render();
+    window.removeEventListener('pointermove', dragMove);
+  }
+
+  function commit() {
+    const list = changes();
+    if (!list.length) return;
+    state.base = clone(state.draft);
+    state.draft = null; state.directTouched.clear();
+    showToast(`已模拟写回原始数据：${list.length} 个节点日期已更新`);
+    render();
+  }
+
+  function discard() {
+    if (!changes().length) return;
+    state.draft = null; state.directTouched.clear();
+    showToast('已放弃页面草稿，原始数据没有改写');
+    render();
+  }
+
+  let toastTimer;
+  function showToast(message) {
+    const toast = el('toast'); toast.textContent = message; toast.className='toast show';
+    clearTimeout(toastTimer); toastTimer=setTimeout(() => toast.className='toast',2600);
+  }
+
+  document.addEventListener('pointerdown', event => {
+    const node = event.target.closest('[data-node]');
+    if (node) beginDrag(event,node.dataset.node);
+  });
+  document.addEventListener('click', event => {
+    const scheme = event.target.closest('[data-scheme]');
+    if (scheme) { state.scheme=scheme.dataset.scheme; render(); return; }
+    const view = event.target.closest('[data-view]');
+    if (view) { state.view=view.dataset.view; render(); return; }
+    const action = event.target.closest('[data-action]');
+    if (action?.dataset.action==='commit') commit();
+    if (action?.dataset.action==='discard') discard();
+  });
+  el('projectSelect').addEventListener('change', event => { state.project=event.target.value; render(); });
+  window.addEventListener('beforeunload', event => { if (changes().length) { event.preventDefault(); event.returnValue=''; } });
+  render();
+})();
+</script>
+</body>
+</html>
