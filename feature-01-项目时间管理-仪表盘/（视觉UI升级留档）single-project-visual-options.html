@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>（视觉UI升级留档）单项目仪表盘 · 方向样张 · B 已选定 · 2026-08-17</title>
+<style>
+  /* ============================================================
+     （视觉UI升级留档）单项目仪表盘 · 视觉方向样张（静态 · 假数据 · 不接后端）
+     配套问卷：3-UX_DETAIL_REQUIREMENTS.md Q1 视觉重议
+     拍板记录（2026-08-17 用户拍板）：
+       ① 方向 B（深色聚焦）= 当前执行方向；
+       ② A/C/D/E 全部保留 = 未来拓展皮肤候选；
+       ③ 条形分界改为 ) 形（前段圆尾 + 后段直角，顺时间轴右行），已统一应用到全部方向。
+       ④ 深色版（方向 B）节点圈由暗表面色改为白色（2026-08-17 用户反馈：暗圈读作黑圈）；
+         逾期红圈同步换深色版红 #ff453a。
+     冻结项保留：绝对日历标尺+今日线 / 六阶段稳定专属色（紫蓝青橙绿金方向）
+                 / 连续条形 2px 小圆角 / 单项目完整双轨 / 不用透明混色承主信息
+     ============================================================ */
+  :root{
+    /* —— 色板 v3.2 候选（明），已过六项校验：最差相邻 ΔE 9.4 / 正常视觉 22.2 —— */
+    --p-创意:#ab5fe8; --p-设计:#1746b0; --p-开发:#0aa67e;
+    --p-测试:#c9641a; --p-量产:#64bc46; --p-应用迭代:#8f6a10;
+    /* —— 文本 tokens（明）—— */
+    --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#aeaeb2;
+    --hairline:#e8e8ed; --canvas:#f5f5f7; --card:#ffffff;
+    --today:#e5484d; --overdue:#e5484d;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--canvas); color:var(--ink); padding:40px 0 120px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 32px}
+
+  /* —— 顶部说明卡 —— */
+  .intro{background:var(--card);border-radius:20px;padding:28px 32px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:48px}
+  .intro h1{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:10px}
+  .intro p{font-size:14px;line-height:1.75;color:var(--ink2);max-width:72ch}
+  .intro .tags{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+  .tag{font-size:12px;color:var(--ink2);background:var(--canvas);border-radius:99px;padding:4px 12px}
+  .decided{background:rgba(52,199,89,.10);border:1px solid rgba(52,199,89,.35);color:#1d1f1a;
+    border-radius:14px;padding:12px 16px;font-size:13.5px;line-height:1.7}
+  .decided b{color:#1d7a34}
+  .swatches{display:flex;gap:14px;margin-top:16px;flex-wrap:wrap}
+  .sw{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2)}
+  .sw i{width:14px;height:14px;border-radius:4px;display:inline-block}
+
+  /* —— 每个方向一节 —— */
+  .dir{margin-bottom:72px}
+  .dir-head{margin-bottom:16px}
+  .dir-head .no{display:inline-flex;align-items:center;gap:10px;margin-bottom:6px}
+  .dir-head .badge{font-size:12px;font-weight:700;color:var(--canvas);background:var(--ink);border-radius:99px;padding:3px 12px;letter-spacing:.06em}
+  .badge.on{background:#34c759;color:#fff}
+  .badge.skin{background:transparent;color:var(--ink2);border:1px solid var(--hairline)}
+  .dir-head h2{font-size:20px;font-weight:700;letter-spacing:-.01em}
+  .dir-head p{font-size:13.5px;color:var(--ink2);margin-top:4px;line-height:1.6}
+  .dir-head ul{margin:10px 0 0 0;padding-left:18px;font-size:13px;color:var(--ink2);line-height:1.8}
+  .stake{margin-top:10px;font-size:12.5px;color:var(--ink3);border-left:2px solid var(--hairline);padding-left:10px;line-height:1.6}
+
+  /* —— 通用卡片（方向 A/C/D/E 共用的「iOS 白卡」）—— */
+  .sheet{background:var(--card);border-radius:20px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.04)}
+  .pad{padding:28px 32px 24px}
+  .proj-title{font-size:30px;font-weight:700;letter-spacing:-.02em}
+  .proj-sub{font-size:13.5px;color:var(--ink2);margin-top:6px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:0}
+  .sep{color:var(--hairline)}
+  .legend{display:flex;gap:16px;align-items:center;margin-top:18px;font-size:12px;color:var(--ink2);flex-wrap:wrap}
+  .legend .sw i{width:10px;height:10px;border-radius:3px}
+  .legend .note{color:var(--ink3)}
+  svg{display:block;width:100%;height:auto}
+  svg text{font-family:inherit}
+
+  /* —— 方向 B 深色 —— */
+  .dark-zone{background:#000;border-radius:24px;padding:36px 32px}
+  .dark-zone .sheet{background:#1c1c1e;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+  .dark-zone .proj-title{color:#f5f5f7}
+  .dark-zone .proj-sub{color:#a1a1a6}
+  .dark-zone .sep{color:#3a3a3c}
+  .dark-zone .legend{color:#a1a1a6}
+  .dark-zone .legend .note{color:#6e6e73}
+
+  /* —— 方向 D 玻璃浮签 —— */
+  .hero-bleed .pad{padding:0}
+  .hero-bleed .tl-area{padding:8px 12px 20px}
+  .glass-row{display:flex;justify-content:space-between;align-items:flex-end;padding:0 20px;transform:translateY(-26px);margin-bottom:-8px}
+  .glass{background:rgba(255,255,255,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.10);padding:10px 18px}
+  .glass .g-title{font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .glass .g-sub{font-size:12px;color:var(--ink2);margin-top:2px}
+  .glass.pills{display:flex;gap:8px;align-items:center}
+  .pill{font-size:12px;color:var(--ink2);background:rgba(245,245,247,.85);border-radius:99px;padding:6px 14px;white-space:nowrap}
+
+  /* —— 方向 E 阶段摘要条 —— */
+  .phasebar{display:flex;gap:2px;height:6px;border-radius:3px;overflow:hidden;margin-top:18px}
+  .phasebar i{display:block;height:100%}
+  .phaseline{display:flex;margin-top:8px;font-size:11.5px;color:var(--ink3)}
+  .phaseline span{overflow:hidden;white-space:nowrap}
+  .phaseline b.cur{color:var(--ink);font-weight:600}
+
+  .foot-note{font-size:12px;color:var(--ink3);margin-top:12px;line-height:1.7}
+</style>
+</head>
+<body data-palette="#ab5fe8,#1746b0,#0aa67e,#c9641a,#64bc46,#8f6a10">
+
+<div class="wrap">
+
+  <!-- ======================= 说明 ======================= -->
+  <section class="intro">
+    <h1>（视觉UI升级留档）单项目仪表盘 · 视觉方向样张</h1>
+    <div class="decided">✅ <b>2026-08-17 拍板：</b>方向 <b>B（深色聚焦）</b>为当前执行方向；<b>A / C / D / E 全部保留为未来拓展皮肤候选</b>；条形分界统一改为 <b>)</b> 形（前段圆尾＋后段直角，顺时间轴右行），已应用到本页全部方向；深色版节点圈改白色。</div>
+    <p style="margin-top:12px">回应 Q1 反馈：「视觉信息太繁杂，时间轴是核心视觉点，应重点突出」。五个方向（A–E）用<b>同一份假数据、同一套色板</b>渲染，只比较<b>页面结构与视觉层级</b>，不比较数据。
+    时间轴拖动磁吸「手感」问题属交互层，视觉方向已定，下一轮单独出交互细调样张。</p>
+    <div class="tags">
+      <span class="tag">静态 · 假数据 · 不接后端</span>
+      <span class="tag">B 已拍板 · 其余留作皮肤候选</span>
+      <span class="tag">冻结项已保留：绝对标尺＋今日线 · 连续条形 2px 圆角 · 单项目双轨全展示 · 不用透明混色承主信息</span>
+    </div>
+    <div class="swatches">
+      <span class="sw"><i style="background:#ab5fe8"></i>创意 #ab5fe8</span>
+      <span class="sw"><i style="background:#1746b0"></i>设计 #1746b0</span>
+      <span class="sw"><i style="background:#0aa67e"></i>开发 #0aa67e</span>
+      <span class="sw"><i style="background:#c9641a"></i>测试 #c9641a</span>
+      <span class="sw"><i style="background:#64bc46"></i>量产 #64bc46</span>
+      <span class="sw"><i style="background:#8f6a10"></i>应用迭代 #8f6a10</span>
+    </div>
+    <p style="margin-top:14px">色板为 <b>v3.2 候选</b>：沿用紫/蓝/青/橙/绿/金方向，微调色阶后通过六项校验（现行 v3 的紫↔蓝相邻对在红绿色盲下 ΔE 仅 4.4，属硬伤）。阶段切换处加 2px 表面缝隙、节点带白圈，为色觉障碍用户的辅助编码。绿对白底对比 2.38 略低于 3:1 → 以阶段直标＋图例救济。深色版单独调阶（方向 B），两套均已验证。</p>
+  </section>
+
+  <!-- ======================= 方向 A ======================= -->
+  <section class="dir">
+    <div class="dir-head">
+      <div class="no"><span class="badge">方向 A</span><span class="badge skin">皮肤候选</span><h2>大标题 · 白卡</h2></div>
+      <p>最接近 iOS 原生设置的观感：浅灰画布上一张白卡，超大项目标题，五个 KPI 瓷砖压成一行细字副标。</p>
+      <ul>
+        <li>KPI 从 5 个瓷砖 → 1 行次级文字（阶段名带色点、完成数、逾期数、预计量产），不再与时间轴抢视线</li>
+        <li>时间轴条 12px 高、六阶段色带 + 节点白圈点，月份发丝线退到底部一行</li>
+        <li>今日线红色细线 + 顶部小胶囊「今天 8/17」；逾期节点红圈 + 直接标注（不靠颜色单扛）</li>
+      </ul>
+      <div class="stake">赌注：信息密度最低、最「素」；若你仍想在首屏看到 KPI 数字块，此方向会把它们全部降级。</div>
+    </div>
+    <div class="sheet pad" id="dirA"></div>
+  </section>
+
+  <!-- ======================= 方向 B ======================= -->
+  <section class="dir">
+    <div class="dir-head">
+      <div class="no"><span class="badge">方向 B</span><span class="badge on">✅ 已选定 · 当前执行</span><h2>深色聚焦</h2></div>
+      <p>iOS 深色模式观感：近黑画布，时间轴色彩在暗底上更突出，「高级感」最强的一版。</p>
+      <ul>
+        <li>色板按暗底单独调阶（不是亮色自动翻转），六色对 #1C1C1E 底对比全部 ≥ 3:1</li>
+        <li>Chrome 全部退成暗灰文字，彩色只留给阶段条与今日线，视觉焦点天然落在时间轴</li>
+        <li>注：产品其余页面（编辑器/全项目）当前为亮色，选 B 意味着单项目仪表盘独立深色，或全站跟随做深色主题（成本另计）</li>
+      </ul>
+      <div class="stake">赌注：与现有亮色页面割裂；团队若在明亮办公室投影仪上看，深色可读性依赖较好屏幕。</div>
+    </div>
+    <div class="dark-zone"><div class="sheet pad" id="dirB"></div></div>
+  </section>
+
+  <!-- ======================= 方向 C ======================= -->
+  <section class="dir">
+    <div class="dir-head">
+      <div class="no"><span class="badge">方向 C</span><span class="badge skin">皮肤候选</span><h2>细链 · 大留白</h2></div>
+      <p>把「减法」做到底：条压到 8px，网格只留季度刻度，阶段名只在切换处出现，大量呼吸空间。</p>
+      <ul>
+        <li>月份竖线全部去掉，只留季度（Q1–Q4）刻度 + 发丝线，背景近乎空白</li>
+        <li>阶段直标只在色带切换处出现（选择式直标，不是每个节点都标）</li>
+        <li>副标一行 + 图例一行，其余全删；整页只有「标题、一句话状态、一条链」</li>
+      </ul>
+      <div class="stake">赌注：最克制也最「远」——节点名/日期全靠后续悬停或点击，一眼扫过去只知道阶段脉络，不知道具体节点。若你日常需要直接读节点名，此方向信息可能过瘦。</div>
+    </div>
+    <div class="sheet pad" id="dirC"></div>
+  </section>
+
+  <!-- ======================= 方向 D ======================= -->
+  <section class="dir">
+    <div class="dir-head">
+      <div class="no"><span class="badge">方向 D</span><span class="badge skin">皮肤候选</span><h2>画布即主角 · 玻璃浮签</h2></div>
+      <p>时间轴通栏满铺（无左右留白），标题和操作变成浮在卡片边缘的毛玻璃签，像 iOS 地图的浮层。</p>
+      <ul>
+        <li>时间轴撑满卡片全宽，日历标尺贴边，视觉重量最大</li>
+        <li>项目名/状态摘要 = 左上玻璃签；操作（排序、导出）= 右下玻璃胶囊，悬在图上不占行</li>
+        <li>今日线从上贯穿到下，是画面里唯一的竖向强调</li>
+      </ul>
+      <div class="stake">赌注：毛玻璃在低端局域网旧机器/旧浏览器上可能退化为纯白块（可接受降级）；浮签遮挡极左侧 1 月初的条尾（假数据 1/5 起，实搭需留边）。</div>
+    </div>
+    <div class="sheet hero-bleed" id="dirD">
+      <div class="glass-row">
+        <div class="glass">
+          <div class="g-title">跑鞋 2026 春夏款</div>
+          <div class="g-sub" id="dirD-sub"></div>
+        </div>
+        <div class="glass pills">
+          <span class="pill">↕ 按日期</span><span class="pill">⤓ 导出</span>
+        </div>
+      </div>
+      <div class="tl-area" id="dirD-tl"></div>
+    </div>
+  </section>
+
+  <!-- ======================= 方向 E ======================= -->
+  <section class="dir">
+    <div class="dir-head">
+      <div class="no"><span class="badge">方向 E</span><span class="badge skin">皮肤候选</span><h2>阶段摘要条 · 一眼看全局</h2></div>
+      <p>在 A 的结构上，标题下加一条 6px 六阶段比例条（按各阶段起止占比），当前阶段带指示点——「项目走到哪了」先于节点细节被看到。</p>
+      <ul>
+        <li>摘要条各段宽 = 阶段首节点到下一阶段首节点的日历跨度，2px 缝隙分隔</li>
+        <li>当前阶段（开发）标记「进行中」；摘要条是<b>新增组件</b>，非冻结项，需拍板才保留</li>
+        <li>时间轴本体与 A 相同，方便纯比较「多这一条值不值」</li>
+      </ul>
+      <div class="stake">赌注：多一个组件 = 多一处要维护的信息；阶段占比由节点日期推导，若某阶段只录 1 个节点，摘要条该段会极窄。</div>
+    </div>
+    <div class="sheet pad" id="dirE"></div>
+  </section>
+
+  <p class="foot-note">
+    <b>拍板记录（2026-08-17）：</b>① 方向 B（深色聚焦）为当前执行方向；② A / C / D / E 全部保留为未来拓展皮肤候选；③ 条形分界改为 <b>)</b> 形——同阶段相邻节点已合并为整段实条（段内不再有凹口），阶段切换处「前段右端 2px 圆角 ＋ 后段左端直角」，每处分界读作 ) ，顺时间轴右行方向；链首段四角圆、链尾节点仅留点。④ 本页色板由 v3.2 候选升级为<b>当前执行色板</b>（深色版随方向 B 一并转正）。⑤ 深色版节点圈 = 白色 2px（原暗表面色圈在暗底上读作黑圈；亮色版白圈不变），逾期红圈深色版用 #ff453a。
+    <br>本页所有方向共用：① 绝对日历标尺（2026 全年）＋红色今日线（2026-08-17）；② 连续条形、条色取左端节点阶段；③ 主线/并行双轨各自成链；④ 逾期 = 日期早于今天且未手工标完成（工程样件评审 8/10，逾期 7 天）。
+    悬停提示（tooltip）、拖动磁吸手感、点击展开等交互层，下一轮单独出交互样张。
+  </p>
+</div>
+
+<script>
+/* ============================================================
+   数据与几何（与 mockup.html v3.1 同源，单日期模型）
+   ============================================================ */
+const PHASE = ['创意','设计','开发','测试','量产','应用迭代'];
+const C_LIGHT = {'创意':'#ab5fe8','设计':'#1746b0','开发':'#0aa67e','测试':'#c9641a','量产':'#64bc46','应用迭代':'#8f6a10'};
+const C_DARK  = {'创意':'#a878e4','设计':'#3a6bc2','开发':'#12ab8a','测试':'#c37a24','量产':'#2cae71','应用迭代':'#a07f24'};
+
+const TODAY = '2026-08-17';
+const MAIN = [ /* 主线：{阶段, 节点名, 日期, 状态} 状态按冻结规则可推导，此处直标 */
+  {phase:'创意', name:'项目头脑风暴',   date:'2026-01-05', done:true},
+  {phase:'创意', name:'创意整合',       date:'2026-01-22', done:true},
+  {phase:'创意', name:'正式立项',       date:'2026-02-01', done:true},
+  {phase:'设计', name:'首轮设计图评审', date:'2026-03-02', done:true},
+  {phase:'设计', name:'设计定稿',       date:'2026-03-25', done:true},
+  {phase:'开发', name:'鞋楦开发',       date:'2026-04-15', done:true},
+  {phase:'开发', name:'材料打样',       date:'2026-05-20', done:true},
+  {phase:'开发', name:'工程样件评审',   date:'2026-08-10', done:false},   // 逾期
+  {phase:'测试', name:'穿着性能测试',   date:'2026-09-05', done:false},
+  {phase:'量产', name:'量产启动',       date:'2026-10-20', done:false},
+  {phase:'应用迭代', name:'上市后反馈迭代', date:'2026-12-05', done:false},
+];
+const PARA = [
+  {phase:'设计', name:'市场同步评审',     date:'2026-02-12', done:true},
+  {phase:'开发', name:'材料供应商预沟通', date:'2026-04-20', done:true},
+];
+
+/* —— 日历几何：2026 全年映射到 [X0,X1] —— */
+const X0=64, X1=1016, DAYS=365;
+const MONTHS=[0,31,59,90,120,151,181,212,243,273,304,334,365];
+const doy = s => { const [m,d]=s.split('-').slice(1).map(Number); return MONTHS[m-1]+d-1; };
+const dx  = s => X0 + doy(s)/DAYS*(X1-X0);
+
+const esc = s => s.replace(/&/g,'&amp;');
+
+/* —— SVG 拼装：一条轨道 = 按阶段合并的连续条形 ——
+   同阶段相邻节点合并为一段实条；阶段切换处保留 2px 表面缝（CVD 辅助编码）。
+   分界形状（2026-08-17 拍板）：前段右端 2px 圆角、后段左端直角，
+   每处分界读作 ) —— 顺时间轴右行方向；链首段左端与链末段右端保持圆角收口。 */
+function laneSVG(lane, y, barH, C, ring, red, rx=2){
+  const runs=[];                                    /* 先按阶段聚合成段 */
+  lane.forEach(n=>{
+    const last=runs[runs.length-1];
+    if(last && last.phase===n.phase) last.nodes.push(n);
+    else runs.push({phase:n.phase, nodes:[n]});
+  });
+  let out='';
+  runs.forEach((r,ri)=>{
+    const next=runs[ri+1];
+    const xStart=dx(r.nodes[0].date);
+    const xEnd = next ? dx(next.nodes[0].date)               /* 段尾 = 下一阶段首节点（过渡点） */
+                      : dx(r.nodes[r.nodes.length-1].date);  /* 末段收在自己尾节点 */
+    if(xEnd-xStart<=1) return;                      /* 末段单节点：无外延条（链尾只留节点点） */
+    const x0=xStart+(ri===0?0:1), x1=xEnd-1;        /* 切换处 2px 表面缝（两侧各让 1px） */
+    const w=x1-x0, rr=Math.min(rx,w/2);
+    out += ri===0                                    /* 链头：四角圆（rect 半径自动钳制） */
+      ? `<rect x="${x0.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="${barH}" rx="${rx}" fill="${C[r.phase]}"/>`
+      : `<path d="M${x0.toFixed(1)},${y}h${(w-rr).toFixed(1)}a${rr.toFixed(1)},${rr.toFixed(1)} 0 0 1 ${rr.toFixed(1)},${rr.toFixed(1)}v${(barH-2*rr).toFixed(1)}a${rr.toFixed(1)},${rr.toFixed(1)} 0 0 1 ${(-rr).toFixed(1)},${rr.toFixed(1)}h${(-(w-rr)).toFixed(1)}z" fill="${C[r.phase]}"/>`;
+  });                                               /* 其余段：左端直角 + 右端 ) 圆角 */
+  /* 节点点：阶段色填充 + 2px 圈（亮底=表面色，深底=白色，2026-08-17 拍板）；逾期红圈（叠在条之上） */
+  lane.forEach(n=>{
+    const x=dx(n.date), cy=y+barH/2, overdue=!n.done && n.date<TODAY;
+    out+=`<circle cx="${x.toFixed(1)}" cy="${cy}" r="${overdue?6:5}" fill="${C[n.phase]}" stroke="${overdue?red:ring}" stroke-width="2"/>`;
+  });
+  return out;
+}
+
+/* —— 阶段切换直标（只标色带变化处，选择式）—— */
+function phaseLabels(lane,y,C){
+  let out='', prevPhase=null;
+  lane.forEach(n=>{
+    if(n.phase!==prevPhase){
+      const x=dx(n.date);
+      out+=`<circle cx="${x.toFixed(1)}" cy="${y-9}" r="3" fill="${C[n.phase]}"/>`+
+           `<text x="${(x+8).toFixed(1)}" y="${y-5}" font-size="11" fill="#6e6e73">${n.phase}</text>`;
+      prevPhase=n.phase;
+    }
+  });
+  return out;
+}
+
+/* —— 月份标尺：发丝线 + 月名，季度加重 —— */
+function ruler(axisY,C){
+  let out='';
+  for(let m=0;m<12;m++){
+    const x=X0+MONTHS[m]/DAYS*(X1-X0), q=(m%3===0);
+    out+=`<line x1="${x.toFixed(1)}" y1="${axisY-4}" x2="${x.toFixed(1)}" y2="${axisY}" stroke="${q?'#c7c7cc':'#e8e8ed'}" stroke-width="1"/>`+
+         `<text x="${(x+3).toFixed(1)}" y="${axisY+14}" font-size="10.5" fill="${q?'#6e6e73':'#aeaeb2'}">${m+1}月</text>`;
+  }
+  return out;
+}
+
+function todayLine(yTop,yBot,dark){
+  const x=dx(TODAY), red=dark?'#ff453a':'#e5484d';
+  return `<line x1="${x.toFixed(1)}" y1="${yTop}" x2="${x.toFixed(1)}" y2="${yBot}" stroke="${red}" stroke-width="1.5"/>`+
+    `<g><rect x="${(x-31).toFixed(1)}" y="${yTop-16}" width="62" height="15" rx="7.5" fill="${red}"/>`+
+    `<text x="${x.toFixed(1)}" y="${yTop-4.5}" font-size="10" font-weight="600" fill="#fff" text-anchor="middle">今天 8/17</text></g>`;
+}
+
+function overdueLabel(x,y,text,dark){
+  const red=dark?'#ff453a':'#e5484d';
+  return `<text x="${x.toFixed(1)}" y="${y}" font-size="10.5" font-weight="600" fill="${red}">⚠ ${esc(text)}</text>`;
+}
+
+/* —— 完整时间轴 SVG —— */
+function timeline(C,surface,dark,opts={}){
+  const barH=opts.barH??12, gapY=opts.barH??12;
+  const yMain=opts.yMain??46, yPara=yMain+barH+28;
+  const axisY=yPara+barH+26, H=axisY+22;
+  const laneLbl=(x,y,t)=>`<text x="${x}" y="${y}" font-size="11" fill="${dark?'#6e6e73':'#aeaeb2'}">${t}</text>`;
+  let s=`<svg viewBox="0 0 ${X1+8} ${H}" role="img" aria-label="单项目时间轴">`;
+  s+=`<line x1="${X0}" y1="${axisY}" x2="${X1}" y2="${axisY}" stroke="${dark?'#3a3a3c':'#e8e8ed'}" stroke-width="1"/>`;
+  s+=ruler(axisY,C);
+  s+=laneLbl(8,yMain+barH/2+4,'主线')+laneLbl(8,yPara+barH/2+4,'并行');
+  s+=phaseLabels(MAIN,yMain,C);
+  const ring=dark?'#f5f5f7':surface;              /* 深色底：白圈（2026-08-17 拍板）；亮色底：表面色圈 */
+  const red =dark?'#ff453a':'#e5484d';
+  s+=laneSVG(MAIN,yMain,barH,C,ring,red);
+  s+=laneSVG(PARA,yPara,barH,C,ring,red);
+  /* 并行轨节点直标（并行只有 2 节点，直标不挤） */
+  PARA.forEach(n=>{
+    s+=`<text x="${dx(n.date).toFixed(1)}" y="${yPara-6}" font-size="10.5" fill="${dark?'#a1a1a6':'#6e6e73'}">${esc(n.name)}</text>`;
+  });
+  s+=todayLine(6,axisY,dark);
+  /* 逾期直标：贴在节点上方第二行 */
+  const od=MAIN.find(n=>!n.done&&n.date<TODAY);
+  if(od) s+=overdueLabel(dx(od.date)+10,yMain-22,'工程样件评审 · 逾期7天',dark);
+  /* 量产节点直标（远端关键里程碑） */
+  const mp=MAIN.find(n=>n.name==='量产启动');
+  if(mp && !opts.minimal) s+=`<text x="${dx(mp.date).toFixed(1)}" y="${yMain+barH+16}" font-size="10.5" fill="${dark?'#a1a1a6':'#6e6e73'}">量产 ${mp.date.slice(5).replace('-','/')}</text>`;
+  s+=`</svg>`;
+  return s;
+}
+
+function legendHTML(C,dark){
+  return PHASE.map(p=>`<span class="sw"><i style="background:${C[p]}"></i>${p}</span>`).join('')+
+    `<span class="note">｜ <b style="color:${dark?'#ff453a':'#e5484d'}">｜</b> 今天 · <b style="color:${dark?'#ff453a':'#e5484d'}">◯</b> 逾期节点</span>`;
+}
+
+const SUB = `<span><i class="dot" style="background:#0aa67e"></i>当前 开发</span><span class="sep">｜</span><span>11 节点 · 7 已完成</span><span class="sep">｜</span><span>1 逾期</span><span class="sep">｜</span><span>预计量产 10/20</span>`;
+
+/* ============================================================
+   方向 A：大标题白卡
+   ============================================================ */
+document.getElementById('dirA').innerHTML =
+  `<div class="proj-title">跑鞋 2026 春夏款</div>
+   <div class="proj-sub">${SUB}</div>
+   ${timeline(C_LIGHT,'#ffffff',false)}
+   <div class="legend">${legendHTML(C_LIGHT,false)}</div>`;
+
+/* ============================================================
+   方向 B：深色聚焦
+   ============================================================ */
+document.getElementById('dirB').innerHTML =
+  `<div class="proj-title">跑鞋 2026 春夏款</div>
+   <div class="proj-sub">${SUB.replace('#0aa67e','#12ab8a')}</div>
+   ${timeline(C_DARK,'#1c1c1e',true)}
+   <div class="legend">${legendHTML(C_DARK,true)}</div>`;
+
+/* ============================================================
+   方向 C：细链大留白（8px 条 / 只留季度刻度 / 最少直标）
+   ============================================================ */
+(function(){
+  const barH=8, yMain=52, yPara=yMain+barH+34, axisY=yPara+barH+30;
+  let s=`<svg viewBox="0 0 ${X1+8} ${axisY+20}">`;
+  s+=`<line x1="${X0}" y1="${axisY}" x2="${X1}" y2="${axisY}" stroke="#e8e8ed" stroke-width="1"/>`;
+  [0,3,6,9].forEach(q=>{
+    const x=X0+MONTHS[q]/DAYS*(X1-X0);
+    s+=`<line x1="${x}" y1="${axisY-6}" x2="${x}" y2="${axisY}" stroke="#c7c7cc" stroke-width="1"/>`+
+       `<text x="${(x+4).toFixed(1)}" y="${axisY+14}" font-size="10.5" fill="#aeaeb2">Q${q/3+1}</text>`;
+  });
+  s+=`<text x="8" y="${yMain+barH/2+4}" font-size="11" fill="#aeaeb2">主线</text>`;
+  s+=`<text x="8" y="${yPara+barH/2+4}" font-size="11" fill="#aeaeb2">并行</text>`;
+  s+=phaseLabels(MAIN,yMain,C_LIGHT);
+  s+=laneSVG(MAIN,yMain,barH,C_LIGHT,'#ffffff','#e5484d');
+  s+=laneSVG(PARA,yPara,barH,C_LIGHT,'#ffffff','#e5484d');
+  s+=todayLine(10,axisY,false);
+  const od=MAIN.find(n=>!n.done&&n.date<TODAY);
+  if(od) s+=overdueLabel(dx(od.date)+10,yMain-24,'逾期7天',false);
+  s+=`</svg>`;
+  document.getElementById('dirC').innerHTML =
+    `<div class="proj-title" style="font-size:26px">跑鞋 2026 春夏款</div>
+     <div class="proj-sub">${SUB}</div>
+     ${s}
+     <div class="legend">${legendHTML(C_LIGHT,false)}</div>`;
+})();
+
+/* ============================================================
+   方向 D：画布即主角（时间轴满铺 + 玻璃浮签，去内边距）
+   ============================================================ */
+document.getElementById('dirD-sub').innerHTML = `<i class="dot" style="background:#0aa67e"></i>开发 · 7/11 · 1 逾期`;
+document.getElementById('dirD-tl').innerHTML = timeline(C_LIGHT,'#ffffff',false,{yMain:56});
+
+/* ============================================================
+   方向 E：阶段摘要条 + A 结构
+   ============================================================ */
+(function(){
+  /* 阶段跨度 = 该阶段首节点 → 下一阶段首节点（按主线） */
+  const firsts={}; MAIN.forEach(n=>{ if(!(n.phase in firsts)) firsts[n.phase]=n.date; });
+  const order=PHASE.filter(p=>p in firsts);
+  const spans=order.map((p,i)=>{
+    const from=doy(firsts[p]);
+    const to=i<order.length-1?doy(firsts[order[i+1]]):DAYS;
+    return {p,from,to};
+  });
+  const cur=spans.find(s=>doy(TODAY)>=s.from&&doy(TODAY)<s.to);
+  const bar=spans.map(s=>{
+    const w=((s.to-s.from)/DAYS*100).toFixed(2);
+    return `<i style="width:${w}%;background:${C_LIGHT[s.p]}"></i>`;
+  }).join('');
+  const line=spans.map(s=>{
+    const label=`${s.p}${s===cur?' · 进行中':''}`;
+    return `<span style="width:${((s.to-s.from)/DAYS*100).toFixed(2)}%"><span class="${s===cur?'cur':''}">${label}</span></span>`;
+  }).join('');
+  document.getElementById('dirE').innerHTML =
+    `<div class="proj-title">跑鞋 2026 春夏款</div>
+     <div class="proj-sub">${SUB}</div>
+     <div class="phasebar">${bar}</div>
+     <div class="phaseline">${line}</div>
+     ${timeline(C_LIGHT,'#ffffff',false)}
+     <div class="legend">${legendHTML(C_LIGHT,false)}</div>`;
+})();
+</script>
+</body>
+</html>

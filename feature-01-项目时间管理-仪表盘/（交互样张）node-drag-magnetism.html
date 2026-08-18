@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>（交互样张）节点右键菜单 + 拖动磁吸 · 方向 B 深色基线 · 2026-08-18</title>
+<style>
+  /* ============================================================
+     （交互样张）节点右键菜单 + 拖动磁吸 —— 静态假数据 · 不接后端 · 全部待拍板
+     视觉基线（已拍板，2026-08-17）：方向 B 深色聚焦 / 白色节点圈 / ) 形分界 /
+       六阶段深色色板 / 绝对标尺 + 红色今日线 / 连续条形 / 单项目双轨
+     本样张验证的新决策（2026-08-18 用户指令 + 三问收敛）：
+       ① 节点右键菜单：修改/拖拽 · 已完成 · 未完成（防误拖的门控入口）
+       ② 拖拽进入方式 = 一次性解锁（右键授权一次 → 按住拖 → 松手上锁）
+       ③ 拖动精度 = 局部放大带（光标附近 ±10 天 ×8 倍放大尺）
+       ④ 状态菜单 = 恒显三项 · 当前态打 ✓ 置灰
+       ⑤ 拖拽双模式（2026-08-18 用户追加）：【拖拽】仅此节点 /【拖拽（顺延）】后续同步平移
+       ⑥ 无默认拖拽档（2026-08-18 用户拍板）：每次拖动都必须右键重新选择模式
+     继承的冻结结论（2-DRAG_TIMELINE_REQUIREMENTS.md 确认项）：
+       1日吸附 + 「旧→新（±N天）」（确认9）/ 拖动级联平移后续节点（确认1）/
+       不可拖过同轨前驱（确认2）/ 草稿 + 右上角红色更新日期 + 放弃更改（确认6）/
+       旧位置空心点钉在最近已提交位置 + 虚线净位移（确认15）/
+       已完成节点可拖但标【历史日期修正】（确认10）/ 状态三态（确认21）
+     ⚠️ 覆盖注记：原「4px 位移阈值区分拖动/点击」（确认13）被右键门控取代，
+     单击节点仍打开详情（Q7 结论保留）；原「拖动 = 自动级联后续整体平移」（确认1）
+     改为菜单二选一：【拖拽】仅此节点（不越过前后邻居，链序不变）／
+     【拖拽（顺延）】= 原级联行为。
+     ============================================================ */
+  :root{
+    --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --seg:#636366;
+    --ink:#f5f5f7; --ink2:#a1a1a6; --ink3:#6e6e73;
+    --hairline:#3a3a3c; --red:#ff453a; --blue:#6db2ff; --amber:#ffd60a;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);padding:40px 0 120px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 32px}
+  body.dragging{user-select:none;cursor:grabbing}
+
+  /* —— 顶部说明卡 —— */
+  .intro{background:var(--card);border-radius:20px;padding:28px 32px;box-shadow:0 1px 3px rgba(0,0,0,.5);margin-bottom:40px}
+  .intro h1{font-size:21px;font-weight:700;letter-spacing:-.02em;margin-bottom:10px}
+  .intro p{font-size:13.5px;line-height:1.8;color:var(--ink2)}
+  .decided{background:rgba(52,199,89,.12);border:1px solid rgba(52,199,89,.4);border-radius:14px;
+    padding:12px 16px;font-size:13px;line-height:1.75;margin-bottom:14px}
+  .decided b{color:#63d97c}
+  .frozen{background:var(--card2);border-radius:14px;padding:12px 16px;font-size:12.5px;line-height:1.8;color:var(--ink2);margin-top:12px}
+  .frozen b{color:var(--ink)}
+  .howto{margin-top:12px;font-size:13px;line-height:2;color:var(--ink2)}
+  .howto b{color:var(--ink)}
+  .howto li{margin-left:18px}
+  .warn{color:var(--amber)}
+
+  /* —— 主卡（方向 B）—— */
+  .board{background:var(--card);border-radius:20px;box-shadow:0 1px 3px rgba(0,0,0,.5),0 12px 32px rgba(0,0,0,.35);
+    padding:28px 32px 24px;position:relative}
+  .title-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  .proj-title{font-size:30px;font-weight:700;letter-spacing:-.02em}
+  .proj-sub{font-size:13px;color:var(--ink2);margin-top:6px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+  .sep{color:var(--hairline)}
+
+  /* 草稿工具条（确认6：极简顶栏——红色更新日期 + 放弃更改） */
+  .toolbar{min-height:56px;display:flex;align-items:center;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+  .toolbar .placeholder{font-size:12px;color:var(--ink3)}
+  .btn-update{background:var(--red);color:#fff;font-weight:700;font-size:13.5px;border:none;
+    border-radius:10px;padding:9px 18px;cursor:pointer;box-shadow:0 4px 14px rgba(255,69,58,.35)}
+  .btn-update:hover{filter:brightness(1.08)}
+  .btn-ghost{background:transparent;color:var(--ink);font-size:13px;border:1px solid var(--hairline);
+    border-radius:10px;padding:8px 14px;cursor:pointer}
+  .btn-ghost:hover{background:var(--card2)}
+  .btn-undo{background:var(--card2);color:var(--blue);font-size:13px;border:none;border-radius:10px;
+    padding:8px 14px;cursor:pointer}
+  .draft-n{background:rgba(0,0,0,.22);border-radius:99px;padding:1px 8px;font-size:12px;margin-left:6px}
+
+  /* 上下文提示 + 交互参数 */
+  .ctl-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+    border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);
+    padding:10px 0;margin:14px 0 6px}
+  .hint{font-size:12.5px;color:var(--ink2);display:flex;align-items:center;gap:8px;min-height:22px}
+  .hint .st{width:7px;height:7px;border-radius:50%;background:var(--ink3);flex:none}
+  .hint.unlocked .st{background:var(--blue)}
+  .hint.drag .st{background:var(--red)}
+  .hint.draft .st{background:var(--amber)}
+  .ctls{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .ctl{display:flex;align-items:center;gap:8px}
+  .ctl label{font-size:11.5px;color:var(--ink3)}
+  .seg{display:inline-flex;background:var(--card2);border-radius:9px;padding:2px}
+  .seg button{background:transparent;border:none;color:var(--ink2);font-size:12px;padding:4px 12px;
+    border-radius:7px;cursor:pointer;font-family:inherit}
+  .seg button.on{background:var(--seg);color:#fff}
+
+  svg{display:block;width:100%;height:auto}
+  svg text{font-family:inherit}
+  .hit{cursor:default}
+  .hit.unlocked{cursor:grab}
+  body.dragging .hit{cursor:grabbing}
+
+  .legend{display:flex;gap:15px;align-items:center;margin-top:16px;font-size:12px;color:var(--ink2);flex-wrap:wrap}
+  .legend .sw{display:flex;align-items:center;gap:5px}
+  .legend .sw i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .legend .note{color:var(--ink3)}
+
+  .foot-note{font-size:12px;color:var(--ink3);margin-top:14px;line-height:1.75}
+
+  /* —— 右键菜单 —— */
+  .ctx{position:fixed;z-index:60;min-width:212px;background:rgba(44,44,46,.97);
+    -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+    border:1px solid var(--hairline);border-radius:12px;padding:5px;
+    box-shadow:0 12px 34px rgba(0,0,0,.55);display:none}
+  .ctx .item{display:flex;justify-content:space-between;align-items:center;gap:16px;width:100%;
+    background:none;border:none;color:var(--ink);font-size:13px;font-family:inherit;
+    padding:8px 12px;border-radius:8px;cursor:pointer;text-align:left}
+  .ctx .item:hover{background:#3a3a3d}
+  .ctx .item .glyph{color:var(--ink3);margin-right:8px}
+  .ctx .item .chk{color:#63d97c;font-weight:700}
+  .ctx .item .sub{font-size:10.5px;color:var(--ink3);white-space:nowrap}
+  .ctx .item.dis{opacity:.35;cursor:default}
+  .ctx .item.dis:hover{background:none}
+  .ctx .divider{height:1px;background:var(--hairline);margin:5px 8px}
+
+  /* —— 局部放大带（loupe）—— */
+  .loupe{position:absolute;z-index:40;display:none;pointer-events:none;
+    background:rgba(28,28,30,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    border:1px solid var(--hairline);border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.55);padding:8px 10px 6px}
+  .loupe .lp-head{display:flex;align-items:center;gap:8px;padding:0 2px 6px;white-space:nowrap}
+  .lp-date{font-size:13px;font-weight:700;color:var(--ink)}
+  .lp-date .arr{color:var(--ink3);font-weight:400;margin:0 2px}
+  .lp-delta{font-size:12px;color:var(--blue);font-weight:600}
+  .lp-flag{font-size:10.5px;color:#1c1c1e;background:var(--amber);border-radius:99px;padding:1px 8px;font-weight:700}
+  .lp-free{font-size:10.5px;color:var(--ink3)}
+  .loupe svg{display:block}
+  .loupe .lp-arrow{position:absolute;bottom:-6px;width:12px;height:12px;background:inherit;
+    border-right:1px solid var(--hairline);border-bottom:1px solid var(--hairline);
+    transform:rotate(45deg);border-bottom-right-radius:3px}
+
+  /* —— 节点详情浮层（悬停/单击钉住）—— */
+  .tip{position:absolute;z-index:50;display:none;pointer-events:none;
+    background:rgba(44,44,46,.97);border:1px solid var(--hairline);border-radius:12px;
+    box-shadow:0 8px 24px rgba(0,0,0,.5);padding:10px 14px;min-width:190px}
+  .tip .t-name{font-size:13.5px;font-weight:700;margin-bottom:4px;padding-right:14px}
+  .tip .t-row{font-size:12px;color:var(--ink2);line-height:1.9;display:flex;gap:8px}
+  .tip .t-row b{color:var(--ink);font-weight:600;flex:none}
+  .tip.pinned{pointer-events:auto;border-color:#5a5a5e}
+  .tip .t-pin{position:absolute;top:8px;right:10px;font-size:10px;color:var(--ink3)}
+  .tip.pinned .t-pin{color:var(--blue)}
+</style>
+</head>
+<body data-palette="#a878e4,#3a6bc2,#12ab8a,#c37a24,#2cae71,#a07f24">
+
+<div class="wrap">
+
+  <!-- ======================= 说明 ======================= -->
+  <section class="intro">
+    <h1>（交互样张）节点右键菜单 + 拖动磁吸</h1>
+    <div class="decided">✅ <b>2026-08-18 已拍板决策：</b>① 节点右键菜单 =【拖拽】【拖拽（顺延）】【已完成】【未完成】四项，拖动必须先右键授权，避免误操作直接拖拽（用户指令）；② 进入方式 = <b>一次性解锁</b>；③ 精度辅助 = <b>局部放大带</b>；④ 状态菜单 = <b>恒显三项 · 当前态 ✓ 置灰</b>；⑤ <b>拖拽双模式</b> =【拖拽】仅此节点 ·【拖拽（顺延）】后续同步平移；⑥ <b>无默认档</b>——每次拖动必须右键重新选择模式。视觉基线 = 2026-08-17 已拍板的方向 B 深色 + 白圈节点 + ) 形分界。</div>
+    <div class="frozen">
+      <b>继承的冻结结论（不在本样张重议）：</b>拖动按 <b>1 个自然日</b>吸附并持续显示「旧日期 → 新日期（±N 天）」（DRAG 确认 9）；<b>不可拖过同轨前驱</b>（确认 2）；拖动只产生<b>草稿</b>，右上角红色【更新日期】+【放弃更改】一次提交（确认 6）；旧位置<b>空心点钉在最近已提交位置</b>＋虚线净位移（确认 15）；已完成节点可拖但标<b>【历史日期修正】</b>（确认 10）；状态三态 = 未开始 / 进行中（隐含逾期）/ 已完成（确认 21）。<br>
+      <span class="warn">⚠️ 覆盖注记：</span>原「按下移动超过 4px 才算拖动」（确认 13）被右键门控<b>取代</b>；单击节点打开详情（Q7）保留为悬停/单击浮层；原「拖动 = 后续自动整体平移」（确认 1）改为菜单二选一——<b>【拖拽】</b>仅此节点（不越过前后邻居，链序不变），<b>【拖拽（顺延）】</b> = 原级联行为。
+    </div>
+    <div class="howto">
+      <b>操作方式：</b>
+      <li><b>右键点任意节点</b> → 菜单四项：<b>【拖拽】</b>只动这一个节点（不越过前后邻居，链序不变）／<b>【拖拽（顺延）】</b>本节点 + 同轨后续整体平移、间隔不变（原确认 1 级联）／【已完成】／【未完成】。授权一次 → 节点出现蓝色光环，<b>按住左键拖动</b>，松手即落为草稿并自动上锁（Esc 取消当前拖动）。</li>
+      <li>菜单里点【已完成 / 未完成】直接切换状态：逾期红圈即时消失 / 出现（已拍板：切换与日期共用同一草稿批次一次提交；本样张即时生效仅为演示简化）。</li>
+      <li>拖动时节点上方浮出<b>放大带</b>：光标附近 ±10 天放大 8 倍，日号可数；红刻度 = 今天，黄刻度 = 不可越过的前驱边界。</li>
+      <li>右上角出现红色【更新日期 N】后可继续右键调整其他节点；【更新日期】提交（提交后可撤销一次），【放弃更改】全部回滚。</li>
+      <li><b>悬停</b>节点看详情，<b>单击</b>钉住详情浮层。</li>
+      <li>下方「磁吸强度」可切换手感：<b>强</b>（日吸附＋周一/月初强磁铁＋阻带）· <b>标准</b>（纯 1 日吸附，冻结基线）· <b>弱</b>（日吸附＋弹簧缓动）· <b>关</b>（自由跟手，松手才取整）。</li>
+    </div>
+  </section>
+
+  <!-- ======================= 仪表盘主卡 ======================= -->
+  <section class="board" id="board">
+    <div class="title-row">
+      <div>
+        <div class="proj-title">跑鞋 2026 春夏款</div>
+        <div class="proj-sub" id="sub"></div>
+      </div>
+      <div class="toolbar" id="toolbar"><span class="placeholder">拖动后在此出现【更新日期】</span></div>
+    </div>
+
+    <div class="ctl-row">
+      <div class="hint" id="hint"><span class="st"></span><span id="hintText">右键节点开始 · 悬停看详情</span></div>
+      <div class="ctls">
+        <div class="ctl"><label>磁吸强度</label>
+          <div class="seg" id="segMag">
+            <button data-v="强">强</button><button data-v="标准" class="on">标准</button>
+            <button data-v="弱">弱</button><button data-v="关">关</button>
+          </div>
+        </div>
+        <div class="ctl"><label>放大带</label>
+          <div class="seg" id="segLp"><button data-v="开" class="on">开</button><button data-v="关">关</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tl"></div>
+    <div class="legend" id="legend"></div>
+
+    <div class="loupe" id="loupe"></div>
+    <div class="tip" id="tip"></div>
+
+    <p class="foot-note">
+      本样张 = 假数据 · 不接后端 · 全部行为待拍板。样张按 <b>admin 视角</b>（可改可拖）；member 只能拖自己创建的项目（冻结权限基线，只读视角未在本样张演示）。
+      2026-08-18 随问卷一并收口：磁吸默认档 = <b>标准</b> / 放大带 = <b>±10 天 ×8 倍</b> / 状态切换与日期<b>共用同一草稿批次</b>（本样张即时切换仅为演示简化）/ 右键四项菜单<b>同样用于全项目仪表盘</b> / 单节点档钳制在<b>前后邻居之间</b> / 拖拽<b>无默认档</b>，必须每次右键选择。仅「强」档磁铁规则（周一/月初磁铁 + 阻带参数）留集成验收微调。
+    </p>
+  </section>
+</div>
+
+<div class="ctx" id="ctx"></div>
+<div id="jsok" hidden>OK</div>
+
+<script>
+'use strict';
+/* ============================================================
+   数据（与视觉样张同源，单日期模型）—— d = 2026 年第几天（0 起）
+   ============================================================ */
+const PHASE=['创意','设计','开发','测试','量产','应用迭代'];
+const C={'创意':'#a878e4','设计':'#3a6bc2','开发':'#12ab8a','测试':'#c37a24','量产':'#2cae71','应用迭代':'#a07f24'};
+const TODAY='2026-08-17';
+const MONTHS=[0,31,59,90,120,151,181,212,243,273,304,334,365];
+const doy=s=>{const[m,d]=s.split('-').slice(1).map(Number);return MONTHS[m-1]+d-1;};
+const TODAY_D=doy(TODAY);
+const dateOf=d=>new Date(Date.UTC(2026,0,1+Math.round(d)));
+const dow=d=>dateOf(d).getUTCDay();                 /* 0=周日 */
+const fmtD=d=>{const t=dateOf(d);return (t.getUTCMonth()+1)+'/'+t.getUTCDate();};
+const isMonday=d=>dow(d)===1;
+const isMonthStart=d=>MONTHS.includes(Math.round(d));
+const isWeekend=d=>{const w=dow(d);return w===0||w===6;};
+
+const TRACKS=[
+ {name:'主线',nodes:[
+  {phase:'创意',name:'项目头脑风暴',   d:doy('2026-01-05'),done:true},
+  {phase:'创意',name:'创意整合',       d:doy('2026-01-22'),done:true},
+  {phase:'创意',name:'正式立项',       d:doy('2026-02-01'),done:true},
+  {phase:'设计',name:'首轮设计图评审', d:doy('2026-03-02'),done:true},
+  {phase:'设计',name:'设计定稿',       d:doy('2026-03-25'),done:true},
+  {phase:'开发',name:'鞋楦开发',       d:doy('2026-04-15'),done:true},
+  {phase:'开发',name:'材料打样',       d:doy('2026-05-20'),done:true},
+  {phase:'开发',name:'工程样件评审',   d:doy('2026-08-10'),done:false},   /* 逾期 */
+  {phase:'测试',name:'穿着性能测试',   d:doy('2026-09-05'),done:false},
+  {phase:'量产',name:'量产启动',       d:doy('2026-10-20'),done:false},
+  {phase:'应用迭代',name:'上市后反馈迭代', d:doy('2026-12-05'),done:false},
+ ]},
+ {name:'并行',nodes:[
+  {phase:'设计',name:'市场同步评审',     d:doy('2026-02-12'),done:true},
+  {phase:'开发',name:'材料供应商预沟通', d:doy('2026-04-20'),done:true},
+ ]},
+];
+TRACKS.forEach(t=>t.nodes.forEach(n=>{n.committed=n.d;n.draft=n.d;n.render=n.d;}));
+
+/* ============================================================
+   几何
+   ============================================================ */
+const X0=64,X1=1016,DAYS=365;
+const dx=d=>X0+d/DAYS*(X1-X0);
+const dayOf=x=>Math.max(0,Math.min(DAYS,(x-X0)/(X1-X0)*DAYS));
+const Y_MAIN=46,Y_PARA=86,BAR_H=12,AXIS_Y=124,SVG_H=152;
+
+/* ============================================================
+   状态
+   ============================================================ */
+let unlocked=null;        /* {ti,ni,mode} 已解锁待拖；mode: single=仅此节点 / cascade=顺延后续 */
+let drag=null;            /* {ti,ni,mode,snapshot} 拖动中 */
+let undoSnap=null;        /* 提交后的一次撤销快照 */
+let strength='标准', loupeOn=true;
+let magRaf=0;
+
+const $=id=>document.getElementById(id);
+window.onerror=function(msg,src,line,col){const el=document.getElementById('jsok');
+  if(el){el.removeAttribute('hidden');el.textContent='ERR:'+msg+' @'+line+':'+col;el.style.color='#ff453a';}};
+const svgEl=()=>$('tl').firstElementChild;
+const board=$('board');
+
+/* 派生状态（确认21） */
+function statusOf(n){
+  if(n.done) return '已完成';
+  if(n.draft<TODAY_D)  return '进行中 · 逾期 '+(TODAY_D-n.draft)+' 天';
+  if(n.draft===TODAY_D)return '进行中 · 今天';
+  return '未开始';
+}
+const esc=s=>s.replace(/&/g,'&amp;');
+
+/* ============================================================
+   渲染：时间轴 SVG
+   ============================================================ */
+function ruler(){
+  let s='';
+  for(let m=0;m<12;m++){
+    const x=X0+MONTHS[m]/DAYS*(X1-X0), q=(m%3===0);
+    s+=`<line x1="${x.toFixed(1)}" y1="${AXIS_Y-4}" x2="${x.toFixed(1)}" y2="${AXIS_Y}" stroke="${q?'#5a5a5e':'#3a3a3c'}" stroke-width="1"/>`
+      +`<text x="${(x+3).toFixed(1)}" y="${AXIS_Y+14}" font-size="10.5" fill="${q?'#a1a1a6':'#6e6e73'}">${m+1}月</text>`;
+  }
+  return s;
+}
+function todayLine(){
+  const x=dx(TODAY_D);
+  return `<line x1="${x.toFixed(1)}" y1="20" x2="${x.toFixed(1)}" y2="${AXIS_Y}" stroke="#ff453a" stroke-width="1.5"/>`
+   +`<g><rect x="${(x-31).toFixed(1)}" y="4" width="62" height="15" rx="7.5" fill="#ff453a"/>`
+   +`<text x="${x.toFixed(1)}" y="15" font-size="10" font-weight="600" fill="#fff" text-anchor="middle">今天 8/17</text></g>`;
+}
+function phaseLabels(track,y){
+  let out='',prev=null;
+  track.nodes.forEach(n=>{
+    if(n.phase!==prev){
+      const x=dx(n.render);
+      out+=`<circle cx="${x.toFixed(1)}" cy="${y-9}" r="3" fill="${C[n.phase]}"/>`
+          +`<text x="${(x+8).toFixed(1)}" y="${y-5}" font-size="11" fill="#a1a1a6">${n.phase}</text>`;
+      prev=n.phase;
+    }
+  });
+  return out;
+}
+/* ) 形分界（2026-08-17 拍板）：同阶段合并整条；切换处前段圆尾 + 后段直角 */
+function laneSVG(track,y){
+  const runs=[];
+  track.nodes.forEach(n=>{
+    const last=runs[runs.length-1];
+    if(last&&last.phase===n.phase)last.nodes.push(n);
+    else runs.push({phase:n.phase,nodes:[n]});
+  });
+  let out='';
+  runs.forEach((r,ri)=>{
+    const next=runs[ri+1];
+    const xS=dx(r.nodes[0].render);
+    const xE=next?dx(next.nodes[0].render):dx(r.nodes[r.nodes.length-1].render);
+    if(xE-xS<=1)return;
+    const x0=xS+(ri===0?0:1), x1=xE-1, w=x1-x0, rx=2, rr=Math.min(rx,w/2);
+    out+= ri===0
+      ? `<rect x="${x0.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="${BAR_H}" rx="2" fill="${C[r.phase]}"/>`
+      : `<path d="M${x0.toFixed(1)},${y}h${(w-rr).toFixed(1)}a${rr},${rr} 0 0 1 ${rr},${rr}v${(BAR_H-2*rr).toFixed(1)}a${rr},${rr} 0 0 1 ${-rr},${rr}h${(-(w-rr)).toFixed(1)}z" fill="${C[r.phase]}"/>`;
+  });
+  return out;
+}
+/* 节点点：白圈（拍板）；逾期红圈；已完成 ✓；拖拽/解锁/级联态 */
+function dotsSVG(track,ti,y){
+  let out='';
+  track.nodes.forEach((n,ni)=>{
+    const cy=y+BAR_H/2, isDrag=drag&&drag.ti===ti&&drag.ni===ni;
+    const isUnl=!drag&&unlocked&&unlocked.ti===ti&&unlocked.ni===ni;
+    const cascaded=drag&&drag.ti===ti&&ni>drag.ni&&n.draft!==dragFromSnapshot(ti,ni);
+    /* 旧位置空心点 + 虚线（确认15） */
+    if(n.draft!==n.committed){
+      const ox=dx(n.committed), nx=dx(n.render);
+      if(isDrag) out+=`<line x1="${ox.toFixed(1)}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${cy}" stroke="#98989d" stroke-width="1" stroke-dasharray="3,3" opacity=".85"/>`;
+      out+=`<circle cx="${ox.toFixed(1)}" cy="${cy}" r="4" fill="none" stroke="#98989d" stroke-width="1.5" stroke-dasharray="2,2"/>`;
+    }
+    const overdue=!n.done&&n.draft<TODAY_D;
+    if(isDrag) out+=`<circle cx="${dx(n.render).toFixed(1)}" cy="${cy}" r="10" fill="none" stroke="#6db2ff" stroke-width="2"/>`;          /* 直接拖动：浅蓝轮廓 */
+    else if(isUnl) out+=`<circle cx="${dx(n.render).toFixed(1)}" cy="${cy}" r="9" fill="none" stroke="#6db2ff" stroke-width="1.5" opacity=".9"/>`;
+    else if(cascaded) out+=`<circle cx="${dx(n.render).toFixed(1)}" cy="${cy}" r="7.5" fill="none" stroke="#8e8e93" stroke-width="1.5"/>`; /* 自动顺延：中性轮廓 */
+    const r=n.done?6.5:(overdue?6:5);
+    out+=`<circle cx="${dx(n.render).toFixed(1)}" cy="${cy}" r="${r}" fill="${C[n.phase]}" stroke="${overdue?'#ff453a':'#f5f5f7'}" stroke-width="2"/>`;
+    if(n.done){
+      const x=dx(n.render);
+      out+=`<path d="M${(x-2.7).toFixed(1)},${cy+.1}l1.9,1.9 ${(3.5).toFixed(1)},${-3.8}" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    }
+    out+=`<circle class="hit${isUnl?' unlocked':''}" data-ti="${ti}" data-ni="${ni}" cx="${dx(n.render).toFixed(1)}" cy="${cy}" r="13" fill="transparent"/>`;
+  });
+  return out;
+}
+function dragFromSnapshot(ti,ni){return drag?drag.snapshot[ti][ni]:TRACKS[ti].nodes[ni].draft;}
+
+function render(){
+  let s=`<svg viewBox="0 0 ${X1+8} ${SVG_H}" role="img" aria-label="单项目时间轴（交互样张）">`;
+  s+=`<line x1="${X0}" y1="${AXIS_Y}" x2="${X1}" y2="${AXIS_Y}" stroke="#3a3a3c" stroke-width="1"/>`;
+  s+=ruler();
+  s+=`<text x="8" y="${Y_MAIN+BAR_H/2+4}" font-size="11" fill="#6e6e73">主线</text>`;
+  s+=`<text x="8" y="${Y_PARA+BAR_H/2+4}" font-size="11" fill="#6e6e73">并行</text>`;
+  s+=phaseLabels(TRACKS[0],Y_MAIN);
+  s+=laneSVG(TRACKS[0],Y_MAIN);
+  s+=laneSVG(TRACKS[1],Y_PARA);
+  s+=dotsSVG(TRACKS[0],0,Y_MAIN);
+  s+=dotsSVG(TRACKS[1],1,Y_PARA);
+  /* 并行节点直标 */
+  TRACKS[1].nodes.forEach(n=>{
+    s+=`<text x="${dx(n.render).toFixed(1)}" y="${Y_PARA-6}" font-size="10.5" fill="#a1a1a6">${esc(n.name)}</text>`;
+  });
+  s+=todayLine();
+  s+=`</svg>`;
+  $('tl').innerHTML=s;
+  renderSub();renderToolbar();renderHint();
+}
+
+/* ============================================================
+   顶部状态行 / 工具条 / 提示
+   ============================================================ */
+function draftCount(){let c=0;TRACKS.forEach(t=>t.nodes.forEach(n=>{if(n.draft!==n.committed)c++;}));return c;}
+function renderSub(){
+  const done=TRACKS[0].nodes.filter(n=>n.done).length+TRACKS[1].nodes.filter(n=>n.done).length;
+  const od=TRACKS[0].nodes.filter(n=>!n.done&&n.draft<TODAY_D).length+TRACKS[1].nodes.filter(n=>!n.done&&n.draft<TODAY_D).length;
+  $('sub').innerHTML=`<span><i class="dot" style="background:${C['开发']}"></i>当前 开发</span><span class="sep">｜</span>`
+    +`<span>13 节点 · ${done} 已完成</span><span class="sep">｜</span><span>${od} 逾期</span>`;
+}
+function renderToolbar(){
+  const tb=$('toolbar'),n=draftCount();
+  if(undoSnap){
+    tb.innerHTML=`<button class="btn-undo" id="btnUndo">↩ 撤销刚才的更新</button>`
+      +`<span class="placeholder" style="margin-left:4px">已提交 · 撤销有效至下一次编辑</span>`;
+    $('btnUndo').onclick=doUndo;return;
+  }
+  if(n>0){
+    tb.innerHTML=`<button class="btn-ghost" id="btnDrop">放弃更改</button>`
+      +`<button class="btn-update" id="btnCommit">更新日期<span class="draft-n">${n}</span></button>`;
+    $('btnDrop').onclick=dropAll;$('btnCommit').onclick=commit;return;
+  }
+  tb.innerHTML=`<span class="placeholder">拖动后在此出现【更新日期】</span>`;
+}
+function renderHint(){
+  const h=$('hint'),t=$('hintText');
+  h.className='hint';
+  if(drag){h.classList.add('drag');t.textContent=`拖动中：${dragNode().name} · 松手落草稿，Esc 取消`;}
+  else if(unlocked){h.classList.add('unlocked');t.textContent=`已解锁「${nodeAt(unlocked).name}」${unlocked.mode==='cascade'?'（顺延后续）':'（仅此节点）'}：按住左键拖动 · Esc 上锁`;}
+  else if(draftCount()>0){h.classList.add('draft');t.textContent=`${draftCount()} 处草稿待更新 · 可继续右键调整其他节点`;}
+  else t.textContent='右键节点开始 · 悬停看详情';
+}
+const nodeAt=r=>TRACKS[r.ti].nodes[r.ni];
+const dragNode=()=>nodeAt(drag);
+
+/* ============================================================
+   右键菜单（恒显三项 · 当前态 ✓ 置灰）
+   ============================================================ */
+const ctx=$('ctx');
+function showMenu(r,x,y){
+  const n=nodeAt(r);
+  ctx.innerHTML=
+    `<button class="item" data-act="drag1"><span><span class="glyph">✥</span>拖拽</span><span class="sub">仅此节点</span></button>`
+   +`<button class="item" data-act="dragc"><span><span class="glyph">⇉</span>拖拽（顺延）</span><span class="sub">后续同步</span></button>`
+   +`<div class="divider"></div>`
+   +`<button class="item ${n.done?'dis':''}" data-act="done"><span><span class="glyph">✓</span>已完成</span>${n.done?'<span class="chk">✓</span>':''}</button>`
+   +`<button class="item ${n.done?'':'dis'}" data-act="undone"><span><span class="glyph">○</span>未完成</span>${n.done?'':'<span class="chk">✓</span>'}</button>`;
+  ctx.style.display='block';
+  const w=ctx.offsetWidth,h2=ctx.offsetHeight;
+  ctx.style.left=Math.min(x,innerWidth-w-8)+'px';
+  ctx.style.top=Math.min(y,innerHeight-h2-8)+'px';
+  ctx.querySelectorAll('.item').forEach(btn=>{
+    btn.onclick=()=>{
+      const act=btn.dataset.act;hideMenu();
+      if(act==='drag1'){unlocked={ti:r.ti,ni:r.ni,mode:'single'};undoSnap=null;render();}
+      else if(act==='dragc'){unlocked={ti:r.ti,ni:r.ni,mode:'cascade'};undoSnap=null;render();}
+      else if(act==='done'&&!n.done){n.done=true;render();}
+      else if(act==='undone'&&n.done){n.done=false;render();}
+    };
+  });
+}
+function hideMenu(){ctx.style.display='none';}
+
+/* ============================================================
+   拖动：一次性解锁 → 按住拖 → 松手上锁
+   冻结语义：1日吸附 / 级联平移 / 不越前驱 / ±N天显示
+   ============================================================ */
+function svgX(e){
+  const el=svgEl(),r=el.getBoundingClientRect();
+  return (e.clientX-r.left)/r.width*(X1+8);
+}
+function startDrag(e){
+  drag={ti:+e.target.dataset.ti,ni:+e.target.dataset.ni,mode:unlocked.mode,
+        snapshot:TRACKS.map(t=>t.nodes.map(n=>n.draft))};
+  document.body.classList.add('dragging');
+  hideTip();e.preventDefault();
+  magLoop();
+}
+function magnets(){ /* 「强」档磁铁：周一 + 月初 */
+  const m=[];
+  for(let d=4;d<=DAYS;d+=7)m.push(d);        /* 2026-01-05 是周一 */
+  MONTHS.slice(0,12).forEach(d0=>m.push(d0));
+  return m;
+}
+const MAGS=magnets();
+function onDragMove(e){
+  if(!drag)return;
+  const t=TRACKS[drag.ti],n=t.nodes[drag.ni];
+  const dayF=dayOf(svgX(e));
+  const prev=drag.ni>0?t.nodes[drag.ni-1].draft:0;
+  const next=drag.mode==='single'&&drag.ni<t.nodes.length-1?t.nodes[drag.ni+1].draft:DAYS; /* 单节点档不越后邻 */
+  let day;
+  if(strength==='强'){                        /* 阻带（粘滞）吸附 */
+    day=n.draft;const stick=.32;
+    while(dayF>day+.5+stick&&day+1<=DAYS)day++;
+    while(dayF<day-.5-stick&&day-1>=prev)day--;
+    for(const m of MAGS){if(m>=prev&&Math.abs(dayF-m)<=1.15){day=m;break;}}
+  }else{
+    day=Math.round(dayF);
+  }
+  day=Math.max(prev,Math.min(DAYS,day));
+  if(drag.mode==='single')day=Math.min(next,day);
+  const delta=day-n.draft;
+  if(delta){
+    if(drag.mode==='cascade')for(let j=drag.ni;j<t.nodes.length;j++)t.nodes[j].draft+=delta;
+    else n.draft=day;
+  }
+  if(strength==='关')n.render=dayF;           /* 关：拖动点自由跟手 */
+  updateLoupe();
+  render();
+}
+function endDrag(commit){
+  if(!drag)return;
+  if(!commit){                                /* Esc：恢复本次拖动前草稿 */
+    drag.snapshot.forEach((arr,ti)=>arr.forEach((d,ni)=>{TRACKS[ti].nodes[ni].draft=d;}));
+  }
+  const n=dragNode();n.render=n.draft;        /* 关档松手取整回位 */
+  drag=null;unlocked=null;
+  document.body.classList.remove('dragging');
+  $('loupe').style.display='none';
+  cancelAnimationFrame(magRaf);
+  render();
+}
+function magLoop(){                           /* 弱档：弹簧缓动 */
+  const step=()=>{
+    if(!drag)return;
+    if(strength==='弱'){
+      TRACKS[drag.ti].nodes.forEach(n=>{
+        n.render+= (n.draft-n.render)*.28;
+        if(Math.abs(n.draft-n.render)<.02)n.render=n.draft;
+      });
+      updateLoupe();render();
+    }
+    magRaf=requestAnimationFrame(step);
+  };
+  magRaf=requestAnimationFrame(step);
+}
+
+/* ============================================================
+   局部放大带（±10 天 ×8 倍）
+   ============================================================ */
+function updateLoupe(){
+  const lp=$('loupe');
+  if(!drag||!loupeOn){lp.style.display='none';return;}
+  const n=dragNode();
+  const center=n.draft;
+  const PPD=34,W=21*PPD,H=54;                 /* 8 倍≈34px/日（基线 2.6px/日） */
+  const prev=drag.ni>0?TRACKS[drag.ti].nodes[drag.ni-1].draft:null;
+  const next=drag.mode==='single'&&drag.ni<TRACKS[drag.ti].nodes.length-1?TRACKS[drag.ti].nodes[drag.ni+1].draft:null;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">`;
+  s+=`<line x1="0" y1="36" x2="${W}" y2="36" stroke="#3a3a3c" stroke-width="1"/>`;
+  for(let k=-10;k<=10;k++){
+    const d=Math.round(center)+k;if(d<0||d>DAYS)continue;
+    const x=(k+10)*PPD+PPD/2;
+    const mon=isMonday(d),ms=isMonthStart(d),td=d===TODAY_D,bd=(prev!==null&&d===prev)||(next!==null&&d===next),we=isWeekend(d);
+    const col=td?'#ff453a':bd?'#ffd60a':mon?'#f5f5f7':'#5a5a5e';
+    const t1=td?24:ms?26:mon?28:we?38:32,t2=46;
+    s+=`<line x1="${x}" y1="${t1}" x2="${x}" y2="${t2}" stroke="${col}" stroke-width="${td||bd?2:1}"/>`;
+    if(strength==='强'&&mon&&!ms)s+=`<circle cx="${x}" cy="20" r="2.5" fill="#6db2ff"/>`;  /* 磁铁标记 */
+    const lbl=ms?(dateOf(d).getUTCMonth()+1)+'月':dateOf(d).getUTCDate();
+    s+=`<text x="${x}" y="54" font-size="10" text-anchor="middle" fill="${td?'#ff453a':mon?'#f5f5f7':'#98989d'}" font-weight="${mon||td?600:400}">${lbl}</text>`;
+    if(td)s+=`<text x="${x}" y="16" font-size="9" text-anchor="middle" fill="#ff453a">今天</text>`;
+    if(bd)s+=`<text x="${x}" y="16" font-size="9" text-anchor="middle" fill="#ffd60a">不可越</text>`;
+  }
+  s+=`<line x1="${W/2}" y1="22" x2="${W/2}" y2="46" stroke="#f5f5f7" stroke-width="2"/>`;
+  s+=`</svg>`;
+  /* 头部：旧 → 新（±N 天）（确认9/15：净位移相对最近已提交） */
+  const delta=n.draft-n.committed;
+  const head=`<div class="lp-head">`
+    +(n.done?`<span class="lp-flag">历史日期修正</span>`:'')
+    +`<span class="lp-date">${fmtD(n.committed)}<span class="arr">→</span>${fmtD(n.draft)}</span>`
+    +`<span class="lp-delta">${delta>=0?'+':''}${delta} 天</span>`
+    +(strength==='关'?`<span class="lp-free">（松手取整）</span>`:'')
+    +`</div>`;
+  lp.innerHTML=head+s+`<div class="lp-arrow" id="lpArrow"></div>`;
+  /* 定位：节点上方 */
+  const el=svgEl(),sr=el.getBoundingClientRect(),br=board.getBoundingClientRect();
+  const nodeX=sr.left-br.left+dx(n.render)/(X1+8)*sr.width;
+  const nodeY=sr.top-br.top+ (drag.ti===0?Y_MAIN:Y_PARA)/SVG_H*sr.height;
+  const lw=W+22,lh=lp.offsetHeight||110;
+  let left=Math.max(12,Math.min(br.width-lw-12,nodeX-lw/2));
+  lp.style.left=left+'px';
+  lp.style.top=Math.max(8,nodeY-lh-16)+'px';
+  lp.style.display='block';
+  const ar=$('lpArrow');
+  ar.style.left=Math.max(8,Math.min(lw-20,nodeX-left-6))+'px';
+}
+
+/* ============================================================
+   节点详情浮层（悬停显示 / 单击钉住 —— Q7 保留）
+   ============================================================ */
+const tip=$('tip');let pinned=null;
+function showTip(r,pin){
+  const t=TRACKS[r.ti],n=t.nodes[r.ni];
+  const prev=r.ni>0?t.nodes[r.ni-1]:null;
+  const draft=n.draft!==n.committed?`<div class="t-row"><b>草稿</b><span>${fmtD(n.committed)} → ${fmtD(n.draft)}（${n.draft>=n.committed?'+':''}${n.draft-n.committed} 天，未提交）</span></div>`:'';
+  tip.innerHTML=`<div class="t-name">${esc(n.name)}</div>`
+   +`<div class="t-row"><b>阶段</b><span>${n.phase} · ${t.name}</span></div>`
+   +`<div class="t-row"><b>日期</b><span>${fmtD(n.draft)}（周${'日一二三四五六'[dow(n.draft)]}）</span></div>`
+   +`<div class="t-row"><b>状态</b><span>${statusOf(n)}</span></div>`
+   +(prev?`<div class="t-row"><b>间隔</b><span>距「${esc(prev.name)}」${n.draft-prev.draft} 天</span></div>`:'')
+   +draft+`<div class="t-pin">${pin?'● 已钉住，点空白关闭':'单击钉住'}</div>`;
+  const el=svgEl(),sr=el.getBoundingClientRect(),br=board.getBoundingClientRect();
+  const nx=sr.left-br.left+dx(n.render)/(X1+8)*sr.width;
+  const ny=sr.top-br.top+(r.ti===0?Y_MAIN:Y_PARA)/SVG_H*sr.height;
+  tip.style.left=Math.max(10,Math.min(br.width-230,nx+14))+'px';
+  tip.style.top=(ny-14)+'px';
+  tip.className=pin?'tip pinned':'tip';
+  tip.style.display='block';
+}
+function hideTip(force){if(pinned&&!force)return;tip.style.display='none';}
+
+/* ============================================================
+   提交 / 放弃 / 撤销（确认6/12/16）
+   ============================================================ */
+function commit(){
+  undoSnap=TRACKS.map(t=>t.nodes.map(n=>n.committed));
+  TRACKS.forEach(t=>t.nodes.forEach(n=>{n.committed=n.draft;}));
+  render();
+}
+function dropAll(){
+  TRACKS.forEach(t=>t.nodes.forEach(n=>{n.draft=n.committed;n.render=n.committed;}));
+  undoSnap=null;render();
+}
+function doUndo(){
+  if(!undoSnap)return;
+  undoSnap.forEach((arr,ti)=>arr.forEach((d,ni)=>{
+    TRACKS[ti].nodes[ni].committed=d;TRACKS[ti].nodes[ni].draft=d;TRACKS[ti].nodes[ni].render=d;
+  }));
+  undoSnap=null;render();
+}
+
+/* ============================================================
+   事件绑定
+   ============================================================ */
+document.addEventListener('contextmenu',e=>{
+  const hit=e.target.closest?e.target.closest('.hit'):null;
+  if(hit&&board.contains(hit)){e.preventDefault();hideTip(true);pinned=null;showMenu({ti:+hit.dataset.ti,ni:+hit.dataset.ni},e.clientX,e.clientY);}
+  else if(!ctx.contains(e.target)){hideMenu();}   /* 右键别处 = 关闭本菜单 */
+});
+document.addEventListener('mousedown',e=>{
+  /* 菜单内部按下不预先关闭——否则 display:none 吞掉菜单项的 click（真浏览器序：mousedown→mouseup→click） */
+  if(!ctx.contains(e.target))hideMenu();
+  if(pinned){pinned=null;hideTip(true);}
+  const hit=e.target.closest?e.target.closest('.hit'):null;
+  if(e.button===0&&hit&&drag===null&&unlocked
+     &&unlocked.ti===+hit.dataset.ti&&unlocked.ni===+hit.dataset.ni){
+    startDrag(e);
+  }else if(e.button===0&&hit&&(!unlocked||unlocked.ti!==+hit.dataset.ti||unlocked.ni!==+hit.dataset.ni)){
+    /* 单击（未解锁）= 钉住详情 */
+    const r={ti:+hit.dataset.ti,ni:+hit.dataset.ni};
+    setTimeout(()=>{pinned=r;showTip(r,true);},0);
+  }
+});
+document.addEventListener('mousemove',e=>{
+  if(drag){onDragMove(e);return;}
+  const hit=e.target.closest?e.target.closest('.hit'):null;
+  if(hit&&!pinned)showTip({ti:+hit.dataset.ti,ni:+hit.dataset.ni},false);
+  else if(!hit)hideTip();
+});
+document.addEventListener('mouseup',()=>{if(drag)endDrag(true);});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(ctx.style.display==='block'){hideMenu();return;}
+    if(drag){endDrag(false);return;}
+    if(pinned){pinned=null;hideTip(true);return;}
+    if(unlocked){unlocked=null;render();}
+  }
+});
+document.addEventListener('wheel',()=>hideMenu(),{passive:true});
+$('segMag').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  strength=b.dataset.v;
+  $('segMag').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+});
+$('segLp').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  loupeOn=b.dataset.v==='开';
+  $('segLp').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+  if(!loupeOn)$('loupe').style.display='none';else if(drag)updateLoupe();
+});
+
+/* 图例 */
+$('legend').innerHTML=PHASE.map(p=>`<span class="sw"><i style="background:${C[p]}"></i>${p}</span>`).join('')
+ +`<span class="note">｜ <b style="color:#ff453a">｜</b> 今天 · <b style="color:#ff453a">◯</b> 逾期`
+ +` · <b style="color:#f5f5f7">✓</b> 已完成 · ◌ 旧位置（草稿） · <b style="color:#6db2ff">◯</b> 解锁/拖动中</span>`;
+
+render();
+</script>
+</body>
+</html>
