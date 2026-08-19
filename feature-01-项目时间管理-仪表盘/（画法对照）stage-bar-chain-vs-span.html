@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>feature01 · 单项目仪表盘「链式 vs 跨式」画法对照稿</title>
+<style>
+  :root{
+    --bg:#0e0e10; --card:#1c1c1e; --card2:#2c2c2e; --ink:#f5f5f7; --dim:#98989d;
+    --red:#ff453a; --blue:#6db2ff; --yellow:#ffd60a;
+    --s1:#a878e4; --s2:#3a6bc2; --s3:#12ab8a; --s4:#c37a24; --s5:#2cae71; --s6:#a07f24;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--ink); font:14px/1.65 "Segoe UI","Microsoft YaHei",sans-serif; padding:28px 20px 60px;}
+  .wrap{max-width:1180px; margin:0 auto;}
+  h1{font-size:20px; margin-bottom:6px;}
+  .banner{background:var(--card); border:1px solid #3a3a3c; border-radius:8px; padding:14px 18px; margin:14px 0 22px;}
+  .banner .tag{display:inline-block; background:rgba(255,214,10,.14); color:var(--yellow); border:1px solid rgba(255,214,10,.4); border-radius:4px; padding:1px 8px; font-size:12px; font-weight:600; margin-left:8px;}
+  .banner p{color:var(--dim); font-size:13px; margin-top:6px;}
+  .banner b{color:var(--ink);}
+
+  /* 数据卡 */
+  .datacard{background:var(--card); border:1px solid #3a3a3c; border-radius:8px; padding:14px 18px; margin-bottom:22px;}
+  .datacard h2{font-size:15px; margin-bottom:8px;}
+  table.dt{width:100%; border-collapse:collapse; font-size:12.5px;}
+  table.dt th,table.dt td{border:1px solid #3a3a3c; padding:4px 8px; text-align:left;}
+  table.dt th{color:var(--dim); background:var(--card2); font-weight:600;}
+  .chip{display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:5px; vertical-align:-1px;}
+  .st-done{color:#9be29b;} .st-late{color:var(--red);} .st-todo{color:var(--dim);}
+
+  /* 色点演示条 */
+  .dotsbar{background:var(--card); border:1px solid #3a3a3c; border-radius:8px; padding:10px 18px; margin-bottom:22px; font-size:13px; color:var(--dim);}
+  .dot{display:inline-block; width:9px; height:9px; border-radius:50%; vertical-align:-1px; margin:0 3px 0 10px;}
+  .dot.r{background:var(--red);} .dot.o{background:var(--yellow);}
+
+  /* 方案面板 */
+  .scheme{background:var(--card); border:1px solid #3a3a3c; border-radius:8px; padding:16px 18px 12px; margin-bottom:26px;}
+  .scheme h3{font-size:16px; margin-bottom:2px;}
+  .scheme .sub{color:var(--dim); font-size:12.5px; margin-bottom:12px;}
+  .scheme .sub b{color:var(--ink);}
+  .mark{display:inline-block; min-width:20px; text-align:center; background:var(--card2); border:1px solid #48484a; border-radius:4px; padding:0 5px; margin-right:6px; font-size:12px;}
+
+  /* 时间轴 */
+  .tl{position:relative; border:1px solid #3a3a3c; border-radius:6px; background:#151517; padding:0 12px 6px 0;}
+  .scale{position:relative; height:26px; margin-left:86px;}
+  .scale .mo{position:absolute; top:4px; color:var(--dim); font-size:11px; transform:translateX(-50%);}
+  .scale .tick{position:absolute; top:20px; width:1px; height:6px; background:#48484a;}
+  .lane{display:flex; align-items:stretch; border-top:1px solid #2a2a2c;}
+  .lane .lbl{flex:0 0 86px; display:flex; align-items:center; justify-content:center; gap:4px; color:var(--dim); font-size:12px;}
+  .lane .lbl .tchip{width:8px;height:8px;border-radius:2px;}
+  .trk{position:relative; flex:1; height:64px;}
+  .seg{position:absolute; height:14px; top:50%; transform:translateY(-50%); border-radius:0 2px 2px 0;}
+  .seg.pill{border-radius:2px; min-width:4px;}
+  .seg.top{top:calc(50% - 8px); height:9px; transform:none; border-radius:0 2px 0 0;}
+  .seg.bot{top:calc(50% - 1px); height:9px; transform:none; border-radius:0 0 2px 2px;}
+  .nd{position:absolute; top:50%; width:11px; height:11px; border:2px solid #fff; border-radius:50%; transform:translate(-50%,-50%); background:var(--bg); z-index:5;}
+  .nd.done{background:#fff; color:#1c1c1e; font-size:8px; line-height:8px; text-align:center; font-weight:700;}
+  .nd.late{border-color:var(--red); box-shadow:0 0 0 1px rgba(255,69,58,.35);}
+  .today{position:absolute; top:0; bottom:0; width:2px; background:var(--red); z-index:6;}
+  .today i{position:absolute; top:0; left:4px; font-style:normal; font-size:10.5px; color:var(--red); white-space:nowrap; background:rgba(14,14,16,.85); padding:0 3px; border-radius:2px;}
+  .week{position:absolute; top:0; bottom:0; background:rgba(255,214,10,.07); border-left:1px dashed rgba(255,214,10,.35); border-right:1px dashed rgba(255,214,10,.35); z-index:1;}
+  .week i{position:absolute; top:2px; left:50%; transform:translateX(-50%); font-style:normal; font-size:10px; color:rgba(255,214,10,.75); white-space:nowrap;}
+  .callout{position:absolute; font-size:10.5px; color:var(--blue); z-index:7; white-space:nowrap;}
+  .cap{color:var(--dim); font-size:12.5px; padding:8px 4px 2px;}
+  .cap b{color:var(--ink);}
+  .cap .hl-r{color:var(--red); font-weight:600;}
+  .cap .hl-y{color:var(--yellow); font-weight:600;}
+  .cap .hl-b{color:var(--blue); font-weight:600;}
+
+  /* 差异表 */
+  table.cmp{width:100%; border-collapse:collapse; font-size:12.5px; margin-bottom:22px;}
+  table.cmp th,table.cmp td{border:1px solid #3a3a3c; padding:6px 9px; text-align:left; vertical-align:top;}
+  table.cmp th{background:var(--card2); color:var(--dim); font-weight:600;}
+  table.cmp td b{color:var(--ink);}
+  .cmp .good{color:#9be29b;} .cmp .bad{color:var(--red);}
+
+  /* 拍板区 */
+  .decided{background:var(--card); border:1px solid rgba(255,214,10,.45); border-radius:8px; padding:14px 18px; margin-bottom:22px;}
+  .decided h2{font-size:15px; color:var(--yellow); margin-bottom:6px;}
+  .decided p{color:var(--dim); font-size:13px;}
+  .decided b{color:var(--ink);}
+  .decided ol{margin:8px 0 4px 20px; color:var(--dim); font-size:13px;}
+  .decided li{margin-bottom:4px;}
+  .foot{color:#6c6c6e; font-size:11.5px; line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>单项目仪表盘 · 时间条画法对照（链式 vs 跨式）</h1>
+  <div class="banner">
+    <b>feature01 · 阶段门 3 单元 ① 收尾件</b><span class="tag">已拍板 2026-08-18 = A 链式（本稿降级为留档）</span>
+    <p>同一份节点数据、同一条绝对日历标尺（6-01 ~ 10-15），三种「单日节点 → 连续阶段条」的画法对照。<b>2026-08-19 覆盖注记：本页方向 B 深色皮肤仅作历史留档；A 链式画法、数据结构、) 形分界与交互含义继续有效，门 4 视觉改用方向 A 浅色 token，不要求重绘本对照稿。</b> 本题只拍「画法」，数据契约已定（当前 API 恒返 nodes + segments + stage_intervals，切换画法不改 API）。今日线 = 2026-08-18（周二）。纯静态样张，无 JS。</p>
+  </div>
+
+  <div class="datacard">
+    <h2>演示数据 · 跑鞋「Photon Racer」：11 个节点（主线 6 + 并行·鞋底模具轨 5）</h2>
+    <table class="dt">
+      <tr><th>轨道</th><th>阶段</th><th>节点</th><th>日期</th><th>状态（按已冻结规则派生）</th></tr>
+      <tr><td>主线</td><td><span class="chip" style="background:var(--s1)"></span>创意</td><td>立项评审</td><td>06-02</td><td class="st-done">已完成（白勾）</td></tr>
+      <tr><td>主线</td><td><span class="chip" style="background:var(--s2)"></span>设计</td><td>外观定稿</td><td>06-20</td><td class="st-done">已完成</td></tr>
+      <tr><td>主线</td><td><span class="chip" style="background:var(--s3)"></span>开发</td><td>中底配方冻结</td><td>07-15</td><td class="st-done">已完成</td></tr>
+      <tr><td>主线</td><td><span class="chip" style="background:var(--s4)"></span>测试</td><td>样品测试</td><td>08-10</td><td class="st-late">进行中·隐含逾期（日期已过未标完成 → 红圈）</td></tr>
+      <tr><td>主线</td><td><span class="chip" style="background:var(--s5)"></span>量产</td><td>首批投产</td><td>09-05</td><td class="st-todo">未开始</td></tr>
+      <tr><td>主线</td><td><span class="chip" style="background:var(--s6)"></span>应用迭代</td><td>上市</td><td>10-01</td><td class="st-todo">未开始</td></tr>
+      <tr><td>并行</td><td><span class="chip" style="background:var(--s2)"></span>设计</td><td>模具评审一</td><td>06-25</td><td class="st-done">已完成</td></tr>
+      <tr><td>并行</td><td><span class="chip" style="background:var(--s3)"></span>开发</td><td>模具开发</td><td>07-05</td><td class="st-done">已完成</td></tr>
+      <tr><td>并行</td><td><span class="chip" style="background:var(--s3)"></span>开发</td><td>模具返修</td><td>07-16</td><td class="st-done">已完成</td></tr>
+      <tr><td>并行</td><td><span class="chip" style="background:var(--s2)"></span>设计</td><td>模具评审二 <b style="color:var(--blue)">← 交错夹层关键节点</b></td><td>07-20</td><td class="st-done">已完成</td></tr>
+      <tr><td>并行</td><td><span class="chip" style="background:var(--s4)"></span>测试</td><td>模具试模</td><td>08-22</td><td class="st-todo">未开始（<b style="color:var(--yellow)">落在本周 → 触发橙点</b>）</td></tr>
+    </table>
+  </div>
+
+  <div class="dotsbar">
+    行内色点演示（D10 本周新规 + 红橙并存）：Photon Racer
+    <span class="dot r"></span>红 = 有逾期未完成（主线 08-10）
+    <span class="dot o"></span>橙 = 本周（08-17 ~ 08-23）内有未完成节点（并行 08-22 试模）——两点独立判定、可并存，红左橙右。本周窗口 = 黄色淡带。
+  </div>
+
+  <!-- ============ 方案 A 链式 ============ -->
+  <div class="scheme">
+    <h3><span class="mark">A</span>链式 —— 相邻节点连线成条，段色 = 左端节点的阶段</h3>
+    <div class="sub">节点按轨道内日期排序，两两相连；<b>忠实呈现顺序</b>：并行轨「设计 → 开发 → 设计（评审二）→ 测试」的交错夹层原样可见（设计条断成两截）。</div>
+    <div class="tl">
+      <div class="scale">
+        <span class="mo" style="left:0%">6月</span><span class="mo" style="left:22.06%">7月</span><span class="mo" style="left:44.85%">8月</span><span class="mo" style="left:67.65%">9月</span><span class="mo" style="left:89.71%">10月</span>
+        <span class="tick" style="left:0%"></span><span class="tick" style="left:22.06%"></span><span class="tick" style="left:44.85%"></span><span class="tick" style="left:67.65%"></span><span class="tick" style="left:89.71%"></span>
+      </div>
+      <div class="lane"><div class="lbl">主线</div><div class="trk">
+        <div class="seg" style="left:0.74%; width:13.23%; background:var(--s1)"></div>
+        <div class="seg" style="left:13.97%; width:18.38%; background:var(--s2)"></div>
+        <div class="seg" style="left:32.35%; width:19.12%; background:var(--s3)"></div>
+        <div class="seg" style="left:51.47%; width:19.12%; background:var(--s4)"></div>
+        <div class="seg" style="left:70.59%; width:19.12%; background:var(--s5)"></div>
+        <div class="seg pill" style="left:89.71%; background:var(--s6)"></div>
+        <div class="nd done" style="left:0.74%" title="立项评审 06-02 已完成">✓</div>
+        <div class="nd done" style="left:13.97%" title="外观定稿 06-20 已完成">✓</div>
+        <div class="nd done" style="left:32.35%" title="中底配方冻结 07-15 已完成">✓</div>
+        <div class="nd late" style="left:51.47%" title="样品测试 08-10 逾期未完成"></div>
+        <div class="nd" style="left:70.59%" title="首批投产 09-05"></div>
+        <div class="nd" style="left:89.71%" title="上市 10-01"></div>
+        <div class="today" style="left:57.35%"><i>今天 08-18</i></div>
+        <div class="week" style="left:56.62%; width:4.41%"><i>本周</i></div>
+      </div></div>
+      <div class="lane"><div class="lbl">并行</div><div class="trk">
+        <div class="seg" style="left:17.65%; width:7.35%; background:var(--s2)"></div>
+        <div class="seg" style="left:25.0%; width:11.03%; background:var(--s3)"></div>
+        <div class="seg" style="left:36.03%; width:24.26%; background:var(--s2)"></div>
+        <div class="seg pill" style="left:60.29%; background:var(--s4)"></div>
+        <div class="nd done" style="left:17.65%" title="模具评审一 06-25 已完成">✓</div>
+        <div class="nd done" style="left:25.0%" title="模具开发 07-05 已完成">✓</div>
+        <div class="nd done" style="left:33.09%" title="模具返修 07-16 已完成">✓</div>
+        <div class="nd done" style="left:36.03%" title="模具评审二 07-20 已完成（夹层）">✓</div>
+        <div class="nd" style="left:60.29%" title="模具试模 08-22 本周 → 橙点"></div>
+        <div class="callout" style="left:37%; top:8px">▲ 设计条在开发条之后再次出现（交错夹层，忠实呈现）</div>
+        <div class="today" style="left:57.35%"></div>
+        <div class="week" style="left:56.62%; width:4.41%"></div>
+      </div></div>
+    </div>
+    <div class="cap"><b>读法</b>：主线全程连续长条（每阶段一个节点时最自然）；并行轨能看到「设计被开发打断、评审二后又接回设计」的真实顺序。<span class="hl-b">代价</span>：判断「哪些阶段区间重叠 → 上下分半 → 展开拆行」时，前端要先把相邻段合并回阶段区间（等于客户端再实现一遍跨式）；07-20 ~ 08-22 之间的「设计条」实际延伸盖过了没有安排的空档。</div>
+  </div>
+
+  <!-- ============ 方案 B 跨式 min·max ============ -->
+  <div class="scheme">
+    <h3><span class="mark">B</span>跨式（min·max）—— 每阶段取「最早 ~ 最晚节点」撑开成条，空档保留</h3>
+    <div class="sub">按「轨道 × 阶段」分组：设计 = [06-25 ~ 07-20]、开发 = [07-05 ~ 07-16]、测试 = [08-22]。<b>重叠区间是查询的直接产物</b>：开发条整个落在设计条内 → 07-05 ~ 07-16 上下分半（已拍板的重叠渲染原则零转换）。</div>
+    <div class="tl">
+      <div class="scale">
+        <span class="mo" style="left:0%">6月</span><span class="mo" style="left:22.06%">7月</span><span class="mo" style="left:44.85%">8月</span><span class="mo" style="left:67.65%">9月</span><span class="mo" style="left:89.71%">10月</span>
+        <span class="tick" style="left:0%"></span><span class="tick" style="left:22.06%"></span><span class="tick" style="left:44.85%"></span><span class="tick" style="left:67.65%"></span><span class="tick" style="left:89.71%"></span>
+      </div>
+      <div class="lane"><div class="lbl">主线</div><div class="trk">
+        <div class="seg pill" style="left:0.74%; background:var(--s1)"></div>
+        <div class="seg pill" style="left:13.97%; background:var(--s2)"></div>
+        <div class="seg pill" style="left:32.35%; background:var(--s3)"></div>
+        <div class="seg pill" style="left:51.47%; background:var(--s4)"></div>
+        <div class="seg pill" style="left:70.59%; background:var(--s5)"></div>
+        <div class="seg pill" style="left:89.71%; background:var(--s6)"></div>
+        <div class="nd done" style="left:0.74%">✓</div>
+        <div class="nd done" style="left:13.97%">✓</div>
+        <div class="nd done" style="left:32.35%">✓</div>
+        <div class="nd late" style="left:51.47%"></div>
+        <div class="nd" style="left:70.59%"></div>
+        <div class="nd" style="left:89.71%"></div>
+        <div class="callout" style="left:6%; top:8px">▲ 每阶段只有一个节点 → 全是单日点，主线断了</div>
+        <div class="today" style="left:57.35%"><i>今天 08-18</i></div>
+        <div class="week" style="left:56.62%; width:4.41%"><i>本周</i></div>
+      </div></div>
+      <div class="lane"><div class="lbl">并行</div><div class="trk">
+        <!-- 设计 [17.65,36.03]：全高 17.65-25.0 与 33.09-36.03，重叠带 25.0-33.09 分半 -->
+        <div class="seg" style="left:17.65%; width:7.35%; background:var(--s2)"></div>
+        <div class="seg top" style="left:25.0%; width:8.09%; background:var(--s2)"></div>
+        <div class="seg bot" style="left:25.0%; width:8.09%; background:var(--s3)"></div>
+        <div class="seg" style="left:33.09%; width:2.94%; background:var(--s2)"></div>
+        <div class="seg pill" style="left:60.29%; background:var(--s4)"></div>
+        <div class="nd done" style="left:17.65%">✓</div>
+        <div class="nd done" style="left:25.0%">✓</div>
+        <div class="nd done" style="left:33.09%">✓</div>
+        <div class="nd done" style="left:36.03%">✓</div>
+        <div class="nd" style="left:60.29%"></div>
+        <div class="callout" style="left:24%; top:8px">▲ 设计/开发重叠段上下分半（上设计·下开发）</div>
+        <div class="callout" style="left:41%; bottom:6px">▲ 07-20 之后到 08-22 之前 = 空档，如实留白</div>
+        <div class="today" style="left:57.35%"></div>
+        <div class="week" style="left:56.62%; width:4.41%"></div>
+      </div></div>
+    </div>
+    <div class="cap"><b>读法</b>：并行轨表达最「结构化」——每阶段一条、重叠即分半、没安排的日子留白。<span class="hl-r">硬伤</span>：<b>主线</b>每阶段只有一个节点（你们的常态），min·max 全缩成单日点，时间轴看起来断成散点；「项目走到哪了」的连续感消失。</div>
+  </div>
+
+  <!-- ============ 方案 C 跨式-衔接 ============ -->
+  <div class="scheme">
+    <h3><span class="mark">C</span>跨式-衔接 —— 阶段条延伸到下一阶段起点，全程连续</h3>
+    <div class="sub">在 B 的基础上：每阶段条末端延伸到（时间上）下一阶段条的起点，消掉空档。<b>主线恢复连续</b>（与 A 视觉相同）；并行轨设计 [06-25 ~ 07-20] 与开发 [07-05 ~ 08-22] 重叠 07-05 ~ 07-20 → 分半。</div>
+    <div class="tl">
+      <div class="scale">
+        <span class="mo" style="left:0%">6月</span><span class="mo" style="left:22.06%">7月</span><span class="mo" style="left:44.85%">8月</span><span class="mo" style="left:67.65%">9月</span><span class="mo" style="left:89.71%">10月</span>
+        <span class="tick" style="left:0%"></span><span class="tick" style="left:22.06%"></span><span class="tick" style="left:44.85%"></span><span class="tick" style="left:67.65%"></span><span class="tick" style="left:89.71%"></span>
+      </div>
+      <div class="lane"><div class="lbl">主线</div><div class="trk">
+        <div class="seg" style="left:0.74%; width:13.23%; background:var(--s1)"></div>
+        <div class="seg" style="left:13.97%; width:18.38%; background:var(--s2)"></div>
+        <div class="seg" style="left:32.35%; width:19.12%; background:var(--s3)"></div>
+        <div class="seg" style="left:51.47%; width:19.12%; background:var(--s4)"></div>
+        <div class="seg" style="left:70.59%; width:19.12%; background:var(--s5)"></div>
+        <div class="seg pill" style="left:89.71%; background:var(--s6)"></div>
+        <div class="nd done" style="left:0.74%">✓</div>
+        <div class="nd done" style="left:13.97%">✓</div>
+        <div class="nd done" style="left:32.35%">✓</div>
+        <div class="nd late" style="left:51.47%"></div>
+        <div class="nd" style="left:70.59%"></div>
+        <div class="nd" style="left:89.71%"></div>
+        <div class="today" style="left:57.35%"><i>今天 08-18</i></div>
+        <div class="week" style="left:56.62%; width:4.41%"><i>本周</i></div>
+      </div></div>
+      <div class="lane"><div class="lbl">并行</div><div class="trk">
+        <!-- 设计 [17.65,36.03]，开发 [25.0,60.29]，重叠 25.0-36.03 分半，开发全高 36.03-60.29 -->
+        <div class="seg" style="left:17.65%; width:7.35%; background:var(--s2)"></div>
+        <div class="seg top" style="left:25.0%; width:11.03%; background:var(--s2)"></div>
+        <div class="seg bot" style="left:25.0%; width:11.03%; background:var(--s3)"></div>
+        <div class="seg" style="left:36.03%; width:24.26%; background:var(--s3)"></div>
+        <div class="seg pill" style="left:60.29%; background:var(--s4)"></div>
+        <div class="nd done" style="left:17.65%">✓</div>
+        <div class="nd done" style="left:25.0%">✓</div>
+        <div class="nd done" style="left:33.09%">✓</div>
+        <div class="nd done" style="left:36.03%">✓</div>
+        <div class="nd" style="left:60.29%"></div>
+        <div class="callout" style="left:24%; top:8px">▲ 重叠段分半（上设计·下开发）</div>
+        <div class="callout" style="left:40%; bottom:6px">▲ 开发条延伸吞掉了「评审二夹层」与空档：看不出设计回来过</div>
+        <div class="today" style="left:57.35%"></div>
+        <div class="week" style="left:56.62%; width:4.41%"></div>
+      </div></div>
+    </div>
+    <div class="cap"><b>读法</b>：全程连续、重叠分半、展开拆行都零转换（服务端区间数组的直接产物）。<span class="hl-y">代价</span>：并行轨的「设计评审二」被延伸的开发条盖住——<b>交错顺序与空档信息被吞</b>，只能靠节点圈（07-20 白圈）看出那里有个设计节点；空档（07-20 ~ 08-22 之间其实没排模具活）不再可见。</div>
+  </div>
+
+  <table class="cmp">
+    <tr><th style="width:16%">维度</th><th>A 链式</th><th>B 跨式 min·max</th><th>C 跨式-衔接</th></tr>
+    <tr><td><b>主线（每阶段单节点，你们的常态）</b></td><td class="good">连续长条，最自然</td><td class="bad">全是单日点，断成散点</td><td class="good">连续长条（同 A）</td></tr>
+    <tr><td><b>并行交错夹层（设计-开发-设计-测试）</b></td><td class="good">忠实呈现顺序</td><td>阶段区间直接可见</td><td class="bad">被延伸条吞掉，只见节点圈</td></tr>
+    <tr><td><b>空档（没排节点的日子）</b></td><td class="bad">被相邻连线盖住（A 的设计条一直画到 08-22）</td><td class="good">如实留白</td><td class="bad">被延伸条盖住</td></tr>
+    <tr><td><b>已拍板「重叠段分半 + 展开拆行」</b></td><td class="bad">前端需先把相邻段合并回阶段区间</td><td class="good">查询直接产物，零转换</td><td class="good">查询直接产物，零转换</td></tr>
+    <tr><td><b>一句话</b></td><td>顺序忠实、连续，但「重叠/空档」要前端二次加工</td><td>最结构化，但常态主线断</td><td>连续 + 重叠零转换，但交错与空档不可见</td></tr>
+  </table>
+
+  <div class="decided">
+    <h2>拍板记录（2026-08-18 · 用户拍板 = A 链式）</h2>
+    <p><b>结果：A 链式</b>——相邻节点连线成条、段色 = 左端节点阶段，忠实呈现交错夹层与真实顺序。B / C 未选，降级为服务端段算法开关的候选（D13=A 契约下随时可切，不构成损失）。</p>
+    <p><b>知情接受的代价</b>（本稿方案 A 面板已标注）：① 空档会被相邻连线盖住；② 「重叠段上下分半 + 展开按钮拆阶段行」需要阶段区间，而链式段本身不含它。<b>配套实现注记（Claude 推导，可否决）</b>：服务端在链式画法下同时返回「阶段区间列表」（同轨按阶段 min·max，B 案的语义作为内部派生结构保留），专供重叠判定与展开拆行使用——重叠/展开逻辑仍是服务端单一实现（D11/P1 原则），前端不做二次合并；画条用链式段、判重叠用阶段区间，两份都来自 segments[] 派生器。</p>
+    <p><b>单元 ① 至此完全收口</b>（D1–D14 + 画法 = A），进单元 ②（原子批量 API：草稿批次提交、并发版本号、整批全成全败、撤销护栏）。</p>
+  </div>
+
+  <div class="foot">
+    留档：feature-01-项目时间管理-仪表盘/（画法对照）stage-bar-chain-vs-span.html · 2026-08-18 · 纯静态无 JS。<br>
+    依据：mainline §4.2/§8、3-UX §0 Q8 注记、门 3 问卷 D13=A（archive/5-GATE3_UNIT1_DECISIONS.md §0）；2026-08-18 历史视觉基线 = 方向 B 深色，门 4 当前视觉以方向 A 浅色为准；) 形分界 + 白圈节点 + 2px 圆角与本周橙点（D10：周一~周日）继续有效。色值留集成验收微调。
+  </div>
+
+</div>
+</body>
+</html>
