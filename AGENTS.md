@@ -1,6 +1,6 @@
 # AGENTS.md — 本仓库的协作与 Agent 约定
 
-> 最后更新：2026-08-18（§3.1 补齐 Codex mc-expert 中央 KB 调用合同；§2 新增「mc-expert 陪审先行」规则，用户显式授权；2026-08-14 新增 §2 需求调研问卷往返模式，原 §2–§7 顺延为 §3–§8）
+> 最后更新：2026-08-21（§5 登记 feature01 门禁与验收证据归档 `team-progress/`；2026-08-18 §3.1 补齐 Codex mc-expert 中央 KB 调用合同）
 > **定位**：这是给「在 Flowboard 这个 repo 里干活的 agent（planner / coder / mc-expert / 主 Claude）」看的操作约定——角色分工、交接契约、文件落点、红线。**只讲怎么协作，不讲产品功能**（产品见 `feature-00-build-up/PROJECT_MAINLINE.md`，状态见 `STATE.md`）。
 > **不是 agent 注册表**：本仓库不维护自定义 subagent 定义；可用的 agent 类型由运行环境提供（planner / coder / mc-expert / general-purpose / Explore / Plan 等）。
 
@@ -15,7 +15,7 @@
 - 只有整条全局主线全部满足才允许结束；
 - 接力状态记在 `.copilot-state.json`（run_id / seq / turn / lease），持续任务记在 `temp.md`。
 
-> 现状：`.copilot-state.json` `status=done` / `last_action=Done` / `turn=planner` / `seq=58`。第一阶段已闭环。**新一轮编码必须由用户显式启动**（commit / 真机验收 / 选第三阶段方向），agent 不得 model-driven 自行开新阶段。
+> 现状：feature01 门 4 已由 CP6 独立终签 PASS，最高状态为 `WAIT_GATE5_HUMAN`；弃用的 `.copilot-*` 只作历史指纹，不再作为当前控制面。用户已授权本次阶段收尾 commit；真实库迁移、push、发布、部署和新阶段仍须另行拍板。
 
 ---
 
@@ -99,6 +99,7 @@ memory，再调用 `agent_type=mc-expert`、`fork_turns=none`。`REVIEW_CONTRACT
 | feature01 项目时间管理需求/主线/静态原型 | `feature-01-项目时间管理-仪表盘/`（需求调研中，正式实现仍按代码/测试落点） |
 | 代码 | 根目录（`server.py`、`app.js`、`flowboard/`、`*-ui.js`、`*.css`、`index.html`） |
 | 测试 | `tests/` |
+| feature01 门禁与验收证据归档 | `team-progress/`（coverage map、独立验证器、终签结果与 Gate 5 交接；不作为活跃控制面） |
 | 运行库 / 备份 / 附件 | `flowboard.db` / `backups/` / 配置的 attachment dir（不放 web 根） |
 | 阶段决策记录 | `mc-plan/` |
 | 交接 / 持续任务 | `temp.md` + `.copilot-*` |

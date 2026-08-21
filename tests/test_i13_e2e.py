@@ -6,6 +6,7 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
+from flowboard.database import SCHEMA_VERSION
 from server import create_server
 from test_secure_foundation import create_legacy_database
 
@@ -26,7 +27,7 @@ class I13E2E(unittest.TestCase):
         answers=iter(["priority","高"]);page.on("dialog",lambda dialog:dialog.accept(next(answers)))
         with page.expect_response(lambda response:response.request.method=="POST" and response.url.endswith("/api/workspaces/1/tasks/batch")) as captured:page.locator('[data-batch="update"]').click()
         response=captured.value;request=response.request.post_data_json;result=response.json();self.assertEqual(request["operation"],"update");self.assertEqual(request["changes"],{"priority":"高"});self.assertEqual(result["updated"],2);self.assertEqual([item["id"] for item in result["items"]],sorted(selected_ids));page.wait_for_function("document.querySelector('#batchBar').hidden")
-        health=page.evaluate("fetch('/api/health').then(r=>r.json())");self.assertEqual(health,{"status":"ok","schema_version":15})
+        health=page.evaluate("fetch('/api/health').then(r=>r.json())");self.assertEqual(health,{"status":"ok","schema_version":SCHEMA_VERSION})
         backup=page.evaluate("api('/api/admin/workspaces/1/backups','POST',{})");self.assertTrue(backup["verified"]);self.assertEqual(backup["restore_mode"],"offline_cli_only");self.assertTrue(page.evaluate("api('/api/admin/workspaces/1/backups').then(x=>x.backups[0].valid)"));context.close()
 
 

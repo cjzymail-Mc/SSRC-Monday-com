@@ -1,15 +1,15 @@
 # STATE.md — 项目状态 / 变更日志 / 近期决定
 
-> 最后更新：2026-08-19（feature01 F1 视觉增量复审 PASS；门 3 成果已提交 `2e906c5`，待门 4 新 run）
+> 最后更新：2026-08-21（feature01 门 4 CP6 独立终签 PASS；最高状态 `WAIT_GATE5_HUMAN`）
 > **与契约的分工**：`feature-00-build-up/PROJECT_MAINLINE.md` = 冻结主线（不可变契约，只在用户调整产品方向时改）；本文件 = 会演进的项目状态。
 > **产品**：Flowboard — 面向约 15 人团队的局域网自托管协作看板（monday.com 子集）。
-> **权威范围**：现有 `.copilot-task.md`（全局 done_when 1～17）仅属于已完成的第一阶段旧 run；feature01 门 4 当前以 `feature-01-项目时间管理-仪表盘/9-GATE3_TECH_FREEZE.md` 为唯一实现契约，新 `.copilot-task.md` 由新 run 启动器生成。第一阶段验收证据索引：`feature-00-build-up/GLOBAL_ACCEPTANCE.md`。
+> **权威范围**：feature01 门 4 实现范围以 `feature-01-项目时间管理-仪表盘/9-GATE3_TECH_FREEZE.md` 为冻结契约，终签与 Gate 5 交接以 `team-progress/planner-report-B005-CP6.md`、`team-progress/B-005-WAIT_GATE5_HUMAN.md` 为准；弃用的 `.copilot-*` 只作历史指纹，不作为当前控制面。第一阶段验收证据索引：`feature-00-build-up/GLOBAL_ACCEPTANCE.md`。
 
 ---
 
 ## 0. 一句话当前状态
 
-**第一阶段（看板 + 多视图）已完工交付。feature01「项目时间管理 + 仪表盘」F1 视觉增量复审已 PASS：方向 A 浅色优先已并入门 4 唯一实现契约，门 3 重新关闭并已由 commit `2e906c5` 固化；数据/API/权限等其余 61 条未重开。尚未动正式代码或数据库，门 4 run 未激活。** feature01 冷启动入口：`feature-01-项目时间管理-仪表盘/STATE.md`。
+**第一阶段（看板 + 多视图）已完工交付。feature01「项目时间管理 + 仪表盘」门 4 自动施工与自动验收已完成：CP6 独立终签 `25 PASS + 7 OUT_OF_SCOPE`、零 `GAP/CONFLICT`，当前且最高状态严格为 `WAIT_GATE5_HUMAN`。真实 `flowboard.db` 仍为 schema v15、`integrity_check=ok` 且指纹未变；未执行真实库迁移、push、发布或部署。** feature01 冷启动入口：`feature-01-项目时间管理-仪表盘/STATE.md`。
 
 ---
 
@@ -20,6 +20,8 @@
 
 | 日期 | 变更内容 |
 |------|---------|
+| 2026-08-21 | **feature01 门 4 阶段收尾并获用户授权 commit**：承接 2026-08-20 CP6 独立终签 PASS，不重复自动验收；32 条终态为 25 PASS + 7 OUT_OF_SCOPE、零 GAP/CONFLICT。最高状态保持 `WAIT_GATE5_HUMAN`；真实库仍为 v15 且指纹未变。仅 commit 获授权，push、发布、部署、真实库迁移仍须另行拍板。 |
+| 2026-08-20 | **feature01 门 4 自动施工与自动验收收口**：B-002～B-005 依次关门，交付 v16 五表隔离迁移、服务/API、浅色编辑器与单双项目仪表盘、真实 Chromium 旅程、Excel 往返、全量回归及备份恢复证据；CP6 独立终签为 `WAIT_GATE5_HUMAN`，未冒充门 5 PASS 或上线完成。 |
 | 2026-08-19 | **feature01 F1 视觉覆盖拍板并增量复审 PASS**：用户基于 Flowboard 整体浅色基调，指定 v1 三页优先浅色、单项目仪表盘方向 A「大标题·白卡」当前执行；方向 B 深色转为未来整体暗色皮肤参考，不进 v1。只窄修订 9- §0 F1/§8 及当前状态/样张标识，其余 61 条未重开；三处文档尾差修正后 mc-expert 定向复审 PASS（高置信），门 3 重新关闭并提交为 `2e906c5`，门 4 尚未激活。 |
 | 2026-08-18 | **feature01 门 3 最终 PASS 并关闭**：独立增量复审先给 CONDITIONAL PASS，补齐所有项目路径 `require_active=True` 与复盘 undo 计数排除后，mc-expert 最终点检 PASS（高置信）。9- 正式冻结为门 4 唯一实现契约；4/5/6/7/8 已移入 feature01 `archive/`（未删除），引用同步完成，10- 降级为历史记录。未 commit、未激活新 run。 |
 | 2026-08-18 | **【历史中间态】门 3 初审修订落盘**：用户拍板 B5c=b；B1–B5/N1–N4/C1–C2 写入 9-，索引核实为 49+13=62。当时尚待增量复审；随后已 PASS 并归档，当前状态以上一行与 §2 为准。 |
@@ -56,11 +58,11 @@
   - 第一阶段文档：全部在 `feature-00-build-up/`（见 §4 目录索引）。
 - **状态边界**：第三阶段候选池（C06 工作负载 / E 项目管理 / G 自动化 / F 表单 / H Webhook）**是候选，不是已批准计划**——planner 不得擅自把候选升级成任务，需用户依据真实使用反馈拍板（冻结主线 §7 纠偏第 4 问）。
 
-### feature-01-项目时间管理-仪表盘（门 3 已重新关闭，待门 4 新 run）
+### feature-01-项目时间管理-仪表盘（门 4 已收口，WAIT_GATE5_HUMAN）
 
-- **当前阶段**：需求、UX 与门 3 技术方案已收口；F1 浅色覆盖增量复审 PASS，门 3 已重新关闭并提交为 `2e906c5`，9- 仍为唯一实现契约，过程稿已归档；未动正式代码或数据库。
+- **当前阶段**：需求、UX、门 3 技术冻结与门 4 自动施工/验收均已收口；CP6 独立终签 25 PASS + 7 OUT_OF_SCOPE、零 GAP/CONFLICT，最高状态为 `WAIT_GATE5_HUMAN`。正式代码已实现；真实 `flowboard.db` 仍为 v15，未执行真实迁移。
 - **当前模型**：固定六阶段；一行一个节点；一个日期字段；主线/并行两轨各自计算一列间隔、各自顺延；状态三态（未开始/进行中/已完成）；仪表盘行模型 = 每项目默认主线/并行两行 + 展开按钮拆重叠阶段（未展开仅重叠段上下分半）；拖拽 = 节点右键四项菜单双模式（拖拽/拖拽顺延/已完成/未完成）、无默认档、草稿批次统一提交；视觉 = **方向 A 浅色（大标题·白卡）+ v3.2 亮色六色 + ) 形分界 + 白圈节点**，三页共享浅色语义 token，暗色皮肤不进 v1；权限 = workspace admin 全改 / member 仅改自己创建的项目，查看对所有注册成员开放；项目入口 = admin/member 网页新建、仅 admin 软删、v1 不改名。**门 3 冻结**：数据模型 = 新增五张专表（timeline_projects/nodes + 批次审计两表 + timeline_import_batches，间隔/状态不落库实时派生）；已完成载体 = 内部 done_at；派生指标契约（当前阶段=已动工阶段序最大跨两轨、临近节点=今天起最早未完成同日全返、逾期数两轨合并、**橙点=本周（周一~周日）内有未完成节点**、指标服务端实时计算、今天=Asia/Shanghai）；Excel 导入状态矛盾 = 日期优先只认「已完成」；API 恒返 nodes+segments+stage_intervals 三份，段算法可切换。
-- **下一步**：启动门 4 planner↔coder 新 run：planner 先从 `temp.md` 准备合同并归档旧终态，提示 ready 后 coder 再 Init；启动前 `.copilot-state.json` 保持旧 run `done/seq=58`。未来候选（不进 v1，升级须拍板）：每周看板、md/json 导入、项目改名/恢复入口、Flowboard 整体暗色皮肤。
+- **下一步**：只进入门 5 人工事项——真实 2～3 项目试用、视觉/磁吸与像素微调、约 15 分钟手工冒烟、真机/部署环境验收，以及在可恢复备份和停服窗口下另行决定真实库 v15→v16。push、发布、部署与上线仍需用户另行授权。未来候选（不进 v1，升级须拍板）：每周看板、md/json 导入、项目改名/恢复入口、Flowboard 整体暗色皮肤。
 - **冷启动入口**：`feature-01-项目时间管理-仪表盘/STATE.md`。
 
 ---
@@ -80,9 +82,10 @@
 | 路径 | 角色 | 说明 |
 |------|------|------|
 | `feature-00-build-up/` | **第一阶段过程文档归档** | 冻结主线 / 架构 / 验收 / subplan / Windows 运维 / 总结（只读冻结档，勿改实现细节） |
-| `feature-01-项目时间管理-仪表盘/` | **feature01 需求与原型** | 冷启动状态 / 冻结主线 / 需求草稿 / 静态 mock；当前不含正式实现 |
+| `feature-01-项目时间管理-仪表盘/` | **feature01 需求与原型** | 冷启动状态 / 冻结主线 / 需求草稿 / 静态 mock；正式实现按代码与测试落点存放 |
+| `team-progress/` | **feature01 门禁与验收证据归档** | B-002～B-005 coverage map、独立验证器、终签结果与 `WAIT_GATE5_HUMAN` 交接；不作为活跃控制面 |
 | `flowboard/` | 业务服务（Python） | database / service / query / aggregation / schedule / transfer / advanced / operations / security |
-| `tests/` | 测试 | 12 `test_*.py` + 5 `*.test.js`（含 9 个真实 Chromium E2E） |
+| `tests/` | 测试 | 第一阶段回归 + feature01 service / HTTP / Chromium / Node 测试 |
 | `backups/` | 迁移与运维备份 | `flowboard-pre-vN-*` 历史快照，勿手删 |
 | `mc-plan/` | 规划产物 | 阶段决策记录（如阶段完工与下阶段计划） |
 | `.claude/` | 记忆层 | `auto-memory/` 用户偏好（每会话加载）+ `memory/` 技术细节（按需读），各自 MEMORY.md 索引；由 `/mc-update` 流程维护 |

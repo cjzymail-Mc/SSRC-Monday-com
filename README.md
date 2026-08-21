@@ -30,6 +30,8 @@ schema v9 增加工作区级看板/项目模板和导入预览批次。模板保
 
 schema v8 扩展 `timeline/rating/file/email/phone/relation/mirror/formula`。时间线保存经过校验的起止日期；评分上限为 1–10；邮件和电话有长度/格式边界；file 在 I7 只保存安全的名称、大小和媒体类型元数据，不接受路径、二进制或附件 ID，真实上传统一留到 I11。
 
+feature01 时间管理使用 schema v16 新增的五张专表：`timeline_projects`、`timeline_nodes`、`timeline_change_batches`、`timeline_node_changes` 与 `timeline_import_batches`。项目与看板保持零外键，节点间隔与派生指标不落库；所有读写均由服务端派生和授权。接口提供项目新建、读取与软删除、批量编辑、undo、initial correction、轻量复盘、Excel 导出与两段式导入。导入复用安全 XLSX/CSV 解析器，拒绝公式、宏、外链与超限文件，并在 commit 事务内重验同名项目。
+
 跨看板关系用 `task_relation_values` 的单条 canonical 软删除边保存，关系字段声明目标看板与是否展示反向关系。新增关系要求源任务写权限和目标任务当前可见，携带 source task、source board 与 target task version；目标失权、归档或删除后，字段配置会被裁剪，关系、反向关系和镜像统一返回不可用诊断，不泄露目标 ID、标题、数量或活动详情。任务单独复制不复制外部关系；看板复制只重映副本集合内部关系、字段 ID 和公式引用，跨板关系字段复制为停用且未绑定，避免副本意外连回原看板。
 
 镜像和公式均为只读、读时求值，不持久化第二份业务值。公式使用 AST allowlist 解释器，禁止 `eval`、属性访问、下标、任意函数和 SQL；表达式最多 500 字符、80 节点、12 层、每函数 20 参数。`SUM/AVG/MIN/MAX/CONCAT/IF/PROGRESS` 提供数值、文本、条件、汇总与进度最小集合；直接和多跳公式环在保存时拒绝。来源 `UNAVAILABLE` 会传播到镜像和公式，不能被当作空值或零用于推断权限数据。
@@ -98,7 +100,9 @@ HTTP 静态服务的 GET 与 HEAD 均采用同一份默认拒绝清单：只公�
 
 ## 迁移、备份与恢复
 
-首次启动或升级会先运行 SQLite `integrity_check`，再使用 SQLite backup API 在 `backups/` 生成对应目标版本的迁移前备份，然后执行版本化迁移。schema v3 增加字段系统，v4 增加保存视图，v5 增加 presentation，v6 增加 Kanban board order，v7 增加任务邻接层级与依赖边，v8 增加高级字段类型和跨看板关系边，v9 增加模板快照和导入预览批次，v12 增加评论协作与私有附件元数据，v13 将订阅归一为每任务/用户一条 sticky 状态记录，v14 增加通知、实时游标和安全审计，v15 增加任务描述及回收站保留策略。运行库使用 WAL；服务运行时不要用文件复制替代一致性备份；恢复时数据库与附件目录必须取同一备份时间点。
+首次启动或升级会先运行 SQLite `integrity_check`，再使用 SQLite backup API 在 `backups/` 生成对应目标版本的迁移前备份，然后执行版本化迁移。schema v3 增加字段系统，v4 增加保存视图，v5 增加 presentation，v6 增加 Kanban board order，v7 增加任务邻接层级与依赖边，v8 增加高级字段类型和跨看板关系边，v9 增加模板快照和导入预览批次，v12 增加评论协作与私有附件元数据，v13 将订阅归一为每任务/用户一条 sticky 状态记录，v14 增加通知、实时游标和安全审计，v15 增加任务描述及回收站保留策略，v16 以单事务纯增量新增 feature01 的五张 timeline 专表。v16 DDL 使用逐条执行，避免 `executescript` 隐式提交破坏失败回滚；迁移失败必须保持完整 v15，不得残留半表或 v16 migration row。运行库使用 WAL；服务运行时不要用文件复制替代一致性备份；恢复时数据库与附件目录必须取同一备份时间点。
+
+门 4 已在全新临时目录验证真实 v15 形状的代表存量、自动 `pre-v16` 备份、v15→v16、二次幂等、计数/FK/integrity、故障注入回滚，以及 `flowboard_ops.py backup → verify → restore → 再迁移`。仓库中的真实 `flowboard.db` 仍为 v15 且 `integrity_check=ok`，本轮没有对它执行迁移、恢复或重建；真实库正式迁移必须在门 5 由用户另行拍板。
 
 恢复演练应在停止服务后进行：先把备份通过 SQLite backup API 恢复到独立路径，运行 `PRAGMA integrity_check` 并核对任务数和关键字段，确认无误后再替换运行库。架构与分迭代说明见 `PHASE1_ARCHITECTURE.md`。
 
@@ -113,6 +117,25 @@ git diff --check
 ```
 
 测试在临时数据库副本和临时端口上运行，不修改仓库中的运行库。Windows sandbox 若禁止 Chromium/Node 子进程，应在受控的沙箱外运行相同完整套件，不能跳过断言。最终验收索引见 `GLOBAL_ACCEPTANCE.md`。
+
+feature01 门 4 终值测试矩阵（2026-08-20）：
+
+- Gate 3 旧基线：12 个 Python + 5 个 Node 文件全部保留，旧 Python 测试方法 79/79，零 skip；经用户授权，仅把 8 个旧 Python 文件中“当前 schema/备份前缀”的过期 v15 预期改为 `SCHEMA_VERSION`，历史 v15 checksum、旧库版本、数据/FK/integrity/权限断言未弱化。
+- Python 全量（含真实 Chromium）：142/142，`OK`；timeline 分栏为 service 29、HTTP 10、Chromium 24。
+- Node：6/6 测试文件通过；JavaScript 语法检查通过。
+- v15→v16 隔离迁移/备份/恢复验证器 exit 0；修改迁移事务后，timeline service 29/29 回归通过。
+- Python 语法检查和字面全仓 `git diff --check` 均 exit 0。
+
+## feature01 门 4 自动终态：WAIT_GATE5_HUMAN
+
+门 4 自动施工、回归和隔离迁移验证已经收口；当前交付状态只表示 `WAIT_GATE5_HUMAN`，不表示门 5、真实部署或上线已经完成。以下事项保留给人工门：
+
+1. 使用真实 2–3 个项目试用编辑器、单项目仪表盘和全项目仪表盘。
+2. 按真实使用感受裁定六阶段精确色值、强磁吸参数、条形/节点/字号/行高/留白及响应式像素微调。
+3. 完成约 15 分钟手工冒烟：开板拖卡与刷新、甘特切视图、widgets 出数、普通成员登录与权限。
+4. 在目标浏览器、真机和实际部署环境验收 HTTPS、进程、备份目录与附件目录。
+5. 先做可恢复备份，再由用户显式决定是否对真实 `flowboard.db` 执行 v15→v16 迁移和恢复演练。
+6. 门 4 阶段收尾 commit 已于 2026-08-21 获用户授权；push、发布、部署和对外交付仍等待用户单独授权。
 
 ## 核心生命周期手工验收
 

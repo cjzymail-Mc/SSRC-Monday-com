@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from flowboard.database import connect, migrate
+from flowboard.database import SCHEMA_VERSION, connect, migrate
 from flowboard.operations import OperationsError, apply_retention, create_backup, restore_backup, verify_backup
 from flowboard.service import FlowboardService
 
@@ -25,7 +25,7 @@ class I13OperationsTests(unittest.TestCase):
         detail=self.service.task_detail(self.admin,1);self.service.update_task(self.admin,1,{"version":detail["version"],"description":"backup sentinel"});self.service.create_comment(self.admin,1,{"body":"backup comment"});attachment=self.service.create_attachment(self.admin,1,{"name":"backup.txt","content_type":"text/plain","content_base64":base64.b64encode(b"backup bytes").decode()});return attachment
 
     def test_backup_manifest_corruption_retention_and_real_restore_with_blob(self):
-        attachment=self._seed();package=create_backup(self.db,self.attachments,self.backups);manifest=verify_backup(package);self.assertEqual(manifest["schema_version"],15);self.assertEqual(len(manifest["attachments"]),1)
+        attachment=self._seed();package=create_backup(self.db,self.attachments,self.backups);manifest=verify_backup(package);self.assertEqual(manifest["schema_version"],SCHEMA_VERSION);self.assertEqual(len(manifest["attachments"]),1)
         conn=connect(self.db);conn.execute("UPDATE tasks SET description='changed after backup' WHERE id=1");storage=conn.execute("SELECT storage_name FROM attachments WHERE id=?",(attachment["id"],)).fetchone()[0];conn.execute("UPDATE attachments SET size_bytes=?,sha256=? WHERE id=?",(len(b"changed"),hashlib.sha256(b"changed").hexdigest(),attachment["id"]));conn.commit();conn.close();(self.attachments/storage).write_bytes(b"changed")
         restored=restore_backup(package,self.db,self.attachments,safety_root=self.backups);self.assertTrue(restored["restored"]);conn=connect(self.db);self.assertEqual(conn.execute("SELECT description FROM tasks WHERE id=1").fetchone()[0],"backup sentinel");self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok");self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);conn.close();self.assertEqual((self.attachments/storage).read_bytes(),b"backup bytes")
         damaged=create_backup(self.db,self.attachments,self.backups,label="damaged");(damaged/"flowboard.db").write_bytes(b"not sqlite")
@@ -40,7 +40,7 @@ class I13OperationsTests(unittest.TestCase):
                 with self.assertRaises(OperationsError):restore_backup(package,self.db,self.attachments,safety_root=self.backups,inject_failure=point)
                 conn=connect(self.db);self.assertEqual(conn.execute("SELECT description FROM tasks WHERE id=1").fetchone()[0],"current protected");self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok");self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);conn.close();self.assertTrue(self.attachments.is_dir());self.assertEqual((self.attachments/storage).read_bytes(),b"current bytes");self.assertFalse((self.root/".flowboard-maintenance.lock").exists());self.assertEqual(list(self.root.glob(".*.restore-*"))+list(self.root.glob(".*.old-*")),[])
         safety=[item for item in self.backups.iterdir() if item.name.startswith("flowboard-pre-restore-")];self.assertEqual(len(safety),len(points))
-        for item in safety:self.assertEqual(verify_backup(item)["schema_version"],15)
+        for item in safety:self.assertEqual(verify_backup(item)["schema_version"],SCHEMA_VERSION)
 
     def test_restore_failure_preserves_originally_missing_targets(self):
         self._seed();package=create_backup(self.db,self.attachments,self.backups);missing_root=self.root/"new-target";missing_root.mkdir();missing_db=missing_root/"flowboard.db";missing_attachments=missing_root/"blobs"

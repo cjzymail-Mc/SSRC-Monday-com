@@ -11,13 +11,14 @@
   <link rel="stylesheet" href="dashboard-mobile.css" />
   <link rel="stylesheet" href="i12.css" />
   <link rel="stylesheet" href="i13.css" />
+  <link rel="stylesheet" href="timeline.css" />
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar">
       <div class="brand"><span class="brand-mark">F</span><span>flowboard</span></div>
       <div class="workspace-switcher"><span class="workspace-icon">N</span><span><small>工作区</small>Northstar Studio</span></div>
-      <nav class="main-nav"><a class="nav-item active" href="#"><span>◇</span>我的工作</a><button class="nav-item nav-button" id="dashboardBtn"><span>▦</span>仪表盘</button><button class="nav-item nav-button" id="archivedBtn"><span>▣</span>已归档</button><button class="nav-item nav-button" id="trashBtn"><span>♲</span>回收站</button></nav>
+      <nav class="main-nav"><a class="nav-item active" href="#"><span>◇</span>我的工作</a><button class="nav-item nav-button" id="dashboardBtn"><span>▦</span>仪表盘</button><button class="nav-item nav-button" id="timelineBtn"><span>⌁</span>时间管理</button><button class="nav-item nav-button" id="archivedBtn"><span>▣</span>已归档</button><button class="nav-item nav-button" id="trashBtn"><span>♲</span>回收站</button></nav>
       <div class="side-section"><div class="side-heading"><span>看板</span><button id="addBoardBtn" class="write-only" title="新建看板">＋</button></div><div id="boardList" class="board-list"><div class="side-empty">加载中…</div></div></div>
       <div class="sidebar-bottom"><a class="nav-item" href="#"><span>⚙</span>设置</a></div>
     </aside>
@@ -32,9 +33,10 @@
     </main>
   </div>
   <div class="toast" id="toast"></div>
+  <div class="timeline-overlay" id="timelineModal" hidden><div class="timeline-shell"><header><strong>项目时间管理</strong><button type="button" id="timelineClose" aria-label="关闭项目时间管理">×</button></header><div id="timelineBody"></div></div></div>
   <div class="modal-backdrop" id="taskModal"><div class="task-modal"><button class="modal-close" data-close="taskModal">×</button><div id="modalBody"></div></div></div>
   <div class="modal-backdrop" id="listModal"><div class="task-modal list-modal"><button class="modal-close" data-close="listModal">×</button><div id="listModalBody"></div></div></div>
   <div class="modal-backdrop login-backdrop" id="loginModal"><form class="login-card" id="loginForm"><div class="brand login-brand"><span class="brand-mark">F</span><span>flowboard</span></div><h2>登录工作空间</h2><p>使用管理员提供的账号登录。</p><label>用户名<input id="loginUser" autocomplete="username" value="u1" required /></label><label>密码<input id="loginPassword" type="password" autocomplete="current-password" required /></label><div class="login-error" id="loginError"></div><button class="primary-btn" type="submit">登录</button></form></div>
-  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="i12-ui.js"></script><script src="app.js"></script>
+  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js"></script><script src="i12-ui.js"></script><script src="app.js"></script>
 </body>
 </html>

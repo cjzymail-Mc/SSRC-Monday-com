@@ -11,7 +11,7 @@ import unittest
 import zipfile
 from pathlib import Path
 
-from flowboard.database import _migration_v1, _migration_v2, _migration_v3, _migration_v4, _migration_v5, _migration_v6, _migration_v7, _migration_v8, connect, copy_database, migrate
+from flowboard.database import SCHEMA_VERSION, _migration_v1, _migration_v2, _migration_v3, _migration_v4, _migration_v5, _migration_v6, _migration_v7, _migration_v8, connect, copy_database, migrate
 from flowboard.transfer import MAX_FILE_BYTES, TransferError, make_xlsx, parse_upload, safe_cell
 from flowboard.query import apply_python_query, python_matches
 from server import create_server
@@ -149,7 +149,7 @@ class FlowboardIntegrationTests(unittest.TestCase):
     def test_migration_preserves_existing_tasks_and_creates_backup(self):
         conn = connect(self.db_path)
         try:
-            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 15)
+            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], SCHEMA_VERSION)
             tasks = conn.execute("SELECT id,title,group_id,owner_id,status,priority,due FROM tasks ORDER BY id").fetchall()
             self.assertEqual([row["id"] for row in tasks], [1, 2, 3, 4, 5])
             self.assertTrue(all(row["title"] for row in tasks))
@@ -264,7 +264,7 @@ class FlowboardIntegrationTests(unittest.TestCase):
         self.assertTrue(backup and Path(backup).exists())
         conn = connect(path)
         try:
-            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 15)
+            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], SCHEMA_VERSION)
             self.assertEqual(before, [tuple(row) for row in conn.execute("SELECT id,title,group_id,owner_id FROM tasks ORDER BY id")])
             self.assertIn("action_code", {row["name"] for row in conn.execute("PRAGMA table_info(activity)")})
             self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0], "ok")
@@ -281,7 +281,7 @@ class FlowboardIntegrationTests(unittest.TestCase):
         backup=migrate(path);self.assertTrue(backup and Path(backup).exists())
         conn=connect(path)
         try:
-            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],15);self.assertEqual(before,[tuple(row) for row in conn.execute("SELECT id,title,board_order FROM tasks ORDER BY id")]);self.assertEqual(conn.execute("SELECT COUNT(*) FROM task_dependencies").fetchone()[0],0);self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok");self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=7").fetchone()[0],"flowboard-schema-v7")
+            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],SCHEMA_VERSION);self.assertEqual(before,[tuple(row) for row in conn.execute("SELECT id,title,board_order FROM tasks ORDER BY id")]);self.assertEqual(conn.execute("SELECT COUNT(*) FROM task_dependencies").fetchone()[0],0);self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok");self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=7").fetchone()[0],"flowboard-schema-v7")
         finally:conn.close()
         restored=str(Path(self.temp.name)/"restored-v6.db");copy_database(backup,restored);check=sqlite3.connect(restored)
         try:self.assertEqual(check.execute("PRAGMA user_version").fetchone()[0],6);self.assertEqual(check.execute("SELECT COUNT(*) FROM tasks").fetchone()[0],len(before))
@@ -977,7 +977,7 @@ class FlowboardIntegrationTests(unittest.TestCase):
             before=conn.execute("SELECT COUNT(*) FROM tasks").fetchone()[0]
         finally:conn.close()
         backup=migrate(path);self.assertTrue(backup and Path(backup).exists());conn=connect(path)
-        try:self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],15);self.assertEqual(conn.execute("SELECT COUNT(*) FROM tasks").fetchone()[0],before);self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=9").fetchone()[0],"flowboard-schema-v9");self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok")
+        try:self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],SCHEMA_VERSION);self.assertEqual(conn.execute("SELECT COUNT(*) FROM tasks").fetchone()[0],before);self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=9").fetchone()[0],"flowboard-schema-v9");self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok")
         finally:conn.close()
         restored=str(Path(self.temp.name)/"restored-v8.db");copy_database(backup,restored);check=sqlite3.connect(restored)
         try:self.assertEqual(check.execute("PRAGMA user_version").fetchone()[0],8)
@@ -993,7 +993,7 @@ class FlowboardIntegrationTests(unittest.TestCase):
         finally:conn.close()
         backup=migrate(path);self.assertTrue(backup and Path(backup).exists());conn=connect(path)
         try:
-            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],15);self.assertEqual(before,[tuple(row) for row in conn.execute("SELECT id,title,parent_id FROM tasks ORDER BY id")]);self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok");self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=8").fetchone()[0],"flowboard-schema-v8")
+            self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],SCHEMA_VERSION);self.assertEqual(before,[tuple(row) for row in conn.execute("SELECT id,title,parent_id FROM tasks ORDER BY id")]);self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok");self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=8").fetchone()[0],"flowboard-schema-v8")
         finally:conn.close()
         restored=str(Path(self.temp.name)/"restored-v7.db");copy_database(backup,restored);check=sqlite3.connect(restored)
         try:self.assertEqual(check.execute("PRAGMA user_version").fetchone()[0],7);self.assertEqual(check.execute("SELECT COUNT(*) FROM tasks").fetchone()[0],len(before))

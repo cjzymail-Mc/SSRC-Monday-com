@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from flowboard.database import connect, migrate
+from flowboard.database import SCHEMA_VERSION, connect, migrate
 from flowboard.service import ApiError, FlowboardService
 
 
@@ -23,7 +23,7 @@ class I13BatchTests(unittest.TestCase):
         conn=connect(self.db);result=[{"id":task_id,"version":conn.execute("SELECT version FROM tasks WHERE id=?",(task_id,)).fetchone()[0]} for task_id in ids];conn.close();return result
 
     def test_v15_description_retention_and_five_atomic_batch_operations(self):
-        conn=connect(self.db);self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],15);self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=15").fetchone()[0],"flowboard-schema-v15");self.assertEqual(conn.execute("SELECT trash_retention_days FROM workspaces WHERE id=1").fetchone()[0],30);conn.close()
+        conn=connect(self.db);self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],SCHEMA_VERSION);self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=15").fetchone()[0],"flowboard-schema-v15");self.assertEqual(conn.execute("SELECT trash_retention_days FROM workspaces WHERE id=1").fetchone()[0],30);conn.close()
         created=self._new_tasks();ids=[item["id"] for item in created]
         result=self.service.batch_tasks(self.admin,1,{"operation":"update","items":self._items(ids),"changes":{"priority":"高","description":"Bulk detail"}});self.assertEqual(result["updated"],2)
         self.service.batch_tasks(self.admin,1,{"operation":"assign","items":self._items(ids),"changes":{"owner_id":"u2"}})
@@ -58,7 +58,7 @@ class I13BatchTests(unittest.TestCase):
     def test_admin_backup_api_surface_is_verified_and_viewer_is_denied(self):
         created=self.service.create_admin_backup(self.admin,1);self.assertTrue(created["verified"]);self.assertEqual(created["restore_mode"],"offline_cli_only")
         listing=self.service.backups(self.admin,1);self.assertEqual(listing["backups"][0]["name"],created["name"]);self.assertTrue(listing["backups"][0]["valid"])
-        verified=self.service.verify_admin_backup(self.admin,1,created["name"]);self.assertTrue(verified["verified"]);self.assertEqual(verified["schema_version"],15)
+        verified=self.service.verify_admin_backup(self.admin,1,created["name"]);self.assertTrue(verified["verified"]);self.assertEqual(verified["schema_version"],SCHEMA_VERSION)
         with self.assertRaises(ApiError) as denied:self.service.backups(self.viewer,1)
         self.assertEqual(denied.exception.status,403)
         with self.assertRaises(ApiError) as traversal:self.service.verify_admin_backup(self.admin,1,"../flowboard-evil")

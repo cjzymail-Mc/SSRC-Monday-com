@@ -1,3 +1,5 @@
+import base64
+import hashlib
 import json
 import os
 import socket
@@ -10,7 +12,8 @@ from pathlib import Path
 from urllib.parse import parse_qs, quote, urlparse
 
 from flowboard.database import SCHEMA_VERSION, migrate
-from flowboard.service import ApiError, FlowboardService, require_object
+from flowboard.service import ApiError, FlowboardService, reject_unknown, require_object, require_text
+from flowboard.timeline import TimelineService
 
 
 ROOT = Path(__file__).resolve().parent
@@ -18,7 +21,7 @@ HOST = os.getenv("FLOWBOARD_HOST", "0.0.0.0")
 PORT = int(os.getenv("FLOWBOARD_PORT", "8080"))
 DB = os.getenv("FLOWBOARD_DB", str(ROOT / "flowboard.db"))
 SESSION_COOKIE = "flowboard_session"
-PUBLIC_PATHS = {"/", "/index.html", "/styles.css", "/auth.css", "/lifecycle.css", "/dashboard.css", "/dashboard-mobile.css", "/i12.css", "/i13.css", "/view-state.js", "/view-ui.js", "/schedule-ui.js", "/dashboard-ui.js", "/i12-ui.js", "/app.js"}
+PUBLIC_PATHS = {"/", "/index.html", "/styles.css", "/auth.css", "/lifecycle.css", "/dashboard.css", "/dashboard-mobile.css", "/timeline.css", "/i12.css", "/i13.css", "/view-state.js", "/view-ui.js", "/schedule-ui.js", "/dashboard-ui.js", "/timeline-ui.js", "/i12-ui.js", "/app.js"}
 
 
 class PresenceRegistry:
@@ -45,6 +48,7 @@ class FlowboardHTTPServer(ThreadingHTTPServer):
 
 class Handler(SimpleHTTPRequestHandler):
     service = None
+    timeline = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(ROOT), **kwargs)
@@ -162,6 +166,34 @@ class Handler(SimpleHTTPRequestHandler):
             return 200,self.service.global_search(user,int(parts[2]),query.get("q",[""])[0],after=query.get("after",[0])[0],limit=query.get("limit",[30])[0]),None
         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["tasks","batch"] and method=="POST":
             return 200,self.service.batch_tasks(user,int(parts[2]),data),None
+        if len(parts)==4 and parts[:2]==["api","workspaces"] and parts[3]=="timeline" and method=="GET":
+            return 200,self.timeline.list_projects(user,int(parts[2])),None
+        if len(parts)==4 and parts[:3]==["api","timeline","projects"] and method=="GET":
+            return 200,self.timeline.get_project(user,int(parts[3])),None
+        if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","batches"] and method=="POST":
+            return 200,self.timeline.submit_batches(user,int(parts[2]),data),None
+        if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","batches","undo"] and method=="POST":
+            return 200,self.timeline.undo_batches(user,int(parts[2]),data),None
+        if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","batches","initial-correction"] and method=="POST":
+            return 200,self.timeline.initial_correction(user,int(parts[2]),data),None
+        if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:5]==["timeline","projects"] and method=="DELETE":
+            return 200,self.timeline.delete_project(user,int(parts[2]),int(parts[5]),data),None
+        if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","review"] and method=="GET":
+            selected=[int(value) for value in query.get("project_ids",[[]])[0].split(",") if value] if "project_ids" in query else []
+            return 200,self.timeline.review(user,int(parts[2]),selected),None
+        if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","imports","preview"] and method=="POST":
+            filename=require_text(data,"filename",max_length=255);content=require_text(data,"content_base64",max_length=3_000_000)
+            try:raw=base64.b64decode(content,validate=True)
+            except Exception:raise ApiError(422,"IMPORT_FILE_INVALID","文件内容不是有效 base64")
+            return 201,self.timeline.preview_import(user,int(parts[2]),filename,raw),None
+        if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","imports","commit"] and method=="POST":
+            return 201,self.timeline.commit_import(user,int(parts[2]),data),None
+        if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","export"] and method=="POST":
+            reject_unknown(data, set())
+            raw=self.timeline.export_timeline(user,int(parts[2]))
+            return 200,{"filename":"timeline.xlsx","content_type":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","content_base64":base64.b64encode(raw).decode("ascii"),"sha256":hashlib.sha256(raw).hexdigest()},None
+        if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","projects"] and method=="POST":
+            return 201,self.timeline.create_project(user,int(parts[2]),data),None
         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["events","poll"] and method=="GET":
             payload=self.service.realtime_poll(user,int(parts[2]),cursor=query.get("cursor",[0])[0],limit=query.get("limit",[100])[0]);payload["online"]=PRESENCE.list(int(parts[2]));return 200,payload,None
         if len(parts)==5 and parts[:3]==["api","admin","workspaces"] and parts[4]=="audit" and method=="GET":
@@ -415,7 +447,8 @@ def create_server(host=HOST, port=PORT, db_path=DB):
     backup = migrate(db_path)
     if backup:
         print(f"Pre-migration backup: {backup}")
-    handler = type("FlowboardHandler", (Handler,), {"service": FlowboardService(db_path)})
+    primary = FlowboardService(db_path)
+    handler = type("FlowboardHandler", (Handler,), {"service": primary, "timeline": TimelineService(db_path)})
     return FlowboardHTTPServer((host, port), handler)
 
 

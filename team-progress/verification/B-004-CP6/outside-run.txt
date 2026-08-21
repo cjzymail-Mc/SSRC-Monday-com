@@ -1,0 +1,65 @@
+command: python -X utf8 team-progress/verification/B-004-CP6/probe_cp6_browser.py
+environment: sandbox-external Windows runner with real Chromium
+probe_sha256: 50173BCBCD70F3D8EE120EA3065C90F43CE01E700511B84088B469669A7EF9FF
+exit_code: 0
+stdout_json:
+{
+  "status": "PASS",
+  "database_instances": 1,
+  "journeys": {
+    "J1": {
+      "start": {
+        "timeline_projects": {"count": 2, "hash": "4ff78579368d8242c40b02a83ab5692c7b9d647f45da79081d19b95a50e98b99"},
+        "timeline_nodes": {"count": 8, "hash": "79bbb4047f48bb33148848fe7a09bdb19ad087c0803c59462414be7d93acb8a2"},
+        "timeline_change_batches": {"count": 0, "hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"},
+        "timeline_node_changes": {"count": 0, "hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"}
+      },
+      "end": {
+        "timeline_projects": {"count": 2, "hash": "f342ed2950b40dd2cdb456a8fe97c86806a9ea77043bf92e095b20e0b8e9a246"},
+        "timeline_nodes": {"count": 9, "hash": "a188e4de17d0902a6dd52b97b73e04fc9179d663f99dd831d773ed4054268546"},
+        "timeline_change_batches": {"count": 2, "hash": "2a76eb0c87ffef19b538dbb8c8d473b37f5e9791a04007def8c4408e3ab0b2a2"},
+        "timeline_node_changes": {"count": 10, "hash": "9f2da605d61b51643a83465ad244b98319e20b9d36856e031d4859e1324dd26e"}
+      },
+      "discard_zero_write": true,
+      "r06_once": true,
+      "refresh": true,
+      "undo_reload": true,
+      "409_zero_write": true,
+      "permission_zero_write": true
+    },
+    "J2": {
+      "start": {
+        "timeline_projects": {"count": 5, "hash": "448b8774381c4d40363359966d4ebc71e6caf895c8bbc086e54933227886cb5c"},
+        "timeline_nodes": {"count": 19, "hash": "56ebadd9aa5a4390ffcfa11c2c2a861ef0797ef5291222d36c01ca2c5db85f1a"},
+        "timeline_change_batches": {"count": 2, "hash": "2a76eb0c87ffef19b538dbb8c8d473b37f5e9791a04007def8c4408e3ab0b2a2"},
+        "timeline_node_changes": {"count": 10, "hash": "9f2da605d61b51643a83465ad244b98319e20b9d36856e031d4859e1324dd26e"}
+      },
+      "end": {
+        "timeline_projects": {"count": 5, "hash": "448b8774381c4d40363359966d4ebc71e6caf895c8bbc086e54933227886cb5c"},
+        "timeline_nodes": {"count": 19, "hash": "56ebadd9aa5a4390ffcfa11c2c2a861ef0797ef5291222d36c01ca2c5db85f1a"},
+        "timeline_change_batches": {"count": 2, "hash": "2a76eb0c87ffef19b538dbb8c8d473b37f5e9791a04007def8c4408e3ab0b2a2"},
+        "timeline_node_changes": {"count": 10, "hash": "9f2da605d61b51643a83465ad244b98319e20b9d36856e031d4859e1324dd26e"}
+      },
+      "shared": true,
+      "writes": 0,
+      "db_unchanged": true
+    },
+    "J3": {
+      "end": {
+        "timeline_projects": {"count": 12, "hash": "84be630593f1698d85d6e8dad67679b4dbd6d0359983f4566047696da48fc785"},
+        "timeline_nodes": {"count": 41, "hash": "5043598887e2e1c9270af875dea64abbed66dd3f80593e8a2be5553ccb050c3f"},
+        "timeline_change_batches": {"count": 9, "hash": "247615a5207acb692a42c49dc4352d1fd26c93995629189e0325e1ba9ef531cd"},
+        "timeline_node_changes": {"count": 32, "hash": "05b5f98fa79c5557b075bd6f7cf91a2704fef62464f048e2f69cace285c7f684"}
+      },
+      "r09_r10_r01": true,
+      "r11_hash_download": true,
+      "workspace2_roundtrip": true,
+      "422_zero_write": true
+    }
+  },
+  "canary": {
+    "bad": ["bad:mousedown"],
+    "good": ["good:mousedown", "good:mouseup", "good:click"]
+  },
+  "locked_and_product_hashes_unchanged": true
+}

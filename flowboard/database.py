@@ -7,7 +7,7 @@ from pathlib import Path
 from .security import hash_password
 
 
-SCHEMA_VERSION = 15
+SCHEMA_VERSION = 16
 
 
 def utc_now():
@@ -113,6 +113,8 @@ def migrate(path, initial_password=None):
             _migration_v14(conn)
         if version < 15:
             _migration_v15(conn)
+        if version < 16:
+            _migration_v16(conn)
         conn.execute("PRAGMA journal_mode = WAL")
         conn.execute("PRAGMA foreign_keys = ON")
         return backup
@@ -937,6 +939,84 @@ def _migration_v15(conn):
         conn.execute("PRAGMA user_version = 15")
     if conn.execute("PRAGMA foreign_key_check").fetchall():raise RuntimeError("foreign key check failed after v15 migration")
     if conn.execute("PRAGMA integrity_check").fetchone()[0]!="ok":raise RuntimeError("database integrity check failed after v15 migration")
+
+
+def _migration_v16(conn):
+    with transaction(conn):
+        _execute_ddl(conn,"""
+            CREATE TABLE timeline_projects(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                workspace_id INTEGER NOT NULL REFERENCES workspaces(id),
+                name TEXT NOT NULL,
+                created_by TEXT NOT NULL REFERENCES users(id),
+                version INTEGER NOT NULL DEFAULT 1,
+                deleted_at TEXT,
+                deleted_by TEXT REFERENCES users(id),
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+            CREATE UNIQUE INDEX idx_timeline_projects_active_name
+                ON timeline_projects(workspace_id, name) WHERE deleted_at IS NULL;
+            CREATE TABLE timeline_nodes(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                project_id INTEGER NOT NULL REFERENCES timeline_projects(id),
+                track TEXT NOT NULL CHECK(track IN ('main','parallel')),
+                stage TEXT NOT NULL CHECK(stage IN ('创意','设计','开发','测试','量产','应用迭代')),
+                name TEXT NOT NULL,
+                date TEXT NOT NULL,
+                initial_date TEXT NOT NULL,
+                done_at TEXT,
+                remark TEXT NOT NULL DEFAULT '',
+                version INTEGER NOT NULL DEFAULT 1,
+                deleted_at TEXT,
+                deleted_by TEXT REFERENCES users(id),
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+            CREATE INDEX idx_tln_project ON timeline_nodes(project_id, deleted_at, track, date);
+            CREATE TABLE timeline_change_batches(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                project_id INTEGER NOT NULL REFERENCES timeline_projects(id),
+                actor_user_id TEXT NOT NULL REFERENCES users(id),
+                change_kind TEXT NOT NULL CHECK(change_kind IN ('direct_edit','status_toggle','initial_correction','undo')),
+                trigger_source TEXT NOT NULL CHECK(trigger_source IN ('editor','drag','import','undo','admin')),
+                project_version_before INTEGER NOT NULL,
+                project_version_after INTEGER NOT NULL,
+                undone_batch_id INTEGER REFERENCES timeline_change_batches(id),
+                details_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL
+            );
+            CREATE INDEX idx_tlcb_project ON timeline_change_batches(project_id, id);
+            CREATE TABLE timeline_node_changes(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                batch_id INTEGER NOT NULL REFERENCES timeline_change_batches(id),
+                node_id INTEGER NOT NULL REFERENCES timeline_nodes(id),
+                change_role TEXT NOT NULL CHECK(change_role IN ('direct','cascaded')),
+                field TEXT NOT NULL CHECK(field IN ('date','done_at','initial_date','stage','track','name','remark','created','deleted')),
+                old_value TEXT,
+                new_value TEXT
+            );
+            CREATE INDEX idx_tlnc_batch ON timeline_node_changes(batch_id, node_id);
+            CREATE TABLE timeline_import_batches(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                workspace_id INTEGER NOT NULL REFERENCES workspaces(id),
+                filename TEXT NOT NULL,
+                file_format TEXT NOT NULL CHECK(file_format IN ('csv','xlsx')),
+                content_sha256 TEXT NOT NULL,
+                preview_json TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'previewed' CHECK(status IN ('previewed','committed')),
+                version INTEGER NOT NULL DEFAULT 1,
+                created_by TEXT NOT NULL REFERENCES users(id),
+                created_at TEXT NOT NULL,
+                committed_at TEXT
+            );
+            CREATE INDEX idx_timeline_import_batches_workspace
+                ON timeline_import_batches(workspace_id, created_by, status, id);
+        """)
+        conn.execute("INSERT INTO schema_migrations VALUES (16,?,?,?)",("project timeline five-table model","flowboard-schema-v16",utc_now()))
+        conn.execute("PRAGMA user_version = 16")
+    if conn.execute("PRAGMA foreign_key_check").fetchall():raise RuntimeError("foreign key check failed after v16 migration")
+    if conn.execute("PRAGMA integrity_check").fetchone()[0]!="ok":raise RuntimeError("database integrity check failed after v16 migration")
 
 
 def copy_database(source, target):

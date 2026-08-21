@@ -13,6 +13,10 @@ MAX_ZIP_ENTRIES=200
 MAX_UNCOMPRESSED=12_000_000
 NS="{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 
+
+class XlsxNumericCell(str):
+    """String-compatible marker retaining whether an OOXML cell was numeric."""
+
 class TransferError(Exception):
     def __init__(self,code,message,details=None):super().__init__(message);self.code=code;self.message=message;self.details=details or {}
 
@@ -24,7 +28,7 @@ def _check_table(rows):
     for row_index,row in enumerate(rows[:MAX_ROWS+2],1):
         values=[]
         for column_index,value in enumerate(row,1):
-            text="" if value is None else str(value)
+            text="" if value is None else (value if isinstance(value, XlsxNumericCell) else str(value))
             if len(text)>MAX_CELL_LENGTH:raise TransferError("IMPORT_CELL_TOO_LONG","单元格内容超过限制",{"row":row_index,"column":column_index,"max":MAX_CELL_LENGTH})
             values.append(text)
         normalized.append(values+[""]*(width-len(values)))
@@ -59,7 +63,7 @@ def _xlsx_cell(cell,shared):
         try:return shared[int(raw)]
         except (ValueError,IndexError):raise TransferError("IMPORT_XLSX_INVALID","共享字符串索引无效")
     if kind=="b":return "true" if raw=="1" else "false"
-    return raw
+    return XlsxNumericCell(raw) if kind in (None,"n") and raw != "" else raw
 
 def parse_xlsx(raw,sheet_name=None):
     try:z=zipfile.ZipFile(io.BytesIO(raw))

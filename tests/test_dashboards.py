@@ -3,7 +3,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from flowboard.aggregation import AggregationError,aggregate,aggregate_value
-from flowboard.database import (_migration_v1,_migration_v2,_migration_v3,_migration_v4,_migration_v5,_migration_v6,_migration_v7,_migration_v8,_migration_v9,_migration_v10,connect,migrate)
+from flowboard.database import (SCHEMA_VERSION,_migration_v1,_migration_v2,_migration_v3,_migration_v4,_migration_v5,_migration_v6,_migration_v7,_migration_v8,_migration_v9,_migration_v10,connect,migrate)
 from flowboard.service import ApiError,FlowboardService
 from server import create_server
 from test_secure_foundation import create_legacy_database
@@ -118,6 +118,6 @@ class DashboardMigrationTests(unittest.TestCase):
             path=str(Path(root)/"v10.db");create_legacy_database(path);conn=connect(path)
             migrations=(_migration_v1,_migration_v2,_migration_v3,_migration_v4,_migration_v5,_migration_v6,_migration_v7,_migration_v8,_migration_v9,_migration_v10)
             for migration in migrations:migration(conn,"test-password") if migration is _migration_v1 else migration(conn)
-            before=conn.execute("SELECT COUNT(*),COALESCE(SUM(version),0) FROM saved_views").fetchone();conn.close();backup=migrate(path,"test-password");self.assertTrue(Path(backup).exists());old=connect(backup);self.assertEqual(old.execute("PRAGMA user_version").fetchone()[0],10);old.close();conn=connect(path);self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],15);self.assertEqual(tuple(conn.execute("SELECT COUNT(*),COALESCE(SUM(version),0) FROM saved_views").fetchone()),tuple(before));self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=11").fetchone()[0],"flowboard-schema-v11");self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok");self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);conn.close();self.assertIsNone(migrate(path,"test-password"))
+            before=conn.execute("SELECT COUNT(*),COALESCE(SUM(version),0) FROM saved_views").fetchone();conn.close();backup=migrate(path,"test-password");self.assertTrue(Path(backup).exists());old=connect(backup);self.assertEqual(old.execute("PRAGMA user_version").fetchone()[0],10);old.close();conn=connect(path);self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],SCHEMA_VERSION);self.assertEqual(tuple(conn.execute("SELECT COUNT(*),COALESCE(SUM(version),0) FROM saved_views").fetchone()),tuple(before));self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=11").fetchone()[0],"flowboard-schema-v11");self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok");self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);conn.close();self.assertIsNone(migrate(path,"test-password"))
 
 if __name__=="__main__":unittest.main()
