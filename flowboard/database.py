@@ -7,7 +7,7 @@ from pathlib import Path
 from .security import hash_password
 
 
-SCHEMA_VERSION = 16
+SCHEMA_VERSION = 18
 
 
 def utc_now():
@@ -115,6 +115,10 @@ def migrate(path, initial_password=None):
             _migration_v15(conn)
         if version < 16:
             _migration_v16(conn)
+        if version < 17:
+            _migration_v17(conn)
+        if version < 18:
+            _migration_v18(conn)
         conn.execute("PRAGMA journal_mode = WAL")
         conn.execute("PRAGMA foreign_keys = ON")
         return backup
@@ -1017,6 +1021,103 @@ def _migration_v16(conn):
         conn.execute("PRAGMA user_version = 16")
     if conn.execute("PRAGMA foreign_key_check").fetchall():raise RuntimeError("foreign key check failed after v16 migration")
     if conn.execute("PRAGMA integrity_check").fetchone()[0]!="ok":raise RuntimeError("database integrity check failed after v16 migration")
+
+
+def _migration_v17(conn):
+    with transaction(conn):
+        _execute_ddl(conn,"""
+            CREATE TABLE timeline_tags(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                workspace_id INTEGER NOT NULL REFERENCES workspaces(id),
+                name TEXT NOT NULL,
+                version INTEGER NOT NULL DEFAULT 1,
+                created_by TEXT NOT NULL REFERENCES users(id),
+                deleted_by TEXT REFERENCES users(id),
+                deleted_at TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+            CREATE UNIQUE INDEX idx_timeline_tags_active_name
+                ON timeline_tags(workspace_id, name COLLATE NOCASE) WHERE deleted_at IS NULL;
+            CREATE INDEX idx_timeline_tags_workspace
+                ON timeline_tags(workspace_id, deleted_at, name COLLATE NOCASE, id);
+            CREATE TABLE timeline_project_tags(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                workspace_id INTEGER NOT NULL REFERENCES workspaces(id),
+                project_id INTEGER NOT NULL REFERENCES timeline_projects(id),
+                tag_id INTEGER NOT NULL REFERENCES timeline_tags(id),
+                version INTEGER NOT NULL DEFAULT 1,
+                created_by TEXT NOT NULL REFERENCES users(id),
+                removed_by TEXT REFERENCES users(id),
+                deleted_at TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+            CREATE UNIQUE INDEX idx_timeline_project_tags_active_pair
+                ON timeline_project_tags(project_id, tag_id) WHERE deleted_at IS NULL;
+            CREATE INDEX idx_timeline_project_tags_workspace
+                ON timeline_project_tags(workspace_id, tag_id, deleted_at, project_id);
+            CREATE TABLE timeline_order_contexts(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                workspace_id INTEGER NOT NULL REFERENCES workspaces(id),
+                user_id TEXT NOT NULL REFERENCES users(id),
+                context_type TEXT NOT NULL CHECK(context_type IN ('mine','all','uncategorized','tag')),
+                tag_id INTEGER REFERENCES timeline_tags(id),
+                version INTEGER NOT NULL DEFAULT 1,
+                deleted_at TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                CHECK((context_type='tag' AND tag_id IS NOT NULL) OR
+                      (context_type IN ('mine','all','uncategorized') AND tag_id IS NULL))
+            );
+            CREATE UNIQUE INDEX idx_timeline_order_contexts_active_virtual
+                ON timeline_order_contexts(workspace_id, user_id, context_type)
+                WHERE deleted_at IS NULL AND tag_id IS NULL;
+            CREATE UNIQUE INDEX idx_timeline_order_contexts_active_tag
+                ON timeline_order_contexts(workspace_id, user_id, context_type, tag_id)
+                WHERE deleted_at IS NULL AND tag_id IS NOT NULL;
+            CREATE TABLE timeline_order_items(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                context_id INTEGER NOT NULL REFERENCES timeline_order_contexts(id),
+                project_id INTEGER NOT NULL REFERENCES timeline_projects(id),
+                position INTEGER NOT NULL CHECK(position >= 0),
+                deleted_at TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+            CREATE UNIQUE INDEX idx_timeline_order_items_active_project
+                ON timeline_order_items(context_id, project_id) WHERE deleted_at IS NULL;
+            CREATE UNIQUE INDEX idx_timeline_order_items_active_position
+                ON timeline_order_items(context_id, position) WHERE deleted_at IS NULL;
+        """)
+        conn.execute("INSERT INTO schema_migrations VALUES (17,?,?,?)",("shared timeline tags and personal project ordering","flowboard-schema-v17",utc_now()))
+        conn.execute("PRAGMA user_version = 17")
+    if conn.execute("PRAGMA foreign_key_check").fetchall():raise RuntimeError("foreign key check failed after v17 migration")
+    if conn.execute("PRAGMA integrity_check").fetchone()[0]!="ok":raise RuntimeError("database integrity check failed after v17 migration")
+
+
+def _migration_v18(conn):
+    """Add the independent timeline-project archive state without data backfill."""
+    with transaction(conn):
+        columns = _columns(conn, "timeline_projects")
+        if "archived_at" not in columns:
+            conn.execute("ALTER TABLE timeline_projects ADD COLUMN archived_at TEXT")
+        if "archived_by" not in columns:
+            conn.execute("ALTER TABLE timeline_projects ADD COLUMN archived_by TEXT REFERENCES users(id)")
+        conn.execute(
+            """CREATE INDEX IF NOT EXISTS idx_timeline_projects_archive
+               ON timeline_projects(workspace_id, archived_at DESC, id DESC)
+               WHERE deleted_at IS NULL AND archived_at IS NOT NULL"""
+        )
+        conn.execute(
+            "INSERT INTO schema_migrations VALUES (18,?,?,?)",
+            ("manual timeline project archive state", "flowboard-schema-v18", utc_now()),
+        )
+        conn.execute("PRAGMA user_version = 18")
+    if conn.execute("PRAGMA foreign_key_check").fetchall():
+        raise RuntimeError("foreign key check failed after v18 migration")
+    if conn.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+        raise RuntimeError("database integrity check failed after v18 migration")
 
 
 def copy_database(source, target):

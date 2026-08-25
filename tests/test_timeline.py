@@ -62,6 +62,16 @@ class TimelineCoreTests(unittest.TestCase):
         self.assertEqual(db.execute("SELECT COUNT(*) FROM audit_log WHERE action_code='timeline.batch_committed'").fetchone()[0], 1)
         db.close()
 
+    def test_same_day_numeric_and_text_node_names_have_a_total_natural_order(self):
+        project_id, _ = self._create_with_nodes("混合节点名称", [
+            {"track": "main", "stage": "测试", "name": "1试穿报告", "date": "2026-08-10"},
+            {"track": "main", "stage": "测试", "name": "鞋底确认", "date": "2026-08-10"},
+        ])
+
+        view = self.service.get_project(self.admin, project_id)
+
+        self.assertEqual([node["name"] for node in view["nodes"]], ["1试穿报告", "鞋底确认"])
+
     def test_name_conflict_and_viewer_denied(self):
         self.service.create_project(self.admin, 1, {"name": "独家项目"})
         db = connect(self.db)
@@ -560,13 +570,13 @@ class TimelineCoreTests(unittest.TestCase):
 
         backup = migrate(path)
         self.assertTrue(backup and Path(backup).exists())
-        self.assertTrue(Path(backup).name.startswith("seeded-v15-pre-v16-"))
+        self.assertTrue(Path(backup).name.startswith(f"seeded-v15-pre-v{SCHEMA_VERSION}-"))
         db = connect(path)
         try:
             tables = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
             timeline_tables = {"timeline_projects", "timeline_nodes", "timeline_change_batches", "timeline_node_changes", "timeline_import_batches"}
             self.assertTrue(timeline_tables <= tables)
-            self.assertEqual(db.execute("PRAGMA user_version").fetchone()[0], 16)
+            self.assertEqual(db.execute("PRAGMA user_version").fetchone()[0], SCHEMA_VERSION)
             self.assertEqual({table: db.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0] for table in before}, before)
             self.assertEqual([tuple(row) for row in db.execute("SELECT id,title,status,priority,due,owner_id,description FROM tasks ORDER BY id")], task_rows)
             self.assertEqual(db.execute("SELECT COUNT(*) FROM timeline_projects").fetchone()[0], 0)
@@ -920,7 +930,7 @@ class TimelineCoreTests(unittest.TestCase):
         self.assertFalse(backups_dir.exists())
         backup = migrate(path)
         self.assertTrue(backup and Path(backup).exists() and Path(backup).stat().st_size > 0)
-        self.assertIn("-pre-v16-", Path(backup).name)
+        self.assertIn(f"-pre-v{SCHEMA_VERSION}-", Path(backup).name)
         self.assertEqual(sorted(item.name for item in backups_dir.iterdir()), [Path(backup).name])
 
         snap = connect(backup)
@@ -946,7 +956,7 @@ class TimelineCoreTests(unittest.TestCase):
         migrate(rollback)
         rb = connect(rollback)
         try:
-            self.assertEqual(rb.execute("PRAGMA user_version").fetchone()[0], 16)
+            self.assertEqual(rb.execute("PRAGMA user_version").fetchone()[0], SCHEMA_VERSION)
             tables = {row[0] for row in rb.execute("SELECT name FROM sqlite_master WHERE type='table'")}
             self.assertTrue({"timeline_projects", "timeline_nodes", "timeline_change_batches", "timeline_node_changes", "timeline_import_batches"} <= tables)
             self.assertEqual([tuple(row) for row in rb.execute("SELECT id,title,status,priority,due,owner_id FROM tasks ORDER BY id")], sentinels)
@@ -958,7 +968,7 @@ class TimelineCoreTests(unittest.TestCase):
         self.assertEqual(sorted(item.name for item in backups_dir.iterdir()), [Path(backup).name])
         main = connect(path)
         try:
-            self.assertEqual(main.execute("PRAGMA user_version").fetchone()[0], 16)
+            self.assertEqual(main.execute("PRAGMA user_version").fetchone()[0], SCHEMA_VERSION)
             self.assertEqual(main.execute("SELECT COUNT(*) FROM schema_migrations WHERE version=16").fetchone()[0], 1)
             timeline_counts = [main.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0] for table in ("timeline_projects", "timeline_nodes", "timeline_change_batches", "timeline_node_changes", "timeline_import_batches")]
             self.assertEqual(timeline_counts, [0, 0, 0, 0, 0])

@@ -23,7 +23,11 @@ def _serial_to_date(serial):
 
 
 def _natural_key(value):
-    return [int(part) if part.isdigit() else part.lower() for part in __import__("re").split(r"(\d+)", value) if part]
+    return [
+        (0, int(part)) if part.isdigit() else (1, part.lower())
+        for part in __import__("re").split(r"(\d+)", value)
+        if part
+    ]
 
 
 class TimelineService:
@@ -34,7 +38,7 @@ class TimelineService:
         return connect(self.db_path)
 
     @staticmethod
-    def _project_access(conn, user_id, project_id, *, workspace_id=None, write=False, require_active=False):
+    def _project_access(conn, user_id, project_id, *, workspace_id=None, write=False, require_active=False, allow_archived=False):
         row = conn.execute(
             """SELECT p.*, wm.role FROM timeline_projects p
                JOIN workspace_memberships wm ON wm.workspace_id=p.workspace_id AND wm.user_id=?
@@ -47,6 +51,8 @@ class TimelineService:
             raise ApiError(403, "PROJECT_FORBIDDEN", "资源不存在或不可访问")
         if require_active and row["deleted_at"]:
             raise ApiError(404, "PROJECT_NOT_ACTIVE", "项目当前不可用")
+        if write and row["archived_at"] and not allow_archived:
+            raise ApiError(409, "PROJECT_ARCHIVED", "项目已归档；请先取消归档再编辑")
         return row
 
     @staticmethod
@@ -86,7 +92,7 @@ class TimelineService:
     def _date(value):
         return datetime.strptime(value, "%Y-%m-%d").date()
 
-    def _view(self, conn, project):
+    def _view(self, conn, project, *, user_id=None, role=None):
         nodes = self._nodes(conn, project["id"])
         today = self._server_today()
         payloads = []
@@ -160,11 +166,20 @@ class TimelineService:
         week_end = week_start + timedelta(days=6)
         overdue = [node for node in nodes if not node["done_at"] and self._date(node["date"]) < today]
         this_week = [node for node in nodes if not node["done_at"] and week_start <= self._date(node["date"]) <= week_end]
+        if role is None and "role" in project.keys():
+            role = project["role"]
+        archived = bool(project["archived_at"])
+        can_manage_archive = bool(user_id and (role == "admin" or project["created_by"] == user_id))
         return {
             "project_id": project["id"],
             "name": project["name"],
             "created_by": project["created_by"],
             "version": project["version"],
+            "archived_at": project["archived_at"],
+            "archived_by": project["archived_by"],
+            "read_only": archived,
+            "can_archive": can_manage_archive and not archived,
+            "can_unarchive": can_manage_archive and archived,
             "nodes": payloads,
             "segments": segments,
             "stage_intervals": stage_intervals,
@@ -199,11 +214,15 @@ class TimelineService:
         ).lastrowid
 
     @staticmethod
-    def _audit(conn, workspace_id, user_id, entity_id, action, entity_type="timeline_batch"):
+    def _audit(conn, workspace_id, user_id, entity_id, action, entity_type="timeline_batch", details=None):
+        source_key = f"{action}:{entity_id}"
+        if details is not None:
+            next_id = conn.execute("SELECT COALESCE(MAX(id),0)+1 FROM audit_log").fetchone()[0]
+            source_key = f"{source_key}:{next_id}"
         conn.execute(
             """INSERT INTO audit_log(source_key,workspace_id,actor_user_id,action_code,outcome,entity_type,entity_id,details_json,created_at)
                VALUES (?,?,?,?,?,?,?,?,?)""",
-            (f"{action}:{entity_id}", workspace_id, user_id, action, "success", entity_type, str(entity_id), "{}", utc_now()),
+            (source_key, workspace_id, user_id, action, "success", entity_type, str(entity_id), json.dumps(details or {}, ensure_ascii=False), utc_now()),
         )
 
     def _resolve_batch(self, nodes, changes):
@@ -391,12 +410,29 @@ class TimelineService:
         finally:
             conn.close()
 
-    def list_projects(self, user, workspace_id):
+    def list_projects(self, user, workspace_id, archive_state="active"):
+        if archive_state not in {"active", "archived"}:
+            raise ApiError(422, "VALIDATION_ERROR", "archive_state must be active or archived")
         conn = self._db()
         try:
-            self._workspace_access(conn, user["id"], workspace_id)
-            projects = conn.execute("SELECT * FROM timeline_projects WHERE workspace_id=? AND deleted_at IS NULL ORDER BY id", (workspace_id,)).fetchall()
-            return {"projects": [self._view(conn, project) for project in projects], "server_today": self._server_today().isoformat()}
+            role = self._workspace_access(conn, user["id"], workspace_id)
+            if archive_state == "archived":
+                projects = conn.execute(
+                    """SELECT * FROM timeline_projects
+                       WHERE workspace_id=? AND deleted_at IS NULL AND archived_at IS NOT NULL
+                       ORDER BY archived_at DESC,name COLLATE NOCASE,id""",
+                    (workspace_id,),
+                ).fetchall()
+            else:
+                projects = conn.execute(
+                    "SELECT * FROM timeline_projects WHERE workspace_id=? AND deleted_at IS NULL AND archived_at IS NULL ORDER BY id",
+                    (workspace_id,),
+                ).fetchall()
+            return {
+                "archive_state": archive_state,
+                "projects": [self._view(conn, project, user_id=user["id"], role=role) for project in projects],
+                "server_today": self._server_today().isoformat(),
+            }
         finally:
             conn.close()
 
@@ -404,8 +440,159 @@ class TimelineService:
         conn = self._db()
         try:
             project = self._project_access(conn, user["id"], project_id, require_active=True)
-            payload = self._view(conn, project)
+            payload = self._view(conn, project, user_id=user["id"], role=project["role"])
             return payload
+        finally:
+            conn.close()
+
+    def _set_project_archive(self, user, workspace_id, project_id, data, *, archived):
+        reject_unknown(data, {"base_version"})
+        if "base_version" not in data:
+            raise ApiError(428, "VERSION_REQUIRED", "base_version is required")
+        base_version = require_int(data["base_version"], "base_version", minimum=1)
+        conn = self._db()
+        try:
+            with transaction(conn):
+                project = self._project_access(
+                    conn, user["id"], project_id, workspace_id=workspace_id,
+                    require_active=True, allow_archived=True,
+                )
+                if project["role"] != "admin" and project["created_by"] != user["id"]:
+                    raise ApiError(403, "PROJECT_ARCHIVE_FORBIDDEN", "仅管理员或项目创建者可归档或取消归档")
+                currently_archived = bool(project["archived_at"])
+                if currently_archived == archived or project["version"] != base_version:
+                    raise ApiError(
+                        409, "ARCHIVE_STATE_CONFLICT", "项目归档状态或版本已变化",
+                        {"project": self._view(conn, project, user_id=user["id"], role=project["role"])},
+                    )
+                stamp = utc_now()
+                if archived:
+                    cursor = conn.execute(
+                        """UPDATE timeline_projects
+                           SET archived_at=?,archived_by=?,version=version+1,updated_at=?
+                           WHERE id=? AND workspace_id=? AND version=? AND deleted_at IS NULL AND archived_at IS NULL""",
+                        (stamp, user["id"], stamp, project_id, workspace_id, base_version),
+                    )
+                    action = "timeline.project_archived"
+                else:
+                    cursor = conn.execute(
+                        """UPDATE timeline_projects
+                           SET archived_at=NULL,archived_by=NULL,version=version+1,updated_at=?
+                           WHERE id=? AND workspace_id=? AND version=? AND deleted_at IS NULL AND archived_at IS NOT NULL""",
+                        (stamp, project_id, workspace_id, base_version),
+                    )
+                    action = "timeline.project_unarchived"
+                if cursor.rowcount != 1:
+                    latest = self._project_access(conn, user["id"], project_id, workspace_id=workspace_id, require_active=True, allow_archived=True)
+                    raise ApiError(409, "ARCHIVE_STATE_CONFLICT", "项目归档状态或版本已变化", {"project": self._view(conn, latest, user_id=user["id"], role=latest["role"])})
+                latest = self._project_access(conn, user["id"], project_id, workspace_id=workspace_id, require_active=True, allow_archived=True)
+                self._audit(
+                    conn, workspace_id, user["id"], project_id, action, "timeline_project",
+                    {"version_before": base_version, "version_after": latest["version"], "archived_at": latest["archived_at"]},
+                )
+                return self._view(conn, latest, user_id=user["id"], role=latest["role"])
+        finally:
+            conn.close()
+
+    def archive_project(self, user, workspace_id, project_id, data):
+        return self._set_project_archive(user, workspace_id, project_id, data, archived=True)
+
+    def unarchive_project(self, user, workspace_id, project_id, data):
+        return self._set_project_archive(user, workspace_id, project_id, data, archived=False)
+
+    def _archive_bootstrap_snapshot(self, conn, workspace_id, today):
+        rows = conn.execute(
+            """SELECT p.id project_id,p.name,p.version base_version,MAX(n.date) last_node_date
+               FROM timeline_projects p
+               JOIN timeline_nodes n ON n.project_id=p.id AND n.deleted_at IS NULL
+               WHERE p.workspace_id=? AND p.deleted_at IS NULL AND p.archived_at IS NULL
+               GROUP BY p.id,p.name,p.version
+               HAVING MAX(n.date) < ?
+               ORDER BY p.id""",
+            (workspace_id, today),
+        ).fetchall()
+        candidates = [
+            {
+                "project_id": row["project_id"],
+                "name": row["name"],
+                "base_version": row["base_version"],
+                "last_node_date": row["last_node_date"],
+            }
+            for row in rows
+        ]
+        digest_source = {"workspace_id": workspace_id, "today": today, "candidates": candidates}
+        digest = hashlib.sha256(
+            json.dumps(digest_source, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+        return {**digest_source, "candidate_count": len(candidates), "snapshot_sha256": digest}
+
+    def preview_archive_bootstrap(self, user, workspace_id, data):
+        reject_unknown(data, set())
+        conn = self._db()
+        try:
+            role = self._workspace_access(conn, user["id"], workspace_id)
+            if role != "admin":
+                raise ApiError(403, "ADMIN_REQUIRED", "仅管理员可预览首次归档")
+            today = self._server_today().isoformat()
+            return self._archive_bootstrap_snapshot(conn, workspace_id, today)
+        finally:
+            conn.close()
+
+    def apply_archive_bootstrap(self, user, workspace_id, data):
+        reject_unknown(data, {"today", "candidates", "snapshot_sha256"})
+        today = require_text(data, "today", max_length=10)
+        self._parse_date(today, "today")
+        snapshot_sha256 = require_text(data, "snapshot_sha256", max_length=64)
+        if not re.fullmatch(r"[0-9a-f]{64}", snapshot_sha256):
+            raise ApiError(422, "VALIDATION_ERROR", "snapshot_sha256 must be lowercase SHA-256")
+        candidates = data.get("candidates")
+        if not isinstance(candidates, list):
+            raise ApiError(422, "VALIDATION_ERROR", "candidates must be an array")
+        submitted = []
+        for row in candidates:
+            if not isinstance(row, dict):
+                raise ApiError(422, "VALIDATION_ERROR", "candidate must be an object")
+            reject_unknown(row, {"project_id", "name", "base_version", "last_node_date"})
+            submitted.append({
+                "project_id": require_int(row.get("project_id"), "project_id", minimum=1),
+                "name": require_text(row, "name", max_length=200),
+                "base_version": require_int(row.get("base_version"), "base_version", minimum=1),
+                "last_node_date": self._parse_date(row.get("last_node_date"), "last_node_date").isoformat(),
+            })
+        conn = self._db()
+        try:
+            with transaction(conn):
+                role = self._workspace_access(conn, user["id"], workspace_id)
+                if role != "admin":
+                    raise ApiError(403, "ADMIN_REQUIRED", "仅管理员可执行首次归档")
+                if conn.execute(
+                    "SELECT 1 FROM audit_log WHERE workspace_id=? AND action_code='timeline.archive_bootstrap_completed' AND outcome='success'",
+                    (workspace_id,),
+                ).fetchone():
+                    raise ApiError(409, "ARCHIVE_BOOTSTRAP_ALREADY_COMPLETED", "该工作区已完成首次归档")
+                server_today = self._server_today().isoformat()
+                latest = self._archive_bootstrap_snapshot(conn, workspace_id, server_today)
+                if today != server_today or submitted != latest["candidates"] or snapshot_sha256 != latest["snapshot_sha256"]:
+                    raise ApiError(409, "ARCHIVE_BOOTSTRAP_SNAPSHOT_CHANGED", "日期候选已变化，请重新预览", {"preview": latest})
+                stamp = utc_now()
+                for row in submitted:
+                    updated = conn.execute(
+                        """UPDATE timeline_projects
+                           SET archived_at=?,archived_by=?,version=version+1,updated_at=?
+                           WHERE id=? AND workspace_id=? AND version=? AND deleted_at IS NULL AND archived_at IS NULL""",
+                        (stamp, user["id"], stamp, row["project_id"], workspace_id, row["base_version"]),
+                    )
+                    if updated.rowcount != 1:
+                        raise ApiError(409, "ARCHIVE_BOOTSTRAP_SNAPSHOT_CHANGED", "日期候选已变化，请重新预览", {"preview": self._archive_bootstrap_snapshot(conn, workspace_id, server_today)})
+                    self._audit(
+                        conn, workspace_id, user["id"], row["project_id"], "timeline.project_archived", "timeline_project",
+                        {"source": "archive_bootstrap", "version_before": row["base_version"], "version_after": row["base_version"] + 1, "archived_at": stamp},
+                    )
+                self._audit(
+                    conn, workspace_id, user["id"], workspace_id, "timeline.archive_bootstrap_completed", "workspace",
+                    {"candidate_count": len(submitted), "snapshot_sha256": snapshot_sha256, "today": today},
+                )
+                return {"workspace_id": workspace_id, "today": today, "archived_count": len(submitted), "snapshot_sha256": snapshot_sha256}
         finally:
             conn.close()
 
@@ -729,7 +916,7 @@ class TimelineService:
         try:
             self._workspace_access(conn, user["id"], workspace_id)
             selected = set(project_ids or [])
-            projects = conn.execute("SELECT * FROM timeline_projects WHERE workspace_id=? AND deleted_at IS NULL ORDER BY id", (workspace_id,)).fetchall()
+            projects = conn.execute("SELECT * FROM timeline_projects WHERE workspace_id=? AND deleted_at IS NULL AND archived_at IS NULL ORDER BY id", (workspace_id,)).fetchall()
             payload = []
             for project in projects:
                 if selected and project["id"] not in selected:
@@ -783,7 +970,7 @@ class TimelineService:
         conn = self._db()
         try:
             self._workspace_access(conn, user["id"], workspace_id)
-            projects = conn.execute("SELECT * FROM timeline_projects WHERE workspace_id=? AND deleted_at IS NULL ORDER BY id", (workspace_id,)).fetchall()
+            projects = conn.execute("SELECT * FROM timeline_projects WHERE workspace_id=? AND deleted_at IS NULL AND archived_at IS NULL ORDER BY id", (workspace_id,)).fetchall()
             rows = []
             today = self._server_today()
             for project in projects:
@@ -874,5 +1061,417 @@ class TimelineService:
                 if updated.rowcount != 1:
                     raise ApiError(409, "TIMELINE_IMPORT_ALREADY_COMMITTED", "导入批次已提交")
                 return {"batch_id": batch_id, "projects": projects_created, "nodes": nodes_created}
+        finally:
+            conn.close()
+
+    @staticmethod
+    def _tag_row(conn, workspace_id, tag_id):
+        tag = conn.execute(
+            "SELECT * FROM timeline_tags WHERE id=? AND workspace_id=? AND deleted_at IS NULL",
+            (tag_id, workspace_id),
+        ).fetchone()
+        if not tag:
+            raise ApiError(404, "TIMELINE_TAG_NOT_FOUND", "标签不存在或已删除")
+        return tag
+
+    @staticmethod
+    def _tag_payload(conn, tag):
+        count = conn.execute(
+            "SELECT COUNT(*) FROM timeline_project_tags pt JOIN timeline_projects p ON p.id=pt.project_id "
+            "WHERE pt.tag_id=? AND pt.deleted_at IS NULL AND p.deleted_at IS NULL AND p.archived_at IS NULL",
+            (tag["id"],),
+        ).fetchone()[0]
+        return {"tag_id": tag["id"], "name": tag["name"], "version": tag["version"], "project_count": count}
+
+    def _tag_membership_view(self, conn, workspace_id, tag):
+        rows = conn.execute(
+            """SELECT p.id project_id,p.name,
+                      CASE WHEN pt.id IS NULL THEN 0 ELSE 1 END included
+               FROM timeline_projects p
+               LEFT JOIN timeline_project_tags pt
+                 ON pt.project_id=p.id AND pt.tag_id=? AND pt.deleted_at IS NULL
+               WHERE p.workspace_id=? AND p.deleted_at IS NULL AND p.archived_at IS NULL
+               ORDER BY p.id""",
+            (tag["id"], workspace_id),
+        ).fetchall()
+        payload = [{"project_id": row["project_id"], "name": row["name"]} for row in rows]
+        return {
+            "tag": self._tag_payload(conn, tag),
+            "included": [item for item, row in zip(payload, rows) if row["included"]],
+            "excluded": [item for item, row in zip(payload, rows) if not row["included"]],
+        }
+
+    def list_tags(self, user, workspace_id):
+        conn = self._db()
+        try:
+            role = self._workspace_access(conn, user["id"], workspace_id)
+            tags = conn.execute(
+                "SELECT * FROM timeline_tags WHERE workspace_id=? AND deleted_at IS NULL ORDER BY name COLLATE NOCASE,id",
+                (workspace_id,),
+            ).fetchall()
+            all_count = conn.execute(
+                "SELECT COUNT(*) FROM timeline_projects WHERE workspace_id=? AND deleted_at IS NULL AND archived_at IS NULL", (workspace_id,)
+            ).fetchone()[0]
+            uncategorized_count = conn.execute(
+                """SELECT COUNT(*) FROM timeline_projects p
+                   WHERE p.workspace_id=? AND p.deleted_at IS NULL AND p.archived_at IS NULL
+                     AND NOT EXISTS(SELECT 1 FROM timeline_project_tags pt
+                                    WHERE pt.project_id=p.id AND pt.deleted_at IS NULL)""",
+                (workspace_id,),
+            ).fetchone()[0]
+            archived_count = conn.execute(
+                "SELECT COUNT(*) FROM timeline_projects WHERE workspace_id=? AND deleted_at IS NULL AND archived_at IS NOT NULL",
+                (workspace_id,),
+            ).fetchone()[0]
+            return {
+                "role": role,
+                "virtual": [
+                    {"context_type": "all", "name": "全部", "project_count": all_count},
+                    {"context_type": "uncategorized", "name": "未分类", "project_count": uncategorized_count},
+                    {"context_type": "archived", "name": "已归档项目", "project_count": archived_count},
+                ],
+                "tags": [self._tag_payload(conn, tag) for tag in tags],
+            }
+        finally:
+            conn.close()
+
+    def create_tag(self, user, workspace_id, data):
+        reject_unknown(data, {"name"})
+        name = require_text(data, "name", max_length=80)
+        if name.casefold() in {"全部".casefold(), "未分类".casefold(), "已归档项目".casefold()}:
+            raise ApiError(409, "TAG_NAME_CONFLICT", "该名称为系统标签")
+        conn = self._db()
+        try:
+            with transaction(conn):
+                self._workspace_access(conn, user["id"], workspace_id)
+                if conn.execute(
+                    "SELECT 1 FROM timeline_tags WHERE workspace_id=? AND name=? COLLATE NOCASE AND deleted_at IS NULL",
+                    (workspace_id, name),
+                ).fetchone():
+                    raise ApiError(409, "TAG_NAME_CONFLICT", "标签名称已存在")
+                stamp = utc_now()
+                tag_id = conn.execute(
+                    "INSERT INTO timeline_tags(workspace_id,name,created_by,created_at,updated_at) VALUES (?,?,?,?,?)",
+                    (workspace_id, name, user["id"], stamp, stamp),
+                ).lastrowid
+                tag = self._tag_row(conn, workspace_id, tag_id)
+                self._audit(conn, workspace_id, user["id"], tag_id, "timeline.tag_created", "timeline_tag", {"name": name, "version": 1})
+                return self._tag_payload(conn, tag)
+        finally:
+            conn.close()
+
+    def rename_tag(self, user, workspace_id, tag_id, data):
+        reject_unknown(data, {"name", "base_version"})
+        name = require_text(data, "name", max_length=80)
+        if "base_version" not in data:
+            raise ApiError(428, "VERSION_REQUIRED", "base_version is required")
+        base_version = require_int(data["base_version"], "base_version", minimum=1)
+        if name.casefold() in {"全部".casefold(), "未分类".casefold(), "已归档项目".casefold()}:
+            raise ApiError(409, "TAG_NAME_CONFLICT", "该名称为系统标签")
+        conn = self._db()
+        try:
+            with transaction(conn):
+                self._workspace_access(conn, user["id"], workspace_id)
+                tag = self._tag_row(conn, workspace_id, tag_id)
+                if tag["version"] != base_version:
+                    raise ApiError(409, "TAG_VERSION_CONFLICT", "标签版本冲突", {"tag": self._tag_payload(conn, tag)})
+                if tag["name"] == name:
+                    return self._tag_payload(conn, tag)
+                if conn.execute(
+                    "SELECT 1 FROM timeline_tags WHERE workspace_id=? AND id<>? AND name=? COLLATE NOCASE AND deleted_at IS NULL",
+                    (workspace_id, tag_id, name),
+                ).fetchone():
+                    raise ApiError(409, "TAG_NAME_CONFLICT", "标签名称已存在")
+                stamp = utc_now()
+                updated = conn.execute(
+                    "UPDATE timeline_tags SET name=?,version=version+1,updated_at=? WHERE id=? AND version=? AND deleted_at IS NULL",
+                    (name, stamp, tag_id, base_version),
+                )
+                if updated.rowcount != 1:
+                    latest = self._tag_row(conn, workspace_id, tag_id)
+                    raise ApiError(409, "TAG_VERSION_CONFLICT", "标签版本冲突", {"tag": self._tag_payload(conn, latest)})
+                latest = self._tag_row(conn, workspace_id, tag_id)
+                self._audit(conn, workspace_id, user["id"], tag_id, "timeline.tag_renamed", "timeline_tag", {"old_name": tag["name"], "name": name, "version": latest["version"]})
+                return self._tag_payload(conn, latest)
+        finally:
+            conn.close()
+
+    def delete_tag(self, user, workspace_id, tag_id, data):
+        reject_unknown(data, {"base_version"})
+        if "base_version" not in data:
+            raise ApiError(428, "VERSION_REQUIRED", "base_version is required")
+        base_version = require_int(data["base_version"], "base_version", minimum=1)
+        conn = self._db()
+        try:
+            with transaction(conn):
+                role = self._workspace_access(conn, user["id"], workspace_id)
+                if role != "admin":
+                    raise ApiError(403, "ADMIN_REQUIRED", "仅管理员可删除标签")
+                tag = self._tag_row(conn, workspace_id, tag_id)
+                if tag["version"] != base_version:
+                    raise ApiError(409, "TAG_VERSION_CONFLICT", "标签版本冲突", {"tag": self._tag_payload(conn, tag)})
+                stamp = utc_now()
+                conn.execute(
+                    "UPDATE timeline_tags SET deleted_at=?,deleted_by=?,version=version+1,updated_at=? WHERE id=? AND version=?",
+                    (stamp, user["id"], stamp, tag_id, base_version),
+                )
+                conn.execute(
+                    "UPDATE timeline_project_tags SET deleted_at=?,removed_by=?,version=version+1,updated_at=? WHERE tag_id=? AND deleted_at IS NULL",
+                    (stamp, user["id"], stamp, tag_id),
+                )
+                context_ids = [row[0] for row in conn.execute(
+                    "SELECT id FROM timeline_order_contexts WHERE tag_id=? AND deleted_at IS NULL", (tag_id,)
+                )]
+                if context_ids:
+                    marks = ",".join("?" for _ in context_ids)
+                    conn.execute(f"UPDATE timeline_order_items SET deleted_at=?,updated_at=? WHERE context_id IN ({marks}) AND deleted_at IS NULL", (stamp, stamp, *context_ids))
+                conn.execute(
+                    "UPDATE timeline_order_contexts SET deleted_at=?,updated_at=? WHERE tag_id=? AND deleted_at IS NULL",
+                    (stamp, stamp, tag_id),
+                )
+                self._audit(conn, workspace_id, user["id"], tag_id, "timeline.tag_deleted", "timeline_tag", {"name": tag["name"], "version": base_version + 1})
+                return {"tag_id": tag_id, "version": base_version + 1, "deleted_at": stamp}
+        finally:
+            conn.close()
+
+    def get_tag_projects(self, user, workspace_id, tag_id):
+        conn = self._db()
+        try:
+            self._workspace_access(conn, user["id"], workspace_id)
+            tag = self._tag_row(conn, workspace_id, tag_id)
+            return self._tag_membership_view(conn, workspace_id, tag)
+        finally:
+            conn.close()
+
+    def set_tag_project(self, user, workspace_id, tag_id, project_id, data, *, included):
+        reject_unknown(data, {"base_tag_version"})
+        if "base_tag_version" not in data:
+            raise ApiError(428, "VERSION_REQUIRED", "base_tag_version is required")
+        base_version = require_int(data["base_tag_version"], "base_tag_version", minimum=1)
+        conn = self._db()
+        try:
+            with transaction(conn):
+                self._workspace_access(conn, user["id"], workspace_id)
+                tag = self._tag_row(conn, workspace_id, tag_id)
+                if tag["version"] != base_version:
+                    raise ApiError(409, "TAG_VERSION_CONFLICT", "标签版本冲突", {"view": self._tag_membership_view(conn, workspace_id, tag)})
+                project = self._project_access(conn, user["id"], project_id, workspace_id=workspace_id, require_active=True)
+                if project["archived_at"]:
+                    raise ApiError(409, "PROJECT_ARCHIVED", "项目已归档；请先取消归档再修改标签")
+                relation = conn.execute(
+                    "SELECT * FROM timeline_project_tags WHERE project_id=? AND tag_id=? AND deleted_at IS NULL",
+                    (project_id, tag_id),
+                ).fetchone()
+                if bool(relation) == included:
+                    return self._tag_membership_view(conn, workspace_id, tag)
+                stamp = utc_now()
+                if included:
+                    was_uncategorized = not conn.execute(
+                        "SELECT 1 FROM timeline_project_tags WHERE project_id=? AND deleted_at IS NULL", (project_id,)
+                    ).fetchone()
+                    relation_id = conn.execute(
+                        """INSERT INTO timeline_project_tags(workspace_id,project_id,tag_id,created_by,created_at,updated_at)
+                           VALUES (?,?,?,?,?,?)""",
+                        (workspace_id, project_id, tag_id, user["id"], stamp, stamp),
+                    ).lastrowid
+                    if was_uncategorized:
+                        conn.execute(
+                            """UPDATE timeline_order_items SET deleted_at=?,updated_at=?
+                               WHERE project_id=? AND deleted_at IS NULL AND context_id IN (
+                                   SELECT id FROM timeline_order_contexts
+                                   WHERE workspace_id=? AND context_type='uncategorized' AND deleted_at IS NULL
+                               )""",
+                            (stamp, stamp, project_id, workspace_id),
+                        )
+                    action = "timeline.tag_project_added"
+                else:
+                    relation_id = relation["id"]
+                    conn.execute(
+                        "UPDATE timeline_project_tags SET deleted_at=?,removed_by=?,version=version+1,updated_at=? WHERE id=? AND deleted_at IS NULL",
+                        (stamp, user["id"], stamp, relation_id),
+                    )
+                    conn.execute(
+                        """UPDATE timeline_order_items SET deleted_at=?,updated_at=?
+                           WHERE project_id=? AND deleted_at IS NULL AND context_id IN (
+                               SELECT id FROM timeline_order_contexts
+                               WHERE workspace_id=? AND context_type='tag' AND tag_id=? AND deleted_at IS NULL
+                           )""",
+                        (stamp, stamp, project_id, workspace_id, tag_id),
+                    )
+                    action = "timeline.tag_project_removed"
+                updated = conn.execute(
+                    "UPDATE timeline_tags SET version=version+1,updated_at=? WHERE id=? AND version=? AND deleted_at IS NULL",
+                    (stamp, tag_id, base_version),
+                )
+                if updated.rowcount != 1:
+                    latest = self._tag_row(conn, workspace_id, tag_id)
+                    raise ApiError(409, "TAG_VERSION_CONFLICT", "标签版本冲突", {"view": self._tag_membership_view(conn, workspace_id, latest)})
+                latest = self._tag_row(conn, workspace_id, tag_id)
+                self._audit(conn, workspace_id, user["id"], relation_id, action, "timeline_project_tag", {"tag_id": tag_id, "project_id": project_id, "tag_version": latest["version"]})
+                return self._tag_membership_view(conn, workspace_id, latest)
+        finally:
+            conn.close()
+
+    def _order_scope(self, conn, user_id, workspace_id, context_type, tag_id, *, include_archived=False):
+        archive_filter = "" if include_archived else " AND archived_at IS NULL"
+        project_archive_filter = "" if include_archived else " AND p.archived_at IS NULL"
+        if context_type == "mine":
+            rows = conn.execute(
+                f"SELECT id FROM timeline_projects WHERE workspace_id=? AND created_by=? AND deleted_at IS NULL{archive_filter} ORDER BY id",
+                (workspace_id, user_id),
+            ).fetchall()
+        elif context_type == "all":
+            rows = conn.execute(
+                f"SELECT id FROM timeline_projects WHERE workspace_id=? AND deleted_at IS NULL{archive_filter} ORDER BY id", (workspace_id,)
+            ).fetchall()
+        elif context_type == "uncategorized":
+            rows = conn.execute(
+                f"""SELECT p.id FROM timeline_projects p WHERE p.workspace_id=? AND p.deleted_at IS NULL{project_archive_filter}
+                   AND NOT EXISTS(SELECT 1 FROM timeline_project_tags pt WHERE pt.project_id=p.id AND pt.deleted_at IS NULL)
+                   ORDER BY p.id""",
+                (workspace_id,),
+            ).fetchall()
+        else:
+            self._tag_row(conn, workspace_id, tag_id)
+            rows = conn.execute(
+                f"""SELECT p.id FROM timeline_projects p JOIN timeline_project_tags pt ON pt.project_id=p.id
+                   WHERE p.workspace_id=? AND p.deleted_at IS NULL{project_archive_filter} AND pt.tag_id=? AND pt.deleted_at IS NULL ORDER BY p.id""",
+                (workspace_id, tag_id),
+            ).fetchall()
+        return [row["id"] for row in rows]
+
+    @staticmethod
+    def _order_context(conn, user_id, workspace_id, context_type, tag_id):
+        return conn.execute(
+            """SELECT * FROM timeline_order_contexts
+               WHERE workspace_id=? AND user_id=? AND context_type=?
+                 AND ((? IS NULL AND tag_id IS NULL) OR tag_id=?) AND deleted_at IS NULL""",
+            (workspace_id, user_id, context_type, tag_id, tag_id),
+        ).fetchone()
+
+    def _order_view(self, conn, user_id, workspace_id, context_type, tag_id):
+        scope = self._order_scope(conn, user_id, workspace_id, context_type, tag_id)
+        context = self._order_context(conn, user_id, workspace_id, context_type, tag_id)
+        stored = []
+        if context:
+            stored = [row["project_id"] for row in conn.execute(
+                "SELECT project_id FROM timeline_order_items WHERE context_id=? AND deleted_at IS NULL ORDER BY position,id",
+                (context["id"],),
+            )]
+        scope_set = set(scope)
+        ordered = [project_id for project_id in stored if project_id in scope_set]
+        seen = set(ordered)
+        ordered.extend(project_id for project_id in scope if project_id not in seen)
+        return {"context_type": context_type, "tag_id": tag_id, "order_version": context["version"] if context else 0, "project_ids": ordered}
+
+    @staticmethod
+    def _validate_order_context(context_type, tag_id):
+        if context_type not in {"mine", "all", "uncategorized", "tag"}:
+            raise ApiError(422, "VALIDATION_ERROR", "context_type is invalid")
+        if context_type == "tag":
+            return require_int(tag_id, "tag_id", minimum=1)
+        if tag_id is not None:
+            raise ApiError(422, "VALIDATION_ERROR", "tag_id is only valid for tag context")
+        return None
+
+    def get_personal_order(self, user, workspace_id, context_type, tag_id=None):
+        tag_id = self._validate_order_context(context_type, tag_id)
+        conn = self._db()
+        try:
+            self._workspace_access(conn, user["id"], workspace_id)
+            return self._order_view(conn, user["id"], workspace_id, context_type, tag_id)
+        finally:
+            conn.close()
+
+    def put_personal_order(self, user, workspace_id, data):
+        reject_unknown(data, {"context_type", "tag_id", "base_order_version", "project_ids"})
+        context_type = data.get("context_type")
+        tag_id = self._validate_order_context(context_type, data.get("tag_id"))
+        if "base_order_version" not in data:
+            raise ApiError(428, "VERSION_REQUIRED", "base_order_version is required")
+        base_version = require_int(data["base_order_version"], "base_order_version", minimum=0)
+        project_ids = data.get("project_ids")
+        if not isinstance(project_ids, list) or any(isinstance(value, bool) or not isinstance(value, int) or value < 1 for value in project_ids):
+            raise ApiError(422, "VALIDATION_ERROR", "project_ids must be positive integer ids")
+        if len(project_ids) != len(set(project_ids)):
+            raise ApiError(422, "VALIDATION_ERROR", "project_ids must not contain duplicates")
+        conn = self._db()
+        try:
+            with transaction(conn):
+                self._workspace_access(conn, user["id"], workspace_id)
+                latest = self._order_view(conn, user["id"], workspace_id, context_type, tag_id)
+                if latest["order_version"] != base_version:
+                    raise ApiError(409, "ORDER_VERSION_CONFLICT", "个人排序版本冲突", {"order": latest})
+                if set(project_ids) != set(latest["project_ids"]) or len(project_ids) != len(latest["project_ids"]):
+                    raise ApiError(409, "ORDER_SCOPE_CHANGED", "项目集合已变化", {"order": latest})
+                stamp = utc_now()
+                context = self._order_context(conn, user["id"], workspace_id, context_type, tag_id)
+                if context:
+                    context_id = context["id"]
+                    active_scope = set(latest["project_ids"])
+                    underlying_scope = set(self._order_scope(
+                        conn, user["id"], workspace_id, context_type, tag_id, include_archived=True
+                    ))
+                    existing = conn.execute(
+                        "SELECT id,project_id,position FROM timeline_order_items WHERE context_id=? AND deleted_at IS NULL ORDER BY position,id",
+                        (context_id,),
+                    ).fetchall()
+                    hidden = underlying_scope - active_scope
+                    submitted_iter = iter(project_ids)
+                    merged = []
+                    for item in existing:
+                        project_id = item["project_id"]
+                        if project_id in hidden:
+                            merged.append(project_id)
+                        elif project_id in active_scope:
+                            merged.append(next(submitted_iter))
+                    merged.extend(submitted_iter)
+                    merged_set = set(merged)
+                    obsolete = [item["id"] for item in existing if item["project_id"] not in merged_set]
+                    if obsolete:
+                        marks = ",".join("?" for _ in obsolete)
+                        conn.execute(
+                            f"UPDATE timeline_order_items SET deleted_at=?,updated_at=? WHERE id IN ({marks}) AND deleted_at IS NULL",
+                            (stamp, stamp, *obsolete),
+                        )
+                    retained = {item["project_id"]: item["id"] for item in existing if item["project_id"] in merged_set}
+                    if retained:
+                        marks = ",".join("?" for _ in retained)
+                        conn.execute(
+                            f"UPDATE timeline_order_items SET position=position+1000000,updated_at=? WHERE id IN ({marks})",
+                            (stamp, *retained.values()),
+                        )
+                    for position, project_id in enumerate(merged):
+                        item_id = retained.get(project_id)
+                        if item_id:
+                            conn.execute(
+                                "UPDATE timeline_order_items SET position=?,updated_at=? WHERE id=? AND deleted_at IS NULL",
+                                (position, stamp, item_id),
+                            )
+                        else:
+                            conn.execute(
+                                "INSERT INTO timeline_order_items(context_id,project_id,position,created_at,updated_at) VALUES (?,?,?,?,?)",
+                                (context_id, project_id, position, stamp, stamp),
+                            )
+                    updated = conn.execute(
+                        "UPDATE timeline_order_contexts SET version=version+1,updated_at=? WHERE id=? AND version=?",
+                        (stamp, context["id"], base_version),
+                    )
+                    if updated.rowcount != 1:
+                        raise ApiError(409, "ORDER_VERSION_CONFLICT", "个人排序版本冲突", {"order": self._order_view(conn, user["id"], workspace_id, context_type, tag_id)})
+                    next_version = base_version + 1
+                else:
+                    context_id = conn.execute(
+                        """INSERT INTO timeline_order_contexts(workspace_id,user_id,context_type,tag_id,version,created_at,updated_at)
+                           VALUES (?,?,?,?,1,?,?)""",
+                        (workspace_id, user["id"], context_type, tag_id, stamp, stamp),
+                    ).lastrowid
+                    next_version = 1
+                    conn.executemany(
+                        "INSERT INTO timeline_order_items(context_id,project_id,position,created_at,updated_at) VALUES (?,?,?,?,?)",
+                        [(context_id, project_id, position, stamp, stamp) for position, project_id in enumerate(project_ids)],
+                    )
+                self._audit(conn, workspace_id, user["id"], context_id, "timeline.personal_order_changed", "timeline_order_context", {"context_type": context_type, "tag_id": tag_id, "version": next_version, "project_count": len(project_ids)})
+                return {"context_type": context_type, "tag_id": tag_id, "order_version": next_version, "project_ids": project_ids}
         finally:
             conn.close()

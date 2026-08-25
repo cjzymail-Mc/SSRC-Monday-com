@@ -118,7 +118,7 @@ class Handler(SimpleHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/") or "/"
         query = parse_qs(parsed.query)
-        if method in {"POST", "PATCH", "DELETE"}:
+        if method in {"POST", "PUT", "PATCH", "DELETE"}:
             self.read_body_bytes()
 
         if method == "POST" and path == "/api/auth/login":
@@ -143,8 +143,8 @@ class Handler(SimpleHTTPRequestHandler):
             self.service.logout(self.token())
             return 200, {"ok": True}, self.session_cookie("", clear=True)
 
-        user = self.current_user(csrf=method in {"POST", "PATCH", "DELETE"})
-        data = self.body() if method in {"POST", "PATCH", "DELETE"} else None
+        user = self.current_user(csrf=method in {"POST", "PUT", "PATCH", "DELETE"})
+        data = self.body() if method in {"POST", "PUT", "PATCH", "DELETE"} else None
 
         if method == "GET" and path == "/api/bootstrap":
             board_id = query.get("board_id", [None])[0]
@@ -166,8 +166,25 @@ class Handler(SimpleHTTPRequestHandler):
             return 200,self.service.global_search(user,int(parts[2]),query.get("q",[""])[0],after=query.get("after",[0])[0],limit=query.get("limit",[30])[0]),None
         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["tasks","batch"] and method=="POST":
             return 200,self.service.batch_tasks(user,int(parts[2]),data),None
+        if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","tags"]:
+            if method=="GET":return 200,self.timeline.list_tags(user,int(parts[2])),None
+            if method=="POST":return 201,self.timeline.create_tag(user,int(parts[2]),data),None
+        if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3]=="timeline" and parts[4]=="tags":
+            if method=="PATCH":return 200,self.timeline.rename_tag(user,int(parts[2]),int(parts[5]),data),None
+            if method=="DELETE":return 200,self.timeline.delete_tag(user,int(parts[2]),int(parts[5]),data),None
+        if len(parts)==7 and parts[:2]==["api","workspaces"] and parts[3]=="timeline" and parts[4]=="tags" and parts[6]=="projects" and method=="GET":
+            return 200,self.timeline.get_tag_projects(user,int(parts[2]),int(parts[5])),None
+        if len(parts)==8 and parts[:2]==["api","workspaces"] and parts[3]=="timeline" and parts[4]=="tags" and parts[6]=="projects":
+            if method=="PUT":return 200,self.timeline.set_tag_project(user,int(parts[2]),int(parts[5]),int(parts[7]),data,included=True),None
+            if method=="DELETE":return 200,self.timeline.set_tag_project(user,int(parts[2]),int(parts[5]),int(parts[7]),data,included=False),None
+        if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","order"]:
+            if method=="GET":
+                context_type=query.get("context_type",[None])[0]
+                raw_tag=query.get("tag_id",[None])[0]
+                return 200,self.timeline.get_personal_order(user,int(parts[2]),context_type,int(raw_tag) if raw_tag is not None else None),None
+            if method=="PUT":return 200,self.timeline.put_personal_order(user,int(parts[2]),data),None
         if len(parts)==4 and parts[:2]==["api","workspaces"] and parts[3]=="timeline" and method=="GET":
-            return 200,self.timeline.list_projects(user,int(parts[2])),None
+            return 200,self.timeline.list_projects(user,int(parts[2]),query.get("archive_state",["active"])[0]),None
         if len(parts)==4 and parts[:3]==["api","timeline","projects"] and method=="GET":
             return 200,self.timeline.get_project(user,int(parts[3])),None
         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","batches"] and method=="POST":
@@ -178,6 +195,12 @@ class Handler(SimpleHTTPRequestHandler):
             return 200,self.timeline.initial_correction(user,int(parts[2]),data),None
         if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:5]==["timeline","projects"] and method=="DELETE":
             return 200,self.timeline.delete_project(user,int(parts[2]),int(parts[5]),data),None
+        if len(parts)==7 and parts[:2]==["api","workspaces"] and parts[3:5]==["timeline","projects"] and method=="POST":
+            if parts[6]=="archive":return 200,self.timeline.archive_project(user,int(parts[2]),int(parts[5]),data),None
+            if parts[6]=="unarchive":return 200,self.timeline.unarchive_project(user,int(parts[2]),int(parts[5]),data),None
+        if len(parts)==7 and parts[:3]==["api","admin","workspaces"] and parts[4:6]==["timeline","archive-bootstrap"] and method=="POST":
+            if parts[6]=="preview":return 200,self.timeline.preview_archive_bootstrap(user,int(parts[3]),data),None
+            if parts[6]=="apply":return 200,self.timeline.apply_archive_bootstrap(user,int(parts[3]),data),None
         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","review"] and method=="GET":
             selected=[int(value) for value in query.get("project_ids",[[]])[0].split(",") if value] if "project_ids" in query else []
             return 200,self.timeline.review(user,int(parts[2]),selected),None
@@ -432,6 +455,9 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         return self.api("POST")
+
+    def do_PUT(self):
+        return self.api("PUT")
 
     def do_PATCH(self):
         return self.api("PATCH")
