@@ -664,8 +664,10 @@ class TimelineProductionE2E(unittest.TestCase):
 
         self.assertEqual(chart.get_attribute("data-calendar-start"), (today - timedelta(days=50)).isoformat())
         self.assertEqual(chart.get_attribute("data-calendar-end"), (today + timedelta(days=38)).isoformat())
-        for layer in ("years", "quarters", "months", "days"):
+        for layer in ("years", "months", "days"):
             self.assertEqual(page.locator(f".timeline-e-{layer}").count(), 1)
+        self.assertEqual(page.locator(".timeline-e-quarters").count(), 0)
+        self.assertEqual(page.locator(".timeline-shared-caption").count(), 0)
         row_height = page.locator('.timeline-portfolio-project').first.bounding_box()["height"]
         self.assertGreaterEqual(row_height, 61)
         self.assertLessEqual(row_height, 63)
@@ -711,22 +713,24 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertLess(after_pan["top"], before_pan["top"])
         self.assertEqual(page.locator('.timeline-pan-hud').count(), 0)
         keys = page.evaluate("Object.keys(localStorage).filter(key => key.startsWith('flowboard:timeline-viewport:'))")
-        self.assertIn("flowboard:timeline-viewport:1:u1:all", keys)
+        self.assertEqual(keys, [], "zoom memory is temporarily disabled")
 
         self.physical_click(page, page.locator('[data-timeline-tag-context="uncategorized"]'))
         page.locator('[data-timeline-tag-context="uncategorized"].active').wait_for()
-        uncategorized_days = float(page.locator('.timeline-portfolio-chart').get_attribute("data-viewport-days"))
-        self.assertGreater(uncategorized_days, 14)
+        uncategorized_chart = page.locator('.timeline-portfolio-chart')
+        uncategorized_days = float(uncategorized_chart.get_attribute("data-viewport-days"))
+        self.assertEqual(uncategorized_days, float(uncategorized_chart.get_attribute("data-full-days")))
         axis_detail = page.locator('.timeline-portfolio-axis-detail')
         axis_box = axis_detail.bounding_box()
         page.mouse.move(axis_box["x"] + axis_box["width"] * .55, axis_box["y"] + 54)
         page.mouse.wheel(0, -120)
         page.locator('[data-timeline-tag-context="uncategorized"].active').wait_for()
         keys = page.evaluate("Object.keys(localStorage).filter(key => key.startsWith('flowboard:timeline-viewport:'))")
-        self.assertIn("flowboard:timeline-viewport:1:u1:uncategorized", keys)
+        self.assertEqual(keys, [])
         self.physical_click(page, page.locator('[data-timeline-tag-context="all"]'))
         page.locator('[data-timeline-tag-context="all"].active').wait_for()
-        self.assertEqual(float(page.locator('.timeline-portfolio-chart').get_attribute("data-viewport-days")), 14)
+        restored_chart = page.locator('.timeline-portfolio-chart')
+        self.assertEqual(float(restored_chart.get_attribute("data-viewport-days")), float(restored_chart.get_attribute("data-full-days")))
 
         scroll = page.locator('[data-portfolio-scroll]')
         node = page.locator('[data-timeline-page="all"] .timeline-dashboard-node').first
@@ -767,9 +771,10 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(chart.locator('.timeline-past-mask').count(), 2)
         self.assertEqual(
             chart.locator('.timeline-past-mask').first.evaluate("el => getComputedStyle(el).backgroundColor"),
-            "rgba(255, 255, 255, 0.8)",
+            "rgba(255, 255, 255, 0.7)",
         )
         initial_days = float(chart.get_attribute("data-viewport-days"))
+        self.assertEqual(initial_days, float(chart.get_attribute("data-full-days")))
         box = single.bounding_box()
         page.mouse.move(box["x"] + box["width"] * .72, box["y"] + 36)
         page.mouse.wheel(0, -120)
@@ -778,6 +783,21 @@ class TimelineProductionE2E(unittest.TestCase):
             arg=initial_days,
         )
         single = page.locator('[data-timeline-page="single"] [data-single-scroll]')
+        single_labels = single.locator('.timeline-e-day-tick b').evaluate_all(
+            "els => els.map(el => { const r=el.getBoundingClientRect(); return {left:r.left,right:r.right,text:el.textContent.trim()} }).filter(x => x.text).sort((a,b) => a.left-b.left)"
+        )
+        self.assertGreater(len(single_labels), 2)
+        self.assertTrue(all(current["right"] <= following["left"] + 0.5 for current, following in zip(single_labels, single_labels[1:])))
+        self.assertEqual(single.locator('.timeline-e-quarters').count(), 0)
+        single_calendar_colors = single.evaluate("""el => ({
+          years:getComputedStyle(el.querySelector('.timeline-e-years')).backgroundColor,
+          months:getComputedStyle(el.querySelector('.timeline-e-month')).backgroundColor,
+          days:getComputedStyle(el.querySelector('.timeline-e-days')).backgroundColor
+        })""")
+        self.assertEqual(single_calendar_colors["years"], "rgb(38, 60, 98)")
+        self.assertNotEqual(single_calendar_colors["months"], "rgba(0, 0, 0, 0)")
+        self.assertEqual(single.locator('.timeline-today-overlay').evaluate("el => getComputedStyle(el).top"), "0px")
+        self.assertGreater(int(single.locator('.timeline-today-overlay').evaluate("el => getComputedStyle(el).zIndex")), 1100)
         for _ in range(5):
             dimensions = single.evaluate("el => ({client:el.clientWidth,scroll:el.scrollWidth})")
             if dimensions["scroll"] > dimensions["client"] + 40:
@@ -789,7 +809,7 @@ class TimelineProductionE2E(unittest.TestCase):
             single = page.locator('[data-timeline-page="single"] [data-single-scroll]')
         dimensions = single.evaluate("el => ({client:el.clientWidth,scroll:el.scrollWidth})")
         self.assertGreater(dimensions["scroll"], dimensions["client"] + 40)
-        ruler = single.locator('.timeline-month-ruler')
+        ruler = single.locator('.timeline-e-axis')
         page.evaluate("el => { el.scrollLeft=(el.scrollWidth-el.clientWidth)*.55 }", single.element_handle())
         before = single.evaluate("el => ({left:el.scrollLeft,top:el.scrollTop})")
         ruler_box = ruler.bounding_box()
@@ -804,9 +824,32 @@ class TimelineProductionE2E(unittest.TestCase):
         self.physical_click(page, page.locator('[data-timeline-mode-target="all"]'))
         portfolio = page.locator('[data-timeline-page="all"] .timeline-portfolio-chart')
         portfolio.wait_for()
+        self.assertEqual(float(portfolio.get_attribute("data-viewport-days")), float(portfolio.get_attribute("data-full-days")))
+        portfolio_labels = portfolio.locator('.timeline-e-day-tick b').evaluate_all(
+            "els => els.map(el => { const r=el.getBoundingClientRect(); return {left:r.left,right:r.right,text:el.textContent.trim()} }).filter(x => x.text).sort((a,b) => a.left-b.left)"
+        )
+        self.assertGreater(len(portfolio_labels), 2)
+        self.assertTrue(all(current["right"] <= following["left"] + 0.5 for current, following in zip(portfolio_labels, portfolio_labels[1:])))
+        portfolio_calendar_colors = portfolio.evaluate("""el => ({
+          years:getComputedStyle(el.querySelector('.timeline-e-years')).backgroundColor,
+          months:getComputedStyle(el.querySelector('.timeline-e-month')).backgroundColor,
+          days:getComputedStyle(el.querySelector('.timeline-e-days')).backgroundColor
+        })""")
+        self.assertEqual(portfolio_calendar_colors, single_calendar_colors)
+        self.assertEqual(page.locator('.timeline-shared-caption').count(), 0)
+        self.assertEqual(portfolio.locator('.timeline-e-quarters').count(), 0)
+        self.assertEqual(portfolio.locator('.timeline-portfolio-today').evaluate("el => getComputedStyle(el).top"), "0px")
+        self.assertGreater(int(portfolio.locator('.timeline-portfolio-today').evaluate("el => getComputedStyle(el).zIndex")), 1100)
         self.assertFalse(page.locator('[data-portfolio-fullscreen]').is_hidden())
         self.physical_click(page, page.locator('[data-portfolio-fullscreen]'))
         page.locator('.timeline-portfolio-card.is-fullscreen').wait_for()
+        uncategorized_context = page.locator('.timeline-portfolio-card.is-fullscreen [data-timeline-tag-context="uncategorized"]')
+        self.physical_click(page, uncategorized_context)
+        page.locator('.timeline-portfolio-card.is-fullscreen [data-timeline-tag-context="uncategorized"].active').wait_for()
+        fullscreen_chart = page.locator('.timeline-portfolio-card.is-fullscreen .timeline-portfolio-chart')
+        self.assertEqual(float(fullscreen_chart.get_attribute("data-viewport-days")), float(fullscreen_chart.get_attribute("data-full-days")))
+        self.assertEqual(page.locator('.timeline-portfolio-card.is-fullscreen').count(), 1)
+        self.assertEqual(page.locator('.timeline-portfolio-card.is-fullscreen').evaluate("el => getComputedStyle(el).display"), "grid")
         self.physical_click(page, page.locator('[data-portfolio-fullscreen]'))
         self.assertEqual(page.locator('.timeline-portfolio-card.is-fullscreen').count(), 0)
 
@@ -833,6 +876,8 @@ class TimelineProductionE2E(unittest.TestCase):
 
         self.physical_click(page, page.locator('[data-timeline-tag-context="archived"]'))
         page.locator('[data-timeline-tag-context="archived"].active').wait_for()
+        archived_chart = page.locator('.timeline-portfolio-chart')
+        self.assertEqual(float(archived_chart.get_attribute("data-viewport-days")), float(archived_chart.get_attribute("data-full-days")))
         archived_row = page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{project_id}"]')
         archived_row.wait_for()
         self.assertIn("已归档 · 只读", archived_row.inner_text())
@@ -842,7 +887,7 @@ class TimelineProductionE2E(unittest.TestCase):
         page.mouse.move(archived_axis_box["x"] + archived_axis_box["width"] * .55, archived_axis_box["y"] + 80)
         page.mouse.wheel(0, -120)
         page.wait_for_timeout(80)
-        self.assertIn("flowboard:timeline-viewport:1:u1:archived", page.evaluate("Object.keys(localStorage).join('|')"))
+        self.assertNotIn("flowboard:timeline-viewport:", page.evaluate("Object.keys(localStorage).join('|')"))
 
         self.physical_click(page, page.locator('#archivedBtn'))
         archive_page_row = page.locator(f'[data-timeline-page="archived"] .tl-archive-row:has-text("CP4 重叠双轨")')

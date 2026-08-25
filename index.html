@@ -4,28 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Flowboard · 团队工作空间</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=20260825-c" />
   <link rel="stylesheet" href="auth.css" />
   <link rel="stylesheet" href="lifecycle.css" />
   <link rel="stylesheet" href="dashboard.css" />
   <link rel="stylesheet" href="dashboard-mobile.css" />
   <link rel="stylesheet" href="i12.css" />
   <link rel="stylesheet" href="i13.css" />
-  <link rel="stylesheet" href="timeline.css" />
+  <link rel="stylesheet" href="timeline.css?v=20260825-fit100" />
 </head>
 <body>
   <div class="app-shell">
-    <aside class="sidebar">
-      <div class="brand"><span class="brand-mark">F</span><span>flowboard</span></div>
-      <div class="workspace-switcher"><span class="workspace-icon">N</span><span><small>工作区</small>Northstar Studio</span></div>
-      <nav class="main-nav"><button class="nav-item nav-button" id="timelineBtn"><span>◈</span>我的工作</button><button class="nav-item nav-button" id="timelineAllBtn"><span>▤</span>全项目仪表盘</button><button class="nav-item nav-button" id="timelineTagsBtn"><span>♢</span>标签</button><button class="nav-item nav-button" id="archivedBtn"><span>▣</span>已归档</button><button class="nav-item nav-button" id="trashBtn"><span>♲</span>回收站</button></nav>
-      <div class="side-section" id="timelineProjectNav" hidden><div class="side-heading"><span>项目</span></div><div id="timelineProjectList" class="board-list"><div class="side-empty">暂无项目</div></div></div>
+    <aside class="sidebar" id="appSidebar">
+      <button type="button" class="sidebar-collapse" id="sidebarToggle" aria-label="收起侧边栏" aria-expanded="true" title="收起侧边栏">&lt;</button>
+      <div class="brand"><span class="brand-mark">F</span><span class="brand-label">flowboard</span></div>
+      <div class="workspace-switcher"><span class="workspace-icon">N</span><span class="workspace-label"><small>工作区</small>Northstar Studio</span></div>
+      <nav class="main-nav"><button class="nav-item nav-button" id="timelineBtn" title="我的工作"><span class="nav-icon">◈</span><span class="nav-label">我的工作</span></button><button class="nav-item nav-button" id="timelineAllBtn" title="全项目仪表盘"><span class="nav-icon">▤</span><span class="nav-label">全项目仪表盘</span></button><button class="nav-item nav-button" id="timelineTagsBtn" title="标签"><span class="nav-icon">♢</span><span class="nav-label">标签</span></button><button class="nav-item nav-button" id="archivedBtn" title="已归档"><span class="nav-icon">▣</span><span class="nav-label">已归档</span></button><button class="nav-item nav-button" id="trashBtn" title="回收站"><span class="nav-icon">♲</span><span class="nav-label">回收站</span></button></nav>
       <div class="side-section legacy-hidden"><div class="side-heading"><span>看板</span><button id="addBoardBtn" class="write-only" title="新建看板">＋</button></div><div id="boardList" class="board-list"><div class="side-empty">加载中…</div></div></div>
-      <div class="sidebar-bottom"><button class="nav-item nav-button" id="dashboardBtn"><span>▦</span>经典仪表盘</button><a class="nav-item" href="#"><span>⚙</span>设置</a></div>
+      <div class="sidebar-bottom"><button class="nav-item nav-button" id="dashboardBtn" title="经典仪表盘"><span class="nav-icon">▦</span><span class="nav-label">经典仪表盘</span></button><a class="nav-item" href="#" title="设置"><span class="nav-icon">⚙</span><span class="nav-label">设置</span></a></div>
     </aside>
     <main class="main-content">
-      <header class="topbar"><div class="breadcrumbs"><span>Northstar Studio</span><em>/</em><strong id="breadcrumbBoard">看板</strong></div><div class="top-actions"><span class="realtime-state" id="realtimeState">连接中</span><span class="updated" id="loadState">自动同步</span><button class="tool-btn" id="globalSearchBtn">搜索</button><button class="tool-btn notification-button" id="notificationBtn">通知 <b id="notificationCount"></b></button><button class="tool-btn admin-only" id="auditBtn">审计</button><button class="tool-btn mobile-dashboard" id="mobileDashboardBtn">仪表盘</button><div class="current-user" id="currentUser"></div><button class="tool-btn" id="logoutBtn">退出</button></div></header>
-      <div id="boardWorkspace">
+      <header class="topbar" style="justify-content:flex-end"><div class="breadcrumbs" aria-hidden="true" style="display:none"><span>Northstar Studio</span><em>/</em><strong id="breadcrumbBoard">看板</strong></div><div class="top-actions"><span class="realtime-state" id="realtimeState">连接中</span><span class="updated" id="loadState">自动同步</span><button class="tool-btn" id="globalSearchBtn">搜索</button><button class="tool-btn notification-button" id="notificationBtn">通知 <b id="notificationCount"></b></button><button class="tool-btn admin-only" id="auditBtn">审计</button><button class="tool-btn mobile-dashboard" id="mobileDashboardBtn">仪表盘</button><div class="current-user" id="currentUser"></div><button class="tool-btn" id="logoutBtn">退出</button></div></header>
+      <div id="boardWorkspace" hidden aria-hidden="true">
       <section class="board-header"><div><div class="eyebrow">产品研发 · 表格</div><h1><span id="boardTitle">Flowboard</span> <span class="private" id="boardAccess"></span></h1><p id="boardDescription"></p></div><div class="board-header-actions write-only" id="boardActions"><button class="secondary-btn" id="editBoardBtn">编辑</button><button class="secondary-btn" id="copyBoardBtn">复制</button><button class="secondary-btn" id="archiveBoardBtn">归档</button><button class="danger-btn" id="deleteBoardBtn">删除</button><button class="primary-btn" id="addTaskTop">＋ 新建任务</button></div></section>
       <div class="tabs"><button class="tab" data-view-type="table">◇ 表格</button><button class="tab" data-view-type="kanban">▥ Kanban</button><button class="tab" data-view-type="calendar">□ 日历</button><button class="tab" data-view-type="timeline">↔ 时间线</button><button class="tab" data-view-type="gantt">⌁ Gantt</button><button class="tab" data-view-type="chart">▤ 图表</button></div>
       <section class="toolbar"><div class="toolbar-left"><div class="search-box">⌕<input id="searchInput" placeholder="服务端搜索任务..." /></div><button class="tool-btn" id="filterBtn">☷ 筛选</button><button class="tool-btn" id="sortBtn">⇅ 排序</button><select class="tool-btn" id="viewSelect" aria-label="保存的视图"><option value="">默认视图</option></select><button class="tool-btn" id="viewBtn">视图</button><button class="tool-btn write-only" id="templateBtn">模板</button><button class="tool-btn write-only" id="importBtn">导入</button><button class="tool-btn" id="exportBtn">导出</button><button class="tool-btn write-only" id="addFieldBtn">＋ 字段</button><button class="tool-btn write-only" id="archivedItemsBtn">归档项</button></div><div class="toolbar-right"></div></section>
@@ -33,7 +33,7 @@
       <section class="board" id="board"><div class="empty-state">加载中…</div></section>
       <div class="board-footer"><button class="add-group-btn write-only" id="addGroupBtn">＋ 添加新分组</button><span>共 <strong id="taskCount">0</strong> 个任务</span></div>
       </div>
-      <section class="timeline-view" id="timelineView" hidden><div class="timeline-shell"><header><strong>项目时间管理</strong><button type="button" id="timelineClose" aria-label="关闭项目时间管理">×</button></header><div id="timelineBody"></div></div></section>
+      <section class="timeline-view" id="timelineView" hidden><div class="timeline-shell"><header><strong>项目时间管理</strong><button type="button" id="timelineClose" aria-label="返回我的工作" title="返回我的工作">←</button></header><div id="timelineBody"></div></div></section>
     </main>
   </div>
   <div class="toast" id="toast"></div>
@@ -41,6 +41,6 @@
   <div class="modal-backdrop" id="taskModal"><div class="task-modal"><button class="modal-close" data-close="taskModal">×</button><div id="modalBody"></div></div></div>
   <div class="modal-backdrop" id="listModal"><div class="task-modal list-modal"><button class="modal-close" data-close="listModal">×</button><div id="listModalBody"></div></div></div>
   <div class="modal-backdrop login-backdrop" id="loginModal"><form class="login-card" id="loginForm"><div class="brand login-brand"><span class="brand-mark">F</span><span>flowboard</span></div><h2>登录工作空间</h2><p>使用管理员提供的账号登录。</p><label>用户名<input id="loginUser" autocomplete="username" value="u1" required /></label><label>密码<input id="loginPassword" type="password" autocomplete="current-password" required /></label><div class="login-error" id="loginError"></div><button class="primary-btn" type="submit">登录</button></form></div>
-  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js"></script><script src="i12-ui.js"></script><script src="app.js"></script>
+  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js?v=20260825-fit100"></script><script src="i12-ui.js"></script><script src="app.js?v=20260825-fit100"></script>
 </body>
 </html>

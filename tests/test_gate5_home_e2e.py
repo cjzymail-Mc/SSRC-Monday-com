@@ -121,33 +121,61 @@ class Gate5HomeE2E(unittest.TestCase):
         context, page = self.login("u1")
         page.locator('[data-timeline-page="home"]').wait_for()
         self.assertFalse(page.locator("#boardWorkspace").is_visible())
+        self.assertFalse(page.locator(".breadcrumbs").is_visible())
+        self.assertGreater(page.locator(".top-actions").bounding_box()["x"], 700)
         self.assertEqual(page.locator("#boardList").count(), 1)
         self.assertFalse(page.locator("#boardList").is_visible())
         self.assertTrue(page.locator("#dashboardBtn").is_visible())
         self.assertIn("落地项目", page.locator('[data-timeline-section="mine"]').inner_text())
         self.assertIn("我的项目", page.locator('[data-timeline-kpi="mine"]').inner_text())
         self.assert_clean_browser(page)
-        # 回经典看板：右上 × 关闭时间线视图
+        # 返回按钮只能回「我的工作」，不得重新暴露经典看板。
+        self.physical_click(page, page.locator("#timelineAllBtn"))
+        page.locator('[data-timeline-page="all"]').wait_for()
         self.physical_click(page, page.locator("#timelineClose"))
-        page.locator("#boardWorkspace").wait_for(state="visible")
-        self.assertTrue(page.locator("#boardWorkspace").is_visible())
+        page.locator('[data-timeline-page="home"]').wait_for()
+        self.assertFalse(page.locator("#boardWorkspace").is_visible())
         self.assert_clean_browser(page); context.close()
 
-    def test_gate5_default_stays_board_without_projects(self):
-        """无时间线项目：登录默认停留经典看板（经典区块完整可见）。"""
+    def test_gate5_default_lands_empty_timeline_without_projects(self):
+        """无时间线项目也默认进入时间管理空态，经典主页保持隐藏。"""
         context, page = self.login("u1")
-        page.locator("#boardWorkspace").wait_for(state="visible")
-        self.assertTrue(page.locator("#boardWorkspace").is_visible())
-        self.assert_clean_browser(page)
-        self.physical_click(page, page.locator("#timelineBtn"))
         page.locator('[data-timeline-page="home"]').wait_for()
+        self.assertFalse(page.locator("#boardWorkspace").is_visible())
         self.assertIn("暂无负责项目", page.locator('[data-timeline-section="mine"]').inner_text())
         self.assertEqual(page.locator('[data-timeline-create] input[name="name"]').get_attribute("maxlength"), "200")
+        self.assert_clean_browser(page); context.close()
+
+    def test_gate5_sidebar_collapses_to_icons_and_persists(self):
+        """侧栏收起后仅保留图标，并记住个人偏好；项目菜单不再挂载。"""
+        self.seed_timeline(created_by="u1", name="侧栏项目")
+        context, page = self.login("u1")
+        page.locator('[data-timeline-page="home"]').wait_for()
+        self.assertEqual(page.locator("#timelineProjectNav").count(), 0)
+        expanded_width = page.locator("#appSidebar").bounding_box()["width"]
+        self.physical_click(page, page.locator("#sidebarToggle"))
+        page.locator("#appSidebar.is-collapsed").wait_for()
+        page.wait_for_timeout(360)
+        sidebar_box = page.locator("#appSidebar").bounding_box()
+        toggle_box = page.locator("#sidebarToggle").bounding_box()
+        self.assertAlmostEqual(sidebar_box["width"], 64, delta=1)
+        self.assertLess(sidebar_box["width"], expanded_width - 100)
+        self.assertAlmostEqual(toggle_box["y"] + toggle_box["height"] / 2, sidebar_box["y"] + sidebar_box["height"] / 2, delta=2)
+        self.assertAlmostEqual(toggle_box["width"], 27, delta=1)
+        self.assertAlmostEqual(toggle_box["height"], 58, delta=1)
+        self.assertGreater(float(page.locator("#sidebarToggle").evaluate("el => getComputedStyle(el).borderRadius").replace("px", "")), 20)
+        self.assertFalse(page.locator("#timelineAllBtn .nav-label").is_visible())
+        self.assertTrue(page.locator("#timelineAllBtn .nav-icon").is_visible())
+        page.reload()
+        page.locator("#appSidebar.is-collapsed").wait_for()
+        self.assertFalse(page.locator("#boardWorkspace").is_visible())
         self.assert_clean_browser(page); context.close()
 
     def test_gate5_home_kpi_tabs_feed_and_drilldown(self):
         """主页版式：KPI 四格 + 分区标签 + 成员长条药丸下钻 + 右栏动态随标签联动。"""
         (project_id, _), _today = self.seed_cp4_dashboard_projects()
+        for index in range(9):
+            self.seed_timeline(created_by="u1", name=f"折叠压力项目 {index + 1:02d}")
         context, page = self.login("u1")
         page.locator('[data-timeline-page="home"]').wait_for()
         self.assertEqual(page.locator("#breadcrumbBoard").inner_text(), "我的工作")
@@ -160,8 +188,8 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertEqual(page.locator("[data-timeline-kpi]").count(), 4)
         kpi_widths = page.locator("[data-timeline-kpi]").evaluate_all("nodes => nodes.map(node => node.getBoundingClientRect().width)")
         self.assertLessEqual(max(kpi_widths) - min(kpi_widths), 1)
-        self.assertIn("我的项目（2）", page.locator('[data-timeline-tab="mine"]').inner_text())
-        self.assertEqual(page.locator('[data-timeline-section="mine"] [data-project-choice]').count(), 2)
+        self.assertIn("我的项目（11）", page.locator('[data-timeline-tab="mine"]').inner_text())
+        self.assertEqual(page.locator('[data-timeline-section="mine"] [data-project-choice]').count(), 11)
         self.assertIn("今日团队动态", page.locator('[data-timeline-kpi="feed"]').inner_text())
         # 切到团队项目：成员长条 + 每项目一枚药丸（全 DOM 唯一下钻钩子）
         page.locator('[data-timeline-tab="team"]').click()
@@ -169,6 +197,15 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertGreaterEqual(page.locator(".tl-mrow").count(), 2)
         pill = page.locator(f'[data-timeline-member-open="{project_id}"]')
         self.assertEqual(pill.count(), 1)
+        member_toggle = page.locator('[data-timeline-member-toggle]')
+        self.assertEqual(member_toggle.count(), 1)
+        self.assertIn("显示全部（剩余 1 个）", member_toggle.inner_text())
+        self.assertEqual(page.locator('[data-timeline-section="team"] [data-timeline-member-open]:visible').count(), 10)
+        self.physical_click(page, member_toggle)
+        self.assertEqual(page.locator('[data-timeline-section="team"] [data-timeline-member-open]:visible').count(), 11)
+        self.assertEqual(member_toggle.inner_text(), "收起项目")
+        self.physical_click(page, member_toggle)
+        self.assertEqual(page.locator('[data-timeline-section="team"] [data-timeline-member-open]:visible').count(), 10)
         self.assertIn("团队 · 最近 20 条", page.locator("[data-timeline-feed-scope]").inner_text())
         self.assertTrue(page.locator('[data-timeline-feed="team"]').is_visible())
         # 药丸下钻 → 单项目仪表盘
@@ -245,12 +282,11 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertEqual(len(batch_requests), 1)
         self.assert_clean_browser(page); context.close()
 
-    def test_gate5_viewer_stays_board_without_probe_noise(self):
-        """只读成员：登录不做 timeline 探测（无额外 403 噪音）；手动进入仍被服务端拒绝。"""
+    def test_gate5_viewer_never_sees_classic_home_without_probe_noise(self):
+        """只读成员不自动探测时间轴，经典主页仍保持彻底隐藏。"""
         self.seed_timeline(created_by="u1", name="只读可见项目")
         context, page = self.login("u3")
-        page.locator("#boardWorkspace").wait_for(state="visible")
-        self.assertTrue(page.locator("#boardWorkspace").is_visible())
+        self.assertFalse(page.locator("#boardWorkspace").is_visible())
         self.assert_clean_browser(page)
         self.assertTrue(page.locator("#timelineModal").evaluate("element => element.hidden"))
         with page.expect_response(lambda response: response.url.endswith("/api/workspaces/1/timeline")) as denied:
@@ -274,14 +310,14 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertIn("暂无负责项目", page.locator('[data-timeline-section="mine"]').inner_text())
         self.assert_clean_browser(page); context.close()
 
-    def test_gate5_url_board_param_skips_landing(self):
-        """URL 带 ?board=（恢复意图）时不做默认落页，回到经典看板。"""
+    def test_gate5_url_board_param_cannot_restore_classic_home(self):
+        """旧 ?board= 恢复参数不得重新暴露经典主页。"""
         self.seed_timeline(created_by="u1", name="恢复项目")
         context, page = self.login("u1")
         page.locator('[data-timeline-page="home"]').wait_for()
         page.goto(f"{self.base}/?board=1")
-        page.locator("#boardWorkspace").wait_for(state="visible")
-        self.assertTrue(page.locator("#boardWorkspace").is_visible())
+        page.locator('[data-timeline-page="home"]').wait_for()
+        self.assertFalse(page.locator("#boardWorkspace").is_visible())
         self.assert_clean_browser(page); context.close()
 
 

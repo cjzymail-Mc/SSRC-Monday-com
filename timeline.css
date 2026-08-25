@@ -98,6 +98,9 @@
 .tl-member-head small{color:var(--timeline-ink3);font-size:10.5px}
 .tl-mavatar{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;border-radius:50%;background:var(--stage-design);color:#fff;font-size:16px;font-weight:700}
 .tl-mpills{display:flex;flex:1;flex-wrap:wrap;gap:6px;min-width:0}
+.tl-pill[hidden]{display:none}
+.tl-member-more{min-height:31px;border:1px solid #6c5ce7;border-radius:999px;background:#f0edff;padding:6px 12px;color:#4f3ec8;cursor:pointer;font:inherit;font-size:11px;font-weight:800;white-space:nowrap}
+.tl-member-more:hover{background:#e6e0ff}.tl-member-more[aria-expanded="true"]{border-color:#c8cfdb;background:#fff;color:#526079}
 .tl-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--timeline-hairline);border-radius:7px;background:#fff;padding:6px 10px;cursor:pointer;font:inherit;font-size:11.5px;color:var(--timeline-ink);white-space:nowrap}
 .tl-pill:hover{border-color:#c9d4ee;background:#f8faff}
 .tl-pill b{font-size:11.5px}.tl-pill small{color:var(--timeline-ink2);font-size:10.5px}
@@ -111,8 +114,8 @@
 .tl-feed-item{display:grid;grid-template-columns:20px minmax(0,1fr) auto;align-items:start;gap:7px;border-bottom:1px dashed var(--timeline-hairline);padding:8px 0;color:var(--timeline-ink2);font-size:11.5px;line-height:1.45}
 .tl-feed-item:last-child{border-bottom:0}
 .tl-feed-avatar{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--stage-design);color:#fff;font-size:9px;font-weight:700}
-.tl-feed-copy{display:grid;gap:2px;min-width:0}.tl-feed-item b{color:var(--timeline-ink)}
-.tl-feed-item small{display:grid;gap:1px;color:var(--timeline-ink3);font-size:10.5px}
+.tl-feed-copy{display:grid;gap:2px;min-width:0}.tl-feed-copy>span,.tl-feed-copy>small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tl-feed-item b{color:var(--timeline-ink)}
+.tl-feed-item small{color:var(--timeline-ink3);font-size:10.5px}
 .tl-feed-item time{color:var(--timeline-ink3);font-size:10px;white-space:nowrap}
 .tl-feed-empty{margin:0;color:var(--timeline-ink3);font-size:12px;padding:8px 0}
 /* Gate5 CP3 视觉重对齐（终稿屏B）：项目卡头部 KPI 摘要行 + 图例条 */
@@ -265,7 +268,26 @@ body.timeline-dragging{cursor:grabbing;user-select:none}
 .timeline-portfolio-status{position:absolute;right:7px;bottom:5px;border-radius:999px;background:#eef0f4;padding:2px 7px;color:#687386;font-size:8.5px;font-weight:700}
 .timeline-portfolio-project.is-archived .timeline-risk-markers{display:none}
 .timeline-archive-readonly{border-radius:999px;background:#eef0f4;padding:5px 10px;color:#687386;font-size:11px;font-weight:700}
-.timeline-past-mask{position:absolute;z-index:1100;left:0;top:0;bottom:0;display:block;background:rgba(255,255,255,.8);pointer-events:none}
+.timeline-past-mask{position:absolute;z-index:1100;left:0;top:0;bottom:0;display:block;background:rgba(255,255,255,.7);pointer-events:none}
+.timeline-e-day-tick b{right:1px;overflow:hidden;white-space:nowrap;text-overflow:clip}
+.timeline-single-day-tick{position:absolute;top:0;bottom:0;border-left:1px solid #dfe4ec;color:#69758a;font-style:normal;font-variant-numeric:tabular-nums}
+.timeline-single-day-tick b{position:absolute;left:3px;right:1px;bottom:5px;overflow:hidden;color:inherit;font-size:9px;font-weight:600;line-height:1;white-space:nowrap;text-overflow:clip}
+.timeline-single-day-tick.is-week{border-left-color:#aeb9c9;color:#35445e}
+.timeline-today-overlay{z-index:1205;top:0}
+.timeline-portfolio-today{z-index:1205;top:0}
+.timeline-today-overlay .timeline-today-line span,.timeline-portfolio-today .timeline-today-line span{top:4px}
+
+/* 2026-08-25 最新简化：移除季度层；单双项目共用彩色年/月/日标尺。 */
+.timeline-e-quarters{display:none}
+.timeline-e-axis{height:85px}
+.timeline-e-months{top:18px}
+.timeline-e-days{top:53px}
+.timeline-portfolio-axis{min-height:103px;height:103px}
+.timeline-single-chart .timeline-e-calendar{margin-left:94px}
+.timeline-single-chart .timeline-e-axis{margin-left:94px}
+.timeline-portfolio-card.is-fullscreen{grid-template-rows:auto minmax(0,1fr) auto}
+.timeline-portfolio-card.is-fullscreen>.timeline-portfolio-scroll{grid-row:2}
+.timeline-portfolio-card.is-fullscreen>.timeline-portfolio-legend{grid-row:3}
 .timeline-node-cluster{position:absolute;top:25px;display:block;width:5px;height:5px;border-radius:50%;background:#616b78;box-shadow:0 0 0 1px rgba(255,255,255,.9);transform:translate(-50%,-50%);pointer-events:auto;cursor:help}
 .timeline-portfolio-lanes .timeline-node-cluster{top:16px}
 .tl-legend .cluster{display:inline-block;width:5px;height:5px;margin:0 6px 1px 2px;border-radius:50%;background:#616b78}
@@ -329,6 +351,19 @@ body.timeline-dragging{cursor:grabbing;user-select:none}
 .tl-tag-filter button{border:1px solid #d8deea;background:#fff;border-radius:999px;padding:7px 12px;color:#526079;cursor:pointer}
 .tl-tag-filter button.active{border-color:#6c5ce7;background:#f0edff;color:#4f3ec8;font-weight:700}
 .tl-tag-filter small{margin-left:4px;color:inherit;opacity:.7}
+
+/* Fullscreen portfolio uses one compact command row so the calendar owns the screen. */
+.timeline-portfolio-card.is-fullscreen{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto minmax(0,1fr) auto;min-height:100dvh}
+.timeline-portfolio-card.is-fullscreen>.tl-tag-filter{grid-column:1;grid-row:1;min-width:0;flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;padding:10px 12px;border-bottom:1px solid var(--timeline-hairline);background:#fff;scrollbar-width:thin}
+.timeline-portfolio-card.is-fullscreen>.tl-tag-filter button{flex:0 0 auto;white-space:nowrap}
+.timeline-portfolio-card.is-fullscreen>.timeline-portfolio-head{grid-column:2;grid-row:1;min-height:0!important;padding:8px 12px!important;background:#fff}
+.timeline-portfolio-card.is-fullscreen>.timeline-portfolio-head .timeline-portfolio-controls,.timeline-portfolio-card.is-fullscreen>.timeline-portfolio-head .timeline-portfolio-view-actions{height:100%}
+.timeline-portfolio-card.is-fullscreen>.timeline-portfolio-head [data-portfolio-fullscreen]{height:100%;min-height:34px;white-space:nowrap}
+.timeline-portfolio-card.is-fullscreen>.tl-order-note{grid-column:1/-1;grid-row:2;margin:0;padding:6px 14px;border-bottom:1px solid var(--timeline-hairline);background:#fafbfe}
+.timeline-portfolio-card.is-fullscreen>.timeline-shared-caption{grid-column:1/-1;grid-row:3;margin:0;padding:7px 14px;border-bottom:1px solid var(--timeline-hairline);background:#fff}
+.timeline-portfolio-card.is-fullscreen>.timeline-portfolio-scroll{grid-column:1/-1;grid-row:4;height:auto;max-height:none;min-height:0}
+.timeline-portfolio-card.is-fullscreen>.timeline-portfolio-legend{grid-column:1/-1;grid-row:5;min-width:0;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;padding:8px 14px}
+@media(max-width:760px){.timeline-portfolio-card.is-fullscreen{grid-template-columns:minmax(0,1fr) auto}.timeline-portfolio-card.is-fullscreen>.tl-tag-filter{padding:8px}.timeline-portfolio-card.is-fullscreen>.timeline-portfolio-head{padding:6px 8px!important}.timeline-portfolio-card.is-fullscreen>.timeline-shared-caption{display:none!important}.timeline-portfolio-card.is-fullscreen>.tl-order-note{display:none!important}.timeline-portfolio-card.is-fullscreen>.timeline-portfolio-scroll{grid-row:2}.timeline-portfolio-card.is-fullscreen>.timeline-portfolio-legend{grid-row:3}}
 .tl-tags{padding:22px;min-height:620px;color:#253047}
 .tl-tags-head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:18px}
 .tl-tags-head p,.tl-tag-workbench header p{margin:0;color:#7566d9;font-size:11px;font-weight:800;letter-spacing:.12em}
