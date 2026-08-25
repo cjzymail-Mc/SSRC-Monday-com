@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flowboard｜侧栏收回三案交互对照</title>
+<style>
+:root{--blue:#1858c8;--ink:#17233b;--muted:#7b879d;--line:#e3e7ef;--side:#f7f8fc;--ease:cubic-bezier(.22,.8,.24,1)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,"Segoe UI","Microsoft YaHei",sans-serif;color:var(--ink);background:#e9edf4}button{font:inherit;cursor:pointer}
+.reviewbar{position:fixed;z-index:100;inset:0 0 auto;display:flex;align-items:center;gap:16px;height:66px;padding:0 22px;border-bottom:1px solid #d9dee8;background:rgba(255,255,255,.96);box-shadow:0 8px 28px #23304b12;backdrop-filter:blur(12px)}
+.reviewbar strong{font-size:16px}.reviewbar p{margin:3px 0 0;color:var(--muted);font-size:11px}.schemes{display:flex;gap:7px;margin-left:auto}.schemes button{border:1px solid #d7ddea;border-radius:9px;background:#fff;padding:9px 13px;color:#59657a;font-weight:700}.schemes button.on{border-color:#8eb1f3;background:#edf4ff;color:#174ead}.hint{min-width:210px;color:#68758b;font-size:11px}.hint b{color:#244e93}
+.stage{position:fixed;inset:66px 0 0;padding:18px}.frame{height:100%;overflow:hidden;border:1px solid #cfd6e2;border-radius:15px;background:#fff;box-shadow:0 20px 60px #1f2c4618}.app{display:flex;height:100%;--side-w:248px;--collapsed-w:72px;--speed:220ms;--label-speed:140ms}
+.sidebar{position:relative;z-index:3;display:flex;flex:0 0 var(--side-w);width:var(--side-w);min-width:0;flex-direction:column;padding:25px 16px 18px;border-right:1px solid #e4e7ee;background:var(--side);transition:width var(--speed) var(--ease),flex-basis var(--speed) var(--ease),padding var(--speed) var(--ease)}
+.brand{display:flex;align-items:center;gap:10px;height:38px;padding:0 9px;margin-bottom:25px;font-size:22px;font-weight:800;white-space:nowrap}.mark{display:grid;flex:0 0 36px;width:36px;height:36px;place-items:center;border-radius:10px;background:linear-gradient(145deg,#7163e9,#4c42bd);color:#fff}.workspace{display:flex;align-items:center;gap:10px;height:72px;padding:11px;border:1px solid #e0e4eb;border-radius:12px;background:#fff;overflow:hidden;white-space:nowrap}.workspace i{display:grid;flex:0 0 31px;width:31px;height:31px;place-items:center;border-radius:7px;background:#1d2b4c;color:#fff;font-style:normal;font-weight:800}.workspace small{display:block;color:#8a95a8;font-size:11px;font-weight:400}.workspace b{font-size:13px}
+.nav{display:grid;gap:5px;margin-top:22px}.nav button,.bottom button{display:flex;align-items:center;gap:12px;width:100%;height:43px;border:0;border-radius:9px;background:transparent;padding:0 11px;color:#67738a;text-align:left;white-space:nowrap}.nav button.on{background:#eae9fb;color:#5547c5}.icon{display:grid;flex:0 0 20px;width:20px;place-items:center;font-size:17px}.label,.brand-name,.workspace-copy{display:inline-block;max-width:180px;overflow:hidden;opacity:1;transform:translateX(0);transition:max-width var(--label-speed) ease,opacity var(--label-speed) ease,transform var(--label-speed) ease}.blank{flex:1}.bottom{padding-top:13px;border-top:1px solid #e5e8ef}
+.main{position:relative;z-index:1;min-width:0;flex:1;background:#f7f8fa;transition:filter var(--speed) ease}.top{display:flex;justify-content:flex-end;align-items:center;height:72px;padding:0 38px;border-bottom:1px solid #eaedf2;background:#fff}.tools{display:flex;align-items:center;gap:10px}.tools span,.tools button{border:1px solid #e1e5ed;border-radius:9px;background:#fff;padding:9px 13px;color:#6c788e;font-size:12px}.tools .avatar{display:grid;width:35px;height:35px;place-items:center;border:0;border-radius:50%;background:#668bd0;color:#fff;font-weight:800}
+.content{padding:34px}.eyebrow{color:#8e98a9;font-size:12px}.content h1{margin:12px 0 5px;font-size:31px}.content>p{margin:0;color:#738096;font-size:13px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}.card{height:90px;padding:17px;border:1px solid var(--line);border-radius:12px;background:#fff}.card small{color:#8c96a8}.card b{display:block;margin-top:14px;font-size:23px}.board{margin-top:18px;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}.tabs{display:flex;gap:22px;padding:16px 20px;border-bottom:1px solid var(--line);color:#7a8598}.tabs b{color:#1552bc}.timeline{position:relative;height:390px;background:repeating-linear-gradient(90deg,#fff 0,#fff 89px,#edf0f5 90px),repeating-linear-gradient(0deg,transparent 0,transparent 61px,#e8ebf0 62px)}.today{position:absolute;left:43%;top:0;bottom:0;width:2px;background:#e34d52}.today:before{content:"今天";position:absolute;top:8px;left:5px;color:#e34d52;font-size:10px;font-weight:800}.row{position:absolute;left:30px;right:30px;height:16px;border-radius:9px;background:linear-gradient(90deg,#b873e7 0 24%,#1c58b7 24% 48%,#10a37f 48% 72%,#d06b23 72%);box-shadow:0 2px 7px #23304b18}.r1{top:88px}.r2{top:164px}.r3{top:240px}.r4{top:316px}
+.collapse{position:absolute;z-index:10;display:grid;place-items:center;border:1px solid #d8deea;background:#fff;color:#66738a;box-shadow:0 5px 15px #24304a1c;transition:all var(--speed) var(--ease)}.collapse:hover{border-color:#9eb5df;color:#214f9f}.collapse svg{width:14px;height:14px;transition:transform var(--speed) var(--ease)}
+.app.collapsed .sidebar{flex-basis:var(--collapsed-w);width:var(--collapsed-w)}.app.collapsed .label,.app.collapsed .brand-name,.app.collapsed .workspace-copy{max-width:0;opacity:0;transform:translateX(-7px);pointer-events:none}.app.collapsed .nav button,.app.collapsed .bottom button{justify-content:center;gap:0;padding-inline:5px}.app.collapsed .brand{justify-content:center;padding:0}.app.collapsed .workspace{justify-content:center;padding-inline:5px}.app.collapsed .collapse svg{transform:rotate(180deg)}
+/* A：边缘胶囊——明确、稳定、始终可见。 */
+.scheme-a.app{--collapsed-w:72px;--speed:220ms}.scheme-a .collapse{top:92px;right:-15px;width:30px;height:44px;border-radius:9px}.scheme-a.app.collapsed .sidebar{padding-inline:10px}
+/* B：品牌行内——版面最干净，按钮不越过分隔线。 */
+.scheme-b.app{--collapsed-w:80px;--speed:180ms;--ease:cubic-bezier(.2,.7,.25,1)}.scheme-b .brand{padding-right:0}.scheme-b .collapse{top:28px;right:14px;width:31px;height:31px;border-radius:50%;box-shadow:none}.scheme-b:not(.collapsed) .brand{padding-right:42px}.scheme-b.app.collapsed .sidebar{padding-inline:14px}.scheme-b.app.collapsed .collapse{right:24px;top:82px}.scheme-b.app.collapsed .brand{margin-bottom:62px}
+/* C：中部悬浮轨——最省视觉占用，动作感更柔和。 */
+.scheme-c.app{--collapsed-w:64px;--speed:280ms;--ease:cubic-bezier(.34,1.18,.64,1)}.scheme-c .collapse{top:50%;right:-13px;width:27px;height:58px;border-radius:999px;transform:translateY(-50%);opacity:.72}.scheme-c .collapse:hover{opacity:1;transform:translateY(-50%) scale(1.04)}.scheme-c.app.collapsed .sidebar{padding-inline:8px}.scheme-c.app.collapsed .mark{width:34px;height:34px;flex-basis:34px}
+.scheme-note{position:absolute;z-index:20;right:28px;bottom:24px;width:330px;padding:14px 16px;border:1px solid #dce2ec;border-radius:12px;background:rgba(255,255,255,.94);box-shadow:0 12px 32px #26334d14;color:#657187;font-size:11px;line-height:1.65}.scheme-note b{display:block;margin-bottom:4px;color:#263653;font-size:13px}
+@media(max-width:900px){.reviewbar p,.hint{display:none}.cards{grid-template-columns:repeat(2,1fr)}.content{padding:24px}.scheme-note{display:none}}
+@media(prefers-reduced-motion:reduce){.sidebar,.collapse,.collapse svg,.main,.label,.brand-name,.workspace-copy{transition-duration:1ms!important}}
+</style>
+</head>
+<body>
+<header class="reviewbar">
+  <div><strong>侧栏收回 · 三案交互对照</strong><p>切换方案后，点击侧栏上的箭头；反复展开/收回感受按钮位置与动画。</p></div>
+  <div class="hint" id="hint"><b>推荐 A</b>发现性与画布空间最均衡</div>
+  <nav class="schemes" aria-label="侧栏方案"><button data-scheme="a" class="on">A 边缘胶囊</button><button data-scheme="b">B 品牌行内</button><button data-scheme="c">C 中部悬浮轨</button></nav>
+</header>
+<main class="stage">
+  <section class="frame">
+    <div class="app scheme-a" id="app">
+      <aside class="sidebar">
+        <button class="collapse" id="collapse" aria-label="收回侧栏" aria-expanded="true"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="brand"><span class="mark">F</span><span class="brand-name">flowboard</span></div>
+        <div class="workspace"><i>N</i><span class="workspace-copy"><small>工作区</small><b>Northstar Studio</b></span></div>
+        <nav class="nav"><button class="on"><span class="icon">◈</span><span class="label">我的工作</span></button><button><span class="icon">▤</span><span class="label">全项目仪表盘</span></button><button><span class="icon">♢</span><span class="label">标签</span></button><button><span class="icon">▣</span><span class="label">已归档</span></button><button><span class="icon">♲</span><span class="label">回收站</span></button></nav>
+        <div class="blank"></div><div class="bottom"><button><span class="icon">⚙</span><span class="label">设置</span></button></div>
+      </aside>
+      <section class="main">
+        <header class="top"><div class="tools"><span>搜索</span><span>通知</span><span>审计</span><i class="avatar">林</i><button>退出</button></div></header>
+        <div class="content"><span class="eyebrow">信息总览 · 登录默认页</span><h1>我的工作</h1><p>顶部旧项目导航已隐藏，把横向空间留给时间管理。</p><div class="cards"><article class="card"><small>我的项目</small><b>25</b></article><article class="card"><small>团队项目</small><b>25</b></article><article class="card"><small>团队成员</small><b>4</b></article><article class="card"><small>今日动态</small><b>3</b></article></div><section class="board"><div class="tabs"><b>全部 25</b><span>未分类 8</span><span>已归档项目 74</span></div><div class="timeline"><i class="today"></i><i class="row r1"></i><i class="row r2"></i><i class="row r3"></i><i class="row r4"></i></div></section></div>
+      </section>
+      <aside class="scheme-note" id="note"><b>A · 边缘胶囊（推荐）</b>按钮固定在侧栏分隔线上方，展开与收回时位置不跳；220ms 平滑收缩，文字先淡出、主画布同步扩张。</aside>
+    </div>
+  </section>
+</main>
+<script>
+const app=document.querySelector('#app'),collapse=document.querySelector('#collapse'),note=document.querySelector('#note'),hint=document.querySelector('#hint');
+const copy={a:['A · 边缘胶囊（推荐）','按钮固定在侧栏分隔线上方，展开与收回时位置不跳；220ms 平滑收缩，文字先淡出、主画布同步扩张。','推荐 A','发现性与画布空间最均衡'],b:['B · 品牌行内','展开时按钮收在品牌行内，画面最整洁；收回后移动到图标列上方。180ms 更干脆，但按钮会发生一次位置变化。','方案 B','最整洁，但收回前后按钮位置不同'],c:['C · 中部悬浮轨','按钮贴在侧栏中部边缘，接近手柄语义；280ms 轻微弹性，收至最窄 64px。长期可见性较弱，适合熟练用户。','方案 C','画布最大，发现性稍弱']};
+function setScheme(key){app.classList.remove('scheme-a','scheme-b','scheme-c','collapsed');app.classList.add('scheme-'+key);collapse.setAttribute('aria-expanded','true');collapse.setAttribute('aria-label','收回侧栏');document.querySelectorAll('[data-scheme]').forEach(b=>b.classList.toggle('on',b.dataset.scheme===key));note.innerHTML=`<b>${copy[key][0]}</b>${copy[key][1]}`;hint.innerHTML=`<b>${copy[key][2]}</b>${copy[key][3]}`}
+collapse.onclick=()=>{const closed=app.classList.toggle('collapsed');collapse.setAttribute('aria-expanded',String(!closed));collapse.setAttribute('aria-label',closed?'展开侧栏':'收回侧栏')};
+document.querySelectorAll('[data-scheme]').forEach(button=>button.onclick=()=>setScheme(button.dataset.scheme));
+</script>
+</body>
+</html>
