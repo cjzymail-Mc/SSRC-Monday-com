@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>（IA对照）主页·项目·仪表盘逻辑结构选型 · 问卷 Q1–Q5 · 2026-08-21</title>
+<style>
+:root{--ink:#1d1d1f;--ink2:#6e6e73;--ink3:#aeaeb2;--hair:#e8e8ed;--canvas:#f5f5f7;--card:#fff;--red:#e5484d;--blue:#1746b0;--green:#0aa67e}
+*{box-sizing:border-box}
+body{margin:0;padding:32px 20px 80px;background:var(--canvas);color:var(--ink);font:14px/1.7 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+.wrap{max-width:1080px;margin:0 auto}
+header.intro{background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:22px 26px;margin-bottom:22px}
+header.intro h1{margin:0 0 4px;font-size:22px}
+.eyebrow{color:var(--ink3);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.ok{display:inline-block;padding:2px 10px;border-radius:99px;background:#e8f6f0;color:#08785c;font-weight:600;font-size:12px}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;background:#eef1fa;color:var(--blue);font-weight:600;font-size:12px}
+section{background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:22px 26px;margin-bottom:22px}
+section>h2{margin:0 0 12px;font-size:17px;border-left:4px solid var(--blue);padding-left:10px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border:1px solid var(--hair);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:#fafafc;font-weight:600}
+code{background:#f1f3f7;border-radius:4px;padding:1px 5px;font-size:12px}
+.rec{color:#08785c;font-weight:700}
+.con{color:var(--red)}
+/* ———— 廉价线框 ———— */
+.wf{display:grid;grid-template-columns:170px 1fr;gap:10px;background:#fafafc;border:1px solid var(--hair);border-radius:8px;padding:12px;margin:10px 0}
+.wf .sb{border:1px solid var(--hair);background:#fff;border-radius:6px;padding:8px;font-size:12px}
+.wf .sb b{display:block;font-size:12px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--hair)}
+.wf .sb i{display:block;font-style:normal;padding:3px 7px;border-radius:4px;margin-bottom:2px;color:var(--ink2)}
+.wf .sb i.on{background:#e8eafc;color:var(--blue);font-weight:700}
+.wf .sb i.dim{color:var(--ink3)}
+.wf .sb i.sec{margin-top:8px;border-top:1px dashed var(--hair);padding-top:8px}
+.wf .main{border:1px solid var(--hair);background:#fff;border-radius:6px;padding:10px;font-size:12px;min-height:150px}
+.wf .main .ttl{font-weight:700;padding:4px 6px;border-bottom:1px solid var(--hair);margin-bottom:8px;color:var(--ink)}
+.tabbar{display:flex;gap:4px;margin-bottom:8px}
+.tabbar i{font-style:normal;border:1px solid var(--hair);border-bottom:0;border-radius:6px 6px 0 0;padding:3px 10px;background:#fafafc;color:var(--ink2)}
+.tabbar i.on{background:#fff;color:var(--blue);font-weight:700;border-color:var(--hair)}
+.box{border:1px solid var(--hair);border-radius:6px;padding:6px 8px;color:var(--ink2);background:#fff}
+.box.hl{border-color:var(--blue);color:var(--ink)}
+.box.row{display:flex;gap:6px;align-items:center}
+.stack{display:grid;gap:6px}
+.dashbox{border:2px dashed #b9c4e4;border-radius:8px;background:#f2f5fd;color:var(--blue);padding:8px 10px;position:relative}
+.dashbox small{color:var(--ink3)}
+.arrow{color:var(--ink3);font-size:12px;text-align:center;margin:2px 0}
+.notes{font-size:12px;color:var(--ink2)}
+.flow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--ink2)}
+.flow b{background:#eef1fa;color:var(--blue);border-radius:4px;padding:2px 8px;font-weight:600}
+.flow span.sep{color:var(--ink3)}
+/* 问卷 */
+.q{border:1px solid var(--hair);border-radius:8px;padding:14px 18px;margin:14px 0;background:#fcfcfe}
+.q h3{margin:0 0 6px;font-size:15px}
+.q .why{font-size:12.5px;color:var(--ink2);margin:4px 0 10px}
+.opt{display:block;padding:7px 10px;border:1px solid var(--hair);border-radius:6px;margin-bottom:6px;background:#fff;font-size:13px}
+.opt b{font-weight:700}
+.opt .tag{display:inline-block;margin-left:8px;font-size:11px;padding:1px 8px;border-radius:99px;background:#e8f6f0;color:#08785c;font-weight:700}
+.opt .hint{display:block;color:var(--ink3);font-size:12px}
+footer{color:var(--ink3);font-size:12px;text-align:center;margin-top:30px}
+@media(max-width:760px){.wf{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="intro">
+  <div class="eyebrow">feature01 · Gate 5 · 信息架构（IA）选型问卷</div>
+  <h1>主页 / 项目时间管理 / 仪表盘 —— 逻辑结构选型（A–D 对照）</h1>
+  <p><span class="ok">已确认（2026-08-21）</span> 看板（feature00）整体隐藏不删；登录后默认进「我的工作」；主页保持简洁聚合。—— 此为下方所有方案的共同前提，不再重复。</p>
+  <p><b>本页怎么用：</b>先看 §1 现实系统规律 → §2 四个方案线框与优缺点 → §3 一屏速览表 → 最后在 §4 问卷 <b>Q1–Q5</b> 里按编号回复你的选择即可（例如「Q1 选 A，Q2 选 1，Q3 跟 Q1，Q4 选 1，Q5 选 2」）。每题都给了推荐与理由，不同意推荐直接写你的编号或想法。</p>
+  <p class="notes">本页为<b>便宜线框稿</b>：灰白盒子只表达「菜单层级 + 页面归属 + 点击流向」，不表达视觉样式（视觉已按方向 A 白卡基线另拍板）。作答后我会把选型反写进 Gate 5 静态稿与任务书 §13，再进 CP2。</p>
+</header>
+
+<section>
+  <h2>§1 现实同类系统的通行架构（借鉴来源）</h2>
+  <table>
+    <tr><th style="width:110px">系统</th><th>它的结构</th><th>值得我们借鉴的点</th></tr>
+    <tr><td><b>Monday.com</b></td><td>Home（个人聚合）→ 板（项目）为主体；Dashboards 是独立顶层对象，可跨板聚合</td><td>①「全局仪表盘」独立成顶级入口，只做一个；②个人主页只做聚合提醒，不承载管理</td></tr>
+    <tr><td><b>Jira</b></td><td>项目 = 容器，容器内一排视图标签（Roadmap / Board / Backlog / Reports）；全局 Dashboards 另设</td><td><b>时间轴/仪表盘是项目的「视图标签」，不是独立菜单</b>——本项目最该抄的一条</td></tr>
+    <tr><td><b>Asana</b></td><td>Home 卡片聚合；项目内 List / Board / <b>Timeline</b> 标签切换；Portfolios 做全局</td><td>同一份数据、多个视图：列表编辑与时间轴仪表盘是同一项目页的两个标签</td></tr>
+    <tr><td><b>Linear</b></td><td>侧边栏极简：个人视图 / 团队 / 项目树；项目内 Overview / Roadmap 标签</td><td>侧边栏只放「我的工作 + 项目 + 一个全局视图」，克制不膨胀</td></tr>
+    <tr><td><b>MS Project</b></td><td>打开项目 = 打开甘特图本体；Roadmap 聚合多项目并排</td><td>时间轴就是项目的第一公民（不是附属报表）——与你们「Excel 大表 → 时间轴」的心智一致</td></tr>
+  </table>
+  <p style="margin-bottom:0"><b>三条共同规律（行业共识）：</b><br>
+  ① 时间轴编辑器和单项目仪表盘几乎总是<b>项目容器内的两个视图标签</b>，而不是两个各自独立的菜单页；<br>
+  ② 跨项目聚合视图<b>独立顶层、且只有一个</b>（全项目仪表盘），不与个人主页混放；<br>
+  ③ 个人主页（我的工作）只做「我相关的项目 + 提醒 + 入口」，绝不长成管理后台。</p>
+</section>
+
+<section>
+  <h2>§2 方案 A —— 「项目工作台」（Jira / Asana / Linear 模式）<span class="pill">推荐</span></h2>
+  <div class="wf">
+    <div class="sb"><b>Northstar</b>
+      <i class="on">◈ 我的工作（主页）</i>
+      <i>▤ 全项目仪表盘</i>
+      <i class="sec dim">项目</i>
+      <i>· 跑鞋研发 2026</i>
+      <i>· Mc Prj 01</i>
+      <i class="sec dim">已归档 · 回收站</i>
+      <i class="sec dim">⚙ 设置</i>
+    </div>
+    <div class="main">
+      <div class="ttl">项目页：跑鞋研发 2026（点击侧边栏项目进入）</div>
+      <div class="tabbar"><i class="on">仪表盘</i><i>时间轴编辑器</i><i class="dim">审计（预留）</i></div>
+      <div class="dashbox">单项目仪表盘（全年双轨时间轴 + KPI）<br><small>同页切到「时间轴编辑器」= 类 Excel 编辑，无页面跳转</small></div>
+    </div>
+  </div>
+  <div class="flow">路径：<b>我的工作</b> <span class="sep">→ 点项目卡</span> <b>项目页·仪表盘标签</b> <span class="sep">→ 页内切换</span> <b>编辑器标签</b>　｜　全局：<b>全项目仪表盘</b> 顶层直达</div>
+  <table>
+    <tr><th style="width:50%">优点</th><th>代价 / 风险</th></tr>
+    <tr><td><span class="rec">✓</span> 行业验证的心智模型：项目=容器，仪表盘/编辑器=容器内视图；10 个项目扩展无痛<br><span class="rec">✓</span> 单项目仪表盘有「常住位置」，面包屑清晰，刷新/收藏不迷路<br><span class="rec">✓</span> 编辑器↔仪表盘切换零跳转（同一页换标签），改完日期顺手看全局<br><span class="rec">✓</span> 未来加审计/导出等项目级功能有地方挂（第三个标签）</td>
+    <td><span class="con">✗</span> 侧边栏多一个「项目」分组区（但 Linear 式克制，仍是 4+项目清单）<br><span class="con">✗</span> CP2 需要把现有 modal 升格为「项目页 + 双标签」容器，工作量 <b>中等</b>（可复用现成渲染模块，视觉不变）</td></tr>
+  </table>
+  <p class="notes">借鉴：Jira/Asana 的项目内视图标签 + Linear 的克制侧边栏 + Monday 的唯一全局仪表盘。</p>
+</section>
+
+<section>
+  <h2>§2 方案 B —— 「主页直达 + 弹层」（现状架构顺延，CP2 最便宜）</h2>
+  <div class="wf">
+    <div class="sb"><b>Northstar</b>
+      <i class="on">◈ 我的工作（主页）</i>
+      <i>▤ 全项目仪表盘</i>
+      <i class="sec dim">已归档 · 回收站</i>
+      <i class="sec dim">⚙ 设置</i>
+    </div>
+    <div class="main">
+      <div class="ttl">我的工作（项目卡片列表）</div>
+      <div class="stack">
+        <div class="box row">跑鞋研发 2026 卡片　<span style="margin-left:auto">[打开仪表盘] [进入编辑器]</span></div>
+        <div class="arrow">↓ 点按钮，浮层盖在当前页上 ↓</div>
+        <div class="dashbox">弹层：单项目仪表盘 <b>或</b> 时间轴编辑器（二选一，各自独立弹）<br><small>＝ 现在线上 modal 的用法原样保留</small></div>
+      </div>
+    </div>
+  </div>
+  <table>
+    <tr><th style="width:50%">优点</th><th>代价 / 风险</th></tr>
+    <tr><td><span class="rec">✓</span> CP2 工作量<b>最小</b>：现网就是 modal 架构，几乎只改侧边栏和主页<br><span class="rec">✓</span> 侧边栏最短（2+2 项）</td>
+    <td><span class="con">✗</span> 全年双轨时间轴塞在弹层里偏挤（现有编辑器已有此感）<br><span class="con">✗</span> 单项目仪表盘无常住地址，只能从卡片钻入；「我在哪」靠弹层内返回<br><span class="con">✗</span> 仪表盘↔编辑器互相切换要先关再开，来回跳</td></tr>
+  </table>
+  <p class="notes">定位：预算紧张时的过渡形态；结构上不给未来项目级功能（审计/导出）留挂点。</p>
+</section>
+
+<section>
+  <h2>§2 方案 C —— 「三段式菜单」（按你原词汇直译：主页 / 项目时间管理 / 仪表盘）</h2>
+  <div class="wf">
+    <div class="sb"><b>Northstar</b>
+      <i class="on">◈ 我的工作（主页）</i>
+      <i>▦ 项目时间管理</i>
+      <i>▤ 仪表盘（全部项目）</i>
+      <i class="sec dim">已归档 · 回收站</i>
+      <i class="sec dim">⚙ 设置</i>
+    </div>
+    <div class="main">
+      <div class="ttl">「项目时间管理」页 = 项目列表（管理入口）</div>
+      <div class="stack">
+        <div class="box row">跑鞋研发 2026　<span style="margin-left:auto">[仪表盘] [编辑器]</span></div>
+        <div class="box row">Mc Prj 01　<span style="margin-left:auto">[编辑器]</span></div>
+        <div class="arrow">点任一按钮 → 仍是弹层或项目页（取决于 Q2）</div>
+      </div>
+    </div>
+  </div>
+  <table>
+    <tr><th style="width:50%">优点</th><th>代价 / 风险</th></tr>
+    <tr><td><span class="rec">✓</span> 概念显式，「项目时间管理」「仪表盘」各占一个菜单位，与 Excel 导入心智直连<br><span class="rec">✓</span> 项目管理动作（新建/导入/改名）有专门落脚页</td>
+    <td><span class="con">✗</span> 「项目时间管理列表」与「我的工作项目卡」信息高度重复，等于两个项目列表<br><span class="con">✗</span> 到项目深一层（主页→列表→项目）；菜单 5 项偏长<br><span class="con">✗</span> 现实系统几乎没人这么做（列表与聚合分页并存），后续维护两套入口</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>§2 方案 D —— 「主页即一切」（极简端点，仅列作光谱参照）</h2>
+  <div class="wf">
+    <div class="sb"><b>Northstar</b>
+      <i class="on">◈ 我的工作（唯一主页）</i>
+      <i class="sec dim">已归档 · 回收站</i>
+      <i class="sec dim">⚙ 设置</i>
+    </div>
+    <div class="main">
+      <div class="ttl">我的工作（主页内部分区）</div>
+      <div class="stack">
+        <div class="box">[项目卡片] 区（默认）</div>
+        <div class="box">[全项目总览] 区（主页第二屏，向下滑）</div>
+        <div class="arrow">所有仪表盘 / 编辑器一律弹层钻入</div>
+      </div>
+    </div>
+  </div>
+  <table>
+    <tr><th style="width:50%">优点</th><th>代价 / 风险</th></tr>
+    <tr><td><span class="rec">✓</span> 菜单最少、最「简洁」的极限形态</td>
+    <td><span class="con">✗</span> 违背行业规律 ③：主页开始长成管理后台（团队 10–15 人共享时，个人主页被全局视图挤占）<br><span class="con">✗</span> 全项目仪表盘无常住入口，收藏/直达困难<br><span class="con">✗</span> 与已确认的「主页简洁」诉求恰好相反（越塞越多）</td></tr>
+  </table>
+  <p class="notes">列出只为看清光谱两端；<b>不建议选</b>，除非明确要收缩成 5 人以下微团队工具。</p>
+</section>
+
+<section>
+  <h2>§3 一屏速览</h2>
+  <table>
+    <tr><th>·</th><th>A 项目工作台</th><th>B 主页+弹层</th><th>C 三段式菜单</th><th>D 主页即一切</th></tr>
+    <tr><th>侧边栏项数</th><td>2 项 + 项目清单 + 2 收纳</td><td><b>2 + 2（最短）</b></td><td>3 + 2</td><td>1 + 2</td></tr>
+    <tr><th>单项目仪表盘住在哪</th><td><span class="rec">项目页·仪表盘标签（常住）</span></td><td>弹层（无常住地址）</td><td>从两处钻入的弹层/页</td><td>弹层</td></tr>
+    <tr><th>仪表盘↔编辑器切换</th><td><span class="rec">同页换标签，零跳转</span></td><td>关一层再开一层</td><td>关一层再开一层</td><td>关一层再开一层</td></tr>
+    <tr><th>全项目仪表盘</th><td>独立顶层（1 个）</td><td>独立顶层（1 个）</td><td>独立顶层（1 个）</td><td>塞进主页第二屏</td></tr>
+    <tr><th>到单个项目的点击</th><td>2 次（主页卡/侧边栏→项目页）</td><td>2 次（主页卡→弹层）</td><td>3 次（列表→项目）</td><td>2 次</td></tr>
+    <tr><th>CP2 工作量</th><td>中（modal 升格为页+标签）</td><td><b>低（现网顺延）</b></td><td>中</td><td>低</td></tr>
+    <tr><th>10 项目 / 15 人扩展性</th><td><span class="rec">好（行业同规模主流）</span></td><td>一般（弹层越用越挤）</td><td>一般（双入口维护）</td><td>差</td></tr>
+  </table>
+  <p style="margin-bottom:0"><b>我的推荐：A。</b>理由：你们团队 10–15 人、约 10 个并行项目，正是 Jira/Asana/Linear 该结构的目标规模；A 只比 B 多花中等工作量，换来常住的项目页、零跳转切换和未来审计/导出挂点。若这轮 CP2 预算紧，可「A 的结构 + 分期施工」：先按 A 落侧边栏与项目页骨架，仪表盘标签先复用现有渲染，编辑器标签第二期搬入。</p>
+</section>
+
+<section>
+  <h2>§4 问卷 Q1–Q5（按编号回复即可）</h2>
+
+  <div class="q">
+    <h3>Q1　整体逻辑结构选哪个？</h3>
+    <div class="why">这是主拍板，决定后面所有页面归属。Q2–Q4 在其框架内细化。</div>
+    <label class="opt"><input type="checkbox"> <b>1. 方案 A「项目工作台」</b><span class="tag">推荐</span><span class="hint">项目页 + 仪表盘/编辑器双标签；侧边栏含项目清单。行业同规模主流，扩展性最好。</span></label>
+    <label class="opt"><input type="checkbox"> <b>2. 方案 B「主页直达 + 弹层」</b><span class="hint">CP2 最便宜，沿用现网 modal；接受弹层挤、无常住项目页。</span></label>
+    <label class="opt"><input type="checkbox"> <b>3. 方案 C「三段式菜单」</b><span class="hint">「项目时间管理」「仪表盘」各占菜单位；接受与主页列表重复。</span></label>
+    <label class="opt"><input type="checkbox"> <b>4. 方案 D「主页即一切」</b><span class="hint">极简端点，不建议；仅当收缩为微团队时考虑。</span></label>
+  </div>
+
+  <div class="q">
+    <h3>Q2　单项目仪表盘与时间轴编辑器，是什么关系？</h3>
+    <div class="why">行业规律 ① 的直接问法。两份数据完全相同，只是视图不同。</div>
+    <label class="opt"><input type="checkbox"> <b>1. 同一项目页的两个标签</b><span class="tag">推荐</span><span class="hint">「仪表盘 | 编辑器」并排切换，改完日期顺手看全局，零跳转。（A 方案内含此项）</span></label>
+    <label class="opt"><input type="checkbox"> <b>2. 两个独立入口，各开各的</b><span class="hint">从主页卡两个按钮分别打开；切换需先关再开。（B/C 方案形态）</span></label>
+  </div>
+
+  <div class="q">
+    <h3>Q3　项目清单放哪里？</h3>
+    <div class="why">约 10 个项目需要一个稳定的到达路径。可与 Q1 联动，也可表达独立倾向。</div>
+    <label class="opt"><input type="checkbox"> <b>1. 侧边栏「项目」分组 + 主页卡片并存</b><span class="tag">推荐</span><span class="hint">侧边栏直达任意项目（Linear 式）；主页卡片继续做聚合提醒。两处内容同源，只是视角不同。</span></label>
+    <label class="opt"><input type="checkbox"> <b>2. 只放主页卡片（侧边栏不列项目）</b><span class="hint">侧边栏更短；但 10+ 项目时主页卡片滚动找项目慢于侧边栏直达。</span></label>
+    <label class="opt"><input type="checkbox"> <b>3. 独立「项目时间管理」列表页（C 方案）</b><span class="hint">概念显式，代价是与主页重复、多一跳。</span></label>
+  </div>
+
+  <div class="q">
+    <h3>Q4　全项目仪表盘放哪里？</h3>
+    <div class="why">行业规律 ②：跨项目聚合视图独立顶层、只做一个，不与个人主页混放。</div>
+    <label class="opt"><input type="checkbox"> <b>1. 独立顶层菜单项（侧边栏常驻）</b><span class="tag">推荐</span><span class="hint">「我的工作管我、全项目仪表盘管全局」，职责分明；周一站会/主管查看可直达。</span></label>
+    <label class="opt"><input type="checkbox"> <b>2. 主页内的一个区块/标签</b><span class="hint">入口更浅，但主页会随项目数变重，与「主页简洁」的已确认诉求相悖（趋同 D）。</span></label>
+  </div>
+
+  <div class="q">
+    <h3>Q5　feature00 看板（含旧「仪表盘」按钮）入口怎么归位？</h3>
+    <div class="why">承接上一轮 H1-④ 遗留：已拍板「UI 隐藏不删、数据保留」，剩入口摆放。测试约束：#dashboardBtn 按钮本体需保留可点击，只改摆放与文案。</div>
+    <label class="opt"><input type="checkbox"> <b>1. 藏进「设置 → 高级/经典功能」区</b><span class="tag">推荐</span><span class="hint">侧边栏零残留；需要时从设置进入；语义上明确「旧功能仍在，只是退居二线」。</span></label>
+    <label class="opt"><input type="checkbox"> <b>2. 侧边栏底部小字折叠区「经典看板」</b><span class="hint">一键可达性更好；代价是侧边栏多一个常驻项。</span></label>
+    <label class="opt"><input type="checkbox"> <b>3. 完全无入口（仅数据保留，未来需要再说）</b><span class="hint">最彻底；但 #dashboardBtn 需以隐形方式保留供测试点击，线上用户彻底不可见。</span></label>
+  </div>
+
+  <p class="notes" style="margin-top:10px">作答示例：「Q1:1　Q2:1　Q3:1　Q4:1　Q5:1」，或直接写想法。收口后我会：①按选型修订 Gate 5 静态稿（Screen B 会改为所选结构的项目页形态）→ ②你过目 → ③回填任务书 §13 拍板记录 → ④进 CP2。任何结构性改动以此轮选型为准。</p>
+</section>
+
+<footer>（IA对照）主页·项目·仪表盘逻辑结构选型 · feature01 Gate 5 · 便宜线框稿 · 2026-08-21 · 静态·不接后端·无业务逻辑</footer>
+</div>
+</body>
+</html>

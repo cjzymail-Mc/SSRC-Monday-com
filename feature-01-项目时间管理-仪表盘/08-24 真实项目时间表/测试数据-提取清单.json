@@ -1,0 +1,802 @@
+{
+  "source": "【先锋进度】款项进度情况.xlsx",
+  "source_size": 47469,
+  "source_sha256_before": "8e915848cac6ba6dc73e4cacb6dcbce430483811ab5b27f24405115d8605cf76",
+  "source_sha256_after": "8e915848cac6ba6dc73e4cacb6dcbce430483811ab5b27f24405115d8605cf76",
+  "source_unchanged": true,
+  "generated_at": "2026-08-24T06:33:27+00:00",
+  "standard_workbook": "测试数据-Flowboard标准时间表.xlsx",
+  "project_count": 97,
+  "node_count": 857,
+  "fallback_node_count": 8,
+  "projects": [
+    {
+      "name": "[真实表] 雷雳2GT明辉",
+      "node_count": 12,
+      "source_sheets": [
+        "26Q4（8项+1同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳2GT宇涛",
+      "node_count": 11,
+      "source_sheets": [
+        "26Q4（8项+1同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳 2.0",
+      "node_count": 18,
+      "source_sheets": [
+        "26Q2",
+        "26Q4（8项+1同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳2 MAX",
+      "node_count": 12,
+      "source_sheets": [
+        "26Q4（8项+1同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 山神3GT",
+      "node_count": 16,
+      "source_sheets": [
+        "26Q4（8项+1同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 山神3PRO",
+      "node_count": 16,
+      "source_sheets": [
+        "26Q4（8项+1同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 羽速PRO",
+      "node_count": 16,
+      "source_sheets": [
+        "26Q4（8项+1同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞影PB6.5",
+      "node_count": 10,
+      "source_sheets": [
+        "26Q4（8项+1同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 强风4.5",
+      "node_count": 10,
+      "source_sheets": [
+        "26Q4（8项+1同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 山神3.5",
+      "node_count": 9,
+      "source_sheets": [
+        "26Q4（8项+1同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞影PB7维正",
+      "node_count": 15,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞影GT2明辉",
+      "node_count": 13,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞影GT2庆铭",
+      "node_count": 23,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）",
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 强风5宇涛",
+      "node_count": 13,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 强风5维正",
+      "node_count": 10,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 强风GT子楠",
+      "node_count": 10,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 强风GT庆铭",
+      "node_count": 16,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞腾 4.0(A)子楠",
+      "node_count": 17,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞腾 4.0(B)子楠",
+      "node_count": 14,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 幻影4 MAX(雨林、正)",
+      "node_count": 12,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 幻影4 MAX(雨林、辉)",
+      "node_count": 15,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 轻鸿 2.0(A)明辉",
+      "node_count": 15,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 轻鸿 2.0(B)明辉",
+      "node_count": 15,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 轻鸿 2.0(鞋垫版)明辉",
+      "node_count": 15,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 轻鸿2 GT(A)庆铭",
+      "node_count": 15,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 轻鸿2 GT(B)庆铭",
+      "node_count": 12,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 轻鸿2 FREE(宇涛)",
+      "node_count": 17,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）",
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] HYROX(子楠)",
+      "node_count": 10,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 1
+    },
+    {
+      "name": "[真实表] 赛后恢复鞋(子楠)",
+      "node_count": 8,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞影PLAID 3.5(庆铭)",
+      "node_count": 9,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）",
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 结构缓震",
+      "node_count": 4,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳2GT( 革面版)雨林",
+      "node_count": 6,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳2GT TRAIL(宇涛)",
+      "node_count": 7,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳2GT TRAIL(明辉)",
+      "node_count": 7,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 轻鸿FREE V3 (宇涛)",
+      "node_count": 7,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 轻鸿FREE V2(明辉)",
+      "node_count": 6,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳GT 2.5 (维正)",
+      "node_count": 7,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳GT 2.5 (明辉)",
+      "node_count": 5,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳 2.5 (庆铭)",
+      "node_count": 7,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳3 MAX (庆铭)",
+      "node_count": 11,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳3 GT(子楠)",
+      "node_count": 11,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳 3.0(宇涛)",
+      "node_count": 11,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 匹克球鞋(庆铭)",
+      "node_count": 11,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 强风5 TR(雨林)",
+      "node_count": 11,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 3D打印拖鞋(明辉)",
+      "node_count": 8,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 一体注塑拖鞋(宇涛)",
+      "node_count": 8,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞影拖鞋4.0(子楠)",
+      "node_count": 8,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 云巢 MAX (子楠)",
+      "node_count": 10,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 云巢(维正)",
+      "node_count": 6,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 云巢(明辉)",
+      "node_count": 4,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 云巢ST(维正)",
+      "node_count": 1,
+      "source_sheets": [
+        "27Q1-Q4（7项+3同步）"
+      ],
+      "fallback_node_count": 1
+    },
+    {
+      "name": "[真实表] 飞影PLAID 4.0(维正)",
+      "node_count": 1,
+      "source_sheets": [
+        "28Q1-28Q2"
+      ],
+      "fallback_node_count": 1
+    },
+    {
+      "name": "[真实表] 飞影PLAID 4.0(明辉)",
+      "node_count": 1,
+      "source_sheets": [
+        "28Q1-28Q2"
+      ],
+      "fallback_node_count": 1
+    },
+    {
+      "name": "[真实表] 飞影PB7 维正 A",
+      "node_count": 21,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞影PB7 明辉 B",
+      "node_count": 14,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 强风5GT 子楠 A",
+      "node_count": 10,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 强风5GT 庆铭 B",
+      "node_count": 8,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 强风5 宇涛 A",
+      "node_count": 11,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 强风5 维正B",
+      "node_count": 18,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞影PLAID 4.0",
+      "node_count": 1,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 轻鸿2.0",
+      "node_count": 11,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 轻鸿2GT 庆铭",
+      "node_count": 2,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 幻影4MAX 雨林",
+      "node_count": 7,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞腾4.0 子楠",
+      "node_count": 9,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] HYROX方案A B 子楠",
+      "node_count": 5,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 赛后恢复鞋方案 子楠",
+      "node_count": 4,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 结构缓震鞋(3D",
+      "node_count": 1,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 1
+    },
+    {
+      "name": "[真实表] 雷雳2GT越野版",
+      "node_count": 1,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 1
+    },
+    {
+      "name": "[真实表] 雷雳GT革料版",
+      "node_count": 1,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳2.5 GT(线下",
+      "node_count": 2,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳2.5(线上",
+      "node_count": 1,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 轻鸿V2(线上",
+      "node_count": 2,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 轻鸿V3(线下",
+      "node_count": 2,
+      "source_sheets": [
+        "27年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 幻影3.0",
+      "node_count": 7,
+      "source_sheets": [
+        "26Q2"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 轻鸿FREE",
+      "node_count": 4,
+      "source_sheets": [
+        "26Q2"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 山神 3.0",
+      "node_count": 4,
+      "source_sheets": [
+        "26Q2"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞腾PRO",
+      "node_count": 3,
+      "source_sheets": [
+        "26Q2"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞影PB6 维正",
+      "node_count": 10,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞影PB6.5 维正",
+      "node_count": 7,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞影PLAID3 维正",
+      "node_count": 10,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 强风4PRO 宇涛",
+      "node_count": 2,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 强风4.5 雨林",
+      "node_count": 8,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 强风4 维正",
+      "node_count": 6,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞腾3.0 宇涛",
+      "node_count": 1,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 1
+    },
+    {
+      "name": "[真实表] 飞腾3.0PRO 明辉",
+      "node_count": 2,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 山神3 庆铭",
+      "node_count": 6,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 飞影GT 庆铭",
+      "node_count": 2,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 轻鸿FREE 明辉",
+      "node_count": 4,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 幻影3 明辉",
+      "node_count": 7,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳2.0 庆铭",
+      "node_count": 10,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳GT 明辉",
+      "node_count": 23,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳GT 宇涛",
+      "node_count": 4,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 雷雳MAX 明辉",
+      "node_count": 14,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 羽速PRO 庆铭",
+      "node_count": 9,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 羽速MIX 宇涛",
+      "node_count": 1,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 1
+    },
+    {
+      "name": "[真实表] 山神PRO 子楠",
+      "node_count": 18,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    },
+    {
+      "name": "[真实表] 山神GT 明辉",
+      "node_count": 2,
+      "source_sheets": [
+        "26年专项现况进展记录"
+      ],
+      "fallback_node_count": 0
+    }
+  ],
+  "trial_db": "C:\\Users\\xy198\\AppData\\Local\\Temp\\flowboard-gate5-trial\\flowboard-trial.db",
+  "import_result": {
+    "projects_created": 0,
+    "nodes_created": 0,
+    "projects_reused": 97,
+    "tag_count": 6,
+    "tag_memberships_added": 0
+  }
+}

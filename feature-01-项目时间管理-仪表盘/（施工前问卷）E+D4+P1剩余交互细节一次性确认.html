@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>全项目仪表盘｜E+D4+P1 施工前一次性确认</title>
+<style>
+:root{--ink:#172033;--sub:#5e6878;--muted:#8b95a6;--line:#dbe2ec;--blue:#246bfd;--blue2:#edf3ff;--green:#138460;--paper:#fff;--bg:#eef2f6}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI","Microsoft YaHei",sans-serif}.page{max-width:1180px;margin:auto;padding:24px}.hero{padding:24px 26px;border:1px solid #d4dfef;border-radius:18px;background:linear-gradient(135deg,#fff,#f5f9ff);box-shadow:0 14px 40px rgba(28,43,71,.07)}.kicker{margin:0 0 8px;color:var(--blue);font-size:11px;font-weight:900;letter-spacing:.14em}.hero h1{margin:0;font-size:28px;letter-spacing:-.03em}.hero>p:last-child{max-width:880px;margin:10px 0 0;color:var(--sub);font-size:13px;line-height:1.75}.locked{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.locked article{padding:14px 16px;border:1px solid #b8cffc;border-radius:12px;background:#f7faff}.locked b{display:block;color:var(--blue);font-size:13px}.locked span{display:block;margin-top:4px;color:var(--sub);font-size:11px;line-height:1.5}.notice{margin:0 0 15px;padding:11px 14px;border-left:4px solid #d3a200;background:#fff9de;color:#6a591f;font-size:12px;line-height:1.6}.questions{display:grid;gap:12px}.question{margin:0;padding:17px;border:1px solid var(--line);border-radius:13px;background:var(--paper)}.question legend{padding:0 7px;font-size:14px;font-weight:900}.why{margin:0 0 11px;color:var(--sub);font-size:11px;line-height:1.6}.options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.option{position:relative;display:grid;grid-template-columns:18px 1fr;gap:8px;min-height:92px;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}.option:hover{border-color:#a9bde3}.option:has(input:checked){border-color:var(--blue);background:var(--blue2);box-shadow:0 0 0 2px rgba(36,107,253,.09)}.option input{margin:2px 0 0;accent-color:var(--blue)}.option b{display:block;margin-bottom:5px;font-size:11.5px}.option small{display:block;color:var(--sub);font-size:10px;line-height:1.5}.rec{position:absolute;right:8px;top:7px;border-radius:999px;background:#dbe8ff;padding:2px 6px;color:var(--blue);font-size:8px;font-weight:900}.result{position:sticky;z-index:10;bottom:12px;margin-top:16px;border:1px solid #9dbafb;border-radius:14px;background:rgba(249,251,255,.97);padding:14px 16px;box-shadow:0 14px 40px rgba(36,107,253,.15);backdrop-filter:blur(10px)}.result-head{display:flex;align-items:center;justify-content:space-between;gap:14px}.result h2{margin:0;font-size:14px}.actions{display:flex;gap:7px}.actions button{border:1px solid var(--line);border-radius:7px;background:#fff;padding:7px 10px;color:var(--sub);font:inherit;font-size:11px;font-weight:800;cursor:pointer}.actions button.primary{border-color:var(--blue);background:var(--blue);color:#fff}.result textarea{width:100%;min-height:112px;margin-top:10px;resize:vertical;border:1px solid var(--line);border-radius:8px;background:#fff;padding:10px;color:var(--ink);font:12px/1.65 ui-monospace,"Cascadia Code",monospace}.copy-state{min-height:18px;margin:5px 0 0;color:var(--green);font-size:10px}@media(max-width:800px){.page{padding:10px}.locked,.options{grid-template-columns:1fr}.result-head{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<main class="page">
+  <section class="hero">
+    <p class="kicker">PRE-BUILD DECISION GATE</p>
+    <h1>全项目仪表盘：施工前剩余细节一次性确认</h1>
+    <p>以下只补齐 E＋D4＋P1 尚未覆盖的边界，不重问已经确认的方向。推荐项已预选；可以逐题修改，底部会自动生成一段可直接粘贴回对话的拍板结果。</p>
+  </section>
+  <section class="locked">
+    <article><b>✓ E 已确认</b><span>年 / 季度 / 月份与日期分层的唯一绝对标尺。</span></article>
+    <article><b>✓ D4 已确认</b><span>节点拖动时，在原标尺强化原点、目标和位移走廊。</span></article>
+    <article><b>✓ P1 已确认</b><span>时间图左键二维直接抓取，超过 4px 启动，松手即停。</span></article>
+  </section>
+  <p class="notice">本问卷不会修改正式系统或数据库。完成后请点击“复制拍板结果”，把文字粘贴回对话；只回复“已填写”无法让我读取你浏览器里的选择。</p>
+  <form class="questions" id="form">
+    <fieldset class="question"><legend>Q1 · 时间轴两端允许拖到哪里？</legend><p class="why">真实数据范围之外需要留出呼吸空间，但无限空白会让用户迷失。</p><div class="options">
+      <label class="option"><input type="radio" name="q1" value="A" checked><span><b>A · 数据边界＋30天缓冲</b><small>按当前标签项目的最早/最晚日期动态计算，两侧各留 30 天，随后硬停止。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q1" value="B"><span><b>B · 紧贴真实数据边界</b><small>最早节点和最晚节点就是尽头，信息密度最高，但边缘偏挤。</small></span></label>
+      <label class="option"><input type="radio" name="q1" value="C"><span><b>C · 可无限拖入空白日期</b><small>自由度最高，但容易丢失项目所在位置，也不利于“适配全部”。</small></span></label>
+    </div></fieldset>
+
+    <fieldset class="question"><legend>Q2 · 局部最多放大到多细？</legend><p class="why">月份层始终保留；这里只决定最细窗口及日期刻度密度。</p><div class="options">
+      <label class="option"><input type="radio" name="q2" value="A" checked><span><b>A · 最细 14 天</b><small>可精确到日，同时仍看得到前后上下文；适合绝大多数节点调整。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q2" value="B"><span><b>B · 最细 30 天</b><small>更克制，缩放层级少，但密集日期微调空间较小。</small></span></label>
+      <label class="option"><input type="radio" name="q2" value="C"><span><b>C · 最细 7 天</b><small>日级操作最精细，但更容易失去月份和项目全局方位。</small></span></label>
+    </div></fieldset>
+
+    <fieldset class="question"><legend>Q3 · 首次进入与再次进入如何定位？</legend><p class="why">既要第一次看懂全局，也要避免高频用户每次重新找位置。</p><div class="options">
+      <label class="option"><input type="radio" name="q3" value="A" checked><span><b>A · 首次适配，之后按用户记忆</b><small>每个账户、每个标签分别记住中心日期、缩放和纵向位置。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q3" value="B"><span><b>B · 每次都适配当前标签</b><small>始终从全貌开始，行为简单，但高频操作需要重复缩放。</small></span></label>
+      <label class="option"><input type="radio" name="q3" value="C"><span><b>C · 全部标签共用一个视角</b><small>切换标签保持中心和比例，但不同标签日期跨度差异大时可能空屏。</small></span></label>
+    </div></fieldset>
+
+    <fieldset class="question"><legend>Q4 · 全屏采用哪种方式？</legend><p class="why">原生浏览器全屏权限提示较强；应用内全屏更容易随时进入和退出。</p><div class="options">
+      <label class="option"><input type="radio" name="q4" value="A" checked><span><b>A · 应用内全屏</b><small>隐藏侧栏和非核心区，保留浏览器标签；按钮和 Esc 均可退出。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q4" value="B"><span><b>B · 浏览器原生全屏</b><small>画布面积最大，但会触发浏览器权限与全屏提示。</small></span></label>
+      <label class="option"><input type="radio" name="q4" value="C"><span><b>C · 两种入口都提供</b><small>自由度最高，但工具栏多一个相似按钮，学习成本略高。</small></span></label>
+    </div></fieldset>
+
+    <fieldset class="question"><legend>Q5 · 拖动节点靠近左右边缘时怎么办？</legend><p class="why">局部放大后，目标日期可能在当前窗口之外；此行为会直接影响长距离改期。</p><div class="options">
+      <label class="option"><input type="radio" name="q5" value="A" checked><span><b>A · 停留 350ms 后自动平移</b><small>靠近边缘先给用户反悔时间，再逐步移动时间轴；D4 强化同步更新。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q5" value="B"><span><b>B · 到边缘立即自动平移</b><small>长距离移动最快，但容易因手抖触发画布游走。</small></span></label>
+      <label class="option"><input type="radio" name="q5" value="C"><span><b>C · 不自动平移</b><small>最可控；超出窗口时先松手、平移画布，再继续拖节点。</small></span></label>
+    </div></fieldset>
+
+    <fieldset class="question"><legend>Q6 · 哪些区域可以启动 P1 画布拖动？</legend><p class="why">高密度项目中纯空白很少，范围过窄会让“抓画布”变得困难。</p><div class="options">
+      <label class="option"><input type="radio" name="q6" value="A" checked><span><b>A · 整个时间图，排除节点和控件</b><small>顶部标尺、空白和阶段色条均可抓取；节点、冻结列、按钮不启动。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q6" value="B"><span><b>B · 仅纯空白区域</b><small>冲突最少，但项目和节点越密集，可抓位置越难找。</small></span></label>
+      <label class="option"><input type="radio" name="q6" value="C"><span><b>C · 增加“抓手模式”开关</b><small>模式明确，但多一步切换，违背左键随手拖动的高频目标。</small></span></label>
+    </div></fieldset>
+
+    <fieldset class="question"><legend>Q7 · 画布拖动时显示多少反馈？</legend><p class="why">反馈用于区分“正在移动画布”和“正在修改节点”，但不能遮挡时间轴。</p><div class="options">
+      <label class="option"><input type="radio" name="q7" value="A" checked><span><b>A · 抓手光标＋小型位移提示</b><small>拖动中显示中心日期和移动天数，松手立即消失。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q7" value="B"><span><b>B · 只改变抓手光标</b><small>最干净，但在大幅移动时缺少当前位置确认。</small></span></label>
+      <label class="option"><input type="radio" name="q7" value="C"><span><b>C · 固定显示鸟瞰导航</b><small>方位最明确，但会长期占用纵向空间，接近此前 P4。</small></span></label>
+    </div></fieldset>
+
+    <fieldset class="question"><legend>Q8 · 冻结区和纵向滚动如何处理？</legend><p class="why">97 个项目需要稳定的项目名参照，横向和纵向的冻结语义必须明确。</p><div class="options">
+      <label class="option"><input type="radio" name="q8" value="A" checked><span><b>A · 左列横向冻结，表头纵向冻结</b><small>P1 横拖只移动日期；纵拖项目列表时，项目名与时间行同步上下移动。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q8" value="B"><span><b>B · 左列始终固定不参与纵移</b><small>项目名不动会与时间行错位，只适合另设独立目录，不建议。</small></span></label>
+      <label class="option"><input type="radio" name="q8" value="C"><span><b>C · 整张画布一起移动</b><small>项目名也会横向离开视口，远距离查看时容易失去行身份。</small></span></label>
+    </div></fieldset>
+
+    <fieldset class="question"><legend>Q9 · 默认项目行密度采用哪档？</legend><p class="why">项目多时行高直接决定一屏可比较多少项目；仍可保留单项目展开查看。</p><div class="options">
+      <label class="option"><input type="radio" name="q9" value="A" checked><span><b>A · 紧凑 62px</b><small>主线/并行各一行，一屏可比较更多项目；重叠阶段按既有展开按钮处理。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q9" value="B"><span><b>B · 舒适 84px</b><small>节点标签更宽松，但 97 项目需要更多纵向拖动。</small></span></label>
+      <label class="option"><input type="radio" name="q9" value="C"><span><b>C · 用户可切换紧凑/舒适</b><small>兼顾两种场景，但增加一个显示偏好和对应持久化。</small></span></label>
+    </div></fieldset>
+  </form>
+
+  <section class="result">
+    <div class="result-head"><h2>拍板结果</h2><div class="actions"><button type="button" id="recommended">恢复全部推荐</button><button type="button" class="primary" id="copy">复制拍板结果</button></div></div>
+    <textarea id="summary" readonly></textarea>
+    <p class="copy-state" id="copyState" aria-live="polite"></p>
+  </section>
+</main>
+<script>
+const labels={q1:{A:'数据边界＋30天缓冲',B:'紧贴真实数据边界',C:'允许无限空白日期'},q2:{A:'最细14天',B:'最细30天',C:'最细7天'},q3:{A:'首次适配、之后按账户和标签记忆',B:'每次适配当前标签',C:'全部标签共用一个视角'},q4:{A:'应用内全屏',B:'浏览器原生全屏',C:'两种全屏入口'},q5:{A:'边缘停留350ms后自动平移',B:'边缘立即自动平移',C:'节点拖动不自动平移'},q6:{A:'整个时间图可抓，排除节点和控件',B:'仅纯空白可抓',C:'增加抓手模式'},q7:{A:'抓手光标＋小型位移提示',B:'只改变抓手光标',C:'固定鸟瞰导航'},q8:{A:'左列横向冻结、表头纵向冻结',B:'左列不参与纵移',C:'整张画布一起移动'},q9:{A:'紧凑62px',B:'舒适84px',C:'用户切换紧凑/舒适'}};
+const form=document.querySelector('#form'),summary=document.querySelector('#summary'),copyState=document.querySelector('#copyState'),storageKey='flowboard-e-d4-p1-prebuild';
+function selections(){return Object.fromEntries([...new FormData(form).entries()])}
+function render(){const values=selections(),answers=Object.entries(values).map(([q,value])=>`${q.toUpperCase()}=${value}（${labels[q][value]}）`).join('\n');summary.value=`已确认基线：E＋D4＋P1\n剩余细节拍板：\n${answers}\n可以按上述结果进入正式施工。`;localStorage.setItem(storageKey,JSON.stringify(values));copyState.textContent=''}
+function restore(){try{const values=JSON.parse(localStorage.getItem(storageKey)||'{}');Object.entries(values).forEach(([name,value])=>{const input=form.querySelector(`[name="${name}"][value="${value}"]`);if(input)input.checked=true})}catch(_){}render()}
+form.addEventListener('change',render);document.querySelector('#recommended').onclick=()=>{form.querySelectorAll('input[value="A"]').forEach(input=>input.checked=true);render()};document.querySelector('#copy').onclick=async()=>{summary.select();try{await navigator.clipboard.writeText(summary.value)}catch(_){document.execCommand('copy')}copyState.textContent='已复制。请把这段结果粘贴回对话。'};restore();
+</script>
+</body>
+</html>

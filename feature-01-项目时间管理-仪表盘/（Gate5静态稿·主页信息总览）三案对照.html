@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>（Gate5静态稿·主页信息总览）我的项目·团队项目·最新动态 三案对照 · 2026-08-21</title>
+<style>
+:root{--canvas:#f5f5f7;--card:#fff;--ink:#1d1d1f;--ink2:#6e6e73;--ink3:#aeaeb2;--hair:#e8e8ed;--red:#e5484d;--blue:#1746b0;--green:#08785c;
+--idea:#ab5fe8;--design:#1746b0;--dev:#0aa67e;--test:#c9641a;--prod:#64bc46;--iter:#8f6a10}
+*{box-sizing:border-box}
+body{margin:0;padding:28px 20px 70px;background:#e9e9ee;color:var(--ink);font:14px/1.65 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+.wrap{max-width:1180px;margin:0 auto}
+.intro{background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:20px 24px;margin-bottom:24px}
+.eyebrow{color:var(--ink3);font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 4px}
+.intro h1{margin:0 0 8px;font-size:21px}
+.intro ol{margin:8px 0;padding-left:22px;color:var(--ink2);font-size:13px}
+.intro ol b{color:var(--ink)}
+.req{display:inline-block;padding:1px 8px;border-radius:99px;background:#eef1fa;color:var(--blue);font-size:11px;font-weight:700;margin-right:4px}
+.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;margin:0 6px 6px 0}
+.tag.ok{background:#e8f6f0;color:var(--green)}
+.tag.demo{background:#fdf3e7;color:#c9641a}
+.note{background:#fffdf5;border:1px solid #f0e6c8;border-radius:8px;padding:10px 14px;font-size:12.5px;color:#6b5d33;margin-top:10px}
+section.screen{margin-bottom:30px}
+.screen-head{display:flex;align-items:baseline;gap:12px;margin:0 0 8px;flex-wrap:wrap}
+.screen-head h2{margin:0;font-size:16px}
+.screen-head span{color:var(--ink3);font-size:12.5px}
+.browser{border:1px solid #d4d4da;border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(29,29,31,.08);background:var(--canvas)}
+.browser-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#ececef;border-bottom:1px solid #dddde3}
+.browser-bar i{width:10px;height:10px;border-radius:50%;background:#c8c8cf}
+.browser-bar span{margin-left:10px;color:var(--ink3);font-size:12px}
+.app{display:grid;grid-template-columns:200px 1fr;min-height:520px}
+.sb{background:#fbfbfd;border-right:1px solid var(--hair);padding:14px 10px;display:flex;flex-direction:column;gap:2px;font-size:13px}
+.sb .brand{padding:2px 8px 12px;border-bottom:1px solid var(--hair);margin-bottom:10px}
+.sb .brand b{font-size:14px}.sb .brand small{display:block;color:var(--ink3);font-size:11px;margin-top:2px}
+.sb a{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;color:var(--ink2);text-decoration:none}
+.sb a.on{background:#e8eafc;color:var(--blue);font-weight:700}
+.sb a.sub{padding-left:24px;font-size:12.5px}
+.sb .grp{margin:10px 0 2px;padding:0 9px;color:var(--ink3);font-size:11px;letter-spacing:.08em}
+.sb .tail{margin-top:auto;border-top:1px solid var(--hair);padding-top:8px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:#fff;border-bottom:1px solid var(--hair);font-size:12.5px;color:var(--ink2)}
+.top .crumb b{color:var(--ink)}
+.top .u{display:flex;gap:12px;align-items:center}
+.av{width:22px;height:22px;border-radius:50%;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none}
+.page{padding:20px 24px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.page-head h1{margin:0;font-size:26px;letter-spacing:-.02em}
+.page-head .sub{color:var(--ink2);font-size:12.5px;margin-top:3px}
+.actions{display:flex;gap:8px}
+.btn{border:1px solid var(--hair);background:#fff;border-radius:7px;padding:7px 13px;font-size:13px;color:var(--ink);cursor:default}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
+.sechead{display:flex;align-items:center;gap:8px;margin:16px 0 8px;font-size:14px;font-weight:700}
+.sechead small{color:var(--ink3);font-weight:400;font-size:12px}
+/* 项目卡 */
+.pcard{background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:14px 16px;box-shadow:0 6px 18px rgba(29,29,31,.04);margin-bottom:10px}
+.pcard.empty{border-style:dashed;background:transparent;box-shadow:none}
+.pcard .row1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pcard h3{margin:0;font-size:16px}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600}
+.chip.red{background:#fdecec;color:var(--red)}
+.chip.gray{background:#f1f1f4;color:var(--ink2);font-weight:400}
+.chip.edit{background:#e8f6f0;color:var(--green)}
+.chip.lock{background:#f4f0fa;color:#7a4fb6}
+.chip.demo{background:#fdf3e7;color:#c9641a}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.pcard .meta{color:var(--ink2);font-size:12.5px;margin:7px 0 0}
+.pcard .meta b{color:var(--ink)}
+.pcard .ops{display:flex;gap:8px;margin-top:10px}
+.upcoming{margin-top:9px;padding:7px 11px;border-left:3px solid var(--prod);background:#f7fbf5;border-radius:0 6px 6px 0;font-size:12.5px}
+/* 团队条 */
+.team{background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:12px 14px}
+.team h4,.feed h4{margin:0 0 10px;font-size:13.5px;display:flex;align-items:center;justify-content:space-between}
+.team h4 small,.feed h4 small{color:var(--ink3);font-weight:400;font-size:11.5px}
+.member{display:flex;align-items:center;gap:9px;padding:7px 6px;border-bottom:1px dashed var(--hair);font-size:12.5px}
+.member:last-child{border-bottom:0}
+.member .nm{font-weight:600}
+.member .role{font-size:11px;padding:1px 7px;border-radius:99px;background:#f1f1f4;color:var(--ink2)}
+.member .role.admin{background:#eef1fa;color:var(--blue)}
+.member .pj{margin-left:auto;text-align:right;color:var(--ink2);font-size:11.5px;line-height:1.45}
+/* 动态栏 */
+.feed{background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:12px 14px}
+.fi{display:flex;gap:9px;padding:8px 2px;border-bottom:1px dashed var(--hair);font-size:12.5px;align-items:flex-start}
+.fi:last-child{border-bottom:0}
+.fi .t{margin-left:auto;color:var(--ink3);font-size:11px;white-space:nowrap;padding-top:2px}
+.fi b{font-weight:600}
+.fi .mv{color:var(--ink2)}
+.fi .mv code{background:#f4f4f7;border-radius:4px;padding:0 4px;font-size:11px}
+/* 团队项目表 */
+table.tp{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--hair);border-radius:10px;overflow:hidden;font-size:12.5px}
+.tp th{background:#fafafc;border-bottom:1px solid var(--hair);padding:8px 10px;text-align:left;color:var(--ink2);font-weight:600;font-size:11.5px}
+.tp td{border-bottom:1px solid var(--hair);padding:8px 10px;vertical-align:middle}
+.tp tr:last-child td{border-bottom:0}
+.num{font-variant-numeric:tabular-nums;color:var(--ink2)}
+/* KPI 条（案3） */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border:1px solid var(--hair);border-radius:10px;padding:12px 14px}
+.kpi small{display:block;color:var(--ink3);font-size:11.5px}
+.kpi b{font-size:20px}
+.kpi b em{font-style:normal;font-size:12px;color:var(--red);font-weight:700;margin-left:4px}
+.kpi b em.g{color:var(--green)}
+/* 标签（案3） */
+.tabs{display:flex;gap:2px;border-bottom:2px solid var(--hair);margin-bottom:12px}
+.tabs button{border:0;background:transparent;padding:9px 16px;font:600 13.5px/1 inherit;color:var(--ink2);cursor:default;border-bottom:2px solid transparent;margin-bottom:-2px}
+.tabs button.on{color:var(--blue);border-bottom-color:var(--blue)}
+/* 布局容器 */
+.cols{display:grid;gap:14px}
+.h1g{grid-template-columns:1fr 320px}
+.h2g{grid-template-columns:1.4fr 1fr}
+.rail{display:grid;gap:14px;align-content:start}
+@media(max-width:900px){.h1g,.h2g{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+footer.decl{color:var(--ink3);font-size:12px;text-align:center;margin-top:26px;line-height:1.8}
+/* 问卷 */
+.qq{background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:20px 24px;margin-top:26px}
+.qq h2{margin:0 0 10px;font-size:17px;border-left:4px solid var(--blue);padding-left:10px}
+.q{border:1px solid var(--hair);border-radius:8px;padding:13px 16px;margin:12px 0;background:#fcfcfe}
+.q h3{margin:0 0 4px;font-size:14.5px}
+.q .why{font-size:12px;color:var(--ink2);margin:0 0 8px}
+.opt{display:block;padding:6px 10px;border:1px solid var(--hair);border-radius:6px;margin-bottom:5px;background:#fff;font-size:13px}
+.opt .tg{display:inline-block;margin-left:8px;font-size:11px;padding:1px 8px;border-radius:99px;background:#e8f6f0;color:var(--green);font-weight:700}
+.opt .hint{display:block;color:var(--ink3);font-size:12px}
+.cmp{width:100%;border-collapse:collapse;font-size:12.5px}
+.cmp th,.cmp td{border:1px solid var(--hair);padding:7px 10px;text-align:left}
+.cmp th{background:#fafafc}
+.rec{color:var(--green);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="intro">
+  <p class="eyebrow">feature01 · Gate 5 · 主页（我的工作）重设计 · 依据 temp.md 三条需求</p>
+  <h1>主页信息总览 —— 我的项目 / 团队项目 / 团队与最新动态 · 三案对照</h1>
+  <div><span class="tag ok">已确认前提：方案A 项目工作台 · 登录默认「我的工作」</span><span class="tag demo">本稿含少量「示意」数据（橙标）——演示他人项目只读态与动态颗粒度，真实库暂无他人项目</span></div>
+  <ol>
+    <li><span class="req">需求①</span><b>信息总览首页</b>：区分【我的项目】（当前成员负责·可编辑）与【团队项目】（全部项目；仅本人负责的可编辑，他人只读）——与已冻结权限契约一致（admin 全可编辑；member 仅自己创建的项目）。</li>
+    <li><span class="req">需求②</span><b>团队概览</b>：共几人、每人负责哪几个项目（真实团队 4 人：林晓 admin · 周然/陈默/王敏 member）。</li>
+    <li><span class="req">需求③</span><b>最新动态栏</b>：3–5 条最新团队修改动作 + 时间戳（改日期 / 改节点状态 / 改备注 / 新建项目），数据源已存在（timeline_change_batches + audit_log 记录了操作者·时间·变更内容），无需改 schema。</li>
+  </ol>
+  <div class="note"><b>数据更正与来源：</b>之前静态稿把 u1 写作「Mc」，实为<b>林晓（admin）</b>，本稿起更正（团队 4 人、两项目均林晓创建）。真实动态两条（今天 09:36 / 09:40）；「越野跑鞋概念 2027（周然负责）」及其动态为<b>示意数据</b>，仅用于演示只读态与动态格式，橙标区分。</div>
+</div>
+
+<!-- ═══════════ 案1 双栏信息台 ═══════════ -->
+<section class="screen">
+  <div class="screen-head"><h2>案 1 · 双栏信息台（左主右辅）</h2><span>左：项目区（我的+团队）｜右：团队栏 + 最新动态 · 需求①②③一屏总览</span></div>
+  <div class="browser">
+    <div class="browser-bar"><i></i><i></i><i></i><span>localhost:8080 · 我的工作（登录默认页）</span></div>
+    <div class="app">
+      <nav class="sb">
+        <div class="brand"><b>flowboard</b><small>Northstar Studio 工作区</small></div>
+        <a class="on">◈ 我的工作</a><a>▤ 全项目仪表盘</a>
+        <div class="grp">项目</div><a class="sub">跑鞋研发 2026</a><a class="sub">Mc Prj 01</a>
+        <div class="grp"></div><a>已归档</a><a>回收站</a>
+        <div class="tail"><a>⚙ 设置</a></div>
+      </nav>
+      <div>
+        <div class="top"><span class="crumb"><b>Northstar Studio</b> / 我的工作</span><span class="u"><span>搜索</span><span>通知</span><span class="av" style="background:var(--blue)">林</span><span>林晓 · admin</span><span>退出</span></span></div>
+        <div class="page">
+          <div class="page-head">
+            <div><p class="eyebrow">信息总览 · 登录默认页</p><h1>我的工作</h1>
+            <div class="sub">团队 4 人 · 我负责 2 个项目 · 团队共 3 个项目 · 今天 2026-08-21</div></div>
+            <div class="actions"><button class="btn">⇪ 导入 Excel</button><button class="btn pri">＋ 新建项目</button></div>
+          </div>
+          <div class="cols h1g">
+            <div>
+              <div class="sechead">我的项目 <small>我负责 · 可编辑 <span class="req">需求①</span></small></div>
+              <div class="pcard">
+                <div class="row1"><h3>跑鞋研发 2026</h3><span class="chip red">逾期 1</span><span class="chip edit">✓ 我可编辑</span></div>
+                <div class="meta"><span class="dot" style="background:var(--test)"></span> 当前 <b>测试</b> ｜ <b>01/10 → 12/18</b> ｜ <b>15</b> 节点 · <b>9</b> 已完成 ｜ 负责人 林晓</div>
+                <div class="upcoming">▸ <b>临近</b>　试产与品质复核 · <b>2026-09-02</b>（12 天后）</div>
+                <div class="ops"><button class="btn pri">打开项目 →</button><button class="btn">进入编辑器</button></div>
+              </div>
+              <div class="pcard empty">
+                <div class="row1"><h3>Mc Prj 01</h3><span class="chip gray">未开始</span><span class="chip edit">✓ 我可编辑</span></div>
+                <div class="meta"><b>0</b> 节点 · 时间范围 — ｜ 负责人 林晓</div>
+                <div class="ops" style="margin-top:9px"><button class="btn pri">进入编辑器 →</button></div>
+              </div>
+              <div class="sechead">团队项目 <small>全部项目 · 他人负责者按权限只读 <span class="req">需求①</span></small></div>
+              <table class="tp">
+                <thead><tr><th>项目</th><th>负责人</th><th>状态</th><th>提示</th><th>我的权限</th></tr></thead>
+                <tbody>
+                  <tr><td><b>跑鞋研发 2026</b></td><td><span class="av" style="background:var(--blue);width:18px;height:18px;font-size:10px">林</span> 林晓（我）</td><td class="num">测试 · 9/15</td><td><span class="chip red">逾期 1</span></td><td><span class="chip edit">可编辑</span></td></tr>
+                  <tr><td><b>Mc Prj 01</b></td><td><span class="av" style="background:var(--blue);width:18px;height:18px;font-size:10px">林</span> 林晓（我）</td><td class="num">未开始 · 0</td><td><span class="chip gray">—</span></td><td><span class="chip edit">可编辑</span></td></tr>
+                  <tr><td><b>越野跑鞋概念 2027</b> <span class="chip demo">示意</span></td><td><span class="av" style="background:#b83280;width:18px;height:18px;font-size:10px">周</span> 周然</td><td class="num">创意 · 2/6</td><td><span class="chip gray">临近 09/10</span></td><td><span class="chip lock">🔒 成员只读 · admin 可编辑</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="rail">
+              <div class="team"><h4>团队 · 4 人 <span class="req">需求②</span><small>每人负责的项目</small></h4>
+                <div class="member"><span class="av" style="background:var(--blue)">林</span><span class="nm">林晓（我）</span><span class="role admin">admin</span><span class="pj">跑鞋研发 2026 · Mc Prj 01</span></div>
+                <div class="member"><span class="av" style="background:#b83280">周</span><span class="nm">周然</span><span class="role">member</span><span class="pj">越野跑鞋概念 2027 <span class="chip demo" style="font-size:10px;padding:0 6px">示意</span></span></div>
+                <div class="member"><span class="av" style="background:var(--dev)">陈</span><span class="nm">陈默</span><span class="role">member</span><span class="pj">暂无负责项目</span></div>
+                <div class="member"><span class="av" style="background:var(--idea)">王</span><span class="nm">王敏</span><span class="role">member</span><span class="pj">暂无负责项目</span></div>
+              </div>
+              <div class="feed"><h4>最新动态 <span class="req">需求③</span><small>团队最近修改动作</small></h4>
+                <div class="fi"><span class="av" style="background:#b83280;width:20px;height:20px;font-size:10px">周</span><span class="mv"><b>周然</b> 将「越野跑鞋概念 2027 · 概念评审」日期 <code>08-18 → 08-25</code> <span class="chip demo" style="font-size:10px;padding:0 6px">示意</span></span><span class="t">昨天 16:20</span></div>
+                <div class="fi"><span class="av" style="background:#b83280;width:20px;height:20px;font-size:10px">周</span><span class="mv"><b>周然</b> 标记「竞品扫描」为 <b>已完成</b> <span class="chip demo" style="font-size:10px;padding:0 6px">示意</span></span><span class="t">昨天 10:05</span></div>
+                <div class="fi"><span class="av" style="background:var(--blue);width:20px;height:20px;font-size:10px">林</span><span class="mv"><b>林晓</b> 创建「跑鞋研发 2026」并录入 <b>15</b> 个时间节点</span><span class="t">今天 09:40</span></div>
+                <div class="fi"><span class="av" style="background:var(--blue);width:20px;height:20px;font-size:10px">林</span><span class="mv"><b>林晓</b> 创建「Mc Prj 01」</span><span class="t">今天 09:36</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 案2 单列纵排 ═══════════ -->
+<section class="screen">
+  <div class="screen-head"><h2>案 2 · 单列纵排（团队条置顶，移动友好）</h2><span>团队横条 → 我的项目 → 团队项目+动态 并列底部 · 动态在折叠线以下</span></div>
+  <div class="browser">
+    <div class="browser-bar"><i></i><i></i><i></i><span>localhost:8080 · 我的工作（登录默认页）</span></div>
+    <div class="app">
+      <nav class="sb">
+        <div class="brand"><b>flowboard</b><small>Northstar Studio 工作区</small></div>
+        <a class="on">◈ 我的工作</a><a>▤ 全项目仪表盘</a>
+        <div class="grp">项目</div><a class="sub">跑鞋研发 2026</a><a class="sub">Mc Prj 01</a>
+        <div class="grp"></div><a>已归档</a><a>回收站</a>
+        <div class="tail"><a>⚙ 设置</a></div>
+      </nav>
+      <div>
+        <div class="top"><span class="crumb"><b>Northstar Studio</b> / 我的工作</span><span class="u"><span>搜索</span><span>通知</span><span class="av" style="background:var(--blue)">林</span><span>林晓 · admin</span><span>退出</span></span></div>
+        <div class="page">
+          <div class="page-head">
+            <div><p class="eyebrow">信息总览 · 登录默认页</p><h1>我的工作</h1>
+            <div class="sub">团队 4 人 · 我负责 2 个项目 · 今天 2026-08-21</div></div>
+            <div class="actions"><button class="btn">⇪ 导入 Excel</button><button class="btn pri">＋ 新建项目</button></div>
+          </div>
+          <div class="team" style="margin-bottom:14px"><h4>团队 · 4 人 <span class="req">需求②</span><small>头像点击查看该成员负责的项目</small></h4>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <span class="member" style="border:0;padding:4px 8px 4px 4px;background:#f8f9fc;border-radius:8px"><span class="av" style="background:var(--blue)">林</span><span class="nm">林晓（我）</span><span class="role admin">admin · 2 项</span></span>
+              <span class="member" style="border:0;padding:4px 8px 4px 4px;background:#f8f9fc;border-radius:8px"><span class="av" style="background:#b83280">周</span><span class="nm">周然</span><span class="role">1 项</span><span class="chip demo" style="font-size:10px;padding:0 6px">示意</span></span>
+              <span class="member" style="border:0;padding:4px 8px 4px 4px;background:#f8f9fc;border-radius:8px"><span class="av" style="background:var(--dev)">陈</span><span class="nm">陈默</span><span class="role">0 项</span></span>
+              <span class="member" style="border:0;padding:4px 8px 4px 4px;background:#f8f9fc;border-radius:8px"><span class="av" style="background:var(--idea)">王</span><span class="nm">王敏</span><span class="role">0 项</span></span>
+            </div>
+          </div>
+          <div class="sechead">我的项目 <small>我负责 · 可编辑 <span class="req">需求①</span></small></div>
+          <div class="cols h2g">
+            <div>
+              <div class="pcard">
+                <div class="row1"><h3>跑鞋研发 2026</h3><span class="chip red">逾期 1</span><span class="chip edit">✓ 我可编辑</span></div>
+                <div class="meta"><span class="dot" style="background:var(--test)"></span> 当前 <b>测试</b> ｜ <b>01/10 → 12/18</b> ｜ <b>15</b> 节点 · <b>9</b> 已完成 ｜ 负责人 林晓</div>
+                <div class="upcoming">▸ <b>临近</b>　试产与品质复核 · <b>2026-09-02</b>（12 天后）</div>
+                <div class="ops"><button class="btn pri">打开项目 →</button><button class="btn">进入编辑器</button></div>
+              </div>
+              <div class="pcard empty">
+                <div class="row1"><h3>Mc Prj 01</h3><span class="chip gray">未开始</span><span class="chip edit">✓ 我可编辑</span></div>
+                <div class="meta"><b>0</b> 节点 · 时间范围 — ｜ 负责人 林晓</div>
+                <div class="ops" style="margin-top:9px"><button class="btn pri">进入编辑器 →</button></div>
+              </div>
+            </div>
+            <div class="feed" style="align-self:start"><h4>最新动态 <span class="req">需求③</span></h4>
+              <div class="fi"><span class="av" style="background:#b83280;width:20px;height:20px;font-size:10px">周</span><span class="mv"><b>周然</b> 将「概念评审」日期 <code>08-18 → 08-25</code> <span class="chip demo" style="font-size:10px;padding:0 6px">示意</span></span><span class="t">昨天 16:20</span></div>
+              <div class="fi"><span class="av" style="background:#b83280;width:20px;height:20px;font-size:10px">周</span><span class="mv"><b>周然</b> 标记「竞品扫描」为 <b>已完成</b> <span class="chip demo" style="font-size:10px;padding:0 6px">示意</span></span><span class="t">昨天 10:05</span></div>
+              <div class="fi"><span class="av" style="background:var(--blue);width:20px;height:20px;font-size:10px">林</span><span class="mv"><b>林晓</b> 创建「跑鞋研发 2026」并录入 <b>15</b> 节点</span><span class="t">今天 09:40</span></div>
+              <div class="fi"><span class="av" style="background:var(--blue);width:20px;height:20px;font-size:10px">林</span><span class="mv"><b>林晓</b> 创建「Mc Prj 01」</span><span class="t">今天 09:36</span></div>
+            </div>
+          </div>
+          <div class="sechead">团队项目 <span class="req">需求①</span><small>全部项目 · 他人负责者按权限只读</small></div>
+          <table class="tp">
+            <thead><tr><th>项目</th><th>负责人</th><th>状态</th><th>提示</th><th>我的权限</th></tr></thead>
+            <tbody>
+              <tr><td><b>跑鞋研发 2026</b></td><td><span class="av" style="background:var(--blue);width:18px;height:18px;font-size:10px">林</span> 林晓（我）</td><td class="num">测试 · 9/15</td><td><span class="chip red">逾期 1</span></td><td><span class="chip edit">可编辑</span></td></tr>
+              <tr><td><b>Mc Prj 01</b></td><td><span class="av" style="background:var(--blue);width:18px;height:18px;font-size:10px">林</span> 林晓（我）</td><td class="num">未开始 · 0</td><td><span class="chip gray">—</span></td><td><span class="chip edit">可编辑</span></td></tr>
+              <tr><td><b>越野跑鞋概念 2027</b> <span class="chip demo">示意</span></td><td><span class="av" style="background:#b83280;width:18px;height:18px;font-size:10px">周</span> 周然</td><td class="num">创意 · 2/6</td><td><span class="chip gray">临近 09/10</span></td><td><span class="chip lock">🔒 成员只读 · admin 可编辑</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 案3 KPI条+标签 ═══════════ -->
+<section class="screen">
+  <div class="screen-head"><h2>案 3 · KPI 摘要条 + 分区标签</h2><span>顶部四格摘要（一眼全局）→ 我的项目/团队项目 标签切换 · 团队与动态右栏</span></div>
+  <div class="browser">
+    <div class="browser-bar"><i></i><i></i><i></i><span>localhost:8080 · 我的工作（登录默认页）</span></div>
+    <div class="app">
+      <nav class="sb">
+        <div class="brand"><b>flowboard</b><small>Northstar Studio 工作区</small></div>
+        <a class="on">◈ 我的工作</a><a>▤ 全项目仪表盘</a>
+        <div class="grp">项目</div><a class="sub">跑鞋研发 2026</a><a class="sub">Mc Prj 01</a>
+        <div class="grp"></div><a>已归档</a><a>回收站</a>
+        <div class="tail"><a>⚙ 设置</a></div>
+      </nav>
+      <div>
+        <div class="top"><span class="crumb"><b>Northstar Studio</b> / 我的工作</span><span class="u"><span>搜索</span><span>通知</span><span class="av" style="background:var(--blue)">林</span><span>林晓 · admin</span><span>退出</span></span></div>
+        <div class="page">
+          <div class="page-head">
+            <div><p class="eyebrow">信息总览 · 登录默认页</p><h1>我的工作</h1></div>
+            <div class="actions"><button class="btn">⇪ 导入 Excel</button><button class="btn pri">＋ 新建项目</button></div>
+          </div>
+          <div class="kpis">
+            <div class="kpi"><small>我的项目</small><b>2<em>逾期 1</em></b></div>
+            <div class="kpi"><small>团队项目</small><b>3<em>逾期 1</em></b></div>
+            <div class="kpi"><small>团队成员</small><b>4</b></div>
+            <div class="kpi"><small>今日团队动作</small><b>2<em class="g">昨日 2</em></b></div>
+          </div>
+          <div class="cols h1g">
+            <div>
+              <div class="tabs"><button class="on">我的项目（2）</button><button>团队项目（3）</button></div>
+              <div class="pcard">
+                <div class="row1"><h3>跑鞋研发 2026</h3><span class="chip red">逾期 1</span><span class="chip edit">✓ 我可编辑</span></div>
+                <div class="meta"><span class="dot" style="background:var(--test)"></span> 当前 <b>测试</b> ｜ <b>01/10 → 12/18</b> ｜ <b>15</b> 节点 · <b>9</b> 已完成 ｜ 负责人 林晓</div>
+                <div class="upcoming">▸ <b>临近</b>　试产与品质复核 · <b>2026-09-02</b>（12 天后）</div>
+                <div class="ops"><button class="btn pri">打开项目 →</button><button class="btn">进入编辑器</button></div>
+              </div>
+              <div class="pcard empty">
+                <div class="row1"><h3>Mc Prj 01</h3><span class="chip gray">未开始</span><span class="chip edit">✓ 我可编辑</span></div>
+                <div class="meta"><b>0</b> 节点 · 时间范围 — ｜ 负责人 林晓</div>
+                <div class="ops" style="margin-top:9px"><button class="btn pri">进入编辑器 →</button></div>
+              </div>
+              <p style="color:var(--ink3);font-size:12px;margin:10px 0 0">「团队项目」标签内＝同案1 的团队项目表（含只读行）。</p>
+            </div>
+            <div class="rail">
+              <div class="team"><h4>团队 · 4 人 <span class="req">需求②</span></h4>
+                <div class="member"><span class="av" style="background:var(--blue)">林</span><span class="nm">林晓（我）</span><span class="role admin">admin</span><span class="pj">跑鞋研发 2026 · Mc Prj 01</span></div>
+                <div class="member"><span class="av" style="background:#b83280">周</span><span class="nm">周然</span><span class="role">member</span><span class="pj">越野跑鞋概念 2027 <span class="chip demo" style="font-size:10px;padding:0 6px">示意</span></span></div>
+                <div class="member"><span class="av" style="background:var(--dev)">陈</span><span class="nm">陈默</span><span class="role">member</span><span class="pj">暂无</span></div>
+                <div class="member"><span class="av" style="background:var(--idea)">王</span><span class="nm">王敏</span><span class="role">member</span><span class="pj">暂无</span></div>
+              </div>
+              <div class="feed"><h4>最新动态 <span class="req">需求③</span></h4>
+                <div class="fi"><span class="av" style="background:#b83280;width:20px;height:20px;font-size:10px">周</span><span class="mv"><b>周然</b> 将「概念评审」日期 <code>08-18 → 08-25</code> <span class="chip demo" style="font-size:10px;padding:0 6px">示意</span></span><span class="t">昨天 16:20</span></div>
+                <div class="fi"><span class="av" style="background:#b83280;width:20px;height:20px;font-size:10px">周</span><span class="mv"><b>周然</b> 标记「竞品扫描」为 <b>已完成</b> <span class="chip demo" style="font-size:10px;padding:0 6px">示意</span></span><span class="t">昨天 10:05</span></div>
+                <div class="fi"><span class="av" style="background:var(--blue);width:20px;height:20px;font-size:10px">林</span><span class="mv"><b>林晓</b> 创建「跑鞋研发 2026」并录入 <b>15</b> 节点</span><span class="t">今天 09:40</span></div>
+                <div class="fi"><span class="av" style="background:var(--blue);width:20px;height:20px;font-size:10px">林</span><span class="mv"><b>林晓</b> 创建「Mc Prj 01」</span><span class="t">今天 09:36</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 速览 + 问卷 ═══════════ -->
+<div class="qq">
+  <h2>三案速览与问卷（按编号回复即可）</h2>
+  <table class="cmp">
+    <tr><th>·</th><th>案1 双栏信息台</th><th>案2 单列纵排</th><th>案3 KPI条+标签</th></tr>
+    <tr><th>需求覆盖</th><td>①②③ 同屏全见</td><td>①②③ 全见（③在下方）</td><td>①② 同屏，③右栏；①部分藏在标签里</td></tr>
+    <tr><th>首屏信息量</th><td><span class="rec">高：项目+团队+动态一次到位</span></td><td>中：需少量滚动</td><td>最高：KPI 数字先行</td></tr>
+    <tr><th>项目多时（≈10 个）</th><td><span class="rec">好：右栏固定，左侧列表自然生长</span></td><td>一般：整页变长</td><td>好：KPI 常驻</td></tr>
+    <tr><th>实现成本</th><td>中（两栏栅格）</td><td><b>低</b></td><td>中高（KPI 聚合 + 标签）</td></tr>
+    <tr><th>风险</th><td>窄屏需折叠右栏</td><td>动态栏易被忽略</td><td>「我的/团队」切换增加一步；KPI 口径需定义</td></tr>
+  </table>
+
+  <div class="q">
+    <h3>Q1　主页版式选哪个？</h3>
+    <p class="why">三案均已落实需求①②③，差别在信息排布与首屏密度。</p>
+    <label class="opt"><input type="checkbox"> <b>1. 案1 双栏信息台</b><span class="tg">推荐</span><span class="hint">左项目右团队+动态，一屏总览；项目增多时结构不变。</span></label>
+    <label class="opt"><input type="checkbox"> <b>2. 案2 单列纵排</b><span class="hint">实现最简、移动端最友好；接受动态栏在折叠线下。</span></label>
+    <label class="opt"><input type="checkbox"> <b>3. 案3 KPI条+标签</b><span class="hint">数字先行适合向管理层汇报；接受多一步标签切换。</span></label>
+  </div>
+  <div class="q">
+    <h3>Q2　「负责」的语义＝创建人，还是新增独立负责人字段？</h3>
+    <p class="why">冻结契约：member 只能编辑自己创建（created_by）的项目、admin 全可编辑。你提出「每个成员负责的项目不同」——用创建人即可表达，无需动契约。</p>
+    <label class="opt"><input type="checkbox"> <b>1. 沿用创建人＝负责人</b><span class="tg">推荐</span><span class="hint">零契约改动；Excel 导入者即负责人。当前 4 人团队够用。</span></label>
+    <label class="opt"><input type="checkbox"> <b>2. 新增「负责人」字段（可改派/可多人）</b><span class="hint">需 schema 迁移+权限细化，建议 Gate 5 后另立项；本轮先用创建人展示。</span></label>
+  </div>
+  <div class="q">
+    <h3>Q3　动态颗粒度：动作级直陈，还是项目级汇总？</h3>
+    <p class="why">数据源（timeline_change_batches / audit_log）已记录操作者·时间·字段·新旧值，两种都能做。</p>
+    <label class="opt"><input type="checkbox"> <b>1. 动作级直陈</b><span class="tg">推荐</span><span class="hint">「周然 将『概念评审』日期 08-18 → 08-25 · 昨天 16:20」——谁动什么一目了然，正合 temp.md 描述。</span></label>
+    <label class="opt"><input type="checkbox"> <b>2. 项目级汇总</b><span class="hint">「周然 更新了『越野跑鞋概念 2027』（3 个动作）」——更省空间，丢细节。</span></label>
+  </div>
+  <div class="q">
+    <h3>Q4　动态范围：只收时间管理动作，还是全站动作？</h3>
+    <label class="opt"><input type="checkbox"> <b>1. 仅时间管理动作</b><span class="tg">推荐</span><span class="hint">改日期 / 节点状态 / 备注 / 新建项目 / Excel 导入。与 temp.md「项目推进形式」一致。</span></label>
+    <label class="opt"><input type="checkbox"> <b>2. 全站动作</b><span class="hint">再含经典看板（feature00）任务修改、登录等；信息更杂。</span></label>
+  </div>
+  <div class="q">
+    <h3>Q5　这个首页还叫「我的工作」吗？</h3>
+    <label class="opt"><input type="checkbox"> <b>1. 保留「我的工作」</b><span class="tg">推荐</span><span class="hint">已拍板语义（登录默认页），侧边栏零改动。</span></label>
+    <label class="opt"><input type="checkbox"> <b>2. 改名「首页」或「信息总览」</b><span class="hint">更贴信息台定位；需同步改侧边栏文案与文档。</span></label>
+  </div>
+  <p style="color:var(--ink2);font-size:12.5px;margin:10px 0 0">作答示例：「Q1:1 Q2:1 Q3:1 Q4:1 Q5:1」。收口后我把选型并入方案A 稿出整合版（含成员只读演示、林晓更正），再回填任务书 §13。</p>
+</div>
+
+<footer class="decl">
+  （Gate5静态稿·主页信息总览）三案对照 · feature01 · 2026-08-21 · 静态·不接后端<br>
+  真实数据：团队 4 人（users/workspace_memberships）· 两项目及 15 节点（timeline_projects/nodes）· 动态两条（audit_log：今天 09:36 / 09:40，Asia/Shanghai）<br>
+  示意数据（橙标）：越野跑鞋概念 2027（周然）及其动态——真实库暂无他人项目，仅演示只读态与动态格式。真实 flowboard.db 保持 schema v15 未动。
+</footer>
+</div>
+</body>
+</html>

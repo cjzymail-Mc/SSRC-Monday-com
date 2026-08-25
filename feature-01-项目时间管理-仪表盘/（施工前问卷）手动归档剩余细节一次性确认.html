@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>feature01 拍板回填｜手动归档剩余细节</title>
+<style>
+:root{--ink:#172033;--sub:#5e6878;--line:#dbe2ec;--blue:#246bfd;--blue2:#edf3ff;--green:#138460;--paper:#fff;--bg:#eef2f6;--amber:#8a6813}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI","Microsoft YaHei",sans-serif}.page{max-width:1180px;margin:auto;padding:24px}.hero{padding:24px 26px;border:1px solid #d4dfef;border-radius:18px;background:linear-gradient(135deg,#fff,#f5f9ff);box-shadow:0 14px 40px rgba(28,43,71,.07)}.kicker{margin:0 0 8px;color:var(--blue);font-size:11px;font-weight:900;letter-spacing:.14em}.hero h1{margin:0;font-size:28px;letter-spacing:-.03em}.hero p{max-width:930px;margin:10px 0 0;color:var(--sub);font-size:12px;line-height:1.75}.hero a{color:var(--blue);font-weight:800;text-decoration:none}.locked{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:14px 0}.locked article{padding:13px 14px;border:1px solid #b8ddcf;border-radius:11px;background:#f6fcf9}.locked b{display:block;color:var(--green);font-size:11px}.locked span{display:block;margin-top:4px;color:var(--sub);font-size:9px;line-height:1.5}.context{margin:0 0 12px;padding:11px 14px;border-left:4px solid var(--amber);background:#fff9de;color:#6a591f;font-size:10px;line-height:1.7}.notice{margin:0 0 15px;padding:11px 14px;border-left:4px solid var(--blue);background:#f4f7ff;color:#46577a;font-size:10px;line-height:1.65}.questions{display:grid;gap:12px}.question{margin:0;padding:17px;border:1px solid var(--line);border-radius:13px;background:var(--paper)}.question legend{padding:0 7px;font-size:14px;font-weight:900}.why{margin:0 0 11px;color:var(--sub);font-size:10.5px;line-height:1.65}.options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.option{position:relative;display:grid;grid-template-columns:18px 1fr;gap:8px;min-height:104px;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}.option:hover{border-color:#a9bde3}.option:has(input:checked){border-color:var(--blue);background:var(--blue2);box-shadow:0 0 0 2px rgba(36,107,253,.09)}.option input{margin:2px 0 0;accent-color:var(--blue)}.option b{display:block;margin-bottom:5px;font-size:11.5px}.option small{display:block;color:var(--sub);font-size:9.5px;line-height:1.55}.rec,.risk{position:absolute;right:8px;top:7px;border-radius:999px;padding:2px 6px;font-size:8px;font-weight:900}.rec{background:#dbe8ff;color:var(--blue)}.risk{background:#fff0dd;color:#a46208}.result{margin-top:16px;border:1px solid #9dbafb;border-radius:14px;background:#f9fbff;padding:14px 16px;box-shadow:0 14px 40px rgba(36,107,253,.10)}.result-head{display:flex;align-items:center;justify-content:space-between;gap:14px}.result h2{margin:0;font-size:14px}.actions{display:flex;gap:7px}.actions button{border:1px solid var(--line);border-radius:7px;background:#fff;padding:7px 10px;color:var(--sub);font:inherit;font-size:11px;font-weight:800;cursor:pointer}.actions button.primary{border-color:var(--blue);background:var(--blue);color:#fff}.result textarea{width:100%;min-height:210px;margin-top:10px;resize:vertical;border:1px solid var(--line);border-radius:8px;background:#fff;padding:10px;color:var(--ink);font:11px/1.6 ui-monospace,"Cascadia Code",monospace}.copy-state{min-height:18px;margin:5px 0 0;color:var(--green);font-size:10px}@media(max-width:860px){.page{padding:10px}.locked{grid-template-columns:repeat(2,1fr)}.options{grid-template-columns:1fr}.result-head{align-items:flex-start;flex-direction:column}}@media(max-width:520px){.locked{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="hero"><p class="kicker">FEATURE01 · CONFIRMED MANUAL ARCHIVE DECISIONS</p><h1>手动归档 · Q1–Q8 已确认回填</h1><p>已确认答案为 A / A / A / A / A / B / A / A。自动归档前提已作废；Q6=B 只代表首次一次性整理全部日期候选。可打开<a href="（静态确认稿）归档与今日蒙版及单双项目缩放.html">最新静态确认稿</a>体验全项目归档标签和首页管理页。</p></header>
+  <section class="locked">
+    <article><b>触发方式 · 已确认</b><span>未来永不自动归档，只能人工执行。</span></article>
+    <article><b>归档权限 · 已确认</b><span>workspace admin 或该项目 created_by。</span></article>
+    <article><b>展示优先级 · 已确认</b><span>归档后从全部普通标签视图剔除，只进【已归档项目】。</span></article>
+    <article><b>管理入口 · 已确认</b><span>首页【已归档】页仅列项目名称并提供取消归档。</span></article>
+  </section>
+  <p class="context"><strong>技术边界：</strong>归档具有特殊权限、优先遮蔽和取消动作，因此不能直接复用“所有成员都可维护”的普通共享标签权限，也不能使用 deleted_at。实现可呈现为系统标签，但服务端需要独立归档状态与权限校验，并记录归档/取消归档审计。</p>
+  <p class="notice">本页保留为拍板证据，默认已回填最终答案；可用【恢复已确认结果】复位。页面只在浏览器本机演示，不会修改项目、数据库或正式系统。</p>
+  <form class="questions" id="form">
+    <fieldset class="question"><legend>Q1 · 归档后，普通标签归属和个人顺序是否保留？</legend><p class="why">“从其他标签剔除”可以只是显示优先级，也可以真的删除原标签关系；后者取消归档后无法恢复原组织。</p><div class="options">
+      <label class="option"><input type="radio" name="q1" value="A" checked><span><b>A · 底层保留，只在界面遮蔽</b><small>归档时不删除普通标签和个人位置；取消归档后自动恢复到原标签及原顺序。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q1" value="B"><span><b>B · 删除普通标签关系</b><small>取消归档后项目进入未分类，原标签组织无法自动恢复。</small></span></label>
+      <label class="option"><input type="radio" name="q1" value="C"><span><b>C · 保留标签，但重置个人顺序</b><small>取消归档后回到原标签末尾，不恢复各用户原位置。</small></span></label>
+    </div></fieldset>
+    <fieldset class="question"><legend>Q2 · 谁可以执行【取消归档】？</legend><p class="why">你已明确归档权限；取消归档仍需单独冻结，避免首页按钮成为权限绕过。</p><div class="options">
+      <label class="option"><input type="radio" name="q2" value="A" checked><span><b>A · admin 或项目创建者</b><small>与归档权限完全对称，由服务端按 created_by 校验。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q2" value="B"><span><b>B · 仅 admin</b><small>创建者能归档但不能自行取消，需管理员介入。</small></span></label>
+      <label class="option"><input type="radio" name="q2" value="C"><span><b>C · 任意注册成员</b><small>任何成员都能让他人项目重回活跃区，扩大当前项目权限。</small></span><i class="risk">不建议</i></label>
+    </div></fieldset>
+    <fieldset class="question"><legend>Q3 · 已归档项目的时间内容能否直接编辑？</legend><p class="why">全项目仪表盘仍能查看归档项目，但归档状态是否锁定节点编辑需要明确。</p><div class="options">
+      <label class="option"><input type="radio" name="q3" value="A" checked><span><b>A · 归档期间只读</b><small>可缩放、拖动画布和查看；先取消归档，才能按原权限修改节点。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q3" value="B"><span><b>B · 仍按原权限可编辑</b><small>归档项目仍可能持续变化，归档与结束状态的心智较弱。</small></span></label>
+      <label class="option"><input type="radio" name="q3" value="C"><span><b>C · 仅 admin 可编辑</b><small>改变了项目创建者原有内容权限，且比取消归档再编辑更复杂。</small></span></label>
+    </div></fieldset>
+    <fieldset class="question"><legend>Q4 · 手工【归档】入口放在哪里？</legend><p class="why">需要既容易找到，又避免在高密度大图中误触。</p><div class="options">
+      <label class="option"><input type="radio" name="q4" value="A" checked><span><b>A · 项目页菜单＋全项目行菜单</b><small>两处都先做权限判断和确认；大图不放常驻醒目按钮。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q4" value="B"><span><b>B · 仅项目页菜单</b><small>最克制，但清理大量测试项目时需要逐个进入项目页。</small></span></label>
+      <label class="option"><input type="radio" name="q4" value="C"><span><b>C · 全项目行常驻按钮</b><small>批量浏览时方便，但每行增加高风险操作，画面更拥挤。</small></span></label>
+    </div></fieldset>
+    <fieldset class="question"><legend>Q5 · 单个项目归档前采用哪种确认？</legend><p class="why">归档可恢复，但会立刻从普通标签和首页活跃区消失。</p><div class="options">
+      <label class="option"><input type="radio" name="q5" value="A" checked><span><b>A · 一次确认弹窗</b><small>明确说明“不会删除数据，可在已归档页取消”；不要求输入项目名。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q5" value="B"><span><b>B · 输入项目名称确认</b><small>防误触更强，但对可恢复操作偏重。</small></span></label>
+      <label class="option"><input type="radio" name="q5" value="C"><span><b>C · 不确认，直接归档</b><small>最快，但行菜单误点后项目会立即消失。</small></span><i class="risk">不建议</i></label>
+    </div></fieldset>
+    <fieldset class="question"><legend>Q6 · 首次清理约 99 个测试项目怎么执行？</legend><p class="why">这是一次性数据整理，不应演变成未来自动归档规则；真实库操作仍需单独授权。</p><div class="options">
+      <label class="option"><input type="radio" name="q6" value="A"><span><b>A · 日期生成候选，再人工勾选批量归档</b><small>“最后节点早于今天”只用于本次推荐候选；确认清单后一次提交，未来不再自动执行。</small></span><i class="rec">原推荐</i></label>
+      <label class="option"><input type="radio" name="q6" value="B" checked><span><b>B · 本次自动归档全部日期候选</b><small>用户已拍板：仅本次一次性执行；未来永久保持手工归档。</small></span><i class="rec">已确认</i></label>
+      <label class="option"><input type="radio" name="q6" value="C"><span><b>C · 完全手工逐个归档</b><small>零批量规则，最稳但处理 99 个项目较慢。</small></span></label>
+    </div></fieldset>
+    <fieldset class="question"><legend>Q7 · 【已归档项目】默认如何排序？</legend><p class="why">手工归档有明确发生时间，通常优先展示最近归档项目。</p><div class="options">
+      <label class="option"><input type="radio" name="q7" value="A" checked><span><b>A · 归档时间倒序</b><small>刚归档的项目在最上方；同一批次按项目名称稳定排序。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q7" value="B"><span><b>B · 项目名称排序</b><small>适合按名称查找，但最近动作不突出。</small></span></label>
+      <label class="option"><input type="radio" name="q7" value="C"><span><b>C · 个人自定义顺序</b><small>需要为系统归档上下文新增个人排序写入和拖拽规则。</small></span></label>
+    </div></fieldset>
+    <fieldset class="question"><legend>Q8 · 全项目仪表盘的【已归档项目】是否独立记忆视角？</legend><p class="why">归档项目与活跃项目日期范围不同，复用普通标签视角容易落到空白区域。</p><div class="options">
+      <label class="option"><input type="radio" name="q8" value="A" checked><span><b>A · 独立范围＋独立视角记忆</b><small>按归档项目日期范围±30天；每账户分别记忆中心、缩放和纵向位置。</small></span><i class="rec">推荐</i></label>
+      <label class="option"><input type="radio" name="q8" value="B"><span><b>B · 独立范围，每次适配全部</b><small>每次进入都显示全部归档项目，不保留上次位置。</small></span></label>
+      <label class="option"><input type="radio" name="q8" value="C"><span><b>C · 复用【全部】视角</b><small>日期范围不一致时可能出现空白或中心跳动。</small></span><i class="risk">不稳定</i></label>
+    </div></fieldset>
+  </form>
+  <section class="result"><div class="result-head"><h2>拍板结果</h2><div class="actions"><button type="button" id="recommended">恢复已确认结果</button><button type="button" class="primary" id="copy">复制拍板结果</button></div></div><textarea id="summary" readonly></textarea><p class="copy-state" id="copyState"></p></section>
+</main>
+<script>
+const form=document.querySelector('#form'),summary=document.querySelector('#summary'),copyState=document.querySelector('#copyState'),storageKey='flowboard-feature01-manual-archive-questionnaire-v2';
+const labels={q1:{A:'底层保留普通标签与个人顺序，只在界面遮蔽',B:'归档时删除普通标签关系',C:'保留标签但重置个人顺序'},q2:{A:'admin或项目创建者可取消归档',B:'仅admin可取消归档',C:'任意注册成员可取消归档'},q3:{A:'归档期间只读，取消后再编辑',B:'归档期间仍按原权限编辑',C:'归档期间仅admin编辑'},q4:{A:'项目页菜单＋全项目行菜单',B:'仅项目页菜单',C:'全项目行常驻按钮'},q5:{A:'一次确认弹窗',B:'输入项目名称确认',C:'不确认直接归档'},q6:{A:'日期生成候选，人工勾选批量归档',B:'本次自动归档全部日期候选',C:'完全手工逐个归档'},q7:{A:'归档时间倒序',B:'项目名称排序',C:'个人自定义顺序'},q8:{A:'独立范围＋独立视角记忆',B:'独立范围且每次适配全部',C:'复用全部视角'}};
+function selections(){return Object.fromEntries([...new FormData(form).entries()])}function render(){const values=selections(),answers=Object.entries(values).map(([q,v])=>`${q.toUpperCase()}=${v}（${labels[q][v]}）`).join('\n');summary.value=`已确认归档基线：\n- 归档只可手工执行，未来不自动归档\n- admin与项目创建者可归档\n- 归档是高优先级系统标签，不是删除/回收站\n- 归档项目只在全项目【已归档项目】和首页【已归档】页出现\n- 首页归档页仅列项目名称并提供取消归档\n\n剩余细节拍板：\n${answers}\n\n请按以上结果更新静态稿与技术契约；真实库首次批量归档须另行授权。`;localStorage.setItem(storageKey,JSON.stringify(values));copyState.textContent=''}function restore(){let saved={};try{saved=JSON.parse(localStorage.getItem(storageKey)||'{}')}catch(_){};Object.entries(saved).forEach(([q,v])=>{const input=form.querySelector(`input[name="${q}"][value="${v}"]`);if(input)input.checked=true});render()}function restoreConfirmed(){form.querySelectorAll('input[value="A"]').forEach(input=>input.checked=true);form.querySelector('input[name="q6"][value="B"]').checked=true;render()}form.addEventListener('change',render);document.querySelector('#recommended').onclick=restoreConfirmed;document.querySelector('#copy').onclick=async()=>{summary.select();try{await navigator.clipboard.writeText(summary.value)}catch(_){document.execCommand('copy')}copyState.textContent='已复制。请把这段结果粘贴回对话。'};restore();
+</script>
+</body>
+</html>

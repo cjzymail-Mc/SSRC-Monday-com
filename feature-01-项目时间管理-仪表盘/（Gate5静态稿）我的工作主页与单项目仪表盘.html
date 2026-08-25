@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>（Gate5静态稿）我的工作主页 + 单项目仪表盘 · H1 人工确认稿 · 2026-08-21</title>
+<style>
+  /* ============================================================
+     feature01 · Gate 5 UX 重对齐 · CP1 静态确认稿（H1 人工冻结门对象）
+     任务来源：11-GATE5_UX_REALIGNMENT_TASK.md §5 CP1
+     性质：静态 · 快照数据 · 不接后端 · 不发 API · 无业务逻辑（纯展示渲染）
+     数据出处（诚实快照，非编造）：
+       %TEMP%\flowboard-gate5-trial\flowboard-trial.db（Gate 5 隔离体验库，只读导出）
+       · 跑鞋研发 2026：15 节点（主线 9 + 并行 6），2026-01-10 → 2026-12-18
+       · Mc Prj 01：网页新建的空项目（0 节点）
+       · 今天 = 2026-08-21（服务器 Asia/Shanghai 语义，D14）
+     视觉基线：方向 A「大标题 · 白卡」浅色版（2026-08-19 拍板，本页机械沿用
+       （视觉UI升级留档）single-project-visual-options.html 的 SVG 渲染方式）
+     冻结项保留：六阶段 v3.2 色板 / 画法 A 链式 + ) 形分界 / 2px 小圆角条形 /
+       白圈节点 + 逾期红圈 / 主线·并行双轨 / 绝对日历标尺 + 红色今日线 /
+       不用透明混色承主信息
+     ============================================================ */
+  :root{
+    --p-创意:#ab5fe8; --p-设计:#1746b0; --p-开发:#0aa67e;
+    --p-测试:#c9641a; --p-量产:#64bc46; --p-应用迭代:#8f6a10;
+    --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#aeaeb2;
+    --hairline:#e8e8ed; --canvas:#f5f5f7; --card:#ffffff;
+    --today:#e5484d; --overdue:#e5484d; --week:#c9641a;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--canvas); color:var(--ink); padding:40px 0 120px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+
+  /* —— 顶部说明卡 —— */
+  .intro{background:var(--card);border-radius:20px;padding:28px 32px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:48px}
+  .intro h1{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:10px}
+  .intro p{font-size:14px;line-height:1.75;color:var(--ink2);max-width:78ch}
+  .intro .tags{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+  .tag{font-size:12px;color:var(--ink2);background:var(--canvas);border-radius:99px;padding:4px 12px}
+  .h1list{margin-top:16px;border:1px solid rgba(52,199,89,.35);background:rgba(52,199,89,.08);border-radius:14px;padding:14px 18px}
+  .h1list b{color:#1d7a34}
+  .h1list ol{margin:8px 0 0 0;padding-left:22px;font-size:13.5px;line-height:1.9;color:var(--ink)}
+  .swatches{display:flex;gap:14px;margin-top:16px;flex-wrap:wrap}
+  .sw{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2)}
+  .sw i{width:14px;height:14px;border-radius:4px;display:inline-block}
+  .neg{margin-top:14px;font-size:13px;color:var(--ink2);line-height:1.8}
+  .neg code{background:var(--canvas);border-radius:6px;padding:1px 8px;font-size:12px}
+
+  /* —— 每屏一节 —— */
+  .screen{margin-bottom:72px}
+  .screen-head{margin-bottom:16px}
+  .screen-head .no{display:inline-flex;align-items:center;gap:10px;margin-bottom:6px}
+  .screen-head .badge{font-size:12px;font-weight:700;color:var(--canvas);background:var(--ink);border-radius:99px;padding:3px 12px;letter-spacing:.06em}
+  .screen-head h2{font-size:20px;font-weight:700;letter-spacing:-.01em;display:inline}
+  .screen-head p{font-size:13.5px;color:var(--ink2);margin-top:6px;line-height:1.7;max-width:88ch}
+  .screen-head .points{margin:10px 0 0 0;padding-left:18px;font-size:13px;color:var(--ink2);line-height:1.9}
+  .screen-head .points b{color:var(--ink)}
+  .stake{margin-top:10px;font-size:12.5px;color:var(--ink3);border-left:2px solid var(--hairline);padding-left:10px;line-height:1.7}
+
+  /* —— 应用壳（浏览器窗式容器，模拟真实页面框） —— */
+  .browser{border:1px solid var(--hairline);border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06),0 12px 32px rgba(0,0,0,.05);background:var(--card)}
+  .browser-bar{display:flex;align-items:center;gap:8px;padding:10px 16px;background:#fafafb;border-bottom:1px solid var(--hairline)}
+  .browser-bar i{width:10px;height:10px;border-radius:50%;background:#d5d5da;display:inline-block}
+  .browser-bar span{margin-left:12px;font-size:11.5px;color:var(--ink3)}
+  .app-shell{display:grid;grid-template-columns:216px 1fr;min-height:560px}
+
+  .sidebar{background:#fbfbfc;border-right:1px solid var(--hairline);display:flex;flex-direction:column;padding:18px 12px}
+  .brand{display:flex;align-items:center;gap:8px;padding:2px 8px 14px;font-weight:700;letter-spacing:-.01em}
+  .brand-mark{width:26px;height:26px;border-radius:8px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:13px}
+  .workspace-switcher{display:flex;align-items:center;gap:8px;margin:0 4px 18px;padding:8px 10px;border:1px solid var(--hairline);border-radius:10px;font-size:12.5px}
+  .workspace-switcher .workspace-icon{width:22px;height:22px;border-radius:6px;background:#e9e4f8;color:#5b3a9e;display:grid;place-items:center;font-size:11px;font-weight:700}
+  .workspace-switcher small{display:block;color:var(--ink3);font-size:10px}
+  .main-nav{display:grid;gap:2px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;font-size:13.5px;color:var(--ink);text-decoration:none;border:0;background:transparent;cursor:default;text-align:left}
+  .nav-item span{color:var(--ink2);width:18px;text-align:center}
+  .nav-item.active{background:rgba(23,70,176,.08);color:#1746b0;font-weight:600}
+  .nav-item.active span{color:#1746b0}
+  .sidebar-bottom{margin-top:auto;border-top:1px solid var(--hairline);padding-top:10px}
+  .sidebar-bottom .nav-item{font-size:12.5px;color:var(--ink2)}
+
+  .main-content{display:flex;flex-direction:column;min-width:0}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 24px;border-bottom:1px solid var(--hairline);background:var(--card)}
+  .breadcrumbs{font-size:12.5px;color:var(--ink2)}
+  .breadcrumbs strong{color:var(--ink);font-weight:600}
+  .breadcrumbs em{font-style:normal;color:var(--ink3);margin:0 6px}
+  .top-actions{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--ink2)}
+  .tool-btn{border:1px solid var(--hairline);border-radius:7px;background:var(--card);padding:5px 10px;font-size:12px;color:var(--ink2)}
+  .realtime-state{font-size:11px;color:#1d7a34;background:rgba(52,199,89,.1);border-radius:99px;padding:3px 10px}
+  .current-user{display:flex;align-items:center;gap:6px;color:var(--ink);font-size:12px}
+  .avatar{width:22px;height:22px;border-radius:50%;background:#c9d6f2;color:#1746b0;display:grid;place-items:center;font-size:10px;font-weight:700}
+
+  .page{padding:28px 32px 40px}
+
+  /* —— 屏A · 我的工作主页 —— */
+  .page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:22px;flex-wrap:wrap}
+  .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+  .page-title{font-size:30px;font-weight:700;letter-spacing:-.02em}
+  .page-sub{font-size:13px;color:var(--ink2);margin-top:6px}
+  .page-actions{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{border:1px solid var(--hairline);border-radius:10px;background:var(--card);padding:9px 16px;font-size:13px;color:var(--ink);white-space:nowrap}
+  .btn.primary{background:#1746b0;border-color:#1746b0;color:#fff;font-weight:600}
+  .btn.subtle{color:#1746b0;border-color:rgba(23,70,176,.35)}
+
+  .proj-card{background:var(--card);border:1px solid var(--hairline);border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);padding:22px 26px 18px;margin-bottom:16px}
+  .proj-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  .proj-card h3{font-size:21px;font-weight:700;letter-spacing:-.015em}
+  .proj-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:var(--ink2)}
+  .proj-meta .sep{color:var(--hairline)}
+  .proj-meta .stage-tag{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink)}
+  .risk-chips{display:flex;gap:8px}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;border-radius:99px;padding:4px 11px}
+  .chip.overdue{color:#b42318;background:rgba(229,72,77,.09);border:1px solid rgba(229,72,77,.30)}
+  .chip.week{color:#8a4310;background:rgba(201,100,26,.09);border:1px solid rgba(201,100,26,.30)}
+  .upcoming{margin-top:12px;font-size:12.5px;color:var(--ink);background:var(--canvas);border-radius:10px;padding:8px 12px;display:inline-block}
+  .upcoming b{font-weight:600}
+  .upcoming small{color:var(--ink2)}
+  .card-actions{display:flex;gap:8px;margin-top:14px}
+  .card-actions .btn{padding:7px 13px;font-size:12.5px;border-radius:8px}
+  .mini-wrap{margin-top:16px}
+  .mini-dates{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink3);margin-top:4px}
+  svg{display:block;width:100%;height:auto}
+  svg text{font-family:inherit}
+
+  .proj-card.empty{border-style:dashed;box-shadow:none;background:#fcfcfd}
+  .empty-note{margin-top:10px;font-size:12.5px;color:var(--ink2);line-height:1.8}
+
+  .page-foot{margin-top:18px;font-size:12px;color:var(--ink3);line-height:1.8}
+
+  /* —— 屏B · 单项目仪表盘（方向 A） —— */
+  .dirA-card{background:var(--card);border-radius:20px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.04);padding:28px 32px 24px}
+  .proj-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap}
+  .proj-title{font-size:30px;font-weight:700;letter-spacing:-.02em}
+  .proj-sub{font-size:13.5px;color:var(--ink2);margin-top:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .proj-sub .stage-tag{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink)}
+  .proj-sub .sep{color:var(--hairline)}
+  .proj-sub .overdue-num{color:#b42318;font-weight:600}
+  .proj-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .legend{display:flex;gap:16px;align-items:center;margin-top:18px;font-size:12px;color:var(--ink2);flex-wrap:wrap}
+  .legend .sw i{width:10px;height:10px;border-radius:3px}
+  .legend .note{color:var(--ink3)}
+  .dash-foot{margin-top:12px;font-size:12px;color:var(--ink3);line-height:1.8}
+
+  .foot-note{font-size:12.5px;color:var(--ink3);margin-top:8px;line-height:1.9;max-width:92ch}
+  .foot-note b{color:var(--ink2)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ======================= 说明 + H1 确认清单 ======================= -->
+  <section class="intro">
+    <h1>Gate 5 UX 重对齐 · CP1 静态确认稿（H1 人工冻结门）</h1>
+    <p>本页回应 Gate 5 次轮三项反馈：① 单项目仪表盘偏离开工前冻结的方向 A 效果；② 主导航收敛到 feature01 项目时间管理；③ <b>我的工作 = 项目时间管理</b>，成为登录后默认主页。以下两屏为<b>结构、信息层级、操作路径与视觉方向</b>的确认对象——按任务合同，本静态稿未获你明确通过前，不改任何生产文件。</p>
+    <div class="h1list">📋 <b>H1 需要你确认的四项（对应下方两屏）：</b>
+      <ol>
+        <li><b>侧边栏与默认入口</b>——侧边栏只保留「我的工作 / 已归档 / 回收站」，登录后默认落在「我的工作」（屏 A 左侧）。</li>
+        <li><b>「我的工作」信息架构与操作路径</b>——timeline 项目卡片列表 + Excel 导入 / 网页新建 / 编辑器 / 单项目仪表盘 / 全项目仪表盘入口（屏 A）。</li>
+        <li><b>单项目仪表盘视觉层级</b>——方向 A「大标题 · 白卡」：超大项目标题、KPI 压为一行次级摘要、时间轴是核心视觉点；六色链式、双轨、今日线、逾期红圈直标（屏 B）。</li>
+        <li><b>feature00 只隐藏、不删除的呈现边界</b>——看板区块、独立「仪表盘 / 时间管理」菜单从主导航消失（下方两屏侧边栏已按此绘制）；旧看板代码、数据、路由、测试全部保留，其中旧仪表盘入口将降级放置到非主导航位置以保回归测试可达，具体位置在 H1 一并拍板。</li>
+      </ol>
+    </div>
+    <div class="tags">
+      <span class="tag">静态 · 快照数据 · 不接后端</span>
+      <span class="tag">数据取自 Gate 5 隔离体验库只读导出（非编造）</span>
+      <span class="tag">今天 = 2026-08-21（Asia/Shanghai 服务器语义）</span>
+      <span class="tag">冻结项保留：v3.2 六色 · 链式 ) 形 · 2px 圆角 · 双轨 · 绝对标尺 + 今日线</span>
+    </div>
+    <div class="swatches">
+      <span class="sw"><i style="background:#ab5fe8"></i>创意 #ab5fe8</span>
+      <span class="sw"><i style="background:#1746b0"></i>设计 #1746b0</span>
+      <span class="sw"><i style="background:#0aa67e"></i>开发 #0aa67e</span>
+      <span class="sw"><i style="background:#c9641a"></i>测试 #c9641a</span>
+      <span class="sw"><i style="background:#64bc46"></i>量产 #64bc46</span>
+      <span class="sw"><i style="background:#8f6a10"></i>应用迭代 #8f6a10</span>
+    </div>
+    <p class="neg">⛔ <b>负例自查（两屏中不得出现，已核对为零）</b>：独立「仪表盘」菜单 · 独立「时间管理」菜单 · 看板区块与看板列表（如 <code>Q3 产品路线图</code>、<code>Mc-test</code>） · 旧看板任务表。<br>
+    交互层（右键四项菜单、双模式拖拽、磁吸/放大带、草稿批次）为已冻结契约，不在本静态稿演示，接入后沿用现有控制器。</p>
+  </section>
+
+  <!-- ======================= 屏 A · 我的工作（默认主页） ======================= -->
+  <section class="screen">
+    <div class="screen-head">
+      <div class="no"><span class="badge">屏 A</span><h2>「我的工作」= 项目时间管理 · 登录后默认主页</h2></div>
+      <p>完整应用壳 + 最终侧边栏。主页主体只展示 timeline 项目（Excel 导入或网页创建）；原 feature00「我的工作」看板工作台不再作为主页，也不出现在导航中。</p>
+      <ul class="points">
+        <li><b>H1-① 侧边栏</b>：仅「我的工作 / 已归档 / 回收站」＋底部「设置」壳层件；无仪表盘、时间管理、看板区块。</li>
+        <li><b>H1-② 操作路径</b>：右上「导入 Excel」「＋ 新建项目」「全项目仪表盘」；每张项目卡「打开单项目仪表盘」「进入编辑器」。</li>
+        <li><b>项目卡五要素</b>：当前阶段（带色点）· 临近节点 · 逾期/本周提示（红左橙右）· 时间范围 · 迷你双轨概览条。</li>
+      </ul>
+      <div class="stake">看点说明：迷你条为主页新组件（只读概览，复用已冻结的链式画法），是否保留属 H1-② 拍板范围；「Mc Prj 01」卡演示网页新建空项目的引导态。</div>
+    </div>
+    <div class="browser">
+      <div class="browser-bar"><i></i><i></i><i></i><span>localhost:8080 · 登录后首页</span></div>
+      <div class="app-shell">
+        <aside class="sidebar">
+          <div class="brand"><span class="brand-mark">F</span><span>flowboard</span></div>
+          <div class="workspace-switcher"><span class="workspace-icon">N</span><span><small>工作区</small>Northstar Studio</span></div>
+          <nav class="main-nav">
+            <a class="nav-item active" href="#"><span>◇</span>我的工作</a>
+            <a class="nav-item" href="#"><span>▣</span>已归档</a>
+            <a class="nav-item" href="#"><span>♲</span>回收站</a>
+          </nav>
+          <div class="sidebar-bottom"><a class="nav-item" href="#"><span>⚙</span>设置</a></div>
+        </aside>
+        <main class="main-content">
+          <header class="topbar">
+            <div class="breadcrumbs"><span>Northstar Studio</span><em>/</em><strong>我的工作</strong></div>
+            <div class="top-actions"><span class="realtime-state">实时已连接</span><button class="tool-btn">搜索</button><button class="tool-btn">通知</button><button class="tool-btn">审计</button><span class="current-user"><span class="avatar">M</span>Mc</span><button class="tool-btn">退出</button></div>
+          </header>
+          <div class="page">
+            <div class="page-head">
+              <div>
+                <p class="eyebrow">项目时间管理 · 平台主页</p>
+                <h1 class="page-title">我的工作</h1>
+                <p class="page-sub">2 个项目 · 来自 Excel 导入或网页新建 · 登录后默认页</p>
+              </div>
+              <div class="page-actions">
+                <button class="btn">⇪ 导入 Excel</button>
+                <button class="btn primary">＋ 新建项目</button>
+                <button class="btn subtle">全项目仪表盘 →</button>
+              </div>
+            </div>
+
+            <article class="proj-card" id="card-runshoe">
+              <div class="proj-card-head">
+                <div>
+                  <h3>跑鞋研发 2026</h3>
+                  <div class="proj-meta">
+                    <span class="stage-tag"><i class="dot" style="background:#c9641a"></i>当前 测试</span><span class="sep">｜</span>
+                    <span>01/10 → 12/18</span><span class="sep">｜</span>
+                    <span>15 节点 · 9 已完成</span><span class="sep">｜</span>
+                    <span>创建人 Mc</span>
+                  </div>
+                </div>
+                <div class="risk-chips"><span class="chip overdue"><i>●</i>逾期 1</span></div>
+              </div>
+              <div class="upcoming">▸ <b>临近节点</b>　试产与品质复核 · <b>2026-09-02</b>（12 天后 · 量产）　<small>同日无并列节点</small></div>
+              <div class="card-actions">
+                <button class="btn subtle">打开单项目仪表盘 →</button>
+                <button class="btn">进入编辑器</button>
+              </div>
+              <div class="mini-wrap" id="mini-runshoe"></div>
+            </article>
+
+            <article class="proj-card empty">
+              <div class="proj-card-head">
+                <div>
+                  <h3>Mc Prj 01</h3>
+                  <div class="proj-meta">
+                    <span class="stage-tag"><i class="dot" style="background:#aeaeb2"></i>未开始</span><span class="sep">｜</span>
+                    <span>时间范围 —</span><span class="sep">｜</span>
+                    <span>0 节点</span><span class="sep">｜</span>
+                    <span>创建人 Mc · 网页新建</span>
+                  </div>
+                </div>
+                <div class="risk-chips"><span class="chip" style="color:var(--ink3);border:1px solid var(--hairline);background:transparent">无提示</span></div>
+              </div>
+              <p class="empty-note">空项目还没有时间节点——进入编辑器录入首个节点后，开始日期、当前阶段与仪表盘将自动生成。</p>
+              <div class="card-actions">
+                <button class="btn primary">进入编辑器 →</button>
+              </div>
+            </article>
+
+            <p class="page-foot">提示徽章语义（与全项目仪表盘同源）：红 = 有逾期未完成节点 · 橙 = 本周（周一~周日）有未完成节点，红左橙右、可并存；本项目数据本周为 0，故仅显示红。「已归档」「回收站」沿用现有看板归档与回收站能力。</p>
+          </div>
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= 屏 B · 单项目仪表盘（方向 A 重对齐） ======================= -->
+  <section class="screen">
+    <div class="screen-head">
+      <div class="no"><span class="badge">屏 B</span><h2>单项目仪表盘首屏 · 重新对齐方向 A「大标题 · 白卡」</h2></div>
+      <p>由屏 A「打开单项目仪表盘」进入。与开工前冻结样张同构：超大项目标题、KPI 压为一行次级摘要、时间轴作为核心视觉点；下方时间轴沿用已拍板的渲染机械（链式 ) 形分界、白圈节点、逾期红圈直标、月份发丝线标尺、今日线胶囊）。</p>
+      <ul class="points">
+        <li><b>H1-③ 视觉层级</b>：标题 30px → 一行 KPI（阶段带色点 · 节点/完成数 · 逾期 · 临近 · 关键里程碑）→ 时间轴主体 → 图例，视线落点在时间轴。</li>
+        <li><b>语义保留</b>：六阶段 v3.2 专属色；主线/并行双轨各自成链；绝对日历标尺 + 红色今日线「今天 8/21」；已完成节点 ✓；逾期 = 红圈 + 文字直标（不靠颜色单扛）；本数据两轨无阶段重叠，故无「展开重叠」按钮（有重叠时才出现）。</li>
+        <li><b>操作路径</b>：右上「进入编辑器」「全项目仪表盘」，面包屑可返回「我的工作」。</li>
+      </ul>
+      <div class="stake">直标节点只挑关键项（逾期 1 个 + 临近 1 个），其余节点名在编辑器与悬停提示中完整可见——避免回到「信息太繁杂」的旧问题。</div>
+    </div>
+    <div class="browser">
+      <div class="browser-bar"><i></i><i></i><i></i><span>localhost:8080 · 我的工作 / 跑鞋研发 2026</span></div>
+      <div class="app-shell">
+        <aside class="sidebar">
+          <div class="brand"><span class="brand-mark">F</span><span>flowboard</span></div>
+          <div class="workspace-switcher"><span class="workspace-icon">N</span><span><small>工作区</small>Northstar Studio</span></div>
+          <nav class="main-nav">
+            <a class="nav-item active" href="#"><span>◇</span>我的工作</a>
+            <a class="nav-item" href="#"><span>▣</span>已归档</a>
+            <a class="nav-item" href="#"><span>♲</span>回收站</a>
+          </nav>
+          <div class="sidebar-bottom"><a class="nav-item" href="#"><span>⚙</span>设置</a></div>
+        </aside>
+        <main class="main-content">
+          <header class="topbar">
+            <div class="breadcrumbs"><span>Northstar Studio</span><em>/</em><span>我的工作</span><em>/</em><strong>跑鞋研发 2026</strong></div>
+            <div class="top-actions"><span class="realtime-state">实时已连接</span><button class="tool-btn">搜索</button><button class="tool-btn">通知</button><button class="tool-btn">审计</button><span class="current-user"><span class="avatar">M</span>Mc</span><button class="tool-btn">退出</button></div>
+          </header>
+          <div class="page">
+            <div class="dirA-card">
+              <div class="proj-head">
+                <div>
+                  <div class="proj-title">跑鞋研发 2026</div>
+                  <div class="proj-sub">
+                    <span class="stage-tag"><i class="dot" style="background:#c9641a"></i>当前 测试</span><span class="sep">｜</span>
+                    <span>15 节点 · 9 已完成</span><span class="sep">｜</span>
+                    <span class="overdue-num">1 逾期</span><span class="sep">｜</span>
+                    <span>临近 09/02 试产与品质复核</span><span class="sep">｜</span>
+                    <span>首发上市 11/01</span>
+                  </div>
+                </div>
+                <div class="proj-actions">
+                  <button class="btn">← 我的工作</button>
+                  <button class="btn">进入编辑器</button>
+                  <button class="btn subtle">全项目仪表盘</button>
+                </div>
+              </div>
+              <div id="dash-runshoe" style="margin-top:20px"></div>
+              <div class="legend" id="legend-runshoe"></div>
+              <p class="dash-foot">右键任意节点：拖拽（仅此节点 / 顺延）· 已完成 · 未完成——沿用已冻结四项菜单与草稿批次，静态稿不演示交互。</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot-note">
+    <b>数据诚实声明：</b>两屏全部数值取自 Gate 5 隔离体验库 <code>%TEMP%\flowboard-gate5-trial\flowboard-trial.db</code> 的只读导出（跑鞋研发 2026 · 15 节点快照；Mc Prj 01 · 空项目），派生指标按冻结契约服务端口径计算（今天 2026-08-21：当前阶段=测试、临近=09/02、逾期=1、本周=0、开始=01/10）。<br>
+    <b>范围声明：</b>本静态稿只用于 H1 信息架构与视觉确认，不构成第二套业务逻辑；未获批准前不修改任何生产文件；真实库保持 schema v15 不动。<br>
+    <b>审批留痕：</b>批准后路径、SHA-256、日期与批准项回填至 <code>11-GATE5_UX_REALIGNMENT_TASK.md</code> §13；结构性修改须重新过 H1。
+  </p>
+</div>
+
+<script>
+/* ============================================================
+   快照数据（只读导出自 Gate 5 体验库；today = 2026-08-21）
+   ============================================================ */
+const TODAY = '2026-08-21';
+const RUNSHOE = {
+  main: [
+    {phase:'创意', name:'市场趋势与竞品复盘', date:'2026-01-10', done:true},
+    {phase:'创意', name:'跑者画像与性能目标', date:'2026-01-28', done:true},
+    {phase:'设计', name:'鞋楦与中底结构定案', date:'2026-03-05', done:true},
+    {phase:'开发', name:'首轮样鞋完成',       date:'2026-04-18', done:true},
+    {phase:'开发', name:'二轮样鞋优化',       date:'2026-06-10', done:true},
+    {phase:'测试', name:'实验室性能测试',     date:'2026-07-08', done:true},
+    {phase:'量产', name:'试产与品质复核',     date:'2026-09-02', done:false},
+    {phase:'应用迭代', name:'首发上市',       date:'2026-11-01', done:false},
+    {phase:'应用迭代', name:'年度迭代总结',   date:'2026-12-18', done:false},
+  ],
+  parallel: [
+    {phase:'创意', name:'设计方向评审',       date:'2026-02-12', done:true},
+    {phase:'设计', name:'CMF 配色方案定案',   date:'2026-03-26', done:true},
+    {phase:'测试', name:'穿着测试与反馈回收', date:'2026-05-15', done:true},
+    {phase:'测试', name:'量产工艺评审',       date:'2026-08-05', done:false},   /* 逾期 16 天 */
+    {phase:'量产', name:'上市物料准备',       date:'2026-10-12', done:false},
+    {phase:'应用迭代', name:'用户反馈复盘',   date:'2026-11-20', done:false},
+  ]
+};
+
+const PHASE = ['创意','设计','开发','测试','量产','应用迭代'];
+const C = {'创意':'#ab5fe8','设计':'#1746b0','开发':'#0aa67e','测试':'#c9641a','量产':'#64bc46','应用迭代':'#8f6a10'};
+const RED = '#e5484d';
+
+const DAY = 86400000;
+const iso = s => new Date(s + 'T00:00:00Z');
+const days = (a,b) => Math.round((iso(b) - iso(a)) / DAY);
+const esc = s => String(s).replace(/&/g,'&amp;');
+
+/* —— 通用几何：把 [dMin,dMax] 天区间线性映射到 [x0,x1] —— */
+function makeGeom(dMin, dMax, x0, x1){
+  const span = Math.max(1, days(dMin, dMax));
+  const dx = s => x0 + days(dMin, s) / span * (x1 - x0);
+  return {dx, span};
+}
+
+/* —— 链式条形（画法 A · 2026-08-17/08-19 拍板机械，同留档样张）：
+   同阶段相邻节点合并为整段实条；阶段切换处前段右端 2px 圆角 + 后段左端直角（) 形）；
+   链首段四角圆；末段收在自己尾节点；末段单节点只留点。 —— */
+function laneSVG(lane, geom, y, barH, opts={}){
+  const runs = [];
+  lane.forEach(n => {
+    const last = runs[runs.length-1];
+    if(last && last.phase === n.phase) last.nodes.push(n);
+    else runs.push({phase:n.phase, nodes:[n]});
+  });
+  let out = '';
+  runs.forEach((r, ri) => {
+    const next = runs[ri+1];
+    const xStart = geom.dx(r.nodes[0].date);
+    const xEnd = next ? geom.dx(next.nodes[0].date) : geom.dx(r.nodes[r.nodes.length-1].date);
+    if(xEnd - xStart <= 1) return;
+    const x0 = xStart + (ri===0 ? 0 : 1), x1 = xEnd - 1, w = x1 - x0, rr = Math.min(2, w/2);
+    out += ri===0
+      ? `<rect x="${x0.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="${barH}" rx="2" fill="${C[r.phase]}"/>`
+      : `<path d="M${x0.toFixed(1)},${y}h${(w-rr).toFixed(1)}a${rr.toFixed(1)},${rr.toFixed(1)} 0 0 1 ${rr.toFixed(1)},${rr.toFixed(1)}v${(barH-2*rr).toFixed(1)}a${rr.toFixed(1)},${rr.toFixed(1)} 0 0 1 ${(-rr).toFixed(1)},${rr.toFixed(1)}h${(-(w-rr)).toFixed(1)}z" fill="${C[r.phase]}"/>`;
+  });
+  /* 节点点：阶段色填充 + 白色 2px 圈；已完成 ✓；逾期红圈放大（叠条之上） */
+  lane.forEach(n => {
+    const x = geom.dx(n.date), cy = y + barH/2, overdue = !n.done && n.date < TODAY;
+    out += `<circle cx="${x.toFixed(1)}" cy="${cy}" r="${overdue?6:5}" fill="${C[n.phase]}" stroke="${overdue?RED:'#ffffff'}" stroke-width="2"/>`;
+    if(n.done) out += `<text x="${x.toFixed(1)}" y="${(cy+2.6).toFixed(1)}" font-size="7.5" font-weight="700" fill="#fff" text-anchor="middle">✓</text>`;
+  });
+  return out;
+}
+
+/* ============================================================
+   屏 A · 项目卡迷你双轨概览条（主页新组件，只读）
+   ============================================================ */
+(function miniStrip(){
+  const all = RUNSHOE.main.concat(RUNSHOE.parallel);
+  const dates = all.map(n => n.date).sort();
+  const dMin = dates[0], dMax = dates[dates.length-1];
+  const x0 = 96, x1 = 992, W = 1024;
+  /* 外扩 12 天呼吸边 */
+  const g = makeGeom(days2iso(dMin,-12), days2iso(dMax,12), x0, x1);
+  const barH = 8, yMain = 16, yPara = 16 + barH + 14, H = yPara + barH + 8;
+  function days2iso(s, d){ return new Date(iso(s).getTime() + d*DAY).toISOString().slice(0,10); }
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="跑鞋研发 2026 迷你双轨概览">`;
+  s += `<text x="8" y="${yMain+barH/2+3.5}" font-size="10.5" fill="#aeaeb2">主线</text>`;
+  s += `<text x="8" y="${yPara+barH/2+3.5}" font-size="10.5" fill="#aeaeb2">并行</text>`;
+  s += laneSVG(RUNSHOE.main, g, yMain, barH);
+  s += laneSVG(RUNSHOE.parallel, g, yPara, barH);
+  const tx = g.dx(TODAY);
+  s += `<line x1="${tx.toFixed(1)}" y1="4" x2="${tx.toFixed(1)}" y2="${H-4}" stroke="${RED}" stroke-width="1"/>`;
+  s += `<text x="${(tx+4).toFixed(1)}" y="12" font-size="9" font-weight="600" fill="${RED}">今天</text>`;
+  s += `</svg>`;
+  document.getElementById('mini-runshoe').innerHTML =
+    s + `<div class="mini-dates"><span>${dMin.slice(0,7).replace('-','/')}</span><span>只读概览 · 详细节点与拖拽请进编辑器 / 仪表盘</span><span>${dMax.slice(0,7).replace('-','/')}</span></div>`;
+})();
+
+/* ============================================================
+   屏 B · 单项目仪表盘（方向 A · 2026 全年绝对日历）
+   ============================================================ */
+(function dash(){
+  const X0 = 64, X1 = 1016, DAYS_YEAR = 365;
+  const MONTHS = [0,31,59,90,120,151,181,212,243,273,304,334,365];
+  const doy = s => { const [m,d] = s.split('-').slice(1).map(Number); return MONTHS[m-1] + d - 1; };
+  const g = {dx: s => X0 + doy(s)/DAYS_YEAR*(X1-X0)};
+
+  const barH = 12;
+  const yMain = 56, yPara = yMain + barH + 28;      /* 56..68 主线；96..108 并行 */
+  const axisY = yPara + barH + 26, H = axisY + 22;
+
+  let s = `<svg viewBox="0 0 ${X1+8} ${H}" role="img" aria-label="跑鞋研发 2026 单项目时间轴">`;
+
+  /* 日历标尺：月份发丝线，季度加重 */
+  for(let m = 0; m < 12; m++){
+    const x = X0 + MONTHS[m]/DAYS_YEAR*(X1-X0), q = (m % 3 === 0);
+    s += `<line x1="${x.toFixed(1)}" y1="${axisY-4}" x2="${x.toFixed(1)}" y2="${axisY}" stroke="${q?'#c7c7cc':'#e8e8ed'}" stroke-width="1"/>` +
+         `<text x="${(x+3).toFixed(1)}" y="${axisY+14}" font-size="10.5" fill="${q?'#6e6e73':'#aeaeb2'}">${m+1}月</text>`;
+  }
+  s += `<line x1="${X0}" y1="${axisY}" x2="${X1}" y2="${axisY}" stroke="#e8e8ed" stroke-width="1"/>`;
+
+  /* 轨道标签 */
+  s += `<text x="8" y="${yMain+barH/2+4}" font-size="11" fill="#aeaeb2">主线</text>`;
+  s += `<text x="8" y="${yPara+barH/2+4}" font-size="11" fill="#aeaeb2">并行</text>`;
+
+  /* 阶段切换直标（只标色带变化处，选择式）——主线 */
+  let prev = null;
+  RUNSHOE.main.forEach(n => {
+    if(n.phase !== prev){
+      const x = g.dx(n.date);
+      s += `<circle cx="${x.toFixed(1)}" cy="${yMain-9}" r="3" fill="${C[n.phase]}"/>` +
+           `<text x="${(x+8).toFixed(1)}" y="${yMain-5}" font-size="11" fill="#6e6e73">${n.phase}</text>`;
+      prev = n.phase;
+    }
+  });
+
+  /* 双轨链式条 + 节点 */
+  s += laneSVG(RUNSHOE.main, g, yMain, barH);
+  s += laneSVG(RUNSHOE.parallel, g, yPara, barH);
+
+  /* 今日线 + 胶囊（今天 8/21） */
+  const tx = g.dx(TODAY);
+  s += `<line x1="${tx.toFixed(1)}" y1="17" x2="${tx.toFixed(1)}" y2="${axisY}" stroke="${RED}" stroke-width="1.5"/>` +
+       `<rect x="${(tx-31).toFixed(1)}" y="2" width="62" height="15" rx="7.5" fill="${RED}"/>` +
+       `<text x="${tx.toFixed(1)}" y="13" font-size="10" font-weight="600" fill="#fff" text-anchor="middle">今天 8/21</text>`;
+
+  /* 逾期直标（红圈 + 文字，不靠颜色单扛）：量产工艺评审 08-05 · 逾期 16 天 */
+  const od = RUNSHOE.parallel.find(n => !n.done && n.date < TODAY);
+  if(od) s += `<text x="${(g.dx(od.date)-6).toFixed(1)}" y="32" font-size="10.5" font-weight="600" fill="${RED}" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3">⚠ ${esc(od.name)} · 逾期16天</text>`;
+
+  /* 临近节点直标：试产与品质复核 09/02（12 天后） */
+  const up = RUNSHOE.main.find(n => n.name === '试产与品质复核');
+  if(up) s += `<text x="${(g.dx(up.date)+8).toFixed(1)}" y="${yMain+barH+16}" font-size="10.5" fill="#6e6e73" paint-order="stroke" stroke="#fff" stroke-width="3">▸ ${esc(up.name)} 09/02 · 12 天后</text>`;
+
+  s += `</svg>`;
+  document.getElementById('dash-runshoe').innerHTML = s;
+
+  document.getElementById('legend-runshoe').innerHTML =
+    PHASE.map(p => `<span class="sw"><i style="background:${C[p]}"></i>${p}</span>`).join('') +
+    `<span class="note">｜ <b style="color:${RED}">｜</b> 今天 · <b style="color:${RED}">◯</b> 逾期节点 · <b>✓</b> 已完成 · 阶段分界 ) 形</span>`;
+})();
+</script>
+</body>
+</html>

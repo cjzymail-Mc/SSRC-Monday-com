@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flowboard · 标签管理页三案对照</title>
+<style>
+:root{--canvas:#f5f5f7;--card:#fff;--ink:#1d1d1f;--muted:#6e6e73;--faint:#aeaeb2;--hair:#e6e6eb;--blue:#1746b0;--blue-soft:#edf2ff;--purple:#6253d8;--green:#08785c;--green-soft:#e8f6f0;--orange:#b85c12;--orange-soft:#fff2e5;--red:#d23f45;--red-soft:#fdecec;--shadow:0 12px 36px rgba(29,29,31,.08)}
+*{box-sizing:border-box}
+body{margin:0;padding:26px 18px 64px;background:#eaeaef;color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+.wrap{max-width:1380px;margin:auto}
+.intro{background:#fff;border:1px solid var(--hair);border-radius:12px;padding:20px 24px;margin-bottom:20px}
+.eyebrow{margin:0 0 4px;color:var(--faint);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+h1,h2,h3,p{margin-top:0}.intro h1{font-size:23px;margin-bottom:8px}.intro p{margin-bottom:10px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:7px}.chip{display:inline-flex;padding:3px 9px;border-radius:99px;background:#f1f1f4;color:var(--muted);font-size:12px}.chip.ok{background:var(--green-soft);color:var(--green);font-weight:700}.chip.warn{background:var(--orange-soft);color:var(--orange)}
+.choicebar{display:flex;gap:8px;align-items:stretch;margin:0 0 12px;overflow:auto;padding-bottom:2px}
+.choice{min-width:230px;flex:1;text-align:left;border:1px solid #d8d8df;background:#fff;border-radius:10px;padding:12px 14px;color:var(--muted)}
+.choice strong{display:block;color:var(--ink);margin-bottom:2px}.choice small{display:block}.choice.on{border-color:var(--blue);box-shadow:0 0 0 2px #1746b01c;background:#f9fbff}.choice.on strong{color:var(--blue)}.rec{font-style:normal;color:#fff;background:var(--blue);padding:1px 6px;border-radius:4px;font-size:10px;margin-left:5px}
+.browser{border:1px solid #d5d5dc;border-radius:12px;overflow:hidden;background:var(--canvas);box-shadow:var(--shadow)}
+.browserbar{display:flex;gap:6px;align-items:center;height:34px;background:#ececef;border-bottom:1px solid #dcdce2;padding:0 12px}.browserbar i{width:10px;height:10px;border-radius:50%;background:#c7c7cd}.browserbar span{font-size:11px;color:var(--faint);margin-left:8px}
+.app{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:720px}
+.sidebar{background:#fbfbfd;border-right:1px solid var(--hair);padding:15px 11px;display:flex;flex-direction:column;gap:3px}
+.brand{padding:2px 9px 13px;border-bottom:1px solid var(--hair);margin-bottom:8px}.brand b{font-size:15px}.brand small{display:block;color:var(--faint);font-size:11px}
+.nav{display:flex;align-items:center;gap:9px;border:0;background:transparent;color:var(--muted);padding:8px 10px;border-radius:7px;text-align:left;width:100%}.nav.on{background:#e9ebfb;color:var(--blue);font-weight:700}.nav.tail{margin-top:auto;border-top:1px solid var(--hair);border-radius:0;padding-top:13px}
+.main{min-width:0}.topbar{height:50px;padding:0 22px;display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid var(--hair);color:var(--muted);font-size:12px}.account{display:flex;align-items:center;gap:8px}.account select{border:1px solid var(--hair);border-radius:6px;background:#fff;padding:5px 8px;color:var(--ink)}
+.page{padding:22px 24px 28px}.pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin-bottom:14px}.pagehead h2{font-size:27px;margin-bottom:2px}.pagehead p{color:var(--muted);font-size:13px;margin:0}.actions{display:flex;gap:8px}.btn{border:1px solid var(--hair);background:#fff;border-radius:7px;padding:8px 12px;color:var(--ink)}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}.btn:disabled{opacity:.42;cursor:not-allowed}
+.shared-banner{display:flex;gap:10px;align-items:flex-start;background:var(--orange-soft);border:1px solid #f4d5b7;color:#774015;border-radius:8px;padding:10px 13px;margin-bottom:14px;font-size:12.5px}.shared-banner b{color:#5c2d0c}.shared-banner span:first-child{font-size:16px}
+.scheme{display:grid;gap:12px}.scheme-note{display:flex;gap:13px;justify-content:space-between;align-items:flex-start;background:#fff;border:1px solid var(--hair);border-radius:9px;padding:11px 14px;color:var(--muted);font-size:12.5px}.scheme-note b{color:var(--ink)}.scheme-note .risk{max-width:52%;color:#9b581d}
+.panel{background:#fff;border:1px solid var(--hair);border-radius:10px;overflow:hidden}.panelhead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;border-bottom:1px solid var(--hair)}.panelhead h3{font-size:14px;margin:0}.panelhead small{color:var(--faint)}
+.tag-layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:12px}.tag-directory{padding:8px}.tag-row{display:flex;align-items:center;gap:5px}.tag-select{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:1;border:0;background:transparent;padding:9px 10px;border-radius:7px;color:var(--muted);text-align:left}.tag-select.on{background:var(--blue-soft);color:var(--blue);font-weight:700}.tag-select span:last-child{font-size:11px;color:var(--faint)}.mini{border:0;background:transparent;color:var(--faint);padding:4px}.mini:hover{color:var(--blue)}.directory-help{border-top:1px solid var(--hair);margin-top:7px;padding:10px;color:var(--faint);font-size:11px}
+.current-tag{padding:14px 16px;border-bottom:1px solid var(--hair);display:flex;justify-content:space-between;gap:10px;align-items:center}.current-tag h3{font-size:17px;margin:0}.current-tag p{font-size:11.5px;color:var(--muted);margin:2px 0 0}.shared-flag{color:var(--orange);background:var(--orange-soft);border-radius:5px;padding:3px 7px;font-size:11px;font-weight:700}
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px;background:#fafafd}.bucket{border:1px dashed #cfd1da;background:#fff;border-radius:9px;min-height:410px;display:flex;flex-direction:column}.bucket.over,.tag-column.over,.tag-tile.over,.remove-zone.over{border-color:var(--blue);background:var(--blue-soft)}.bucket-title{display:flex;justify-content:space-between;padding:11px 12px;border-bottom:1px solid var(--hair);font-weight:700}.bucket-title small{font-weight:400;color:var(--faint)}.bucket-help{padding:0 12px 9px;color:var(--faint);font-size:11px}.items{padding:6px;display:grid;gap:5px;align-content:start;max-height:390px;overflow:auto}.project{border:1px solid var(--hair);background:#fff;border-radius:7px;padding:8px 10px;display:flex;gap:8px;align-items:center;min-width:0}.project[draggable=true]{cursor:grab}.project[draggable=true]:active{cursor:grabbing}.grip{color:#b5b7c0;letter-spacing:-2px}.project-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}.empty{padding:35px 12px;text-align:center;color:var(--faint);font-size:12px}
+.board-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:12px}.library .items{max-height:490px}.columns-wrap{overflow:auto;padding:10px}.columns{display:grid;grid-template-columns:repeat(4,minmax(190px,1fr));gap:9px;min-width:800px}.tag-column{min-height:355px;border:1px dashed #cfd1da;border-radius:8px;background:#fafafd}.column-title{padding:10px 11px;border-bottom:1px solid var(--hair);display:flex;justify-content:space-between;font-weight:700}.column-title span:last-child{font-size:11px;color:var(--faint)}.tag-column .items{max-height:310px}.remove-zone{border:1px dashed #e1a5a8;background:var(--red-soft);color:#9c3035;border-radius:8px;margin:0 10px 10px;padding:10px;text-align:center;font-size:12px}
+.inspector{display:grid;grid-template-columns:280px minmax(0,1fr);gap:12px}.search{margin:10px;border:1px solid var(--hair);border-radius:7px;padding:8px 10px;width:calc(100% - 20px);outline:0}.project-index{padding:0 8px 10px;max-height:470px;overflow:auto}.project-pick{border:0;background:transparent;width:100%;text-align:left;padding:9px 10px;border-radius:7px;color:var(--muted)}.project-pick.on{background:var(--blue-soft);color:var(--blue);font-weight:700}.focus{padding:13px 14px;border-bottom:1px solid var(--hair)}.focus small{color:var(--faint);display:block;margin-bottom:5px}.focus .project{max-width:360px;border-color:#cbd6f4}.tag-tiles{display:grid;grid-template-columns:repeat(2,minmax(180px,1fr));gap:10px;padding:12px}.tag-tile{border:1px dashed #cfd1da;border-radius:8px;min-height:104px;padding:10px;background:#fafafd}.tag-tile strong{display:block;margin-bottom:7px}.tag-tile small{color:var(--faint)}.tag-tile .project{margin-top:8px}.inspector .remove-zone{margin:0 12px 12px}
+.decision{margin-top:14px;background:#fff;border:1px solid var(--hair);border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;gap:14px;align-items:center}.decision p{margin:0;color:var(--muted);font-size:12.5px}.decision strong{color:var(--ink)}
+.toast{position:fixed;right:22px;bottom:22px;max-width:420px;background:#242735;color:#fff;border-radius:8px;padding:11px 14px;box-shadow:var(--shadow);opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:none}.toast b{color:#ffd9a7}
+.dragging{opacity:.45}
+@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{display:none}.tag-layout,.board-layout,.inspector{grid-template-columns:1fr}.dual{grid-template-columns:1fr}.scheme-note,.decision{display:block}.scheme-note .risk{max-width:none;margin-top:5px}.page{padding:16px}.columns{grid-template-columns:repeat(4,190px)}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section class="intro">
+    <p class="eyebrow">feature01 · 低成本 UX 原型 · 2026-08-24</p>
+    <h1>【标签】顶级管理页 · 三案对照</h1>
+    <p>三案使用同一组 25 个项目与共享标签数据，只比较信息结构、拖拽方向和防错。项目条目严格只显示项目名称。</p>
+    <div class="chips"><span class="chip ok">标签归属：全团队共享</span><span class="chip ok">项目排序：每人独有</span><span class="chip">全员可新增 / 改名标签</span><span class="chip">仅 admin 可删除标签</span><span class="chip warn">本页拖拽会影响所有成员</span></div>
+  </section>
+
+  <nav class="choicebar" aria-label="方案切换">
+    <button class="choice on" data-plan="a"><strong>方案 A · 单标签双栏 <em class="rec">推荐</em></strong><small>选标签，再把项目横向拖入 / 拖出</small></button>
+    <button class="choice" data-plan="b"><strong>方案 B · 多标签分配板</strong><small>项目库 + 多个标签列，适合连续分配</small></button>
+    <button class="choice" data-plan="c"><strong>方案 C · 单项目检查台</strong><small>选项目，再核查它拥有的全部标签</small></button>
+  </nav>
+
+  <section class="browser">
+    <div class="browserbar"><i></i><i></i><i></i><span>localhost:8080 · 标签（交互静态稿，不接后端）</span></div>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><b>flowboard</b><small>Northstar Studio 工作区</small></div>
+        <button class="nav">◈　我的工作</button>
+        <button class="nav">▤　全项目仪表盘</button>
+        <button class="nav on">⌑　标签</button>
+        <button class="nav">▣　已归档</button>
+        <button class="nav">♲　回收站</button>
+        <button class="nav tail">⚙　设置</button>
+      </aside>
+      <div class="main">
+        <header class="topbar"><span><b>Northstar Studio</b> / 标签</span><span class="account">演示账号 <select id="account"><option value="member">A · member</option><option value="admin">admin · admin</option></select></span></header>
+        <div class="page">
+          <div class="pagehead">
+            <div><p class="eyebrow">团队共享分类</p><h2>标签</h2><p>集中维护标签与项目归属；项目内容与个人排序均不会在这里改变。</p></div>
+            <div class="actions"><button class="btn" id="renameTag">修改当前标签名称</button><button class="btn" id="deleteTag" disabled>删除当前标签</button><button class="btn primary" id="newTag">＋ 新建标签</button></div>
+          </div>
+          <div class="shared-banner"><span>⚠</span><div><b>这是团队共享操作区。</b> 本页把项目拖入 / 拖出标签会影响所有成员；全项目仪表盘中的上下拖拽只调整你自己的项目顺序，两种拖拽不会混用。</div></div>
+          <div id="prototype" data-drop-revision="0"></div>
+          <div class="decision"><p><strong>请只判断一件事：</strong>哪种结构最适合你们日常给 25 个项目批量加减标签？颜色、字号、间距暂不作为本轮拍板项。</p><span class="chip ok">默认推荐 A</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const projects=[
+  '晨雾轻跑 01','城市节奏 02','云感训练 03','轻羽竞速 04','周末慢跑 05',
+  '山径探索 06','越野防滑 07','砾石耐磨 08','峰线竞速 09','林道轻越野 10',
+  '校园基础 11','青少年缓震 12','活力跳跃 13','日常百搭 14','成长训练 15',
+  '商务通勤 16','都市行走 17','雨天通勤 18','轻正装 19','全天舒适 20',
+  '夏季凉感 21','冬季保暖 22','可持续材料 23','经典复刻 24','应用迭代 25'
+].map((name,index)=>({id:`p${index+1}`,name}));
+let tags=[
+  {id:'all',name:'全部',system:true},{id:'uncategorized',name:'未分类',system:true},
+  {id:'focus',name:'重点'},{id:'category-a',name:'鞋类 A'},{id:'month',name:'本月关注'},{id:'review',name:'待复盘'}
+];
+let memberships={
+  focus:['p2','p4','p7','p12','p18','p23'],
+  'category-a':['p1','p2','p3','p6','p9','p11','p16','p21'],
+  month:['p4','p5','p8','p12','p15','p19','p22'],
+  review:['p7','p10','p18','p24']
+};
+let plan='a',activeTag='focus',selectedProject='p2',role='member',dragData=null,lastSnapshot=null,dropRevision=0,pendingDrop=null;
+const $=selector=>document.querySelector(selector);
+const esc=value=>String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const natural=(a,b)=>a.name.localeCompare(b.name,'zh-CN',{numeric:true,sensitivity:'base'});
+const regularTags=()=>tags.filter(tag=>!tag.system).sort((a,b)=>a.name.localeCompare(b.name,'zh-CN',{numeric:true}));
+const projectBy=id=>projects.find(project=>project.id===id);
+const idsFor=tagId=>tagId==='all'?projects.map(project=>project.id):tagId==='uncategorized'?projects.filter(project=>!regularTags().some(tag=>(memberships[tag.id]||[]).includes(project.id))).map(project=>project.id):(memberships[tagId]||[]);
+const isEditableTag=id=>tags.some(tag=>tag.id===id&&!tag.system);
+const snapshot=()=>JSON.stringify({tags,memberships});
+function mutate(action,message){lastSnapshot=snapshot();action();render();showToast(`<b>团队共享已更新：</b>${esc(message)}　<button class="mini" style="color:#fff" onclick="undo()">撤销</button>`)}
+function commitDrop(action,message){lastSnapshot=snapshot();action();pendingDrop={message};setTimeout(finishDrag,0)}
+function finishDrag(){
+  document.querySelectorAll('.dragging,.over').forEach(node=>node.classList.remove('dragging','over'));
+  dragData=null;
+  if(!pendingDrop)return;
+  const {message}=pendingDrop;pendingDrop=null;dropRevision+=1;render();$('#prototype').dataset.dropRevision=String(dropRevision);
+  showToast(`<b>团队共享已更新：</b>${esc(message)}　<button class="mini" style="color:#fff" onclick="undo()">撤销</button>`)
+}
+function undo(){if(!lastSnapshot)return;const previous=JSON.parse(lastSnapshot);tags=previous.tags;memberships=previous.memberships;lastSnapshot=null;render();showToast('已撤销上一项共享标签修改')}
+function showToast(html){const toast=$('#toast');toast.innerHTML=html;toast.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>toast.classList.remove('show'),3200)}
+function projectCard(project,sourceTag=''){return `<div class="project" draggable="true" data-project="${project.id}" data-source-tag="${sourceTag}"><span class="grip">⠿</span><span class="project-name">${esc(project.name)}</span></div>`}
+function tagRows(){return tags.map(tag=>`<div class="tag-row"><button class="tag-select ${tag.id===activeTag?'on':''}" data-select-tag="${tag.id}"><span>${tag.system?'◇':'#'} ${esc(tag.name)}</span><span>${idsFor(tag.id).length}</span></button>${!tag.system?`<button class="mini" data-quick-rename="${tag.id}" title="修改名称">✎</button>`:''}</div>`).join('')}
+function schemeNote(title,task,risk){return `<div class="scheme-note"><span><b>${title}</b>　代表任务：${task}</span><span class="risk">注意：${risk}</span></div>`}
+function renderA(){
+  const tag=tags.find(item=>item.id===activeTag)||tags[2];activeTag=tag.id;
+  const joined=new Set(idsFor(tag.id));
+  const inside=projects.filter(project=>joined.has(project.id)).sort(natural);
+  const outside=projects.filter(project=>!joined.has(project.id)).sort(natural);
+  const editable=isEditableTag(tag.id);
+  return `<div class="scheme">${schemeNote('方案 A · 单标签双栏工作台','进入“重点”，把“城市节奏 02”拖出，再把“山径探索 06”拖入。','拖入只添加当前标签，不替换项目的其他标签。')}
+  <div class="tag-layout"><aside class="panel"><div class="panelhead"><h3>标签目录</h3><small>名称自然排序</small></div><div class="tag-directory">${tagRows()}<div class="directory-help">“全部 / 未分类”为系统入口；普通标签不支持拖拽排序。</div></div></aside>
+  <section class="panel"><div class="current-tag"><div><h3>${esc(tag.name)}</h3><p>${editable?'横向跨栏 = 修改当前标签归属；栏内不提供排序。':'系统入口仅供查看，请选择普通标签后管理归属。'}</p></div><span class="shared-flag">影响全团队</span></div>
+  <div class="dual"><div class="bucket ${editable?'droppable':''}" data-drop="remove" data-tag="${tag.id}"><div class="bucket-title"><span>未加入当前标签</span><small>${outside.length} 项</small></div><div class="bucket-help">把右侧项目拖到这里 = 从“${esc(tag.name)}”剔除</div><div class="items">${outside.map(project=>projectCard(project)).join('')||'<div class="empty">没有项目</div>'}</div></div>
+  <div class="bucket ${editable?'droppable':''}" data-drop="add" data-tag="${tag.id}"><div class="bucket-title"><span>已加入当前标签</span><small>${inside.length} 项</small></div><div class="bucket-help">把左侧项目拖到这里 = 加入“${esc(tag.name)}”</div><div class="items">${inside.map(project=>projectCard(project,tag.id)).join('')||'<div class="empty">把项目拖到这里</div>'}</div></div></div></section></div></div>`
+}
+function renderB(){
+  const columns=regularTags().slice(0,4).map(tag=>{const inside=projects.filter(project=>(memberships[tag.id]||[]).includes(project.id)).sort(natural);return `<div class="tag-column droppable" data-drop="add" data-tag="${tag.id}"><div class="column-title"><span># ${esc(tag.name)}</span><span>${inside.length}</span></div><div class="items">${inside.map(project=>projectCard(project,tag.id)).join('')||'<div class="empty">从项目库拖入</div>'}</div></div>`}).join('');
+  return `<div class="scheme">${schemeNote('方案 B · 项目库 + 多标签列','连续把三个项目分配进不同标签，其中一个项目加入两个标签。','同一项目会在多列重复；标签间直接拖动被禁止，避免“移动还是复制”的歧义。')}
+  <div class="board-layout"><aside class="panel library"><div class="panelhead"><h3>全部项目</h3><small>拖到右侧只会添加</small></div><div class="items">${projects.slice().sort(natural).map(project=>projectCard(project)).join('')}</div></aside>
+  <section class="panel"><div class="panelhead"><h3>共享标签分配板</h3><small>横向浏览 4 个普通标签</small></div><div class="columns-wrap"><div class="columns">${columns}</div></div><div class="remove-zone droppable" data-drop="remove-source">把某个标签列里的项目拖到这里 = 仅从来源标签剔除（项目不会删除）</div></section></div></div>`
+}
+function renderC(){
+  const selected=projectBy(selectedProject)||projects[0];selectedProject=selected.id;
+  const tiles=regularTags().map(tag=>{const joined=(memberships[tag.id]||[]).includes(selected.id);return `<div class="tag-tile ${!joined?'droppable':''}" ${!joined?`data-drop="add" data-tag="${tag.id}"`:''}><strong># ${esc(tag.name)}</strong><small>${joined?'已加入；可把下方项目拖到剔除区':'把上方项目拖到这里即可加入'}</small>${joined?projectCard(selected,tag.id):''}</div>`}).join('');
+  return `<div class="scheme">${schemeNote('方案 C · 单项目标签检查台','选中“城市节奏 02”，核查并调整它拥有的全部标签。','一次只处理一个项目，批量整理 25 个项目时切换次数较多。')}
+  <div class="inspector"><aside class="panel"><div class="panelhead"><h3>项目</h3><small>仅显示名称</small></div><input class="search" id="projectSearch" placeholder="搜索项目名称"><div class="project-index">${projects.slice().sort(natural).map(project=>`<button class="project-pick ${project.id===selected.id?'on':''}" data-pick-project="${project.id}">${esc(project.name)}</button>`).join('')}</div></aside>
+  <section class="panel"><div class="focus"><small>当前项目 · 可拖到未加入的标签</small>${projectCard(selected)}</div><div class="tag-tiles">${tiles}</div><div class="remove-zone droppable" data-drop="remove-source">把“已加入”标签中的项目拖到这里 = 从该来源标签剔除</div></section></div></div>`
+}
+function render(){
+  document.querySelectorAll('[data-plan]').forEach(button=>button.classList.toggle('on',button.dataset.plan===plan));
+  $('#prototype').innerHTML=plan==='a'?renderA():plan==='b'?renderB():renderC();
+  bindPrototype();
+  const current=tags.find(tag=>tag.id===activeTag),canEdit=current&&!current.system;
+  $('#renameTag').disabled=!canEdit;
+  $('#deleteTag').disabled=!canEdit||role!=='admin';
+}
+function bindPrototype(){
+  document.querySelectorAll('[data-select-tag]').forEach(button=>button.onclick=()=>{activeTag=button.dataset.selectTag;render()});
+  document.querySelectorAll('[data-quick-rename]').forEach(button=>button.onclick=()=>renameTag(button.dataset.quickRename));
+  document.querySelectorAll('[data-pick-project]').forEach(button=>button.onclick=()=>{selectedProject=button.dataset.pickProject;render()});
+  const search=$('#projectSearch');if(search)search.oninput=()=>document.querySelectorAll('[data-pick-project]').forEach(button=>button.hidden=!button.textContent.toLowerCase().includes(search.value.trim().toLowerCase()));
+  document.querySelectorAll('.project[draggable=true]').forEach(item=>{
+    item.ondragstart=event=>{dragData={project:item.dataset.project,sourceTag:item.dataset.sourceTag||''};item.classList.add('dragging');event.dataTransfer.effectAllowed='copyMove';event.dataTransfer.setData('text/plain',dragData.project)};
+  });
+  document.querySelectorAll('.droppable').forEach(zone=>{
+    zone.ondragover=event=>{event.preventDefault();zone.classList.add('over')};zone.ondragleave=()=>zone.classList.remove('over');
+    zone.ondrop=event=>{event.preventDefault();zone.classList.remove('over');handleDrop(zone)};
+  });
+}
+function handleDrop(zone){
+  if(!dragData)return;const project=projectBy(dragData.project),target=zone.dataset.tag,action=zone.dataset.drop;
+  if(action==='add'){
+    if(!isEditableTag(target))return showToast('系统入口不能修改标签归属');
+    if(dragData.sourceTag&&dragData.sourceTag!==target)return showToast('标签列之间不直接拖动：请从项目库添加，避免“移动/复制”歧义');
+    if((memberships[target]||[]).includes(project.id))return showToast(`${esc(project.name)} 已在该标签中`);
+    commitDrop(()=>{memberships[target]=[...(memberships[target]||[]),project.id]},`${project.name} 已加入“${tags.find(tag=>tag.id===target).name}”，不影响它的其他标签`);
+  }else if(action==='remove'||action==='remove-source'){
+    const source=action==='remove'?zone.dataset.tag:dragData.sourceTag;if(!source)return showToast('请从“已加入”区域拖出项目');
+    if(action==='remove'&&dragData.sourceTag!==source)return showToast('该项目当前不在此标签中');
+    commitDrop(()=>{memberships[source]=(memberships[source]||[]).filter(id=>id!==project.id)},`${project.name} 已从“${tags.find(tag=>tag.id===source).name}”剔除，项目本体未删除`);
+  }
+}
+function renameTag(id=activeTag){const tag=tags.find(item=>item.id===id);if(!tag||tag.system)return;const name=prompt('新的共享标签名称',tag.name)?.trim();if(!name||name===tag.name)return;if(tags.some(item=>item.id!==id&&item.name.toLowerCase()===name.toLowerCase()))return showToast('标签名称不能重复');mutate(()=>{tag.name=name},`标签已改名为“${name}”`) }
+document.querySelectorAll('[data-plan]').forEach(button=>button.onclick=()=>{plan=button.dataset.plan;render()});
+document.addEventListener('dragend',()=>setTimeout(finishDrag,0));
+$('#account').onchange=event=>{role=event.target.value;render();showToast(role==='admin'?'已切换 admin：可删除普通标签':'已切换 member：可新增、改名和调整归属，不能删除标签')};
+$('#newTag').onclick=()=>{const name=prompt('新建共享标签名称','新标签')?.trim();if(!name)return;if(tags.some(tag=>tag.name.toLowerCase()===name.toLowerCase()))return showToast('标签名称不能重复');const id=`tag-${Date.now()}`;mutate(()=>{tags.push({id,name});memberships[id]=[];activeTag=id},`已新建标签“${name}”`)};
+$('#renameTag').onclick=()=>renameTag();
+$('#deleteTag').onclick=()=>{const tag=tags.find(item=>item.id===activeTag);if(role!=='admin'||!tag||tag.system)return;if(!confirm(`删除共享标签“${tag.name}”？项目本体不会删除。`))return;mutate(()=>{tags=tags.filter(item=>item.id!==tag.id);delete memberships[tag.id];activeTag='focus'},`标签“${tag.name}”已停用，项目本体未删除`)};
+render();
+</script>
+</body>
+</html>
