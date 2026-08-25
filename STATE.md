@@ -1,15 +1,15 @@
 # STATE.md — 项目状态 / 变更日志 / 近期决定
 
-> 最后更新：2026-08-21（feature01 门 4 CP6 独立终签 PASS；最高状态 `WAIT_GATE5_HUMAN`）
+> 最后更新：2026-08-25（feature01 原 v16 为 `WAIT_GATE5_HUMAN`；标签与用户排序 v17 为 `TAG_INCREMENT_WAIT_HUMAN`；全项目组合画布为 `PORTFOLIO_CANVAS_WAIT_HUMAN`；手工归档与最新画布显示增量为 `ARCHIVE_VIEW_WAIT_HUMAN`）
 > **与契约的分工**：`feature-00-build-up/PROJECT_MAINLINE.md` = 冻结主线（不可变契约，只在用户调整产品方向时改）；本文件 = 会演进的项目状态。
 > **产品**：Flowboard — 面向约 15 人团队的局域网自托管协作看板（monday.com 子集）。
-> **权威范围**：feature01 门 4 实现范围以 `feature-01-项目时间管理-仪表盘/9-GATE3_TECH_FREEZE.md` 为冻结契约，终签与 Gate 5 交接以 `team-progress/planner-report-B005-CP6.md`、`team-progress/B-005-WAIT_GATE5_HUMAN.md` 为准；弃用的 `.copilot-*` 只作历史指纹，不作为当前控制面。第一阶段验收证据索引：`feature-00-build-up/GLOBAL_ACCEPTANCE.md`。
+> **权威范围**：feature01 原 v16 门 4 以 `feature-01-项目时间管理-仪表盘/9-GATE3_TECH_FREEZE.md` 为冻结契约；标签与用户排序 v17 以 `13-TAG_ORDER_TECH_FREEZE.md` 为增量契约；全项目组合画布以 `14-PORTFOLIO_CANVAS_TECH_FREEZE.md` 为增量契约；手工归档与 2026-08-25 最新画布显示以 `15-MANUAL_ARCHIVE_AND_TIMELINE_VIEW_TECH_FREEZE.md` 为增量契约。原主线终签与 Gate 5 交接仍以 `team-progress/planner-report-B005-CP6.md`、`team-progress/B-005-WAIT_GATE5_HUMAN.md` 为准。
 
 ---
 
 ## 0. 一句话当前状态
 
-**第一阶段（看板 + 多视图）已完工交付。feature01「项目时间管理 + 仪表盘」门 4 自动施工与自动验收已完成：CP6 独立终签 `25 PASS + 7 OUT_OF_SCOPE`、零 `GAP/CONFLICT`，当前且最高状态严格为 `WAIT_GATE5_HUMAN`。真实 `flowboard.db` 仍为 schema v15、`integrity_check=ok` 且指纹未变；未执行真实库迁移、push、发布或部署。** feature01 冷启动入口：`feature-01-项目时间管理-仪表盘/STATE.md`。
+**第一阶段已交付。feature01 原 v16 为 `WAIT_GATE5_HUMAN`；标签与用户排序 v17 为 `TAG_INCREMENT_WAIT_HUMAN`；E＋D4＋P1 全项目组合画布为 `PORTFOLIO_CANVAS_WAIT_HUMAN`；手工归档与最新画布显示增量已完成生产代码施工及隔离自动验收，状态为 `ARCHIVE_VIEW_WAIT_HUMAN`。真实 `flowboard.db` 仍为 schema v15，未执行真实库迁移、首次批量归档、push、发布或部署。** feature01 冷启动入口：`feature-01-项目时间管理-仪表盘/STATE.md`。
 
 ---
 
@@ -20,6 +20,13 @@
 
 | 日期 | 变更内容 |
 |------|---------|
+| 2026-08-25 | **feature01 手工归档与最新画布显示增量完成生产施工及隔离验收**：落地 schema v18 增量代码、服务端 archive/unarchive 权限与只读护栏、active/archived 查询、标签/个人顺序保留、一次性快照式初始化 preview/apply、首页轻量归档页与全项目归档画布；同时完成 80% 今日蒙版、方案 B 5px 密集点、单项目横向缩放/拖拽和全屏入口恢复。归档专项 Python 5/5、标签顺序回归 7/7、Node UI 全绿，真实 Chromium 覆盖归档/取消、独立视角与单双画布交互。状态转为 `ARCHIVE_VIEW_WAIT_HUMAN`；真实库只读仍为 v15，未迁移、未执行首次批量归档。 |
+| 2026-08-25 | **feature01 手工归档与最新画布显示完成静态确认及技术冻结**：归档永久只允许 admin/项目创建者手工执行并可取消，归档为高优先级系统状态且期间只读，底层普通标签/个人顺序保留；首页归档页仅名称＋取消。Q1–Q8=A/A/A/A/A/B/A/A；一次性初始化选择全部日期候选，但真实库 apply 须另行授权。同步冻结 80% 今日蒙版、方案 B 5px 密集点、单项目仅横向缩放/拖拽与全项目全屏入口恢复。当前仅 `ARCHIVE_VIEW_TECH_FROZEN`，未改生产代码或真实库。 |
+| 2026-08-24 | **全项目组合画布可见层再次瘦身**：按用户截图红圈，暂时隐藏标题/数量说明、项目筛选、排序、适配/缩放/全屏按钮与排序提示条；标签、日期范围、E标尺、滚轮缩放、P1、D4和项目共享大图保留。 |
+| 2026-08-24 | **feature01 全项目组合画布增量完成自动验收**：E＋D4＋P1 与 Q1–Q9 正式落地；真实日期±30天、14天最细窗、账户＋上下文视角记忆、应用内全屏、P1横纵抓取、D4瞬时标尺强化、350ms边缘平移、双冻结和62px行均经隔离 Chromium 验证。Python 159/159、6个Node文件全绿；状态为 `PORTFOLIO_CANVAS_WAIT_HUMAN`。 |
+| 2026-08-24 | **feature01 v17“共享标签 + 用户级排序”独立增量完成自动验收**：Q1–Q14 与方案 A 已实现；v17 四表、共享标签/归属、我的项目与全项目各上下文个人排序、服务端权限/并发/审计均落地。最终 Python 157/157、Node 6/6、真浏览器拖拽通过；状态转为 `TAG_INCREMENT_WAIT_HUMAN`。原 v16 仍为 `WAIT_GATE5_HUMAN`，真实库仍为 v15。 |
+| 2026-08-23 | **feature01 Gate 5 第三轮编辑器纠偏**：按用户明确指令撤下误做的“时间轴编辑器”，恢复 `mockup.html` 已确认的类 Excel 时间表编辑器；一并校正项目级只读、管理员纠错入口、editor/drag 审计来源和导入文案。时间管理 E2E 24/24、主页/拖拽 E2E 7/7、Node 6/6、最终 Python 全量 149/149 OK；最高状态仍为 `WAIT_GATE5_HUMAN`，启动器无需更新。 |
+| 2026-08-23 | **建立 Codex 记忆提案收件箱**：按用户 `$mc-update` 授权新增 `.codex/memory-inbox/` schema v2 协议与 2 份 `proposed/pending` 提案（Gate 5 当前状态钩子、Playwright hover 命中循环）；仅供后续人工/Claude 审核，未改写 `.claude/` 正式记忆。 |
 | 2026-08-21 | **feature01 门 4 阶段收尾并获用户授权 commit**：承接 2026-08-20 CP6 独立终签 PASS，不重复自动验收；32 条终态为 25 PASS + 7 OUT_OF_SCOPE、零 GAP/CONFLICT。最高状态保持 `WAIT_GATE5_HUMAN`；真实库仍为 v15 且指纹未变。仅 commit 获授权，push、发布、部署、真实库迁移仍须另行拍板。 |
 | 2026-08-20 | **feature01 门 4 自动施工与自动验收收口**：B-002～B-005 依次关门，交付 v16 五表隔离迁移、服务/API、浅色编辑器与单双项目仪表盘、真实 Chromium 旅程、Excel 往返、全量回归及备份恢复证据；CP6 独立终签为 `WAIT_GATE5_HUMAN`，未冒充门 5 PASS 或上线完成。 |
 | 2026-08-19 | **feature01 F1 视觉覆盖拍板并增量复审 PASS**：用户基于 Flowboard 整体浅色基调，指定 v1 三页优先浅色、单项目仪表盘方向 A「大标题·白卡」当前执行；方向 B 深色转为未来整体暗色皮肤参考，不进 v1。只窄修订 9- §0 F1/§8 及当前状态/样张标识，其余 61 条未重开；三处文档尾差修正后 mc-expert 定向复审 PASS（高置信），门 3 重新关闭并提交为 `2e906c5`，门 4 尚未激活。 |
@@ -58,17 +65,20 @@
   - 第一阶段文档：全部在 `feature-00-build-up/`（见 §4 目录索引）。
 - **状态边界**：第三阶段候选池（C06 工作负载 / E 项目管理 / G 自动化 / F 表单 / H Webhook）**是候选，不是已批准计划**——planner 不得擅自把候选升级成任务，需用户依据真实使用反馈拍板（冻结主线 §7 纠偏第 4 问）。
 
-### feature-01-项目时间管理-仪表盘（门 4 已收口，WAIT_GATE5_HUMAN）
+### feature-01-项目时间管理-仪表盘（v16：WAIT_GATE5_HUMAN；v17：TAG_INCREMENT_WAIT_HUMAN；组合画布：PORTFOLIO_CANVAS_WAIT_HUMAN；归档显示：ARCHIVE_VIEW_WAIT_HUMAN）
 
-- **当前阶段**：需求、UX、门 3 技术冻结与门 4 自动施工/验收均已收口；CP6 独立终签 25 PASS + 7 OUT_OF_SCOPE、零 GAP/CONFLICT，最高状态为 `WAIT_GATE5_HUMAN`。正式代码已实现；真实 `flowboard.db` 仍为 v15，未执行真实迁移。
+- **当前阶段**：原 v16、v17 标签增量与 E＋D4＋P1 组合画布状态不变；手工归档与最新画布显示增量已完成生产代码施工及隔离自动验收，为 `ARCHIVE_VIEW_WAIT_HUMAN`。真实 `flowboard.db` 仍为 v15，未执行真实迁移或首次批量归档。
 - **当前模型**：固定六阶段；一行一个节点；一个日期字段；主线/并行两轨各自计算一列间隔、各自顺延；状态三态（未开始/进行中/已完成）；仪表盘行模型 = 每项目默认主线/并行两行 + 展开按钮拆重叠阶段（未展开仅重叠段上下分半）；拖拽 = 节点右键四项菜单双模式（拖拽/拖拽顺延/已完成/未完成）、无默认档、草稿批次统一提交；视觉 = **方向 A 浅色（大标题·白卡）+ v3.2 亮色六色 + ) 形分界 + 白圈节点**，三页共享浅色语义 token，暗色皮肤不进 v1；权限 = workspace admin 全改 / member 仅改自己创建的项目，查看对所有注册成员开放；项目入口 = admin/member 网页新建、仅 admin 软删、v1 不改名。**门 3 冻结**：数据模型 = 新增五张专表（timeline_projects/nodes + 批次审计两表 + timeline_import_batches，间隔/状态不落库实时派生）；已完成载体 = 内部 done_at；派生指标契约（当前阶段=已动工阶段序最大跨两轨、临近节点=今天起最早未完成同日全返、逾期数两轨合并、**橙点=本周（周一~周日）内有未完成节点**、指标服务端实时计算、今天=Asia/Shanghai）；Excel 导入状态矛盾 = 日期优先只认「已完成」；API 恒返 nodes+segments+stage_intervals 三份，段算法可切换。
-- **下一步**：只进入门 5 人工事项——真实 2～3 项目试用、视觉/磁吸与像素微调、约 15 分钟手工冒烟、真机/部署环境验收，以及在可恢复备份和停服窗口下另行决定真实库 v15→v16。push、发布、部署与上线仍需用户另行授权。未来候选（不进 v1，升级须拍板）：每周看板、md/json 导入、项目改名/恢复入口、Flowboard 整体暗色皮肤。
+- **下一步**：用户在隔离体验环境人工确认 v17 标签/排序、既有组合画布与本轮归档显示效果。真实库 v18 迁移与首次批量归档分别需要明确授权；原 v16 Gate 5、commit、push、发布、部署与上线仍是独立待办。
 - **冷启动入口**：`feature-01-项目时间管理-仪表盘/STATE.md`。
 
 ---
 
 ## 3. 近期决定
 
+- **2026-08-25 ｜ feature01 手工归档与画布显示（用户拍板）｜** 永久只手工归档；admin/创建者可归档和取消；归档高优先级、只读、保留普通标签/个人顺序，只在两个归档入口出现；Q1–Q8=A/A/A/A/A/B/A/A。一次性初始化选全部日期候选但真实库另行授权；同时确认 80% 今日蒙版、方案 B 密集点、单项目横向缩放/拖拽与全项目全屏恢复。
+- **2026-08-24 ｜ feature01 全项目组合画布（用户拍板）｜** E＋D4＋P1；Q1–Q9=A/A/A/A/A/A/B/A/A，按 `14-PORTFOLIO_CANVAS_TECH_FREEZE.md` 实施。
+- **2026-08-24 ｜ feature01 标签与排序增量方案 A（用户拍板）｜** 标签目录与项目标签关系全局共享；所有成员可维护标签及项目归属、仅 admin 删除标签；“我的项目”及“全项目仪表盘”各标签下的排序按用户隔离；标签管理采用单标签双栏静态方案 A，按 v17 独立增量实施。
 - **2026-08-19 ｜ feature01 视觉改为方向 A 浅色优先（用户覆盖拍板）｜** v1 三页均以浅色 token 开发，单项目以「大标题·白卡」为基线；方向 B 仅作未来整体暗色皮肤参考，不实现主题切换。
 - **2026-08-18 ｜ feature01 门 3 技术文档组织（A+B 叠加，用户拍板）｜** 单元 ③ 起不再单出 DRAFT；门 3 最终 PASS 后已蒸馏 `9-GATE3_TECH_FREEZE.md` 为门 4 唯一实现契约，4/5/6/7/8 过程稿已移入 `feature-01-项目时间管理-仪表盘/archive/` 降级留档（未删除），10- 为历史修订记录。
 - **2026-08-12 ｜ 第一阶段过程文档归档进 `feature-00-build-up/` ｜** 保持根目录干净，代码与运行库留在根；归档不改变任何实现或验收结论。
@@ -89,6 +99,7 @@
 | `backups/` | 迁移与运维备份 | `flowboard-pre-vN-*` 历史快照，勿手删 |
 | `mc-plan/` | 规划产物 | 阶段决策记录（如阶段完工与下阶段计划） |
 | `.claude/` | 记忆层 | `auto-memory/` 用户偏好（每会话加载）+ `memory/` 技术细节（按需读），各自 MEMORY.md 索引；由 `/mc-update` 流程维护 |
+| `.codex/memory-inbox/` | **Codex 记忆提案与审计** | schema v2 `proposed` 提案、审核及应用轨迹；不是正式记忆，Codex 不直接写 `.claude/` |
 | `flowboard.db` | 运行库 | schema v15；**只读操作可直接做，禁止对运行库 purge/restore/重建** |
 | `server.py` / `app.js` / `*.css` / `index.html` / `*-ui.js` | 启动适配层 + 原生 Web 前端 | 渐进式模块化单体，原生 Web，无框架 |
 | `flowboard_ops.py` | Windows 运维 CLI | backup/list/verify/retention/restore；恢复仅离线 CLI |

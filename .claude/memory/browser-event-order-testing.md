@@ -21,3 +21,16 @@ document.addEventListener('mousedown', e => {
 ```
 
 适用范围：feature01 门 4 纵向切片的前端交互测试、后续所有 HTML 样张验证。
+
+## 同族增补：UI 集成期竞态（2026-08-21 Gate5 CP2 实测，同属「真浏览器才能暴露的 UI 真缺陷」族）
+
+- **双重渲染竞态**：异步落页探测与用户手动打开同一视图交错，`innerHTML` 整体替换会吞掉测试/用户正在交互的元素（表现为 set_input_files 静默无 change、bounding_box 求得后元素消失）。修法：入口幂等短路（已可见即 return）+ 拉取在飞去重（共享同一 promise），保证任何交错下只渲染一次。
+- **视图切换可见性竞态**：测试 harness 常等待某状态控件（如同步状态徽标）「可见」；该控件若位于会被整体隐藏的区块内，视图切换会随机吃掉等待条件。修法：把常显状态控件迁出可隐藏区块（如 topbar）。
+- 详见 `feature-01-项目时间管理-仪表盘/11-GATE5_UX_REALIGNMENT_TASK.md` §14.4（此处只留族级钩子，不复制细节）。
+
+## 同族增补：hover 显隐命中测试环（2026-08-23 Gate5 反馈修复实测；Playwright actionability 子模式，跨项目通用）
+
+- **症状**：hover 才浮现的控件，attached/visible/enabled/stable 断言全过，但物理 click 超时——中心点被行按钮/兄弟层/底层元素拦截。
+- **根因**：控件只在父级 `:hover` 后才可命中，而 Playwright 命中测试要求指针完成 hover 前目标就有效；`opacity: 0` + `pointer-events: none` 组合把自己锁进「要先 hover 才可命中、要可命中才能 hover」的死循环，可见性断言照样过。
+- **诊断流**：① 取 `getBoundingClientRect()` + computed `opacity`/`visibility`/`pointer-events`；② `document.elementFromPoint()` 在控件中心探针、查最近可操作祖先；③ 用真实指针点击复现——**禁止以 `force`、DOM `.click()`、直调 handler 收尾**（与主坑同源：合成路径掩盖真 bug）。
+- **修法规则**：视觉淡入保留、但操作层始终可命中；`:focus-within` 留键盘通道；`@media (hover: none)` 触屏直接常显；终态用真实指针移动 + 物理点击验证（覆盖浏览器命中测试与事件序，而非只测应用 handler）。
