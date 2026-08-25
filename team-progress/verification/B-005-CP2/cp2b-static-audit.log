@@ -1,0 +1,4 @@
+CP2B_DIFF_AUDIT
+PY_COMPILE_EXIT=0
+warning: in the working copy of 'tests/test_i13_e2e.py', LF will be replaced by CRLF the next time Git touches it
+SCOPED_DIFF_EXIT=0

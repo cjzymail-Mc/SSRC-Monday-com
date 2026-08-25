@@ -1,0 +1,10 @@
+test_collaboration_http
+test_collaboration
+test_dashboards
+test_i12
+test_i13_operations
+test_i13
+test_schedule
+test_secure_foundation
+test_timeline_http
+test_timeline

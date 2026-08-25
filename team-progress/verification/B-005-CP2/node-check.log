@@ -1,0 +1,15 @@
+FILES=13
+[0] D:\Downloads\Mc Claude Code Workshop\monday-com\app.js
+[0] D:\Downloads\Mc Claude Code Workshop\monday-com\dashboard-ui.js
+[0] D:\Downloads\Mc Claude Code Workshop\monday-com\i12-ui.js
+[0] D:\Downloads\Mc Claude Code Workshop\monday-com\schedule-ui.js
+[0] D:\Downloads\Mc Claude Code Workshop\monday-com\tests\dashboard_ui.test.js
+[0] D:\Downloads\Mc Claude Code Workshop\monday-com\tests\i12_ui.test.js
+[0] D:\Downloads\Mc Claude Code Workshop\monday-com\tests\schedule_ui.test.js
+[0] D:\Downloads\Mc Claude Code Workshop\monday-com\tests\timeline_ui.test.js
+[0] D:\Downloads\Mc Claude Code Workshop\monday-com\tests\view_state.test.js
+[0] D:\Downloads\Mc Claude Code Workshop\monday-com\tests\view_ui.test.js
+[0] D:\Downloads\Mc Claude Code Workshop\monday-com\timeline-ui.js
+[0] D:\Downloads\Mc Claude Code Workshop\monday-com\view-state.js
+[0] D:\Downloads\Mc Claude Code Workshop\monday-com\view-ui.js
+FAILED=0

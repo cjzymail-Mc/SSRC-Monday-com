@@ -1,0 +1,54 @@
+{
+  "event": "coverage_map_wave4",
+  "real_passed": true,
+  "real_exit_code": 0,
+  "failure_keys": [],
+  "coverage": {
+    "groups_present": 12,
+    "group_clause_requirements": 63,
+    "section_5_1_requirements": 4,
+    "section_5_2_requirements": 10,
+    "section_5_3_requirements": 1
+  },
+  "statuses": {
+    "rows_checked": 80,
+    "allowed": [
+      "CONFLICT",
+      "GAP-B002",
+      "GAP-非九项",
+      "N/A",
+      "PASS"
+    ],
+    "normalized_counts": {
+      "CONFLICT": 0,
+      "GAP-B002": 0,
+      "GAP-非九项": 8,
+      "N/A": 1,
+      "PASS": 71
+    }
+  },
+  "tests": {
+    "references_resolved": 29,
+    "loadable": 29
+  },
+  "positive_controls": {
+    "delete_one_mapping": {
+      "mutated_in_memory_only": true,
+      "exit_code": 1,
+      "failure_keys": [
+        "MISSING_MAPPING"
+      ],
+      "expected_failure_observed": true
+    },
+    "replace_with_missing_test": {
+      "mutated_in_memory_only": true,
+      "exit_code": 1,
+      "failure_keys": [
+        "TEST_NOT_FOUND"
+      ],
+      "expected_failure_observed": true
+    }
+  },
+  "baseline_stable": true,
+  "overall_pass": true
+}

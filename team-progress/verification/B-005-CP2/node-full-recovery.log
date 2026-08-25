@@ -1,0 +1,126 @@
+FILES=6
+✖ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\dashboard_ui.test.js (21.5818ms)
+✖ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\i12_ui.test.js (11.5134ms)
+✖ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\schedule_ui.test.js (10.4818ms)
+✖ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\timeline_ui.test.js (11.2381ms)
+✖ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\view_state.test.js (7.5164ms)
+✖ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\view_ui.test.js (6.7883ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 93.1686
+
+✖ failing tests:
+
+test at tests\dashboard_ui.test.js:1:1
+✖ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\dashboard_ui.test.js (21.5818ms)
+  Error: spawn EPERM
+      at ChildProcess.spawn (node:internal/child_process:441:11)
+      at spawn (node:child_process:796:9)
+      at TestContext.<anonymous> (node:internal/test_runner/runner:501:19)
+      at FileTest.runInAsyncScope (node:async_hooks:227:14)
+      at FileTest.run (node:internal/test_runner/test:1325:25)
+      at FileTest.start (node:internal/test_runner/test:1191:17)
+      at runTestFile (node:internal/test_runner/runner:583:32)
+      at node:internal/test_runner/runner:974:25
+      at node:internal/per_context/primordials:561:37
+      at new Promise (<anonymous>) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'spawn'
+  }
+
+test at tests\i12_ui.test.js:1:1
+✖ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\i12_ui.test.js (11.5134ms)
+  Error: spawn EPERM
+      at ChildProcess.spawn (node:internal/child_process:441:11)
+      at spawn (node:child_process:796:9)
+      at TestContext.<anonymous> (node:internal/test_runner/runner:501:19)
+      at FileTest.runInAsyncScope (node:async_hooks:227:14)
+      at FileTest.run (node:internal/test_runner/test:1325:25)
+      at FileTest.start (node:internal/test_runner/test:1191:17)
+      at runTestFile (node:internal/test_runner/runner:583:32)
+      at node:internal/test_runner/runner:974:25
+      at node:internal/per_context/primordials:561:37
+      at new Promise (<anonymous>) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'spawn'
+  }
+
+test at tests\schedule_ui.test.js:1:1
+✖ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\schedule_ui.test.js (10.4818ms)
+  Error: spawn EPERM
+      at ChildProcess.spawn (node:internal/child_process:441:11)
+      at spawn (node:child_process:796:9)
+      at TestContext.<anonymous> (node:internal/test_runner/runner:501:19)
+      at FileTest.runInAsyncScope (node:async_hooks:227:14)
+      at FileTest.run (node:internal/test_runner/test:1325:25)
+      at FileTest.start (node:internal/test_runner/test:1191:17)
+      at runTestFile (node:internal/test_runner/runner:583:32)
+      at node:internal/test_runner/runner:974:25
+      at node:internal/per_context/primordials:561:37
+      at new Promise (<anonymous>) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'spawn'
+  }
+
+test at tests\timeline_ui.test.js:1:1
+✖ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\timeline_ui.test.js (11.2381ms)
+  Error: spawn EPERM
+      at ChildProcess.spawn (node:internal/child_process:441:11)
+      at spawn (node:child_process:796:9)
+      at TestContext.<anonymous> (node:internal/test_runner/runner:501:19)
+      at FileTest.runInAsyncScope (node:async_hooks:227:14)
+      at FileTest.run (node:internal/test_runner/test:1325:25)
+      at FileTest.start (node:internal/test_runner/test:1191:17)
+      at runTestFile (node:internal/test_runner/runner:583:32)
+      at node:internal/test_runner/runner:974:25
+      at node:internal/per_context/primordials:561:37
+      at new Promise (<anonymous>) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'spawn'
+  }
+
+test at tests\view_state.test.js:1:1
+✖ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\view_state.test.js (7.5164ms)
+  Error: spawn EPERM
+      at ChildProcess.spawn (node:internal/child_process:441:11)
+      at spawn (node:child_process:796:9)
+      at TestContext.<anonymous> (node:internal/test_runner/runner:501:19)
+      at FileTest.runInAsyncScope (node:async_hooks:227:14)
+      at FileTest.run (node:internal/test_runner/test:1325:25)
+      at FileTest.start (node:internal/test_runner/test:1191:17)
+      at runTestFile (node:internal/test_runner/runner:583:32)
+      at node:internal/test_runner/runner:974:25
+      at node:internal/per_context/primordials:561:37
+      at new Promise (<anonymous>) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'spawn'
+  }
+
+test at tests\view_ui.test.js:1:1
+✖ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\view_ui.test.js (6.7883ms)
+  Error: spawn EPERM
+      at ChildProcess.spawn (node:internal/child_process:441:11)
+      at spawn (node:child_process:796:9)
+      at TestContext.<anonymous> (node:internal/test_runner/runner:501:19)
+      at FileTest.runInAsyncScope (node:async_hooks:227:14)
+      at FileTest.run (node:internal/test_runner/test:1325:25)
+      at FileTest.start (node:internal/test_runner/test:1191:17)
+      at runTestFile (node:internal/test_runner/runner:583:32)
+      at node:internal/test_runner/runner:974:25
+      at node:internal/per_context/primordials:561:37
+      at new Promise (<anonymous>) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'spawn'
+  }
+EXIT_CODE=1

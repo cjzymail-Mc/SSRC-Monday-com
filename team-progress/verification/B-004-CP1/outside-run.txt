@@ -1,0 +1,23 @@
+B-004 CP1 independent probe outside-sandbox run summary
+command: python -X utf8 team-progress\verification\B-004-CP1\probe_cp1_browser.py
+exit: 0
+status: PASS
+probe sha256: FEAC04883E5C214BDD7648657777654F4BF6FA1EC23A0F9A72853BE75B17165A
+
+canary:
+- bad path: mousedown observed; no click; removed bad target received no mouseup; action_count=0
+- good path: mousedown, mouseup, click; action_count=1
+
+production actions:
+- entry #timelineBtn: mousedown, mouseup, click
+- single-project mode: mousedown, mouseup, click
+- all-project mode: mousedown, mouseup, click
+- admin R04 create 201; R01/R02 read 200; reload persisted; R05 soft delete 200
+- member controls: create present, delete absent; forced R05 403 ADMIN_REQUIRED
+- member failed R05 three-table content hash unchanged (reported prefix c9b8...)
+- viewer production R01 403; modal stayed closed; create/delete controls absent
+- viewer failed R01 three-table content hash unchanged (reported prefix 20de...)
+- prelogin session 401, member R05 403 and viewer R01 403 console entries were each structurally isolated; all remaining console errors/pageerrors were zero
+- real flowboard.db size, mtime_ns and SHA-256 were identical before/after
+
+This file is the planner's durable summary of the main agent's unrestricted execution result. The probe's emitted JSON is authoritative for the full ephemeral hashes; the temporary database was removed after the run.

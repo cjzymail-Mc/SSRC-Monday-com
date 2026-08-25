@@ -1,0 +1,83 @@
+B-004 CP4 planner probe outside-run record
+Date: 2026-08-20 Asia/Shanghai
+
+Probe v1
+SHA256: 82F223F34BBB50861C54A2C4F33FD174A1AE509F2D5E33468FEF49CD306CBD51
+Command: python -X utf8 team-progress/verification/B-004-CP4/probe_cp4_browser.py
+Exit: 1
+Failure: ALL_CONTEXT_SEQUENCE
+Initial recorder was target-bound and did not include actual hit-target diagnostics.
+
+Probe v2 (diagnostic strengthening; no product expectation relaxed)
+SHA256: 1911856D023F45FD209BFA57A9BACFBFE7EA9E1B16190AF0699D9A2FCFDA6CE6
+Command: python -X utf8 team-progress/verification/B-004-CP4/probe_cp4_browser.py
+Exit: 1
+Failure: ALL_CONTEXT_SEQUENCE
+Actual captured events:
+[
+  {'type': 'mousedown', 'node': None},
+  {'type': 'mouseup', 'node': None},
+  {'type': 'contextmenu', 'node': None}
+]
+
+Interpretation: the physical mouse sequence was complete, but the center point of
+the selected all-dashboard node did not hit an element inside
+`.timeline-dashboard-node`. Therefore the product node/controller did not receive
+the required real hit-tested contextmenu.
+
+All assertions before this point passed, including direction-A structure, shared
+calendar/today line, dual tracks, overlap split/expand, interval semantics,
+single-dashboard physical context menu, six-stage coverage, risk order/text,
+four sorts, and multi-project filtering. Assertions after the failure (final
+zero-write/hash and click canary) were not reached by this independent run.
+
+Known external coder regression supplied by main agent:
+- full E2E 14/14 PASS (45.971s)
+- Node 20/20 PASS
+- HTTP 10/10 PASS
+- timeline service 29/29 PASS
+
+CP4c POST-FIX RERUN — CIRCUIT BREAKER EVIDENCE
+Command: python -X utf8 team-progress/verification/B-004-CP4/probe_cp4_browser.py
+Exit: 1
+failure_key: CP4_ALL_DASHBOARD_NODE_HIT_TARGET
+failure_count: 2
+Captured: [mousedown:null, mouseup:null, contextmenu:null]
+State: WAIT_HUMAN / CIRCUIT_BREAKER_OPEN
+CP5: FORBIDDEN
+
+Current hashes:
+- timeline-ui.js 71A0142DBC1B6DB8835D80F14293860BFD79B1086409C887884359EC5C2A7B04
+- app.js 7242565B63BED48AB42BD43B12D9E0701C106EB718D09B4F761D80326A785C90
+- timeline.css F802EBB62DF3D3150C288CA70312D59B0B24F5CEBC6D69DBC1A594649EBD0D14
+- tests/timeline_ui.test.js 417E82F02F75E06C468C67A62D4BC6BE71D6296F0952EA1F496ED865E2C55FFC
+- tests/test_timeline_e2e.py FD8D64A7A0FF9E4334D419C74666B9FA7B096BD9BAC4681ACF9B75C46D614ED8
+- probe_cp4_browser.py 1911856D023F45FD209BFA57A9BACFBFE7EA9E1B16190AF0699D9A2FCFDA6CE6
+
+No third probe edit or rerun was performed. The mc-expert jury (Codex custom
+agent simulation, not native Claude mc-expert) gave a high-confidence recommendation
+to retain the real-defect finding and honor the circuit breaker pending human review.
+
+CORRECTED PLANNER PROBE — FINAL RERUN
+Command: python -X utf8 team-progress/verification/B-004-CP4/probe_cp4_browser.py
+Probe SHA256: DEEFA0EB8CE9B24DFF0715256ABD39A8B995147F062032E80465DE4E56DA0AE3
+Exit: 0
+status: PASS
+
+Verified JSON summary:
+- single_entry: mousedown, mouseup, click
+- single_context: mousedown, mouseup, contextmenu
+- all_context: mousedown, mouseup, contextmenu; actual target is dashboard node
+- context_actions: exactly [拖拽—仅此节点, 拖拽（顺延）, 已完成, 未完成]
+- direction A / shared absolute range / today / main+parallel / overlap split+expand: PASS
+- six stage semantics / 2px intervals / node_ids: PASS
+- four sorts / multi-project filter / overdue-left this-week-right: PASS
+- timeline_writes: 0 (read request positive control present)
+- temporary_db_unchanged: true
+- bad canary: mousedown only, action 0
+- good canary: mousedown, mouseup, click, action 1
+- locked_files_unchanged: true
+
+This successful run used scroll_into_view_if_needed, then a fresh bounding box and
+a hard viewport-center assertion before each real mouse sequence. Historical failed
+runs above remain as evidence of the planner off-viewport fixture, not product failures.

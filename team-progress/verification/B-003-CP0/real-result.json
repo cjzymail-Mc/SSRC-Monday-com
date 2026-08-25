@@ -1,0 +1,44 @@
+{
+  "result": "PASS",
+  "route_count": 11,
+  "routes_exact": true,
+  "referenced_tests": [
+    "TimelineCoreTests.test_group1_unauthenticated_http_401"
+  ],
+  "loadable_ast_tests": [
+    "TimelineCoreTests.test_batch_update_conflict_noop_and_cascade",
+    "TimelineCoreTests.test_cascade_anchors_status_only_and_date_priority",
+    "TimelineCoreTests.test_excel_import_preview_commit_and_export",
+    "TimelineCoreTests.test_export_exact_1000_and_over_limit_fail_closed",
+    "TimelineCoreTests.test_group10_backup_content_idempotence_rollback",
+    "TimelineCoreTests.test_group10_true_v15_to_v16_migration_backup_and_idempotence",
+    "TimelineCoreTests.test_group11_import_two_phase_race_and_replay",
+    "TimelineCoreTests.test_group12_empty_and_project_unique_contract",
+    "TimelineCoreTests.test_group1_project_permissions_and_lifecycle",
+    "TimelineCoreTests.test_group1_unauthenticated_http_401",
+    "TimelineCoreTests.test_group2_initial_date_lock_and_group3_conflict_views",
+    "TimelineCoreTests.test_group3_missing_versions_and_exact_zero_writes",
+    "TimelineCoreTests.test_group4_undo_guards",
+    "TimelineCoreTests.test_group4_undo_three_batch_middle_and_reverse_roles",
+    "TimelineCoreTests.test_group5_mixed_batch_audit_kinds",
+    "TimelineCoreTests.test_group6_write_chain_rules_and_snapshot_neighbor",
+    "TimelineCoreTests.test_group7_view_metrics_review_pagination_and_undo_count",
+    "TimelineCoreTests.test_group8_excel_negative_controls",
+    "TimelineCoreTests.test_group9_excel_round_trip_in_new_workspace",
+    "TimelineCoreTests.test_import_field_limits_boundaries",
+    "TimelineCoreTests.test_import_headers_contract_literal",
+    "TimelineCoreTests.test_import_multirow_aggregation_and_counts",
+    "TimelineCoreTests.test_import_status_three_states_and_recompute",
+    "TimelineCoreTests.test_import_xlsx_serial_positive_and_boundaries",
+    "TimelineCoreTests.test_initial_correction_undo_and_review",
+    "TimelineCoreTests.test_name_conflict_and_viewer_denied",
+    "TimelineCoreTests.test_project_create_then_batch_nodes_and_derived_view",
+    "TimelineCoreTests.test_single_and_cascade_clamping",
+    "TimelineCoreTests.test_v16_migration_five_tables_and_checks"
+  ],
+  "failures": [],
+  "inputs": {
+    "team-progress\\B-003-coverage-map.md": "d2463e95ae0a58ed402b16a55c753fdd68922c177a86c21a84e3221c2f351b9c",
+    "tests\\test_timeline.py": "8b30f9536b199f244c00438b706689074af0e403d2016a7905dba46a7a7221cf"
+  }
+}

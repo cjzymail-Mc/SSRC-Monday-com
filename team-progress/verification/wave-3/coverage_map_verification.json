@@ -1,0 +1,248 @@
+{
+  "source": {
+    "freeze": "feature-01-项目时间管理-仪表盘\\9-GATE3_TECH_FREEZE.md",
+    "map": "team-progress\\B-002-coverage-map.md"
+  },
+  "baseline_start": {
+    "hashes": {
+      "flowboard\\timeline.py": "c9bd463da49d5517c7d44f213d929ada5d1d4fb08b7b2a5e36d9b963b75b6e2b",
+      "tests\\test_timeline.py": "8b30f9536b199f244c00438b706689074af0e403d2016a7905dba46a7a7221cf",
+      "team-progress\\B-002-coverage-map.md": "d6e8f7356113e9ee8f6aeb9a848dc5c1a713ef9b448d9f0eac1cc28b1477cada"
+    },
+    "freeze_sha256": "4a83bfecf75b05c5bdbdc26d41dca7710e2e7867bc590a6a5027fa9fae901070",
+    "flowboard_db": {
+      "size": 446464,
+      "mtime_ns": 1786516285465474700
+    }
+  },
+  "baseline_end": {
+    "hashes": {
+      "flowboard\\timeline.py": "c9bd463da49d5517c7d44f213d929ada5d1d4fb08b7b2a5e36d9b963b75b6e2b",
+      "tests\\test_timeline.py": "8b30f9536b199f244c00438b706689074af0e403d2016a7905dba46a7a7221cf",
+      "team-progress\\B-002-coverage-map.md": "d6e8f7356113e9ee8f6aeb9a848dc5c1a713ef9b448d9f0eac1cc28b1477cada"
+    },
+    "freeze_sha256": "4a83bfecf75b05c5bdbdc26d41dca7710e2e7867bc590a6a5027fa9fae901070",
+    "flowboard_db": {
+      "size": 446464,
+      "mtime_ns": 1786516285465474700
+    }
+  },
+  "baseline_stable": true,
+  "real_map": {
+    "passed": false,
+    "exit_code": 1,
+    "freeze_shape": {
+      "group_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "section_5_1_rule_count": 4,
+      "section_5_2_rule_count": 10,
+      "section_5_3_bullet_count": 3
+    },
+    "coverage": {
+      "groups_present": 12,
+      "group_clause_requirements": 63,
+      "section_5_1_requirements": 4,
+      "section_5_2_requirements": 10,
+      "section_5_3_requirements": 1
+    },
+    "statuses": {
+      "rows_checked": 80,
+      "allowed": [
+        "CONFLICT",
+        "GAP-B002",
+        "GAP-非九项",
+        "N/A",
+        "PASS"
+      ],
+      "normalized_counts": {
+        "CONFLICT": 0,
+        "GAP-B002": 0,
+        "GAP-非九项": 8,
+        "N/A": 1,
+        "PASS": 71
+      }
+    },
+    "tests": {
+      "references_resolved": 29,
+      "loadable": 29,
+      "load_results": [
+        {
+          "name": "test_secure_foundation.QueryProjectionTests.test_transfer_rejects_malformed_and_unsafe_inputs",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_batch_update_conflict_noop_and_cascade",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_cascade_anchors_status_only_and_date_priority",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_excel_import_preview_commit_and_export",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_export_exact_1000_and_over_limit_fail_closed",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group10_backup_content_idempotence_rollback",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group10_true_v15_to_v16_migration_backup_and_idempotence",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group11_import_two_phase_race_and_replay",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group12_empty_and_project_unique_contract",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group1_project_permissions_and_lifecycle",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group1_unauthenticated_http_401",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group2_initial_date_lock_and_group3_conflict_views",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group3_missing_versions_and_exact_zero_writes",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group4_undo_guards",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group4_undo_three_batch_middle_and_reverse_roles",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group5_mixed_batch_audit_kinds",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group6_write_chain_rules_and_snapshot_neighbor",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group7_view_metrics_review_pagination_and_undo_count",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group8_excel_negative_controls",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_group9_excel_round_trip_in_new_workspace",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_import_field_limits_boundaries",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_import_headers_contract_literal",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_import_multirow_aggregation_and_counts",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_import_status_three_states_and_recompute",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_import_xlsx_serial_positive_and_boundaries",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_initial_correction_undo_and_review",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_name_conflict_and_viewer_denied",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_project_create_then_batch_nodes_and_derived_view",
+          "loadable": true
+        },
+        {
+          "name": "test_timeline.TimelineCoreTests.test_single_and_cascade_clamping",
+          "loadable": true
+        }
+      ]
+    },
+    "gap_routes": {
+      "entries": [
+        "D-2",
+        "D-4",
+        "D-5",
+        "D-6",
+        "D-7"
+      ],
+      "shared_route": false
+    },
+    "failures": [
+      {
+        "key": "OUT_OF_SCOPE_ROUTE_MISSING",
+        "missing_ids": [
+          "D-2",
+          "D-5",
+          "D-6",
+          "D-7"
+        ],
+        "minimal_fix": "在 §D 前言增加一条共享声明：D 表全部为 B-003 候选；无需逐行改写。"
+      }
+    ]
+  },
+  "positive_controls": {
+    "delete_one_mapping": {
+      "mutated_in_memory_only": true,
+      "target": "| 空 batch/correction 422 |",
+      "exit_code": 1,
+      "passed": false,
+      "failure_keys": [
+        "MISSING_MAPPING",
+        "OUT_OF_SCOPE_ROUTE_MISSING"
+      ],
+      "expected_failure_observed": true
+    },
+    "replace_with_missing_test": {
+      "mutated_in_memory_only": true,
+      "target": "`test_import_headers_contract_literal`",
+      "replacement": "`test_wave3_definitely_missing`",
+      "exit_code": 1,
+      "passed": false,
+      "failure_keys": [
+        "TEST_NOT_FOUND",
+        "OUT_OF_SCOPE_ROUTE_MISSING"
+      ],
+      "expected_failure_observed": true
+    }
+  },
+  "controls_passed": true
+}

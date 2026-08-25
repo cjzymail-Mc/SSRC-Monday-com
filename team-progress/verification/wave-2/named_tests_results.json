@@ -1,0 +1,88 @@
+{
+  "coverage_map_section_e_executable_entries": 9,
+  "note": "§E 第9项是 coverage map 文档本体，不是 unittest；其余九个可执行条目逐一加载并运行。",
+  "passed": 9,
+  "results": [
+    {
+      "name": "test_timeline.TimelineCoreTests.test_import_headers_contract_literal",
+      "loaded_count": 1,
+      "tests_run": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "name": "test_timeline.TimelineCoreTests.test_import_xlsx_serial_positive_and_boundaries",
+      "loaded_count": 1,
+      "tests_run": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "name": "test_timeline.TimelineCoreTests.test_import_status_three_states_and_recompute",
+      "loaded_count": 1,
+      "tests_run": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "name": "test_timeline.TimelineCoreTests.test_import_multirow_aggregation_and_counts",
+      "loaded_count": 1,
+      "tests_run": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "name": "test_timeline.TimelineCoreTests.test_import_field_limits_boundaries",
+      "loaded_count": 1,
+      "tests_run": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "name": "test_timeline.TimelineCoreTests.test_export_exact_1000_and_over_limit_fail_closed",
+      "loaded_count": 1,
+      "tests_run": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "name": "test_timeline.TimelineCoreTests.test_group9_excel_round_trip_in_new_workspace",
+      "loaded_count": 1,
+      "tests_run": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "name": "test_timeline.TimelineCoreTests.test_group10_backup_content_idempotence_rollback",
+      "loaded_count": 1,
+      "tests_run": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "name": "test_timeline.TimelineCoreTests.test_group4_undo_three_batch_middle_and_reverse_roles",
+      "loaded_count": 1,
+      "tests_run": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    }
+  ]
+}

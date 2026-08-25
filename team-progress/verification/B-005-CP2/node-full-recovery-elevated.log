@@ -1,0 +1,44 @@
+FILES=6
+dashboard-ui assertions: 9
+✔ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\dashboard_ui.test.js (128.191ms)
+✔ realtime self echo advances without refresh while remote/system/mixed refresh (1.0279ms)
+schedule-ui assertions: 7
+✔ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\schedule_ui.test.js (97.8853ms)
+ok - bounds use both tracks
+ok - single project renders direction A card and both tracks
+ok - dashboard renders semantic stage intervals
+ok - stage class maps semantic token
+ok - all frozen stages map to stable semantic classes
+ok - single dashboard renders absolute calendar and redundant today label
+ok - collapsed overlap uses server row_index and offers expansion
+ok - stage interval carries matching data, class and redundant label
+ok - expanded overlap splits deterministic server rows
+ok - risk markers are red-left orange-right with text
+ok - single dashboard exposes shared four-action controller menu
+ok - dashboard nodes expose an explicit physical hit target and redundant label
+ok - all dashboard filters projects and reflects one of four sorts
+ok - all dashboard reuses one context controller
+ok - import preview exposes server summary/warnings and enables commit
+ok - import errors render actionable rows and keep commit disabled
+ok - export view links only the verified server blob
+ok - single clamps at next same-track node
+ok - cascade shifts only the same track
+ok - date and status share one draft row
+ok - editor exposes draft count and zoom band
+ok - discard restores original locally
+ok - batch carries version and interaction details
+ok - batch combines date status create and remove changes
+✔ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\timeline_ui.test.js (444.9564ms)
+view-state assertions: 45
+✔ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\view_state.test.js (88.0993ms)
+view-ui assertions: 14
+✔ D:\Downloads\Mc Claude Code Workshop\monday-com\tests\view_ui.test.js (87.5642ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 532.6026
+EXIT_CODE=0

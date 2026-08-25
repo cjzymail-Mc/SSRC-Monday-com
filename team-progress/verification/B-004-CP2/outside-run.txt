@@ -1,0 +1,22 @@
+Command: python -X utf8 team-progress\verification\B-004-CP2\probe_cp2_browser.py
+Environment: main agent execution context permitting Playwright driver/Chromium child processes
+Exit: 0
+Status: PASS
+
+Selected JSON evidence:
+- context events: [mousedown, mouseup, contextmenu]
+- menu events: [mousedown, mouseup, click]
+- bad canary: [bad:mousedown], action=0
+- good canary: [good:mousedown, good:mouseup, good:click], action=1
+- cascade dates: node1=2026-08-02, node2=2026-08-06, node3=2026-08-10, parallel node4=2026-08-03
+- date sort: [1,2,3]
+- stage sort: [2,3,1]
+- drag phase request delta: 0
+- network instrumentation positive control: GET /api/session observed
+- beforeunload: defaultPrevented=true, dispatch returned false
+- temporary database four-table content hash before/after: 62e894... (equal)
+- flowboard.db and .copilot-state/task/message guards: unchanged
+
+The full JSON was observed by the main agent. This durable summary records the
+acceptance-bearing fields and exit status; it is not a synthetic replacement for
+the executed browser probe.

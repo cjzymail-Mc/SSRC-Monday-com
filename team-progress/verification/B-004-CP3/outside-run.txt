@@ -1,0 +1,39 @@
+B-004 CP3 sandbox-outside execution record
+Date: 2026-08-20 Asia/Shanghai
+Executor: root/main agent (outside restricted Windows Playwright pipe sandbox)
+
+COMMAND
+python -X utf8 team-progress/verification/B-004-CP3/probe_cp3_browser.py
+
+EXIT
+0
+
+RESULT
+status=PASS
+right_menu=[拖拽—仅此节点, 拖拽（顺延）, 已完成, 未完成]
+remove_control=independent
+r06.post_count=1
+r06.details.mode=cascade
+r06.details.magnet=standard
+r06.details.zoom_band=±10d×8
+r06.change_kinds=[date,status,create,remove]
+r07=restored
+refresh=persisted
+r03=actor/change_rows visible
+r08.admin=200
+r08.member=403
+r08.code=ADMIN_REQUIRED
+conflict.status=409
+conflict.latest_view=true
+conflict.four_table_hash_unchanged=true
+locked_files_unchanged=true
+
+CODER E2E OUTSIDE RE-RUN
+python -X utf8 -m unittest discover -s tests -p 'test_timeline_e2e.py'
+exit=0
+Ran 6 tests in 21.997s
+OK
+
+Note: full structured outcome was returned by the main agent after the outside run.
+The planner's restricted run was attempted once only and stopped at
+PLAYWRIGHT_DRIVER_WINERROR5 before any browser test executed.

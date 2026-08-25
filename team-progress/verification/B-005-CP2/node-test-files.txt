@@ -1,0 +1,6 @@
+.\tests\dashboard_ui.test.js
+.\tests\i12_ui.test.js
+.\tests\schedule_ui.test.js
+.\tests\timeline_ui.test.js
+.\tests\view_state.test.js
+.\tests\view_ui.test.js

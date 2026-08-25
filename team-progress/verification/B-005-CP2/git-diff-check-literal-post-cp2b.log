@@ -1,0 +1,19 @@
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'flowboard/database.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'flowboard/transfer.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mc-plan/Mc思考01-阶段完工-下阶段计划.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_collaboration.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_dashboards.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_i12.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_i13.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_i13_e2e.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_i13_operations.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_schedule.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_secure_foundation.py', LF will be replaced by CRLF the next time Git touches it
+mc-plan/Mc思考01-阶段完工-下阶段计划.md:1053: trailing whitespace.
++>>>>>> codex 自主 spwan agent，用 team 工作流完成工作...  
+mc-plan/Mc思考01-阶段完工-下阶段计划.md:1195: new blank line at EOF.
+EXIT_CODE=2

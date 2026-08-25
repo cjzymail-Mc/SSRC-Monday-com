@@ -1,0 +1,38 @@
+B-004 CP5 independent planner probe — outside run
+Date: 2026-08-20 Asia/Shanghai
+
+Initial probe
+- SHA256: D98141018FFDA2229FB385BE54B43789790D8D747058897B32796EE92512B096
+- Product journey reached the final isolated click canary.
+- Exit 1 at CANARY_BAD; old assertion had no event/action detail and the
+  canary had no fixed hit box. Classified as planner fixture
+  CP5_PLANNER_CANARY_HITBOX_DIAGNOSTIC, not a product failure.
+
+Corrected probe
+- Command: python -X utf8 team-progress/verification/B-004-CP5/probe_cp5_browser.py
+- SHA256: B3CE3F9C28546CA5DDD2056C47877D880580655D36A7FF6C4A3315CF14BA688B
+- Exit: 0
+- JSON status: PASS
+
+Verified summary
+- R09: 201; real file chooser, summary and warnings visible.
+- R10: 201; request body contains only batch_id; post-commit refresh observed.
+- Row details: active-name conflict reports both source rows 2/4; duplicate_of,
+  invalid enum and invalid date are rendered as actionable row details.
+- Warnings: first sheet only; CSV numeric date advises xlsx; status is
+  recalculated with only 已完成 retained.
+- R11: POST; server base64 decoded; server/Python/WebCrypto SHA-256 agree;
+  actual downloaded bytes equal server bytes.
+- Workspace 2 roundtrip: downloaded file -> R09 201 -> R10 201 -> R01 semantic readback.
+- Safety: 1000 rows plus a 10k cell accepted; 9 real-file negatives rejected
+  (1.5MB, 12MB inflated, 1001 rows, 10001 cell, formula, macro, external link,
+  strict header order/name, duplicate header); commit forbidden and four-table zero-write.
+- Expected 422 console/pageerror segments accounted precisely.
+- Canary: bad = mousedown/action0; good = mousedown,mouseup,click/action1.
+- Runtime flowboard.db and .copilot-* fingerprints unchanged.
+
+Coder regression supplied by main agent
+- Playwright E2E 21/21 PASS (76.692s)
+- Node 24/24 PASS
+- HTTP 10/10 PASS
+- timeline service 29/29 PASS

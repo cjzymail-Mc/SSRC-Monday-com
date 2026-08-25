@@ -1,0 +1,772 @@
+{
+ "using_headers": [
+  "项目名称",
+  "阶段",
+  "轨道",
+  "节点",
+  "日期",
+  "间隔",
+  "状态",
+  "备注"
+ ],
+ "results": [
+  {
+   "probe": "P0",
+   "item": 0,
+   "criterion": "A§5 依据行：列序=项目名称｜阶段｜轨道｜节点｜日期｜间隔｜状态｜备注；F2-① 固定 8 列列序 + 表头精确校验",
+   "construct": "契约字面 8 列表头+1 行合法数据 → preview_import",
+   "expect": "接受",
+   "actual": "{\"batch_id\": 1, \"format\": \"xlsx\", \"row_count\": 1, \"projects\": [{\"name\": \"表头探测\", \"node_count\": 1}], \"warnings\": [\"状态将按日期重算，仅『已完成』保留\"]}",
+   "observed": "PASS_PROBE",
+   "note": "契约字面表头可用"
+  },
+  {
+   "probe": "P1a",
+   "item": 1,
+   "criterion": "A§5.2 日期行：.xlsx 数值日期按序列号换算，限 1950–2100 整数（序列号 18264–73051）；非整数序列号（带时间如 46234.5）明确拒收。B§8-1：整数序列号 18264..73051 换算日期；分数/越界行级 422",
+   "construct": "xlsx 数值 cell 序列号 46648 → preview+commit → 读回节点 date",
+   "expect": "date==2027-09-18（探针自算）",
+   "actual": {
+    "stored_date": "2027-09-18"
+   },
+   "observed": "PASS_PROBE",
+   "note": "端点/中段整数换算"
+  },
+  {
+   "probe": "P1a",
+   "item": 1,
+   "criterion": "A§5.2 日期行：.xlsx 数值日期按序列号换算，限 1950–2100 整数（序列号 18264–73051）；非整数序列号（带时间如 46234.5）明确拒收。B§8-1：整数序列号 18264..73051 换算日期；分数/越界行级 422",
+   "construct": "xlsx 数值 cell 序列号 18264 → preview+commit → 读回节点 date",
+   "expect": "date==1950-01-01（探针自算）",
+   "actual": {
+    "stored_date": "1950-01-01"
+   },
+   "observed": "PASS_PROBE",
+   "note": "端点/中段整数换算"
+  },
+  {
+   "probe": "P1a",
+   "item": 1,
+   "criterion": "A§5.2 日期行：.xlsx 数值日期按序列号换算，限 1950–2100 整数（序列号 18264–73051）；非整数序列号（带时间如 46234.5）明确拒收。B§8-1：整数序列号 18264..73051 换算日期；分数/越界行级 422",
+   "construct": "xlsx 数值 cell 序列号 73051 → preview+commit → 读回节点 date",
+   "expect": "date==2100-01-01（探针自算）",
+   "actual": {
+    "stored_date": "2100-01-01"
+   },
+   "observed": "PASS_PROBE",
+   "note": "端点/中段整数换算"
+  },
+  {
+   "probe": "P1b",
+   "item": 1,
+   "criterion": "A§5.2 日期行：.xlsx 数值日期按序列号换算，限 1950–2100 整数（序列号 18264–73051）；非整数序列号（带时间如 46234.5）明确拒收。B§8-1：整数序列号 18264..73051 换算日期；分数/越界行级 422；A§5.2 错误形态：行级 422，details 带 row（从 2 起）",
+   "construct": "xlsx 数值 cell 46234.5 → preview_import",
+   "expect": "ApiError 422 行级（details.row=2）",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"VALIDATION_ERROR\", \"message\": \"date 必须是有效的 YYYY-MM-DD 日期\", \"details\": {\"row\": 2}}",
+   "observed": "PASS_PROBE",
+   "note": "非整数必须真跑出 422（纪律2 阳性对照）"
+  },
+  {
+   "probe": "P1c",
+   "item": 1,
+   "criterion": "A§5.2 日期行：.xlsx 数值日期按序列号换算，限 1950–2100 整数（序列号 18264–73051）；非整数序列号（带时间如 46234.5）明确拒收。B§8-1：整数序列号 18264..73051 换算日期；分数/越界行级 422",
+   "construct": "xlsx 数值 cell 越界整数 18263 → preview_import",
+   "expect": "ApiError 422 行级",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"VALIDATION_ERROR\", \"message\": \"日期序列号超出 18264..73051（1950–2100）范围\", \"details\": {\"row\": 2}}",
+   "observed": "PASS_PROBE",
+   "note": ""
+  },
+  {
+   "probe": "P1c",
+   "item": 1,
+   "criterion": "A§5.2 日期行：.xlsx 数值日期按序列号换算，限 1950–2100 整数（序列号 18264–73051）；非整数序列号（带时间如 46234.5）明确拒收。B§8-1：整数序列号 18264..73051 换算日期；分数/越界行级 422",
+   "construct": "xlsx 数值 cell 越界整数 73052 → preview_import",
+   "expect": "ApiError 422 行级",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"VALIDATION_ERROR\", \"message\": \"日期序列号超出 18264..73051（1950–2100）范围\", \"details\": {\"row\": 2}}",
+   "observed": "PASS_PROBE",
+   "note": ""
+  },
+  {
+   "probe": "P1d",
+   "item": 1,
+   "criterion": "A§5.2 日期行：文本严格 YYYY-MM-DD+真实历法校验（序列号换算仅限 .xlsx）",
+   "construct": "CSV 日期列文本 46648 → preview_import",
+   "expect": "ApiError 422 行级且为日期校验理由（非缺字段 required）",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"VALIDATION_ERROR\", \"message\": \"date 必须是有效的 YYYY-MM-DD 日期\", \"details\": {\"row\": 2}}",
+   "observed": "PASS_PROBE",
+   "note": "文本路径不得被序列号分支串扰；422 不得由错误理由触发"
+  },
+  {
+   "probe": "P1e",
+   "item": 1,
+   "criterion": "A§5.2 日期行：文本严格 YYYY-MM-DD",
+   "construct": "CSV 日期列 2030-01-01 → preview_import",
+   "expect": "接受",
+   "actual": "{\"batch_id\": 5, \"format\": \"csv\", \"row_count\": 1, \"projects\": [{\"name\": \"文本正例项目\", \"node_count\": 1}], \"warnings\": [\"状态将按日期重算，仅『已完成』保留\"]}",
+   "observed": "PASS_PROBE",
+   "note": "CSV 合法文本正控"
+  },
+  {
+   "probe": "P1f",
+   "item": 1,
+   "criterion": "A§5.2 日期行：文本严格 YYYY-MM-DD（xlsx 文本 cell 同样有效）",
+   "construct": "xlsx inlineStr 日期 2030-01-02 → preview_import",
+   "expect": "接受",
+   "actual": "{\"batch_id\": 6, \"format\": \"xlsx\", \"row_count\": 1, \"projects\": [{\"name\": \"内嵌文本日期\", \"node_count\": 1}], \"warnings\": [\"状态将按日期重算，仅『已完成』保留\"]}",
+   "observed": "PASS_PROBE",
+   "note": ""
+  },
+  {
+   "probe": "P2-weikaishi_past",
+   "item": 2,
+   "criterion": "A§5.2 状态行：∈ 三态或空（D12=B）：「已完成」→ done_at=导入时刻；「未开始/进行中」→ 仅参考、落库按日期重算；空 → 按日期派生；其他文本 → 行级报错。B§8-2：仅 已完成 持久化 done_at，其余按日期重算",
+   "construct": "status=[\"s\", \"未开始\"] + date=2020-01-01 → preview+commit → 读回",
+   "expect": "接受；派生 status=进行中、done_at 落库=False",
+   "actual": {
+    "stored_done_at": false,
+    "derived_status": "进行中"
+   },
+   "observed": "PASS_PROBE",
+   "note": "非完成态不得持久化完成；派生状态按日期重算"
+  },
+  {
+   "probe": "P2-jinxingzhong_future",
+   "item": 2,
+   "criterion": "A§5.2 状态行：∈ 三态或空（D12=B）：「已完成」→ done_at=导入时刻；「未开始/进行中」→ 仅参考、落库按日期重算；空 → 按日期派生；其他文本 → 行级报错。B§8-2：仅 已完成 持久化 done_at，其余按日期重算",
+   "construct": "status=[\"s\", \"进行中\"] + date=2099-01-01 → preview+commit → 读回",
+   "expect": "接受；派生 status=未开始、done_at 落库=False",
+   "actual": {
+    "stored_done_at": false,
+    "derived_status": "未开始"
+   },
+   "observed": "PASS_PROBE",
+   "note": "非完成态不得持久化完成；派生状态按日期重算"
+  },
+  {
+   "probe": "P2-empty_past",
+   "item": 2,
+   "criterion": "A§5.2 状态行：∈ 三态或空（D12=B）：「已完成」→ done_at=导入时刻；「未开始/进行中」→ 仅参考、落库按日期重算；空 → 按日期派生；其他文本 → 行级报错。B§8-2：仅 已完成 持久化 done_at，其余按日期重算",
+   "construct": "status=[\"s\", \"\"] + date=2020-01-02 → preview+commit → 读回",
+   "expect": "接受；派生 status=进行中、done_at 落库=False",
+   "actual": {
+    "stored_done_at": false,
+    "derived_status": "进行中"
+   },
+   "observed": "PASS_PROBE",
+   "note": "非完成态不得持久化完成；派生状态按日期重算"
+  },
+  {
+   "probe": "P2-yiwancheng",
+   "item": 2,
+   "criterion": "A§5.2 状态行：∈ 三态或空（D12=B）：「已完成」→ done_at=导入时刻；「未开始/进行中」→ 仅参考、落库按日期重算；空 → 按日期派生；其他文本 → 行级报错。B§8-2：仅 已完成 持久化 done_at，其余按日期重算",
+   "construct": "status=[\"s\", \"已完成\"] + date=2099-01-02 → preview+commit → 读回",
+   "expect": "接受；派生 status=已完成、done_at 落库=True",
+   "actual": {
+    "stored_done_at": true,
+    "derived_status": "已完成"
+   },
+   "observed": "PASS_PROBE",
+   "note": "非完成态不得持久化完成；派生状态按日期重算"
+  },
+  {
+   "probe": "P2-illegal",
+   "item": 2,
+   "criterion": "A§5.2 状态行：∈ 三态或空（D12=B）：「已完成」→ done_at=导入时刻；「未开始/进行中」→ 仅参考、落库按日期重算；空 → 按日期派生；其他文本 → 行级报错。B§8-2：仅 已完成 持久化 done_at，其余按日期重算",
+   "construct": "status=暂停（三态或空之外）→ preview",
+   "expect": "ApiError 422 行级（details.row=2）",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"VALIDATION_ERROR\", \"message\": \"value is required\", \"details\": {\"row\": 2}}",
+   "observed": "PASS_PROBE",
+   "note": ""
+  },
+  {
+   "probe": "P2-weifenjian",
+   "item": 2,
+   "criterion": "A§5.2 状态行：∈ 三态或空（D12=B）：「已完成」→ done_at=导入时刻；「未开始/进行中」→ 仅参考、落库按日期重算；空 → 按日期派生；其他文本 → 行级报错。B§8-2：仅 已完成 持久化 done_at，其余按日期重算",
+   "construct": "status=未完成（三态或空之外）→ preview",
+   "expect": "ApiError 422 行级（details.row=2）",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"VALIDATION_ERROR\", \"message\": \"value is required\", \"details\": {\"row\": 2}}",
+   "observed": "PASS_PROBE",
+   "note": "「未完成」为旧实现认可值、契约字面三态之外——锋利负例"
+  },
+  {
+   "probe": "P3a",
+   "item": 3,
+   "criterion": "A§5.2 文件内重复行：同项目+同轨+同日+同名，第二行起 行级 422「与第 N 行重复」；B§8-3：同名多行聚合为一个项目；仅四元组重复才拒收；preview 列实际节点数，commit 报去重项目数与总节点数",
+   "construct": "同名 3 行（不同轨道/日期/节点）→ preview+commit",
+   "expect": "preview projects=1 且节点数=3；commit 后 1 项目 3 节点（不互相覆盖）",
+   "actual": {
+    "preview": [
+     {
+      "name": "聚合项目",
+      "node_count": 3
+     }
+    ],
+    "commit": {
+     "batch_id": 11,
+     "projects": 1,
+     "nodes": 3
+    },
+    "db_node_count": 3,
+    "db_project_count": 1
+   },
+   "observed": "PASS_PROBE",
+   "note": "preview projects=[{\"name\": \"聚合项目\", \"node_count\": 3}]"
+  },
+  {
+   "probe": "P3b",
+   "item": 3,
+   "criterion": "A§5.2 文件内重复行：同项目+同轨+同日+同名，第二行起 行级 422「与第 N 行重复」；B§8-3：同名多行聚合为一个项目；仅四元组重复才拒收；preview 列实际节点数，commit 报去重项目数与总节点数",
+   "construct": "同项目+同轨+同日+同名 两行 → preview",
+   "expect": "ApiError 422 且 details.row=3（第二数据行，行号从 2 起）",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"VALIDATION_ERROR\", \"message\": \"与第 2 行重复\", \"details\": {\"row\": 3, \"duplicate_of\": 2}}",
+   "observed": "PASS_PROBE",
+   "note": ""
+  },
+  {
+   "probe": "P3c",
+   "item": 3,
+   "criterion": "A§5.2 文件内重复行：同项目+同轨+同日+同名，第二行起 行级 422「与第 N 行重复」；B§8-3：同名多行聚合为一个项目；仅四元组重复才拒收；preview 列实际节点数，commit 报去重项目数与总节点数",
+   "construct": "四元组任一不同的多变体行 → preview",
+   "expect": "接受",
+   "actual": "{\"batch_id\": 12, \"format\": \"xlsx\", \"row_count\": 4, \"projects\": [{\"name\": \"变体项目\", \"node_count\": 4}], \"warnings\": [\"状态将按日期重算，仅『已完成』保留\"]}",
+   "observed": "PASS_PROBE",
+   "note": ""
+  },
+  {
+   "probe": "P3d",
+   "item": 3,
+   "criterion": "A§5.2 项目名称行：同名已有项目=该项目所有行报错（带行号）、有错不许提交、不做部分导入",
+   "construct": "库内已有同名活跃项目 + 3 行文件（2 行同名）→ preview",
+   "expect": "ApiError 422；同名行 2、3 全部报错；不产生 previewed 批次",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"NAME_CONFLICT\", \"message\": \"项目名称唯一：已存在同名项目\", \"details\": {\"row\": 2, \"project\": \"既有项目\"}}",
+   "observed": "PASS_PROBE",
+   "note": "partial import/静默跳过即违约"
+  },
+  {
+   "probe": "P4a",
+   "item": 4,
+   "criterion": "A§5.2 节点名称行：非空、≤500（对齐任务标题上限）",
+   "construct": "节点名恰 500 个中文字符 → preview",
+   "expect": "接受",
+   "actual": "{\"batch_id\": 13, \"format\": \"xlsx\", \"row_count\": 1, \"projects\": [{\"name\": \"上限项目\", \"node_count\": 1}], \"warnings\": [\"状态将按日期重算，仅『已完成』保留\"]}",
+   "observed": "PASS_PROBE",
+   "note": "半边界：恰上限必须接受"
+  },
+  {
+   "probe": "P4b",
+   "item": 4,
+   "criterion": "A§5.2 节点名称行：非空、≤500（对齐任务标题上限）",
+   "construct": "节点名 501 个中文字符 → preview",
+   "expect": "ApiError 422 行级",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"VALIDATION_ERROR\", \"message\": \"value is too long\", \"details\": {\"row\": 2}}",
+   "observed": "PASS_PROBE",
+   "note": ""
+  },
+  {
+   "probe": "P4c",
+   "item": 4,
+   "criterion": "A§5.2 备注行：可空，≤500",
+   "construct": "备注恰 500 个中文字符 → preview",
+   "expect": "接受",
+   "actual": "{\"batch_id\": 14, \"format\": \"xlsx\", \"row_count\": 1, \"projects\": [{\"name\": \"上限项目\", \"node_count\": 1}], \"warnings\": [\"状态将按日期重算，仅『已完成』保留\"]}",
+   "observed": "PASS_PROBE",
+   "note": ""
+  },
+  {
+   "probe": "P4d",
+   "item": 4,
+   "criterion": "A§5.2 备注行：可空，≤500",
+   "construct": "备注 501 个中文字符 → preview",
+   "expect": "ApiError 422 行级",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"VALIDATION_ERROR\", \"message\": \"remark is too long\", \"details\": {\"row\": 2}}",
+   "observed": "PASS_PROBE",
+   "note": ""
+  },
+  {
+   "probe": "P4e",
+   "item": 4,
+   "criterion": "A§5.2 项目名称行：非空、≤200 字",
+   "construct": "项目名恰 200 个中文字符 → preview",
+   "expect": "接受",
+   "actual": "{\"batch_id\": 15, \"format\": \"xlsx\", \"row_count\": 1, \"projects\": [{\"name\": \"项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项项\", \"node_count\": 1}], \"warnings\": [\"状态将按日期重算，仅『已完成』保留\"]}",
+   "observed": "PASS_PROBE",
+   "note": ""
+  },
+  {
+   "probe": "P4f",
+   "item": 4,
+   "criterion": "A§5.2 项目名称行：非空、≤200 字",
+   "construct": "项目名 201 个中文字符 → preview",
+   "expect": "ApiError 422 行级",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"VALIDATION_ERROR\", \"message\": \"value is too long\", \"details\": {\"row\": 2}}",
+   "observed": "PASS_PROBE",
+   "note": "中文按字符计数（非字节）——201 中文字=603 UTF-8 字节"
+  },
+  {
+   "probe": "P5a",
+   "item": 5,
+   "criterion": "A§3.7 导出行：行上限 1000（与导入闭环，导出物必可再导入）；B§8-5：恰好 1000 行成功导出且产物可再导入；超限 422 EXPORT_LIMIT（含 total/max），禁静默截断",
+   "construct": "恰 1000 活跃节点 → export → 新 workspace preview",
+   "expect": "导出成功；产物数据行=1000；preview 接受",
+   "actual": {
+    "data_rows": 1000,
+    "preview_ok": true,
+    "preview": "{\"batch_id\": 1, \"format\": \"xlsx\", \"row_count\": 1000, \"projects\": [{\"name\": \"导出边界项目\", \"node_count\": 1000}], \"warnings\": [\"状态将按日期重算，仅『已完成』保留\"]}"
+   },
+   "observed": "PASS_PROBE",
+   "note": "导出物必可再导入（闭环）"
+  },
+  {
+   "probe": "P5b",
+   "item": 5,
+   "criterion": "A§3.7 导出行：行上限 1000（与导入闭环，导出物必可再导入）；B§8-5：恰好 1000 行成功导出且产物可再导入；超限 422 EXPORT_LIMIT（含 total/max），禁静默截断",
+   "construct": "隔离库 1001 活跃节点 → export_timeline",
+   "expect": "ApiError 422 且 code==EXPORT_LIMIT 且 details 含 total=1001/max=1000",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"EXPORT_LIMIT\", \"message\": \"导出行数超过上限\", \"details\": {\"total\": 1001, \"max\": 1000}}",
+   "observed": "PASS_PROBE",
+   "note": "任何 200 返回（哪怕带 1000 行产物）=静默截断违约证据"
+  },
+  {
+   "probe": "P6a",
+   "item": 6,
+   "criterion": "B§8-6：用 export_timeline() 返回的真实字节导入新 workspace，断言语义等价、已完成保留、非完成态按日期重算、interval 忽略、done_at 允许时间差；A§3.7：R5 同名即拒，往返等价仅发生在全新 workspace；A§7.1 组9：导出→导入往返等价（除 done_at 时刻与状态重算的既定差异）",
+   "construct": "源 ws（2 项目 5 节点，双轨/三态/跨月/中文/500 字节点名）→ export 真实字节 → 全新 ws2 preview+commit → 双侧视图逐节点比对",
+   "expect": "字节 sha256 一致；语义等价（名称/日期/轨道/阶段/备注）；已完成保留 done_at；非完成态按日期重算；interval 忽略但重派生一致；done_at 只比存在性",
+   "actual": {
+    "export_sha256": "23e9c808edba0c820b81861146b36c1ed20c622b318422a88ac9bb8a2ff64d60",
+    "stored_content_sha256": "23e9c808edba0c820b81861146b36c1ed20c622b318422a88ac9bb8a2ff64d60",
+    "src": [
+     [
+      "往返乙·第二项目",
+      [
+       [
+        "parallel",
+        "应用迭代",
+        "乙并",
+        "2020-03-01",
+        "",
+        false,
+        "进行中",
+        null
+       ]
+      ]
+     ],
+     [
+      "往返甲",
+      [
+       [
+        "main",
+        "创意",
+        "甲首",
+        "2020-01-05",
+        "",
+        false,
+        "进行中",
+        null
+       ],
+       [
+        "main",
+        "设计",
+        "甲二",
+        "2020-02-11",
+        "中文备注·跨月",
+        true,
+        "已完成",
+        37
+       ],
+       [
+        "main",
+        "量产",
+        "节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节",
+        "2099-11-30",
+        "",
+        false,
+        "未开始",
+        29147
+       ],
+       [
+        "parallel",
+        "测试",
+        "并行子",
+        "2099-12-05",
+        "",
+        false,
+        "未开始",
+        null
+       ]
+      ]
+     ]
+    ],
+    "dst": [
+     [
+      "往返乙·第二项目",
+      [
+       [
+        "parallel",
+        "应用迭代",
+        "乙并",
+        "2020-03-01",
+        "",
+        false,
+        "进行中",
+        null
+       ]
+      ]
+     ],
+     [
+      "往返甲",
+      [
+       [
+        "main",
+        "创意",
+        "甲首",
+        "2020-01-05",
+        "",
+        false,
+        "进行中",
+        null
+       ],
+       [
+        "main",
+        "设计",
+        "甲二",
+        "2020-02-11",
+        "中文备注·跨月",
+        true,
+        "已完成",
+        37
+       ],
+       [
+        "main",
+        "量产",
+        "节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节节",
+        "2099-11-30",
+        "",
+        false,
+        "未开始",
+        29147
+       ],
+       [
+        "parallel",
+        "测试",
+        "并行子",
+        "2099-12-05",
+        "",
+        false,
+        "未开始",
+        null
+       ]
+      ]
+     ]
+    ],
+    "equal": true,
+    "preview": "{\"batch_id\": 1, \"format\": \"xlsx\", \"row_count\": 5, \"projects\": [{\"name\": \"往返甲\", \"node_count\": 4}, {\"name\": \"往返乙·第二项目\", \"node_count\": 1}], \"warnings\": [\"状态将按日期重算，...<t>",
+    "commit": "{\"batch_id\": 1, \"projects\": 2, \"nodes\": 5}"
+   },
+   "observed": "PASS_PROBE",
+   "note": "喂给 preview 的字节必须与 export 返回值逐字节相同（sha256 铁证）"
+  },
+  {
+   "probe": "P6b",
+   "item": 6,
+   "criterion": "A§3.7 R5：同名即拒使「导出→导回同一 workspace」被 R1 拦截",
+   "construct": "已 commit 的 ws2 再次 preview 同一真实字节",
+   "expect": "ApiError 422",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"NAME_CONFLICT\", \"message\": \"项目名称唯一：已存在同名项目\", \"details\": {\"row\": 2, \"project\": \"往返甲\"}}",
+   "observed": "PASS_PROBE",
+   "note": ""
+  },
+  {
+   "probe": "P7a",
+   "item": 7,
+   "criterion": "B§8-7：v15→v16 备份非空且含代表性存量；对 v16 库重跑 migrate 幂等（user_version=16 且仅一条 version 16 迁移记录）；回滚语义可证；全程隔离库；A§6 2a：先 integrity_check 再快照，快照失败=迁移中止；A§6 步3：迁移前只读记录存量表动态计数基线→迁移后逐项比对完全一致",
+   "construct": "v15 种子库（users/boards/tasks 含 sentinel）→ migrate → 断言对象=备份本体+迁移后库",
+   "expect": "备份非空、user_version==15、sentinel 在、无 timeline 表；迁移后 16、五表空、存量计数=基线、integrity/FK 过、backups 恰多 1 个 pre-v16",
+   "actual": {
+    "backup_returned": "C:\\Users\\xy198\\AppData\\Local\\Temp\\b002-mig-8ia14jib\\backups\\seeded-v15-pre-v16-20260819-160316-367300.db",
+    "new_backup_files": [
+     "seeded-v15-pre-v16-20260819-160316-367300.db"
+    ],
+    "backup_user_version": 15,
+    "backup_has_timeline_tables": [],
+    "backup_task_count": 5,
+    "backup_sentinel": [
+     [
+      1,
+      "任务一",
+      "进行中"
+     ],
+     [
+      2,
+      "任务二",
+      "待开始"
+     ],
+     [
+      3,
+      "任务三",
+      "审核中"
+     ],
+     [
+      4,
+      "任务四",
+      "已完成"
+     ],
+     [
+      5,
+      "任务五",
+      "进行中"
+     ]
+    ],
+    "backup_user_count": 2,
+    "user_version": 16,
+    "v16_migration_rows": 1,
+    "counts_after": {
+     "users": 2,
+     "workspaces": 1,
+     "boards": 1,
+     "groups_": 2,
+     "tasks": 5
+    },
+    "timeline_empty": {
+     "timeline_projects": 0,
+     "timeline_nodes": 0,
+     "timeline_change_batches": 0,
+     "timeline_node_changes": 0,
+     "timeline_import_batches": 0
+    },
+    "integrity": "ok",
+    "fk": []
+   },
+   "observed": "PASS_PROBE",
+   "note": "断言必须打在备份快照本体上，不是迁移后库"
+  },
+  {
+   "probe": "P7b",
+   "item": 7,
+   "criterion": "B§8-7：对 v16 库重跑 migrate 幂等（user_version=16 且仅一条 version 16 迁移记录）",
+   "construct": "已 v16 的隔离库再次 migrate",
+   "expect": "user_version 仍 16；version=16 记录恰 1 条；五表仍空；存量不变",
+   "actual": {
+    "user_version": 16,
+    "v16_rows": 1,
+    "timeline_counts": {
+     "timeline_projects": 0,
+     "timeline_nodes": 0
+    },
+    "tasks": 5
+   },
+   "observed": "PASS_PROBE",
+   "note": ""
+  },
+  {
+   "probe": "P7c",
+   "item": 7,
+   "criterion": "B§8-7：回滚语义可证；A§6 注记③：回滚=丢时间轴侧新增写入、存量无损",
+   "construct": "备份本体 sqlite backup → 新库，断言 v15 语义",
+   "expect": "恢复库 user_version==15、无 timeline 表、sentinel 存量无损",
+   "actual": {
+    "user_version": 15,
+    "timeline_tables": [],
+    "sentinel": [
+     [
+      1,
+      "任务一",
+      "进行中"
+     ],
+     [
+      2,
+      "任务二",
+      "待开始"
+     ],
+     [
+      3,
+      "任务三",
+      "审核中"
+     ],
+     [
+      4,
+      "任务四",
+      "已完成"
+     ],
+     [
+      5,
+      "任务五",
+      "进行中"
+     ]
+    ]
+   },
+   "observed": "PASS_PROBE",
+   "note": ""
+  },
+  {
+   "probe": "P8a",
+   "item": 8,
+   "criterion": "A§3.2 护栏①：每个 batch_id 必须是其所属项目 MAX(id) 批次，任一不满足→整个 undo 409 UNDO_TARGET_STALE 零写入；③ 逐行生成反向变更（old/new 互换；created 反向=软删该节点、deleted 反向=恢复 deleted_at=NULL），原批次原样保留；B§8-8：三连续批次，中间批次 undo 返回 409 且零写入",
+   "construct": "同项目连续三批（id 严格递增 (1, 2, 3)）→ undo 中间批",
+   "expect": "ApiError 409 且 code==UNDO_TARGET_STALE；六表计数+节点行快照+version 全不变",
+   "actual": {
+    "error": "{\"signal\": \"ApiError\", \"status\": 409, \"code\": \"UNDO_TARGET_STALE\", \"message\": \"撤销目标已过期\", \"details\": null}",
+    "zero_write": true
+   },
+   "observed": "PASS_PROBE",
+   "note": "409 必须是 UNDO_TARGET_STALE（错误理由区分）"
+  },
+  {
+   "probe": "P8a-ctl",
+   "item": 8,
+   "criterion": "A§3.2 护栏①：每个 batch_id 必须是其所属项目 MAX(id) 批次，任一不满足→整个 undo 409 UNDO_TARGET_STALE 零写入；③ 逐行生成反向变更（old/new 互换；created 反向=软删该节点、deleted 反向=恢复 deleted_at=NULL），原批次原样保留；B§8-8：三连续批次，中间批次 undo 返回 409 且零写入",
+   "construct": "同 fixture 撤最新批 3",
+   "expect": "成功",
+   "actual": "{\"results\": [{\"project_id\": 1, \"batch_id\": 4, \"version\": 5, \"view\": {\"project_id\": 1, \"name\": \"撤销探针\", \"created_by\": \"u1\", \"version\": 5, \"nodes\": [{\"id\": 1, \"project_id\": 1, \"track\": \"main\", \"stage\": \"...<t>",
+   "observed": "PASS_PROBE",
+   "note": "证明中间批 409 非其他原因"
+  },
+  {
+   "probe": "P8b",
+   "item": 8,
+   "criterion": "A§3.2 护栏③：created 反向=软删该节点；原批次原样保留",
+   "construct": "undo 一个纯 create 批次 → 读库",
+   "expect": "节点 deleted_at 非空且行仍在（软删非物理删）；被撤批次行保留；undo 批 undone_batch_id 正确",
+   "actual": {
+    "node": [
+     "2026-08-19T08:03:17+00:00",
+     "2030-02-01"
+    ],
+    "row_kept": 1,
+    "orig_batch_kept": 1,
+    "undo_points_to": 5,
+    "undo_batch_id": 6,
+    "undone_batch_change_rows": [
+     [
+      3,
+      "direct",
+      "created",
+      null,
+      "{\"track\": \"main\", \"stage\": \"创意\", \"name\": \"CR\", \"date\": \"2030-02-01\", \"done_at\": false, \"remark\": \"\"}"
+     ]
+    ],
+    "undo_batch_change_rows": [
+     [
+      3,
+      "direct",
+      "created",
+      "{\"track\": \"main\", \"stage\": \"创意\", \"name\": \"CR\", \"date\": \"2030-02-01\", \"done_at\": false, \"remark\": \"\"}",
+      null
+     ]
+    ]
+   },
+   "observed": "PASS_PROBE",
+   "note": "定位型探针：失败时以行级数据定位病因层（changes 选取/field 匹配/UPDATE 生效），不停留在静态归因"
+  },
+  {
+   "probe": "P8c",
+   "item": 8,
+   "criterion": "A§3.2 护栏③：deleted 反向=恢复 deleted_at=NULL",
+   "construct": "remove 软删 D2 成为最新批 → undo → 读库",
+   "expect": "软删生效→undo 后 deleted_at 回 NULL 且原字段值恢复",
+   "actual": {
+    "before_undo_deleted_at": "2026-08-19T08:03:17+00:00",
+    "after_undo": [
+     null,
+     "2030-03-05"
+    ],
+    "undo_batch_id": 9,
+    "undone_batch_change_rows": [
+     [
+      5,
+      "direct",
+      "deleted",
+      null,
+      "deleted"
+     ]
+    ],
+    "undo_batch_change_rows": [
+     [
+      5,
+      "direct",
+      "deleted",
+      "deleted",
+      null
+     ]
+    ]
+   },
+   "observed": "PASS_PROBE",
+   "note": "定位型探针：同 P8b，以行级数据定位病因层"
+  },
+  {
+   "probe": "P8d",
+   "item": 8,
+   "criterion": "A§3.2 护栏②④：undo 批不可再撤（不做 redo）",
+   "construct": "对最新 undo 批 9 再 undo",
+   "expect": "ApiError 409 UNDO_TARGET_STALE",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 409, \"code\": \"UNDO_TARGET_STALE\", \"message\": \"撤销目标已过期\", \"details\": null}",
+   "observed": "PASS_PROBE",
+   "note": ""
+  },
+  {
+   "probe": "P0a",
+   "item": 10,
+   "criterion": "A§5 依据行：列序=项目名称｜阶段｜轨道｜节点｜日期｜间隔｜状态｜备注；A§5.1 表头行：strip 后与 8 列标准列名完全一致（含顺序、无重复）；不一致=文件级 422 IMPORT_HEADERS_MISMATCH，文案附标准表头；A§3.7 导出：8 列同格式（lead 裁定：导入期望表头/导出产列表头/报错附件全收敛契约字面）",
+   "construct": "契约字面 8 列表头 + 合法数据行 → preview_import",
+   "expect": "接受（preview 成功）",
+   "actual": "{\"batch_id\": 1, \"format\": \"xlsx\", \"row_count\": 1, \"projects\": [{\"name\": \"表头正例项目\", \"node_count\": 1}], \"warnings\": [\"状态将按日期重算，仅『已完成』保留\"]}",
+   "observed": "PASS_PROBE",
+   "note": "追加项⑩正例：契约表头必须可用"
+  },
+  {
+   "probe": "P0c",
+   "item": 10,
+   "criterion": "A§5 依据行：列序=项目名称｜阶段｜轨道｜节点｜日期｜间隔｜状态｜备注；A§5.1 表头行：strip 后与 8 列标准列名完全一致（含顺序、无重复）；不一致=文件级 422 IMPORT_HEADERS_MISMATCH，文案附标准表头；A§3.7 导出：8 列同格式（lead 裁定：导入期望表头/导出产列表头/报错附件全收敛契约字面）",
+   "construct": "契约列名乱序表头（前两列互换）→ preview_import",
+   "expect": "ApiError 422 IMPORT_HEADERS_MISMATCH（文件级，含顺序校验）",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"IMPORT_HEADERS_MISMATCH\", \"message\": \"Excel 表头不匹配，标准表头：项目名称｜阶段｜轨道｜节点｜日期｜间隔｜状态｜备注\", \"details\": {\"headers\": [\"项目名称\", \"阶段\", \"轨道\", \"节点\", \"日期\", \"间隔\", \"状态\", \"备注\"]}}",
+   "observed": "PASS_PROBE",
+   "note": "乱序负例保留"
+  },
+  {
+   "probe": "P0d",
+   "item": 10,
+   "criterion": "A§5 依据行：列序=项目名称｜阶段｜轨道｜节点｜日期｜间隔｜状态｜备注；A§5.1 表头行：strip 后与 8 列标准列名完全一致（含顺序、无重复）；不一致=文件级 422 IMPORT_HEADERS_MISMATCH，文案附标准表头；A§3.7 导出：8 列同格式（lead 裁定：导入期望表头/导出产列表头/报错附件全收敛契约字面）",
+   "construct": "缺「间隔」列的 7 列表头 → preview_import",
+   "expect": "ApiError 422 IMPORT_HEADERS_MISMATCH（文件级）",
+   "actual": "{\"signal\": \"ApiError\", \"status\": 422, \"code\": \"IMPORT_HEADERS_MISMATCH\", \"message\": \"Excel 表头不匹配，标准表头：项目名称｜阶段｜轨道｜节点｜日期｜间隔｜状态｜备注\", \"details\": {\"headers\": [\"项目名称\", \"阶段\", \"轨道\", \"节点\", \"日期\", \"间隔\", \"状态\", \"备注\"]}}",
+   "observed": "PASS_PROBE",
+   "note": "缺列负例保留"
+  },
+  {
+   "probe": "P0b",
+   "item": 10,
+   "criterion": "A§5 依据行：列序=项目名称｜阶段｜轨道｜节点｜日期｜间隔｜状态｜备注；A§5.1 表头行：strip 后与 8 列标准列名完全一致（含顺序、无重复）；不一致=文件级 422 IMPORT_HEADERS_MISMATCH，文案附标准表头；A§3.7 导出：8 列同格式（lead 裁定：导入期望表头/导出产列表头/报错附件全收敛契约字面）",
+   "construct": "隔离库导出 → 解析产物第一行表头，逐列比对契约字面 8 列",
+   "expect": "extract_headers(export_bytes) == ['项目名称','阶段','轨道','节点','日期','间隔','状态','备注']（顺序敏感）",
+   "actual": {
+    "export_ok": true,
+    "headers": [
+     "项目名称",
+     "阶段",
+     "轨道",
+     "节点",
+     "日期",
+     "间隔",
+     "状态",
+     "备注"
+    ]
+   },
+   "observed": "PASS_PROBE",
+   "note": "round-trip 前置：导出表头不收敛则真实字节往返必被表头关卡挡住"
+  },
+  {
+   "probe": "PX-realdb",
+   "item": 0,
+   "criterion": "team-task §4 红线：需要触碰真实 flowboard.db……必须停下",
+   "construct": "探针全程结束后 stat 真实库（只读）",
+   "expect": "mtime 保持 2026-08-12 14:31 前后、未被本探针写入",
+   "actual": {
+    "mtime": 1786516285.4654746,
+    "size": 446464
+   },
+   "observed": "PASS_PROBE",
+   "note": ""
+  }
+ ]
+}

@@ -1,0 +1,28 @@
+{
+  "result": "PASS",
+  "missing_route_control": {
+    "validator_result": "REWORK",
+    "failure_keys": [
+      "ROUTE_MISSING",
+      "ROUTE_COUNT"
+    ]
+  },
+  "fake_test_control": {
+    "validator_result": "REWORK",
+    "failure_keys": [
+      "TEST_NOT_FOUND"
+    ]
+  },
+  "flowboard_db_before": {
+    "size": 446464,
+    "mtime_ns": 1786516285465474700,
+    "sha256": "9c782261e3f0f8acfd83723eea15b0fc954b06bf9e0c040335725b2e0268500d"
+  },
+  "flowboard_db_after": {
+    "size": 446464,
+    "mtime_ns": 1786516285465474700,
+    "sha256": "9c782261e3f0f8acfd83723eea15b0fc954b06bf9e0c040335725b2e0268500d"
+  },
+  "flowboard_db_unchanged": true,
+  "temporary_inputs_cleaned": true
+}

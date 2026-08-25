@@ -1,0 +1,2120 @@
+test_omitted_mentions_are_preserved_and_stale_update_is_atomic (test_collaboration.CollaborationTests.test_omitted_mentions_are_preserved_and_stale_update_is_atomic) ... ok
+test_private_attachment_validation_acl_and_soft_delete (test_collaboration.CollaborationTests.test_private_attachment_validation_acl_and_soft_delete) ... ok
+test_subscription_is_single_row_idempotent_and_manual_opt_out_is_sticky (test_collaboration.CollaborationTests.test_subscription_is_single_row_idempotent_and_manual_opt_out_is_sticky) ... ok
+test_thread_mentions_edit_delete_subscription_and_outbox (test_collaboration.CollaborationTests.test_thread_mentions_edit_delete_subscription_and_outbox) ... ok
+test_v12_to_v14_subscription_merge_backup_restore_and_idempotence (test_collaboration.CollaborationTests.test_v12_to_v14_subscription_merge_backup_restore_and_idempotence) ... FAIL
+test_viewer_can_read_but_cannot_mutate_collaboration (test_collaboration.CollaborationTests.test_viewer_can_read_but_cannot_mutate_collaboration) ... ok
+test_two_users_desktop_and_mobile_collaboration_journey (test_collaboration_e2e.CollaborationE2E.test_two_users_desktop_and_mobile_collaboration_journey) ... ERROR
+test_attachment_attack_matrix_and_failure_atomicity (test_collaboration_http.CollaborationHttpTests.test_attachment_attack_matrix_and_failure_atomicity) ... C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py:724: ResourceWarning: unclosed event loop <ProactorEventLoop running=False closed=False debug=False>
+  _warn(f"unclosed event loop {self!r}", ResourceWarning, source=self)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+Future exception was never retrieved
+future: <Future finished exception=PermissionError(13, '拒绝访问。', None, 5, None)>
+Traceback (most recent call last):
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 58, in testPartExecutor
+    yield
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 630, in run
+    self._callSetUp()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 586, in _callSetUp
+    self.setUp()
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_collaboration_e2e.py", line 16, in setUp
+    os.environ["FLOWBOARD_INITIAL_PASSWORD"]="test-password";os.environ["FLOWBOARD_ATTACHMENT_DIR"]=str(Path(self.temp.name)/"private-blobs");self.server=create_server("127.0.0.1",0,self.db_path);self.thread=threading.Thread(target=self.server.serve_forever,daemon=True);self.thread.start();self.base=f"http://127.0.0.1:{self.server.server_address[1]}";self.playwright=sync_playwright().start();self.browser=self.playwright.chromium.launch(headless=True)
+                                                                                                                                                                                                                                                                                                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+ok
+test_complete_acl_event_preview_limit_and_request_boundary_matrix (test_collaboration_http.CollaborationHttpTests.test_complete_acl_event_preview_limit_and_request_boundary_matrix) ... ok
+test_http_csrf_state_machine_events_preview_and_acl (test_collaboration_http.CollaborationHttpTests.test_http_csrf_state_machine_events_preview_and_acl) ... ok
+test_count_numeric_date_tags_and_empty (test_dashboards.AggregationTests.test_count_numeric_date_tags_and_empty) ... ok
+test_cross_board_dynamic_fields_require_explicit_source_mapping (test_dashboards.AggregationTests.test_cross_board_dynamic_fields_require_explicit_source_mapping) ... ok
+test_global_kpi_numeric_ops_empty_and_cross_source_mapping (test_dashboards.AggregationTests.test_global_kpi_numeric_ops_empty_and_cross_source_mapping) ... ok
+test_high_cardinality_series_and_cells_fail_during_accumulation (test_dashboards.AggregationTests.test_high_cardinality_series_and_cells_fail_during_accumulation) ... ok
+test_invalid_combinations_fail_closed (test_dashboards.AggregationTests.test_invalid_combinations_fail_closed) ... ok
+test_aggregation_limit_rejects_before_projection (test_dashboards.DashboardHttpTests.test_aggregation_limit_rejects_before_projection) ... ok
+test_board_chart_and_dashboard_five_widgets_acl_versions (test_dashboards.DashboardHttpTests.test_board_chart_and_dashboard_five_widgets_acl_versions) ... ok
+test_dashboard_source_widget_copy_soft_delete_restore_and_csrf (test_dashboards.DashboardHttpTests.test_dashboard_source_widget_copy_soft_delete_restore_and_csrf) ... ok
+test_pagination_source_change_terminates_after_one_followup (test_dashboards.DashboardHttpTests.test_pagination_source_change_terminates_after_one_followup) ... ok
+test_private_source_revocation_is_generic (test_dashboards.DashboardHttpTests.test_private_source_revocation_is_generic) ... ok
+test_source_and_widget_limits_cover_add_copy_restore_without_mutation (test_dashboards.DashboardHttpTests.test_source_and_widget_limits_cover_add_copy_restore_without_mutation) ... ok
+test_v10_to_v11_backup_preserves_views_and_is_idempotent (test_dashboards.DashboardMigrationTests.test_v10_to_v11_backup_preserves_views_and_is_idempotent) ... ERROR
+test_http_auth_csrf_pagination_search_notifications_poll_and_audit (test_i12.I12HttpTests.test_http_auth_csrf_pagination_search_notifications_poll_and_audit) ... ok
+test_sse_last_event_id_uses_same_bounded_cursor_as_poll (test_i12.I12HttpTests.test_sse_last_event_id_uses_same_bounded_cursor_as_poll) ... ok
+test_global_search_five_types_special_input_and_acl (test_i12.I12ServiceTests.test_global_search_five_types_special_input_and_acl) ... ok
+test_notification_projection_due_idempotence_read_and_acl_revocation (test_i12.I12ServiceTests.test_notification_projection_due_idempotence_read_and_acl_revocation) ... ok
+test_realtime_cursor_audit_permissions_and_csv_formula_safety (test_i12.I12ServiceTests.test_realtime_cursor_audit_permissions_and_csv_formula_safety) ... ok
+test_realtime_hidden_windows_advance_and_later_visible_event_is_reachable (test_i12.I12ServiceTests.test_realtime_hidden_windows_advance_and_later_visible_event_is_reachable) ... ok
+test_realtime_raw_scan_pages_visible_events_without_loss_or_duplicates (test_i12.I12ServiceTests.test_realtime_raw_scan_pages_visible_events_without_loss_or_duplicates) ... ok
+test_realtime_revocation_after_cursor_does_not_block_later_permitted_event (test_i12.I12ServiceTests.test_realtime_revocation_after_cursor_does_not_block_later_permitted_event) ... ok
+test_v13_to_v14_backup_restore_and_idempotence (test_i12.I12ServiceTests.test_v13_to_v14_backup_restore_and_idempotence) ... FAIL
+test_two_context_realtime_fallback_notifications_search_audit_and_mobile (test_i12_e2e.I12E2E.test_two_context_realtime_fallback_notifications_search_audit_and_mobile) ... ERROR
+test_admin_backup_api_surface_is_verified_and_viewer_is_denied (test_i13.I13BatchTests.test_admin_backup_api_surface_is_verified_and_viewer_is_denied) ... FAIL
+test_expired_trash_requires_admin_preview_hash_confirmation_and_keeps_audit (test_i13.I13BatchTests.test_expired_trash_requires_admin_preview_hash_confirmation_and_keeps_audit) ... ok
+test_stale_duplicate_viewer_and_cross_workspace_fail_without_any_mutation_or_events (test_i13.I13BatchTests.test_stale_duplicate_viewer_and_cross_workspace_fail_without_any_mutation_or_events) ... ok
+test_v15_description_retention_and_five_atomic_batch_operations (test_i13.I13BatchTests.test_v15_description_retention_and_five_atomic_batch_operations) ... FAIL
+test_v15_description_retention_and_five_atomic_batch_operations (test_i13.I13BatchTests.test_v15_description_retention_and_five_atomic_batch_operations) ... ERROR
+test_mobile_atomic_batch_and_admin_backup_surface (test_i13_e2e.I13E2E.test_mobile_atomic_batch_and_admin_backup_surface) ... Future exception was never retrieved
+future: <Future finished exception=PermissionError(13, '拒绝访问。', None, 5, None)>
+Traceback (most recent call last):
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 58, in testPartExecutor
+    yield
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 630, in run
+    self._callSetUp()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 586, in _callSetUp
+    self.setUp()
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_i12_e2e.py", line 18, in setUp
+    self.temp=tempfile.TemporaryDirectory(prefix="flowboard-i12-e2e-");self.db=str(Path(self.temp.name)/"flowboard.db");create_legacy_database(self.db);os.environ["FLOWBOARD_INITIAL_PASSWORD"]="test-password";os.environ["FLOWBOARD_ATTACHMENT_DIR"]=str(Path(self.temp.name)/"blobs");self.server=create_server("127.0.0.1",0,self.db);self.thread=threading.Thread(target=self.server.serve_forever,daemon=True);self.thread.start();self.base=f"http://127.0.0.1:{self.server.server_address[1]}";self.playwright=sync_playwright().start();self.browser=self.playwright.chromium.launch(headless=True)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+ERROR
+test_backup_manifest_corruption_retention_and_real_restore_with_blob (test_i13_operations.I13OperationsTests.test_backup_manifest_corruption_retention_and_real_restore_with_blob) ... FAIL
+test_restore_failure_preserves_originally_missing_targets (test_i13_operations.I13OperationsTests.test_restore_failure_preserves_originally_missing_targets) ... ok
+test_restore_injected_failure_rolls_back_current_database_and_attachment (test_i13_operations.I13OperationsTests.test_restore_injected_failure_rolls_back_current_database_and_attachment) ... Future exception was never retrieved
+future: <Future finished exception=PermissionError(13, '拒绝访问。', None, 5, None)>
+Traceback (most recent call last):
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 58, in testPartExecutor
+    yield
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 630, in run
+    self._callSetUp()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 586, in _callSetUp
+    self.setUp()
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_i13_e2e.py", line 15, in setUp
+    self.temp=tempfile.TemporaryDirectory(prefix="flowboard-i13-e2e-");self.db=str(Path(self.temp.name)/"flowboard.db");create_legacy_database(self.db);os.environ["FLOWBOARD_INITIAL_PASSWORD"]="test-password";os.environ["FLOWBOARD_ATTACHMENT_DIR"]=str(Path(self.temp.name)/"blobs");os.environ["FLOWBOARD_BACKUP_DIR"]=str(Path(self.temp.name)/"backups");self.server=create_server("127.0.0.1",0,self.db);self.thread=threading.Thread(target=self.server.serve_forever,daemon=True);self.thread.start();self.base=f"http://127.0.0.1:{self.server.server_address[1]}";self.playwright=sync_playwright().start();self.browser=self.playwright.chromium.launch(headless=True)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+FAIL
+test_atomic_versions_csrf_validation_and_task_bound (test_schedule.ScheduleHttpTests.test_atomic_versions_csrf_validation_and_task_bound) ... ok
+test_dynamic_date_and_timeline_successor_push_are_source_aware_atomic (test_schedule.ScheduleHttpTests.test_dynamic_date_and_timeline_successor_push_are_source_aware_atomic) ... ok
+test_schedule_read_write_conflicts_permissions_and_saved_views (test_schedule.ScheduleHttpTests.test_schedule_read_write_conflicts_permissions_and_saved_views) ... ok
+test_v9_to_latest_preserves_saved_views_backup_and_is_idempotent (test_schedule.ScheduleMigrationTests.test_v9_to_latest_preserves_saved_views_backup_and_is_idempotent) ... ERROR
+test_critical_path_filters_hidden_edges_and_blocks_cycles (test_schedule.ScheduleProjectionTests.test_critical_path_filters_hidden_edges_and_blocks_cycles) ... ok
+test_fixed_dynamic_and_cross_year_projection (test_schedule.ScheduleProjectionTests.test_fixed_dynamic_and_cross_year_projection) ... ok
+test_invalid_dates_fail_closed_and_huge_range_is_bounded (test_schedule.ScheduleProjectionTests.test_invalid_dates_fail_closed_and_huge_range_is_bounded) ... ok
+test_admin_can_change_workspace_role (test_secure_foundation.FlowboardIntegrationTests.test_admin_can_change_workspace_role) ... ok
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-collab-e2e-wid9rmze\backups\flowboard-pre-v16-20260820-151227-692425.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-collab-http-axsrij9g\backups\flowboard-pre-v16-20260820-151228-507421.db
+[20/Aug/2026 15:12:29] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:29] "POST /api/tasks/1/attachments HTTP/1.1" 422 -
+[20/Aug/2026 15:12:29] "POST /api/tasks/1/attachments HTTP/1.1" 422 -
+[20/Aug/2026 15:12:29] "POST /api/tasks/1/attachments HTTP/1.1" 422 -
+[20/Aug/2026 15:12:29] "POST /api/tasks/1/attachments HTTP/1.1" 422 -
+[20/Aug/2026 15:12:29] "POST /api/tasks/1/attachments HTTP/1.1" 422 -
+[20/Aug/2026 15:12:29] "POST /api/tasks/1/attachments HTTP/1.1" 422 -
+[20/Aug/2026 15:12:29] "POST /api/tasks/1/attachments HTTP/1.1" 415 -
+[20/Aug/2026 15:12:29] "POST /api/tasks/1/attachments HTTP/1.1" 415 -
+[20/Aug/2026 15:12:29] "POST /api/tasks/1/attachments HTTP/1.1" 415 -
+[20/Aug/2026 15:12:29] "POST /api/tasks/1/attachments HTTP/1.1" 415 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-collab-http-9cke_3m8\backups\flowboard-pre-v16-20260820-151230-336095.db
+[20/Aug/2026 15:12:31] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:31] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:31] "POST /api/tasks/1/comments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:31] "POST /api/tasks/1/comments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:31] "PATCH /api/comments/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:31] "DELETE /api/comments/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:31] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:31] "POST /api/tasks/1/subscription HTTP/1.1" 200 -
+[20/Aug/2026 15:12:31] "POST /api/tasks/1/subscription HTTP/1.1" 200 -
+[20/Aug/2026 15:12:31] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:31] "GET /api/attachments/1/content?preview=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:31] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:31] "GET /api/attachments/2/content?preview=1 HTTP/1.1" 415 -
+[20/Aug/2026 15:12:31] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:31] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:31] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:31] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:31] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:31] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/attachments HTTP/1.1" 422 -
+[20/Aug/2026 15:12:32] "DELETE /api/attachments/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/attachments HTTP/1.1" 413 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/comments HTTP/1.1" 403 -
+[20/Aug/2026 15:12:32] "PATCH /api/comments/2 HTTP/1.1" 403 -
+[20/Aug/2026 15:12:32] "DELETE /api/comments/2 HTTP/1.1" 403 -
+[20/Aug/2026 15:12:32] "DELETE /api/attachments/2 HTTP/1.1" 403 -
+[20/Aug/2026 15:12:32] "POST /api/tasks/1/subscription HTTP/1.1" 403 -
+[20/Aug/2026 15:12:32] "GET /api/tasks/1 HTTP/1.1" 403 -
+[20/Aug/2026 15:12:32] "GET /api/attachments/2/content HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-collab-http-tqvxwt_i\backups\flowboard-pre-v16-20260820-151233-108574.db
+[20/Aug/2026 15:12:34] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:34] "POST /api/tasks/1/comments HTTP/1.1" 403 -
+[20/Aug/2026 15:12:34] "POST /api/tasks/1/comments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:34] "POST /api/tasks/1/subscription HTTP/1.1" 200 -
+[20/Aug/2026 15:12:34] "POST /api/tasks/1/comments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:34] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:34] "POST /api/tasks/1/subscription HTTP/1.1" 200 -
+[20/Aug/2026 15:12:34] "PATCH /api/comments/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:34] "PATCH /api/comments/1 HTTP/1.1" 409 -
+[20/Aug/2026 15:12:34] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:12:34] "GET /api/attachments/1/content?preview=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:34] "GET /flowboard-attachments/e0f41bb45d9228799ee684defe1093a8f4925cac78c4b252.txt HTTP/1.1" 404 -
+[20/Aug/2026 15:12:34] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:34] "POST /api/tasks/1/comments HTTP/1.1" 403 -
+[20/Aug/2026 15:12:34] "POST /api/tasks/1/subscription HTTP/1.1" 403 -
+[20/Aug/2026 15:12:34] "POST /api/tasks/1/attachments HTTP/1.1" 403 -
+[20/Aug/2026 15:12:34] "GET /api/attachments/1/content HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmp5i77bibb\backups\flowboard-pre-v16-20260820-151235-844808.db
+[20/Aug/2026 15:12:36] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:36] "POST /api/boards/1/aggregate HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpznj7pxn7\backups\flowboard-pre-v16-20260820-151237-359068.db
+[20/Aug/2026 15:12:38] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:38] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:38] "POST /api/boards/1/aggregate HTTP/1.1" 200 -
+[20/Aug/2026 15:12:38] "POST /api/workspaces/1/dashboards HTTP/1.1" 201 -
+[20/Aug/2026 15:12:38] "POST /api/dashboards/1/sources HTTP/1.1" 201 -
+[20/Aug/2026 15:12:38] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:12:38] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:12:38] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:12:38] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:12:38] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:12:38] "POST /api/dashboards/1/widgets/1/data HTTP/1.1" 200 -
+[20/Aug/2026 15:12:38] "POST /api/dashboards/1/widgets/2/data HTTP/1.1" 200 -
+[20/Aug/2026 15:12:38] "POST /api/dashboards/1/widgets/3/data HTTP/1.1" 200 -
+[20/Aug/2026 15:12:38] "POST /api/dashboards/1/widgets/4/data HTTP/1.1" 200 -
+[20/Aug/2026 15:12:38] "POST /api/dashboards/1/widgets/5/data HTTP/1.1" 200 -
+[20/Aug/2026 15:12:38] "PATCH /api/dashboards/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:38] "POST /api/dashboards/1/widgets/1/data HTTP/1.1" 200 -
+[20/Aug/2026 15:12:38] "PATCH /api/dashboards/1/widgets/1 HTTP/1.1" 409 -
+[20/Aug/2026 15:12:39] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:39] "GET /api/workspaces/1/dashboards HTTP/1.1" 200 -
+[20/Aug/2026 15:12:39] "PATCH /api/dashboards/1 HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpv9gd4ceo\backups\flowboard-pre-v16-20260820-151239-790034.db
+[20/Aug/2026 15:12:40] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:40] "POST /api/workspaces/1/dashboards HTTP/1.1" 201 -
+[20/Aug/2026 15:12:40] "POST /api/dashboards/1/sources HTTP/1.1" 201 -
+[20/Aug/2026 15:12:40] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:12:40] "POST /api/dashboards/1/widgets/1/copy HTTP/1.1" 201 -
+[20/Aug/2026 15:12:40] "DELETE /api/dashboards/1/widgets/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:40] "POST /api/dashboards/1/widgets/2/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:12:40] "DELETE /api/dashboards/1/sources/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:40] "POST /api/dashboards/1/sources/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:12:40] "POST /api/dashboards/1/copy HTTP/1.1" 201 -
+[20/Aug/2026 15:12:40] "DELETE /api/dashboards/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:41] "POST /api/dashboards/2/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:12:41] "PATCH /api/dashboards/1 HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpeo7mg1oo\backups\flowboard-pre-v16-20260820-151241-824147.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmp33lkoqzv\backups\flowboard-pre-v16-20260820-151243-432561.db
+[20/Aug/2026 15:12:44] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:44] "POST /api/workspaces/1/boards HTTP/1.1" 201 -
+[20/Aug/2026 15:12:44] "POST /api/workspaces/1/dashboards HTTP/1.1" 201 -
+[20/Aug/2026 15:12:44] "POST /api/dashboards/1/sources HTTP/1.1" 201 -
+[20/Aug/2026 15:12:44] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:12:45] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:45] "POST /api/dashboards/1/widgets/1/data HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmp5tgsz26e\backups\flowboard-pre-v16-20260820-151245-758806.db
+[20/Aug/2026 15:12:47] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:47] "POST /api/workspaces/1/dashboards HTTP/1.1" 201 -
+[20/Aug/2026 15:12:47] "POST /api/dashboards/1/sources HTTP/1.1" 201 -
+[20/Aug/2026 15:12:47] "DELETE /api/dashboards/1/sources/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:47] "POST /api/dashboards/1/sources HTTP/1.1" 201 -
+[20/Aug/2026 15:12:47] "POST /api/dashboards/1/sources HTTP/1.1" 422 -
+[20/Aug/2026 15:12:47] "POST /api/dashboards/1/sources/1/restore HTTP/1.1" 422 -
+[20/Aug/2026 15:12:47] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:12:47] "DELETE /api/dashboards/1/widgets/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:47] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:12:47] "POST /api/dashboards/1/widgets HTTP/1.1" 422 -
+[20/Aug/2026 15:12:47] "POST /api/dashboards/1/widgets/2/copy HTTP/1.1" 422 -
+[20/Aug/2026 15:12:47] "POST /api/dashboards/1/widgets/1/restore HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpthfugxdz\backups\flowboard-pre-v16-20260820-151249-383251.db
+[20/Aug/2026 15:12:49] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:50] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:50] "GET /api/workspaces/1/search?q=x HTTP/1.1" 401 -
+[20/Aug/2026 15:12:50] "POST /api/workspaces/1/notifications/read-all HTTP/1.1" 200 -
+[20/Aug/2026 15:12:50] "GET /api/workspaces/1/search?q=%25_&limit=51 HTTP/1.1" 422 -
+[20/Aug/2026 15:12:50] "GET /api/admin/workspaces/1/audit HTTP/1.1" 403 -
+[20/Aug/2026 15:12:50] "GET /api/admin/workspaces/1/audit.csv HTTP/1.1" 200 -
+[20/Aug/2026 15:12:50] "GET /api/workspaces/1/events/poll?cursor=0&limit=201 HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpb6pqn0es\backups\flowboard-pre-v16-20260820-151250-636950.db
+[20/Aug/2026 15:12:51] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:51] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:51] "GET /api/workspaces/1/events/stream?cursor=4&limit=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:51] "GET /api/workspaces/1/events/stream?limit=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:51] "GET /api/workspaces/1/events/poll?cursor=8&limit=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:51] "GET /api/workspaces/1/events/stream?cursor=9&limit=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:51] "GET /api/workspaces/1/events/stream?limit=2 HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-i12-e2e-xi7rr8r6\backups\flowboard-pre-v16-20260820-151254-003830.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-i13-e2e-mkwdlmxc\backups\flowboard-pre-v16-20260820-151255-507302.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpz4zrknqd\backups\flowboard-pre-v16-20260820-151257-606375.db
+[20/Aug/2026 15:12:59] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:12:59] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:59] "POST /api/tasks/1/schedule HTTP/1.1" 428 -
+[20/Aug/2026 15:12:59] "POST /api/tasks/1/schedule HTTP/1.1" 409 -
+[20/Aug/2026 15:12:59] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:12:59] "POST /api/tasks/1/schedule HTTP/1.1" 403 -
+[20/Aug/2026 15:12:59] "POST /api/boards/1/schedule HTTP/1.1" 422 -
+[20/Aug/2026 15:12:59] "POST /api/boards/1/schedule HTTP/1.1" 422 -
+[20/Aug/2026 15:12:59] "POST /api/boards/1/schedule HTTP/1.1" 422 -
+[20/Aug/2026 15:12:59] "POST /api/boards/1/schedule HTTP/1.1" 200 -
+[20/Aug/2026 15:12:59] "POST /api/boards/1/schedule HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpn9xqt9h5\backups\flowboard-pre-v16-20260820-151300-126225.db
+[20/Aug/2026 15:13:01] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:01] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "PATCH /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "PATCH /api/tasks/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "POST /api/tasks/1/schedule HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "POST /api/tasks/1/schedule HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:01] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "PATCH /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "PATCH /api/tasks/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "POST /api/tasks/1/schedule HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:01] "POST /api/tasks/1/schedule HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpxwsia3v7\backups\flowboard-pre-v16-20260820-151302-267407.db
+[20/Aug/2026 15:13:03] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:03] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:03] "POST /api/tasks/1/schedule HTTP/1.1" 200 -
+[20/Aug/2026 15:13:03] "POST /api/tasks/1/schedule HTTP/1.1" 409 -
+[20/Aug/2026 15:13:03] "POST /api/boards/1/schedule HTTP/1.1" 200 -
+[20/Aug/2026 15:13:03] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:13:04] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:04] "POST /api/tasks/1/schedule HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-7sfmk6n0\backups\flowboard-pre-v16-20260820-151305-362113.db
+[20/Aug/2026 15:13:06] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:06] "PATCH /api/admin/workspace-memberships/u2?workspace_id=1 HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-ytg2vwr9\backups\flowboard-pre-v16-20260820-151307-071525.db
+[20/Aug/2026 15:13:08] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:08] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:13:08] "POST /api/workspaces/1/boards HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "POST /api/boards/2/groups HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "POST /api/groups/3/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "GET /api/bootstrap?board_id=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:08] "POST /api/boards/2/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "PATCH /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:08] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:08] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "POST /api/boards/1/fields HTTP/1.1" 201 -
+test_advanced_fields_relations_mirror_formula_and_acl (test_secure_foundation.FlowboardIntegrationTests.test_advanced_fields_relations_mirror_formula_and_acl) ... ok
+test_archive_parent_visibility_copy_history_and_strict_inputs (test_secure_foundation.FlowboardIntegrationTests.test_archive_parent_visibility_copy_history_and_strict_inputs) ... ok
+test_authentication_csrf_and_header_spoofing (test_secure_foundation.FlowboardIntegrationTests.test_authentication_csrf_and_header_spoofing) ... ok
+test_board_lifecycle_and_stale_version (test_secure_foundation.FlowboardIntegrationTests.test_board_lifecycle_and_stale_version) ... ok
+test_dynamic_fields_all_types_permissions_and_versions (test_secure_foundation.FlowboardIntegrationTests.test_dynamic_fields_all_types_permissions_and_versions) ... ok
+[20/Aug/2026 15:13:08] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "POST /api/workspaces/1/templates HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "POST /api/templates/1/instantiate HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "GET /api/bootstrap?board_id=3 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:08] "PATCH /api/fields/18 HTTP/1.1" 422 -
+[20/Aug/2026 15:13:08] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:08] "PATCH /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:08] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "PATCH /api/tasks/7 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:08] "PATCH /api/tasks/1 HTTP/1.1" 422 -
+[20/Aug/2026 15:13:08] "POST /api/tasks/1/relations/16 HTTP/1.1" 201 -
+[20/Aug/2026 15:13:08] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:08] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:08] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:08] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:08] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:08] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:13:09] "GET /api/boards/1/views HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/tasks/6/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/tasks/6/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "GET /api/groups/3 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/groups/3/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/groups/3/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "DELETE /api/groups/3 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/groups/3/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "DELETE /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "POST /api/tasks/6/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:13:10] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/tasks/1/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/tasks/1/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "DELETE /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/tasks/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "GET /api/groups/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/groups/1/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/groups/1/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "DELETE /api/groups/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/groups/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "DELETE /api/boards/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "GET /api/tasks/6 HTTP/1.1" 200 -
+test_export_hard_limit_at_1000_before_materialization (test_secure_foundation.FlowboardIntegrationTests.test_export_hard_limit_at_1000_before_materialization) ... ok
+test_group_and_task_lifecycle_parent_restore_and_activity (test_secure_foundation.FlowboardIntegrationTests.test_group_and_task_lifecycle_parent_restore_and_activity) ... ok
+test_hierarchy_dependencies_progress_dates_permissions_and_cycles (test_secure_foundation.FlowboardIntegrationTests.test_hierarchy_dependencies_progress_dates_permissions_and_cycles) ... ok
+test_kanban_move_is_atomic_persistent_and_versioned (test_secure_foundation.FlowboardIntegrationTests.test_kanban_move_is_atomic_persistent_and_versioned) ... ok
+test_migration_preserves_existing_tasks_and_creates_backup (test_secure_foundation.FlowboardIntegrationTests.test_migration_preserves_existing_tasks_and_creates_backup) ... FAIL
+test_optimistic_version_conflict (test_secure_foundation.FlowboardIntegrationTests.test_optimistic_version_conflict) ... ok
+test_query_hundreds_of_tasks_is_bounded_and_indexed (test_secure_foundation.FlowboardIntegrationTests.test_query_hundreds_of_tasks_is_bounded_and_indexed) ... ok
+[20/Aug/2026 15:13:11] "POST /api/boards/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "GET /api/bootstrap?board_id=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/2/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/query HTTP/1.1" 403 -
+[20/Aug/2026 15:13:11] "POST /api/boards/2/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "DELETE /api/boards/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/query HTTP/1.1" 403 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/query HTTP/1.1" 403 -
+[20/Aug/2026 15:13:11] "POST /api/boards/2/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:11] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:12] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:12] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:12] "GET /api/bootstrap?board_id=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:12] "PATCH /api/boards/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:12] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:12] "PATCH /api/fields/17 HTTP/1.1" 403 -
+[20/Aug/2026 15:13:12] "PATCH /api/fields/17 HTTP/1.1" 403 -
+[20/Aug/2026 15:13:12] "PATCH /api/boards/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:12] "PATCH /api/fields/17 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:12] "PATCH /api/boards/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:12] "PATCH /api/admin/workspace-memberships/u2?workspace_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:12] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:12] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:13] "GET /api/fields/16/targets HTTP/1.1" 403 -
+[20/Aug/2026 15:13:13] "POST /api/boards/1/query HTTP/1.1" 403 -
+[20/Aug/2026 15:13:13] "POST /api/boards/1/export HTTP/1.1" 403 -
+[20/Aug/2026 15:13:13] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:13] "DELETE /api/tasks/1/relations/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:13] "DELETE /api/tasks/1/relations/1 HTTP/1.1" 409 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-80ywb0i0\backups\flowboard-pre-v16-20260820-151313-667255.db
+[20/Aug/2026 15:13:15] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "POST /api/tasks/1/comments HTTP/1.1" 201 -
+[20/Aug/2026 15:13:15] "POST /api/boards/1/copy HTTP/1.1" 201 -
+[20/Aug/2026 15:13:15] "GET /api/bootstrap?board_id=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "GET /api/boards/2/activity HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "POST /api/groups/1/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "GET /api/boards/1/archived HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "POST /api/groups/1/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "PATCH /api/groups/1 HTTP/1.1" 409 -
+[20/Aug/2026 15:13:15] "DELETE /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "GET /api/boards/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "DELETE /api/boards/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "GET /api/boards/1 HTTP/1.1" 404 -
+[20/Aug/2026 15:13:15] "GET /api/groups/1 HTTP/1.1" 404 -
+[20/Aug/2026 15:13:15] "GET /api/tasks/1 HTTP/1.1" 404 -
+[20/Aug/2026 15:13:15] "GET /api/boards/1/activity HTTP/1.1" 404 -
+[20/Aug/2026 15:13:15] "GET /api/boards/1/archived HTTP/1.1" 404 -
+[20/Aug/2026 15:13:15] "GET /api/workspaces/1/trash HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "POST /api/tasks/1/restore HTTP/1.1" 409 -
+[20/Aug/2026 15:13:15] "POST /api/boards/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "GET /api/groups/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "DELETE /api/groups/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "GET /api/groups/1 HTTP/1.1" 404 -
+[20/Aug/2026 15:13:15] "GET /api/tasks/1 HTTP/1.1" 404 -
+[20/Aug/2026 15:13:15] "POST /api/tasks/1/restore HTTP/1.1" 409 -
+[20/Aug/2026 15:13:15] "POST /api/groups/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "POST /api/tasks/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:13:15] "POST /api/workspaces/1/boards HTTP/1.1" 400 -
+[20/Aug/2026 15:13:15] "POST /api/workspaces/1/boards HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-oadt0fsr\backups\flowboard-pre-v16-20260820-151316-166466.db
+[20/Aug/2026 15:13:16] "GET /api/bootstrap HTTP/1.1" 401 -
+[20/Aug/2026 15:13:17] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:17] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:13:17] "POST /api/tasks HTTP/1.1" 403 -
+[20/Aug/2026 15:13:17] "POST /api/tasks HTTP/1.1" 201 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-jv9sh0r_\backups\flowboard-pre-v16-20260820-151317-779876.db
+[20/Aug/2026 15:13:18] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:18] "POST /api/workspaces/1/boards HTTP/1.1" 201 -
+[20/Aug/2026 15:13:18] "PATCH /api/boards/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:18] "PATCH /api/boards/2 HTTP/1.1" 409 -
+[20/Aug/2026 15:13:18] "POST /api/boards/2/copy HTTP/1.1" 201 -
+[20/Aug/2026 15:13:18] "POST /api/boards/2/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:18] "POST /api/boards/2/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:18] "DELETE /api/boards/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:18] "GET /api/workspaces/1/trash HTTP/1.1" 200 -
+[20/Aug/2026 15:13:18] "POST /api/boards/2/restore HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-gireo4mi\backups\flowboard-pre-v16-20260820-151319-492302.db
+[20/Aug/2026 15:13:21] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:21] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:13:21] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:21] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:21] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:21] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:21] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:21] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:21] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:21] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:21] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:21] "PATCH /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:21] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:21] "POST /api/boards/1/fields/reorder HTTP/1.1" 200 -
+[20/Aug/2026 15:13:21] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:21] "POST /api/boards/1/fields/reorder HTTP/1.1" 409 -
+[20/Aug/2026 15:13:21] "POST /api/boards/1/fields/reorder HTTP/1.1" 422 -
+[20/Aug/2026 15:13:21] "PATCH /api/fields/5 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:21] "PATCH /api/fields/5 HTTP/1.1" 409 -
+[20/Aug/2026 15:13:21] "POST /api/fields/5/delete HTTP/1.1" 200 -
+[20/Aug/2026 15:13:21] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:21] "POST /api/fields/5/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:13:21] "POST /api/fields/4/delete HTTP/1.1" 409 -
+[20/Aug/2026 15:13:21] "PATCH /api/fields/7 HTTP/1.1" 422 -
+[20/Aug/2026 15:13:21] "PATCH /api/tasks/1 HTTP/1.1" 422 -
+[20/Aug/2026 15:13:21] "PATCH /api/tasks/1 HTTP/1.1" 422 -
+[20/Aug/2026 15:13:21] "PATCH /api/tasks/1 HTTP/1.1" 422 -
+[20/Aug/2026 15:13:21] "PATCH /api/tasks/1 HTTP/1.1" 422 -
+[20/Aug/2026 15:13:21] "PATCH /api/tasks/1 HTTP/1.1" 409 -
+[20/Aug/2026 15:13:21] "PATCH /api/tasks/1 HTTP/1.1" 422 -
+[20/Aug/2026 15:13:21] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:21] "PATCH /api/tasks/1 HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-qeqf3_30\backups\flowboard-pre-v16-20260820-151322-333057.db
+[20/Aug/2026 15:13:23] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:23] "POST /api/workspaces/1/boards HTTP/1.1" 201 -
+[20/Aug/2026 15:13:23] "POST /api/boards/2/groups HTTP/1.1" 201 -
+test_saved_view_defaults_permissions_copy_delete_and_blocked_config (test_secure_foundation.FlowboardIntegrationTests.test_saved_view_defaults_permissions_copy_delete_and_blocked_config) ... ok
+test_saved_view_presentations_are_typed_and_fail_closed (test_secure_foundation.FlowboardIntegrationTests.test_saved_view_presentations_are_typed_and_fail_closed) ... ok
+test_server_query_ast_dynamic_types_sort_and_fail_closed_validation (test_secure_foundation.FlowboardIntegrationTests.test_server_query_ast_dynamic_types_sort_and_fail_closed_validation) ... ok
+test_static_allowlist_blocks_repository_files (test_secure_foundation.FlowboardIntegrationTests.test_static_allowlist_blocks_repository_files) ... ok
+test_templates_import_export_and_spreadsheet_safety (test_secure_foundation.FlowboardIntegrationTests.test_templates_import_export_and_spreadsheet_safety) ... ok
+test_v1_to_v2_migration_preserves_data_and_activity (test_secure_foundation.FlowboardIntegrationTests.test_v1_to_v2_migration_preserves_data_and_activity) ... FAIL
+test_v6_to_v7_migration_backup_restore_and_idempotence (test_secure_foundation.FlowboardIntegrationTests.test_v6_to_v7_migration_backup_restore_and_idempotence) ... FAIL
+test_v7_to_v8_migration_backup_restore_and_idempotence (test_secure_foundation.FlowboardIntegrationTests.test_v7_to_v8_migration_backup_restore_and_idempotence) ... FAIL
+test_v8_to_v9_migration_backup_restore_and_idempotence (test_secure_foundation.FlowboardIntegrationTests.test_v8_to_v9_migration_backup_restore_and_idempotence) ... FAIL
+[20/Aug/2026 15:13:23] "POST /api/boards/2/views HTTP/1.1" 201 -
+[20/Aug/2026 15:13:23] "POST /api/boards/2/export HTTP/1.1" 200 -
+[20/Aug/2026 15:13:24] "POST /api/boards/2/export HTTP/1.1" 200 -
+[20/Aug/2026 15:13:24] "POST /api/boards/2/export HTTP/1.1" 200 -
+[20/Aug/2026 15:13:24] "POST /api/boards/2/export HTTP/1.1" 422 -
+[20/Aug/2026 15:13:24] "POST /api/boards/2/export HTTP/1.1" 422 -
+[20/Aug/2026 15:13:24] "POST /api/boards/2/export HTTP/1.1" 422 -
+[20/Aug/2026 15:13:24] "POST /api/boards/2/export HTTP/1.1" 422 -
+[20/Aug/2026 15:13:24] "POST /api/boards/2/export HTTP/1.1" 422 -
+[20/Aug/2026 15:13:24] "POST /api/boards/2/export HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-tj_yv2k3\backups\flowboard-pre-v16-20260820-151325-390542.db
+[20/Aug/2026 15:13:26] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "POST /api/boards/1/groups HTTP/1.1" 201 -
+[20/Aug/2026 15:13:27] "PATCH /api/groups/3 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "POST /api/groups/3/copy HTTP/1.1" 201 -
+[20/Aug/2026 15:13:27] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "POST /api/groups/3/move HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "POST /api/groups/3/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:27] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "PATCH /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "POST /api/tasks/6/comments HTTP/1.1" 201 -
+[20/Aug/2026 15:13:27] "POST /api/tasks/6/copy HTTP/1.1" 201 -
+[20/Aug/2026 15:13:27] "GET /api/tasks/7 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "POST /api/tasks/6/move HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "POST /api/tasks/6/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "POST /api/tasks/6/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "DELETE /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "GET /api/groups/4 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "DELETE /api/groups/4 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "POST /api/tasks/6/restore HTTP/1.1" 409 -
+[20/Aug/2026 15:13:27] "POST /api/groups/4/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "POST /api/tasks/6/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:13:27] "GET /api/boards/1/activity HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-6edvj770\backups\flowboard-pre-v16-20260820-151328-336259.db
+[20/Aug/2026 15:13:29] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:29] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:13:29] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:29] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:29] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:29] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:29] "POST /api/groups/1/tasks HTTP/1.1" 422 -
+[20/Aug/2026 15:13:29] "POST /api/tasks/8/parent HTTP/1.1" 200 -
+[20/Aug/2026 15:13:29] "POST /api/tasks/8/parent HTTP/1.1" 409 -
+[20/Aug/2026 15:13:29] "POST /api/tasks/6/parent HTTP/1.1" 422 -
+[20/Aug/2026 15:13:29] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:29] "PATCH /api/tasks/7 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:29] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:29] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:29] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:29] "POST /api/tasks/11/dependencies HTTP/1.1" 201 -
+[20/Aug/2026 15:13:29] "GET /api/tasks/11 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:29] "POST /api/tasks/10/dependencies HTTP/1.1" 422 -
+[20/Aug/2026 15:13:30] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:30] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:30] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:30] "POST /api/tasks/13/dependencies HTTP/1.1" 201 -
+[20/Aug/2026 15:13:30] "POST /api/tasks/14/dependencies HTTP/1.1" 201 -
+[20/Aug/2026 15:13:30] "POST /api/tasks/12/dependencies HTTP/1.1" 422 -
+[20/Aug/2026 15:13:30] "POST /api/tasks/13/dependencies HTTP/1.1" 409 -
+[20/Aug/2026 15:13:30] "POST /api/tasks/12/dependencies HTTP/1.1" 422 -
+[20/Aug/2026 15:13:30] "POST /api/tasks/12/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:30] "GET /api/tasks/13 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:30] "POST /api/tasks/12/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:13:30] "GET /api/tasks/13 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:30] "PATCH /api/tasks/10 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:30] "GET /api/tasks/11 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:30] "DELETE /api/tasks/11/dependencies/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:30] "DELETE /api/tasks/6 HTTP/1.1" 409 -
+[20/Aug/2026 15:13:30] "POST /api/workspaces/1/boards HTTP/1.1" 201 -
+[20/Aug/2026 15:13:30] "POST /api/boards/2/groups HTTP/1.1" 201 -
+[20/Aug/2026 15:13:30] "POST /api/groups/3/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:30] "POST /api/tasks/8/parent HTTP/1.1" 422 -
+[20/Aug/2026 15:13:30] "POST /api/tasks/8/dependencies HTTP/1.1" 422 -
+[20/Aug/2026 15:13:30] "PATCH /api/admin/workspace-memberships/u2?workspace_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:30] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:30] "POST /api/tasks/7/parent HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-0yrl4mao\backups\flowboard-pre-v16-20260820-151331-368107.db
+[20/Aug/2026 15:13:32] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:32] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:13:32] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:32] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:13:32] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:32] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:32] "POST /api/tasks/7/kanban-move HTTP/1.1" 200 -
+[20/Aug/2026 15:13:32] "POST /api/tasks/7/kanban-move HTTP/1.1" 409 -
+[20/Aug/2026 15:13:32] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:32] "POST /api/tasks/7/kanban-move HTTP/1.1" 200 -
+[20/Aug/2026 15:13:32] "PATCH /api/admin/workspace-memberships/u2?workspace_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:33] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:33] "POST /api/tasks/7/kanban-move HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-bujyw9f0\backups\flowboard-pre-v16-20260820-151333-811905.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-wok26if5\backups\flowboard-pre-v16-20260820-151335-325152.db
+[20/Aug/2026 15:13:36] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:36] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:13:36] "PATCH /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:36] "PATCH /api/tasks/1 HTTP/1.1" 409 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-dj8yyxri\backups\flowboard-pre-v16-20260820-151337-505520.db
+[20/Aug/2026 15:13:38] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:38] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:13:38] "POST /api/boards/1/query HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-29ieolbv\backups\flowboard-pre-v16-20260820-151339-600879.db
+[20/Aug/2026 15:13:42] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:42] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:13:42] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:13:42] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:13:42] "GET /api/boards/1/views HTTP/1.1" 200 -
+[20/Aug/2026 15:13:42] "POST /api/boards/1/views/clear-personal-default HTTP/1.1" 200 -
+[20/Aug/2026 15:13:42] "POST /api/views/2/copy HTTP/1.1" 201 -
+[20/Aug/2026 15:13:42] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:43] "GET /api/boards/1/views HTTP/1.1" 200 -
+[20/Aug/2026 15:13:43] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:13:43] "PATCH /api/views/2 HTTP/1.1" 403 -
+[20/Aug/2026 15:13:43] "DELETE /api/views/4 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:43] "GET /api/boards/1/views HTTP/1.1" 200 -
+test_validation_viewer_and_cross_board_boundaries (test_secure_foundation.FlowboardIntegrationTests.test_validation_viewer_and_cross_board_boundaries) ... ok
+test_viewer_cannot_write_and_private_board_is_hidden (test_secure_foundation.FlowboardIntegrationTests.test_viewer_cannot_write_and_private_board_is_hidden) ... ok
+test_derived_comparator_type_matrix_is_total_and_deterministic (test_secure_foundation.QueryProjectionTests.test_derived_comparator_type_matrix_is_total_and_deterministic) ... ok
+test_transfer_rejects_malformed_and_unsafe_inputs (test_secure_foundation.QueryProjectionTests.test_transfer_rejects_malformed_and_unsafe_inputs) ... ok
+test_batch_update_conflict_noop_and_cascade (test_timeline.TimelineCoreTests.test_batch_update_conflict_noop_and_cascade) ... ok
+test_cascade_anchors_status_only_and_date_priority (test_timeline.TimelineCoreTests.test_cascade_anchors_status_only_and_date_priority) ... ok
+test_excel_import_preview_commit_and_export (test_timeline.TimelineCoreTests.test_excel_import_preview_commit_and_export) ... ok
+test_export_exact_1000_and_over_limit_fail_closed (test_timeline.TimelineCoreTests.test_export_exact_1000_and_over_limit_fail_closed) ... ok
+test_group10_backup_content_idempotence_rollback (test_timeline.TimelineCoreTests.test_group10_backup_content_idempotence_rollback) ... ok
+test_group10_true_v15_to_v16_migration_backup_and_idempotence (test_timeline.TimelineCoreTests.test_group10_true_v15_to_v16_migration_backup_and_idempotence) ... ok
+test_group11_import_two_phase_race_and_replay (test_timeline.TimelineCoreTests.test_group11_import_two_phase_race_and_replay) ... ok
+test_group12_empty_and_project_unique_contract (test_timeline.TimelineCoreTests.test_group12_empty_and_project_unique_contract) ... ok
+test_group1_project_permissions_and_lifecycle (test_timeline.TimelineCoreTests.test_group1_project_permissions_and_lifecycle) ... ok
+test_group1_unauthenticated_http_401 (test_timeline.TimelineCoreTests.test_group1_unauthenticated_http_401) ... ok
+test_group2_initial_date_lock_and_group3_conflict_views (test_timeline.TimelineCoreTests.test_group2_initial_date_lock_and_group3_conflict_views) ... ok
+test_group3_missing_versions_and_exact_zero_writes (test_timeline.TimelineCoreTests.test_group3_missing_versions_and_exact_zero_writes) ... ok
+test_group4_undo_guards (test_timeline.TimelineCoreTests.test_group4_undo_guards) ... ok
+test_group4_undo_three_batch_middle_and_reverse_roles (test_timeline.TimelineCoreTests.test_group4_undo_three_batch_middle_and_reverse_roles) ... ok
+test_group5_mixed_batch_audit_kinds (test_timeline.TimelineCoreTests.test_group5_mixed_batch_audit_kinds) ... ok
+test_group6_write_chain_rules_and_snapshot_neighbor (test_timeline.TimelineCoreTests.test_group6_write_chain_rules_and_snapshot_neighbor) ... ok
+test_group7_view_metrics_review_pagination_and_undo_count (test_timeline.TimelineCoreTests.test_group7_view_metrics_review_pagination_and_undo_count) ... ok
+test_group8_excel_negative_controls (test_timeline.TimelineCoreTests.test_group8_excel_negative_controls) ... ok
+test_group9_excel_round_trip_in_new_workspace (test_timeline.TimelineCoreTests.test_group9_excel_round_trip_in_new_workspace) ... ok
+test_import_field_limits_boundaries (test_timeline.TimelineCoreTests.test_import_field_limits_boundaries) ... ok
+test_import_headers_contract_literal (test_timeline.TimelineCoreTests.test_import_headers_contract_literal) ... ok
+test_import_multirow_aggregation_and_counts (test_timeline.TimelineCoreTests.test_import_multirow_aggregation_and_counts) ... ok
+test_import_status_three_states_and_recompute (test_timeline.TimelineCoreTests.test_import_status_three_states_and_recompute) ... ok
+test_import_xlsx_serial_positive_and_boundaries (test_timeline.TimelineCoreTests.test_import_xlsx_serial_positive_and_boundaries) ... ok
+test_initial_correction_undo_and_review (test_timeline.TimelineCoreTests.test_initial_correction_undo_and_review) ... ok
+test_name_conflict_and_viewer_denied (test_timeline.TimelineCoreTests.test_name_conflict_and_viewer_denied) ... ok
+test_project_create_then_batch_nodes_and_derived_view (test_timeline.TimelineCoreTests.test_project_create_then_batch_nodes_and_derived_view) ... ok
+test_single_and_cascade_clamping (test_timeline.TimelineCoreTests.test_single_and_cascade_clamping) ... ok
+test_v16_migration_five_tables_and_checks (test_timeline.TimelineCoreTests.test_v16_migration_five_tables_and_checks) ... ok
+setUpClass (test_timeline_e2e.TimelineProductionE2E) ... ERROR
+test_r01_r02_list_and_single_get_auth_permissions_and_shapes (test_timeline_http.TimelineHTTPTests.test_r01_r02_list_and_single_get_auth_permissions_and_shapes) ... ok
+test_r03_review_actor_change_rows_metrics_and_overlap_rows (test_timeline_http.TimelineHTTPTests.test_r03_review_actor_change_rows_metrics_and_overlap_rows) ... ok
+test_r04_create_lifecycle_conflict_csrf_and_viewer (test_timeline_http.TimelineHTTPTests.test_r04_create_lifecycle_conflict_csrf_and_viewer) ... ok
+test_r05_delete_path_version_admin_soft_delete_and_repeat (test_timeline_http.TimelineHTTPTests.test_r05_delete_path_version_admin_soft_delete_and_repeat) ... ok
+test_r06_batch_http_complete_view_csrf_version_atomic_and_interval_bounds (test_timeline_http.TimelineHTTPTests.test_r06_batch_http_complete_view_csrf_version_atomic_and_interval_bounds) ... ok
+test_r07_undo_http_success_csrf_stale_soft_delete_and_zero_write (test_timeline_http.TimelineHTTPTests.test_r07_undo_http_success_csrf_stale_soft_delete_and_zero_write) ... ok
+test_r08_initial_correction_http_noop_no_cascade_permissions_and_invalid_node (test_timeline_http.TimelineHTTPTests.test_r08_initial_correction_http_noop_no_cascade_permissions_and_invalid_node) ... ok
+test_r09_import_d4_d5_d7_error_rows_warnings_and_cell_types (test_timeline_http.TimelineHTTPTests.test_r09_import_d4_d5_d7_error_rows_warnings_and_cell_types) ... ok
+test_r09_r10_import_http_preview_commit_permissions_state_and_race (test_timeline_http.TimelineHTTPTests.test_r09_r10_import_http_preview_commit_permissions_state_and_race) ... ok
+test_r11_export_post_json_order_permissions_and_round_trip (test_timeline_http.TimelineHTTPTests.test_r11_export_post_json_order_permissions_and_round_trip) ... Future exception was never retrieved
+future: <Future finished exception=PermissionError(13, '拒绝访问。', None, 5, None)>
+Traceback (most recent call last):
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\suite.py", line 166, in _handleClassSetUp
+    setUpClass()
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_timeline_e2e.py", line 22, in setUpClass
+    cls.playwright = sync_playwright().start()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+[20/Aug/2026 15:13:43] "GET /api/boards/1/views HTTP/1.1" 200 -
+[20/Aug/2026 15:13:43] "PATCH /api/views/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:43] "DELETE /api/views/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:43] "GET /api/boards/1/views HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-d9md5_l5\backups\flowboard-pre-v16-20260820-151344-084936.db
+[20/Aug/2026 15:13:46] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:46] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:13:46] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:13:46] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:13:46] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:13:46] "POST /api/boards/1/views HTTP/1.1" 422 -
+[20/Aug/2026 15:13:46] "GET /api/boards/1/views HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-n94rpakw\backups\flowboard-pre-v16-20260820-151346-927547.db
+[20/Aug/2026 15:13:48] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:48] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:13:48] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:13:48] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:48] "PATCH /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:48] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:48] "POST /api/boards/1/query HTTP/1.1" 422 -
+[20/Aug/2026 15:13:48] "POST /api/boards/1/query HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-t5f12bnx\backups\flowboard-pre-v16-20260820-151349-498737.db
+[20/Aug/2026 15:13:51] "GET / HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "HEAD / HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "GET /index.html HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "HEAD /index.html HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "GET /styles.css HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "HEAD /styles.css HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "GET /auth.css HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "HEAD /auth.css HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "GET /lifecycle.css HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "HEAD /lifecycle.css HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "GET /view-state.js HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "HEAD /view-state.js HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "GET /view-ui.js HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "HEAD /view-ui.js HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "GET /app.js HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "HEAD /app.js HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:51] "GET /flowboard.db HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "GET /flowboard.db HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "HEAD /flowboard.db HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "HEAD /flowboard.db HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "GET /backups/flowboard-pre-v1-example.db HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "GET /backups/flowboard-pre-v1-example.db HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "HEAD /backups/flowboard-pre-v1-example.db HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "HEAD /backups/flowboard-pre-v1-example.db HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "GET /server.py HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "GET /server.py HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "HEAD /server.py HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "HEAD /server.py HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "GET /.copilot-task.md HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "GET /.copilot-task.md HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "HEAD /.copilot-task.md HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "HEAD /.copilot-task.md HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "GET /tests/test_secure_foundation.py HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "GET /tests/test_secure_foundation.py HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "HEAD /tests/test_secure_foundation.py HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "HEAD /tests/test_secure_foundation.py HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "GET /unknown.txt HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "GET /unknown.txt HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "HEAD /unknown.txt HTTP/1.1" 404 -
+[20/Aug/2026 15:13:51] "HEAD /unknown.txt HTTP/1.1" 404 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-1myx12r3\backups\flowboard-pre-v16-20260820-151352-524213.db
+[20/Aug/2026 15:13:54] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:54] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:13:54] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:13:54] "POST /api/workspaces/1/templates HTTP/1.1" 201 -
+[20/Aug/2026 15:13:54] "POST /api/templates/1/instantiate HTTP/1.1" 201 -
+[20/Aug/2026 15:13:55] "GET /api/bootstrap?board_id=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:55] "PATCH /api/templates/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:55] "DELETE /api/templates/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:55] "GET /api/workspaces/1/templates HTTP/1.1" 200 -
+[20/Aug/2026 15:13:55] "GET /api/workspaces/1/templates?include_deleted=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:55] "POST /api/templates/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:13:55] "POST /api/boards/1/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:13:55] "POST /api/boards/1/imports/commit HTTP/1.1" 201 -
+[20/Aug/2026 15:13:55] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:55] "POST /api/boards/1/export HTTP/1.1" 200 -
+[20/Aug/2026 15:13:55] "POST /api/boards/1/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:13:55] "POST /api/boards/1/imports/commit HTTP/1.1" 422 -
+[20/Aug/2026 15:13:55] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:55] "POST /api/boards/1/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:13:55] "POST /api/boards/1/imports/commit HTTP/1.1" 422 -
+[20/Aug/2026 15:13:55] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:13:55] "POST /api/boards/1/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:13:55] "POST /api/boards/1/imports/commit HTTP/1.1" 422 -
+[20/Aug/2026 15:13:55] "POST /api/boards/1/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:13:55] "POST /api/boards/1/imports/commit HTTP/1.1" 422 -
+[20/Aug/2026 15:13:55] "PATCH /api/admin/workspace-memberships/u2?workspace_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:13:56] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:13:56] "POST /api/workspaces/1/templates HTTP/1.1" 403 -
+[20/Aug/2026 15:13:56] "POST /api/boards/1/imports/preview HTTP/1.1" 403 -
+[20/Aug/2026 15:13:56] "POST /api/boards/1/export HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-2jvwgb0m\backups\flowboard-pre-v16-20260820-151356-956754.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-_0dyfe4p\backups\flowboard-pre-v16-20260820-151402-047861.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-77qv7jsr\backups\flowboard-pre-v16-20260820-151406-857194.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-7iaqcvlj\backups\flowboard-pre-v16-20260820-151409-880338.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-oip4hh9h\backups\flowboard-pre-v16-20260820-151413-991322.db
+[20/Aug/2026 15:14:15] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:14:15] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:14:15] "POST /api/groups/1/tasks HTTP/1.1" 422 -
+[20/Aug/2026 15:14:15] "POST /api/groups/1/tasks HTTP/1.1" 422 -
+[20/Aug/2026 15:14:15] "POST /api/groups/1/tasks HTTP/1.1" 422 -
+[20/Aug/2026 15:14:15] "POST /api/groups/1/tasks HTTP/1.1" 422 -
+[20/Aug/2026 15:14:15] "POST /api/groups/1/tasks HTTP/1.1" 422 -
+[20/Aug/2026 15:14:15] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:14:15] "POST /api/workspaces/1/boards HTTP/1.1" 201 -
+[20/Aug/2026 15:14:15] "POST /api/boards/2/groups HTTP/1.1" 201 -
+[20/Aug/2026 15:14:15] "GET /api/groups/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:14:15] "GET /api/groups/3 HTTP/1.1" 200 -
+[20/Aug/2026 15:14:15] "POST /api/tasks/6/move HTTP/1.1" 422 -
+[20/Aug/2026 15:14:16] "PATCH /api/admin/workspace-memberships/u2?workspace_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:14:16] "POST /api/auth/login HTTP/1.1" 200 -
+ok
+test_real_app_chart_views_and_dashboard_widgets (test_views_e2e.FlowboardViewsE2E.test_real_app_chart_views_and_dashboard_widgets) ... ERROR
+test_real_app_cross_board_mirror_formula_and_private_acl (test_views_e2e.FlowboardViewsE2E.test_real_app_cross_board_mirror_formula_and_private_acl) ... ERROR
+test_real_app_hierarchy_dependency_cycle_progress_and_date_policy (test_views_e2e.FlowboardViewsE2E.test_real_app_hierarchy_dependency_cycle_progress_and_date_policy) ... Future exception was never retrieved
+future: <Future finished exception=PermissionError(13, '拒绝访问。', None, 5, None)>
+Traceback (most recent call last):
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 58, in testPartExecutor
+    yield
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 630, in run
+    self._callSetUp()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 586, in _callSetUp
+    self.setUp()
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_views_e2e.py", line 22, in setUp
+    self.playwright = sync_playwright().start()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+Future exception was never retrieved
+future: <Future finished exception=PermissionError(13, '拒绝访问。', None, 5, None)>
+Traceback (most recent call last):
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 58, in testPartExecutor
+    yield
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 630, in run
+    self._callSetUp()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 586, in _callSetUp
+    self.setUp()
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_views_e2e.py", line 22, in setUp
+    self.playwright = sync_playwright().start()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+ERROR
+test_real_app_tabs_saved_resize_drag_calendar_viewer_and_mobile (test_views_e2e.FlowboardViewsE2E.test_real_app_tabs_saved_resize_drag_calendar_viewer_and_mobile) ... ERROR
+test_real_app_template_import_and_export (test_views_e2e.FlowboardViewsE2E.test_real_app_template_import_and_export) ... ERROR
+test_real_app_timeline_gantt_and_mobile_fallback (test_views_e2e.FlowboardViewsE2E.test_real_app_timeline_gantt_and_mobile_fallback) ... Future exception was never retrieved
+future: <Future finished exception=PermissionError(13, '拒绝访问。', None, 5, None)>
+Traceback (most recent call last):
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 58, in testPartExecutor
+    yield
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 630, in run
+    self._callSetUp()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 586, in _callSetUp
+    self.setUp()
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_views_e2e.py", line 22, in setUp
+    self.playwright = sync_playwright().start()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+Future exception was never retrieved
+future: <Future finished exception=PermissionError(13, '拒绝访问。', None, 5, None)>
+Traceback (most recent call last):
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 58, in testPartExecutor
+    yield
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 630, in run
+    self._callSetUp()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 586, in _callSetUp
+    self.setUp()
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_views_e2e.py", line 22, in setUp
+    self.playwright = sync_playwright().start()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+Future exception was never retrieved
+future: <Future finished exception=PermissionError(13, '拒绝访问。', None, 5, None)>
+Traceback (most recent call last):
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 58, in testPartExecutor
+    yield
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 630, in run
+    self._callSetUp()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 586, in _callSetUp
+    self.setUp()
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_views_e2e.py", line 22, in setUp
+    self.playwright = sync_playwright().start()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+ERROR
+
+======================================================================
+ERROR: test_two_users_desktop_and_mobile_collaboration_journey (test_collaboration_e2e.CollaborationE2E.test_two_users_desktop_and_mobile_collaboration_journey)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_collaboration_e2e.py", line 16, in setUp
+    os.environ["FLOWBOARD_INITIAL_PASSWORD"]="test-password";os.environ["FLOWBOARD_ATTACHMENT_DIR"]=str(Path(self.temp.name)/"private-blobs");self.server=create_server("127.0.0.1",0,self.db_path);self.thread=threading.Thread(target=self.server.serve_forever,daemon=True);self.thread.start();self.base=f"http://127.0.0.1:{self.server.server_address[1]}";self.playwright=sync_playwright().start();self.browser=self.playwright.chromium.launch(headless=True)
+                                                                                                                                                                                                                                                                                                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+
+======================================================================
+ERROR: test_v10_to_v11_backup_preserves_views_and_is_idempotent (test_dashboards.DashboardMigrationTests.test_v10_to_v11_backup_preserves_views_and_is_idempotent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_dashboards.py", line 121, in test_v10_to_v11_backup_preserves_views_and_is_idempotent
+    before=conn.execute("SELECT COUNT(*),COALESCE(SUM(version),0) FROM saved_views").fetchone();conn.close();backup=migrate(path,"test-password");self.assertTrue(Path(backup).exists());old=connect(backup);self.assertEqual(old.execute("PRAGMA user_version").fetchone()[0],10);old.close();conn=connect(path);self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],15);self.assertEqual(tuple(conn.execute("SELECT COUNT(*),COALESCE(SUM(version),0) FROM saved_views").fetchone()),tuple(before));self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=11").fetchone()[0],"flowboard-schema-v11");self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok");self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);conn.close();self.assertIsNone(migrate(path,"test-password"))
+                                                                                                                                                                                                                                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 16 != 15
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\shutil.py", line 646, in _rmtree_unsafe
+    os.unlink(fullname)
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'C:\\Users\\xy198\\AppData\\Local\\Temp\\tmpq3328_ep\\v10.db'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_dashboards.py", line 117, in test_v10_to_v11_backup_preserves_views_and_is_idempotent
+    with tempfile.TemporaryDirectory() as root:
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\tempfile.py", line 946, in __exit__
+    self.cleanup()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\tempfile.py", line 950, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\tempfile.py", line 930, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\shutil.py", line 820, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\shutil.py", line 648, in _rmtree_unsafe
+    onexc(os.unlink, fullname, err)
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\tempfile.py", line 905, in onexc
+    _os.unlink(path)
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'C:\\Users\\xy198\\AppData\\Local\\Temp\\tmpq3328_ep\\v10.db'
+
+======================================================================
+ERROR: test_two_context_realtime_fallback_notifications_search_audit_and_mobile (test_i12_e2e.I12E2E.test_two_context_realtime_fallback_notifications_search_audit_and_mobile)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_i12_e2e.py", line 18, in setUp
+    self.temp=tempfile.TemporaryDirectory(prefix="flowboard-i12-e2e-");self.db=str(Path(self.temp.name)/"flowboard.db");create_legacy_database(self.db);os.environ["FLOWBOARD_INITIAL_PASSWORD"]="test-password";os.environ["FLOWBOARD_ATTACHMENT_DIR"]=str(Path(self.temp.name)/"blobs");self.server=create_server("127.0.0.1",0,self.db);self.thread=threading.Thread(target=self.server.serve_forever,daemon=True);self.thread.start();self.base=f"http://127.0.0.1:{self.server.server_address[1]}";self.playwright=sync_playwright().start();self.browser=self.playwright.chromium.launch(headless=True)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+
+======================================================================
+ERROR: test_v15_description_retention_and_five_atomic_batch_operations (test_i13.I13BatchTests.test_v15_description_retention_and_five_atomic_batch_operations)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\shutil.py", line 646, in _rmtree_unsafe
+    os.unlink(fullname)
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'C:\\Users\\xy198\\AppData\\Local\\Temp\\tmp5s7palh6\\flowboard.db'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_i13.py", line 17, in tearDown
+    def tearDown(self):self.temp.cleanup()
+                       ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\tempfile.py", line 950, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\tempfile.py", line 930, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\shutil.py", line 820, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\shutil.py", line 648, in _rmtree_unsafe
+    onexc(os.unlink, fullname, err)
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\tempfile.py", line 905, in onexc
+    _os.unlink(path)
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'C:\\Users\\xy198\\AppData\\Local\\Temp\\tmp5s7palh6\\flowboard.db'
+
+======================================================================
+ERROR: test_mobile_atomic_batch_and_admin_backup_surface (test_i13_e2e.I13E2E.test_mobile_atomic_batch_and_admin_backup_surface)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_i13_e2e.py", line 15, in setUp
+    self.temp=tempfile.TemporaryDirectory(prefix="flowboard-i13-e2e-");self.db=str(Path(self.temp.name)/"flowboard.db");create_legacy_database(self.db);os.environ["FLOWBOARD_INITIAL_PASSWORD"]="test-password";os.environ["FLOWBOARD_ATTACHMENT_DIR"]=str(Path(self.temp.name)/"blobs");os.environ["FLOWBOARD_BACKUP_DIR"]=str(Path(self.temp.name)/"backups");self.server=create_server("127.0.0.1",0,self.db);self.thread=threading.Thread(target=self.server.serve_forever,daemon=True);self.thread.start();self.base=f"http://127.0.0.1:{self.server.server_address[1]}";self.playwright=sync_playwright().start();self.browser=self.playwright.chromium.launch(headless=True)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+
+======================================================================
+ERROR: test_v9_to_latest_preserves_saved_views_backup_and_is_idempotent (test_schedule.ScheduleMigrationTests.test_v9_to_latest_preserves_saved_views_backup_and_is_idempotent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_schedule.py", line 109, in test_v9_to_latest_preserves_saved_views_backup_and_is_idempotent
+    backup=migrate(path,"test-password");self.assertTrue(Path(backup).exists());backup_conn=connect(backup);self.assertEqual(backup_conn.execute("PRAGMA user_version").fetchone()[0],9);self.assertEqual(tuple(backup_conn.execute("SELECT board_id,owner_id,scope,view_type,name,filter_json,sort_json,visible_fields_json,column_order_json,is_default,version,created_at,updated_at,deleted_at,presentation_json FROM saved_views WHERE name='Legacy calendar'").fetchone()),before);backup_conn.close();conn=connect(path);self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],15);self.assertEqual(tuple(conn.execute("SELECT board_id,owner_id,scope,view_type,name,filter_json,sort_json,visible_fields_json,column_order_json,is_default,version,created_at,updated_at,deleted_at,presentation_json FROM saved_views WHERE name='Legacy calendar'").fetchone()),before);self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=10").fetchone()[0],"flowboard-schema-v10");self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok");self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);count=conn.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0];conn.close();self.assertIsNone(migrate(path,"test-password"));conn=connect(path);self.assertEqual(conn.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0],count);conn.close()
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 16 != 15
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\shutil.py", line 646, in _rmtree_unsafe
+    os.unlink(fullname)
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'C:\\Users\\xy198\\AppData\\Local\\Temp\\tmpo3jpqud_\\v9.db'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_schedule.py", line 105, in test_v9_to_latest_preserves_saved_views_backup_and_is_idempotent
+    with tempfile.TemporaryDirectory() as root:
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\tempfile.py", line 946, in __exit__
+    self.cleanup()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\tempfile.py", line 950, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\tempfile.py", line 930, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\shutil.py", line 820, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\shutil.py", line 648, in _rmtree_unsafe
+    onexc(os.unlink, fullname, err)
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\tempfile.py", line 905, in onexc
+    _os.unlink(path)
+PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'C:\\Users\\xy198\\AppData\\Local\\Temp\\tmpo3jpqud_\\v9.db'
+
+======================================================================
+ERROR: setUpClass (test_timeline_e2e.TimelineProductionE2E)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_timeline_e2e.py", line 22, in setUpClass
+    cls.playwright = sync_playwright().start()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+
+======================================================================
+ERROR: test_real_app_chart_views_and_dashboard_widgets (test_views_e2e.FlowboardViewsE2E.test_real_app_chart_views_and_dashboard_widgets)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_views_e2e.py", line 22, in setUp
+    self.playwright = sync_playwright().start()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+
+======================================================================
+ERROR: test_real_app_cross_board_mirror_formula_and_private_acl (test_views_e2e.FlowboardViewsE2E.test_real_app_cross_board_mirror_formula_and_private_acl)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_views_e2e.py", line 22, in setUp
+    self.playwright = sync_playwright().start()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+
+======================================================================
+ERROR: test_real_app_hierarchy_dependency_cycle_progress_and_date_policy (test_views_e2e.FlowboardViewsE2E.test_real_app_hierarchy_dependency_cycle_progress_and_date_policy)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_views_e2e.py", line 22, in setUp
+    self.playwright = sync_playwright().start()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+
+======================================================================
+ERROR: test_real_app_tabs_saved_resize_drag_calendar_viewer_and_mobile (test_views_e2e.FlowboardViewsE2E.test_real_app_tabs_saved_resize_drag_calendar_viewer_and_mobile)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_views_e2e.py", line 22, in setUp
+    self.playwright = sync_playwright().start()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+
+======================================================================
+ERROR: test_real_app_template_import_and_export (test_views_e2e.FlowboardViewsE2E.test_real_app_template_import_and_export)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_views_e2e.py", line 22, in setUp
+    self.playwright = sync_playwright().start()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+
+======================================================================
+ERROR: test_real_app_timeline_gantt_and_mobile_fallback (test_views_e2e.FlowboardViewsE2E.test_real_app_timeline_gantt_and_mobile_fallback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_views_e2e.py", line 22, in setUp
+    self.playwright = sync_playwright().start()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。
+
+======================================================================
+FAIL: test_v12_to_v14_subscription_merge_backup_restore_and_idempotence (test_collaboration.CollaborationTests.test_v12_to_v14_subscription_merge_backup_restore_and_idempotence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_collaboration.py", line 93, in test_v12_to_v14_subscription_merge_backup_restore_and_idempotence
+    backup=migrate(db_path);self.assertIsNotNone(backup);self.assertTrue(Path(backup).name.startswith("v12-pre-v15-"))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_v13_to_v14_backup_restore_and_idempotence (test_i12.I12ServiceTests.test_v13_to_v14_backup_restore_and_idempotence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_i12.py", line 84, in test_v13_to_v14_backup_restore_and_idempotence
+    before={name:conn.execute(f"SELECT COUNT(*) FROM {name}").fetchone()[0] for name in ("tasks","comments","activity","collaboration_events")};conn.close();backup=migrate(path);self.assertTrue(Path(backup).name.startswith("v13-pre-v15-"));old=connect(backup);self.assertEqual(old.execute("PRAGMA user_version").fetchone()[0],13);old.close();conn=connect(path)
+                                                                                                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_admin_backup_api_surface_is_verified_and_viewer_is_denied (test_i13.I13BatchTests.test_admin_backup_api_surface_is_verified_and_viewer_is_denied)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_i13.py", line 61, in test_admin_backup_api_surface_is_verified_and_viewer_is_denied
+    verified=self.service.verify_admin_backup(self.admin,1,created["name"]);self.assertTrue(verified["verified"]);self.assertEqual(verified["schema_version"],15)
+                                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 16 != 15
+
+======================================================================
+FAIL: test_v15_description_retention_and_five_atomic_batch_operations (test_i13.I13BatchTests.test_v15_description_retention_and_five_atomic_batch_operations)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_i13.py", line 26, in test_v15_description_retention_and_five_atomic_batch_operations
+    conn=connect(self.db);self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],15);self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=15").fetchone()[0],"flowboard-schema-v15");self.assertEqual(conn.execute("SELECT trash_retention_days FROM workspaces WHERE id=1").fetchone()[0],30);conn.close()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 16 != 15
+
+======================================================================
+FAIL: test_backup_manifest_corruption_retention_and_real_restore_with_blob (test_i13_operations.I13OperationsTests.test_backup_manifest_corruption_retention_and_real_restore_with_blob)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_i13_operations.py", line 28, in test_backup_manifest_corruption_retention_and_real_restore_with_blob
+    attachment=self._seed();package=create_backup(self.db,self.attachments,self.backups);manifest=verify_backup(package);self.assertEqual(manifest["schema_version"],15);self.assertEqual(len(manifest["attachments"]),1)
+                                                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 16 != 15
+
+======================================================================
+FAIL: test_restore_injected_failure_rolls_back_current_database_and_attachment (test_i13_operations.I13OperationsTests.test_restore_injected_failure_rolls_back_current_database_and_attachment)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_i13_operations.py", line 43, in test_restore_injected_failure_rolls_back_current_database_and_attachment
+    for item in safety:self.assertEqual(verify_backup(item)["schema_version"],15)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 16 != 15
+
+======================================================================
+FAIL: test_migration_preserves_existing_tasks_and_creates_backup (test_secure_foundation.FlowboardIntegrationTests.test_migration_preserves_existing_tasks_and_creates_backup)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_secure_foundation.py", line 152, in test_migration_preserves_existing_tasks_and_creates_backup
+    self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 15)
+AssertionError: 16 != 15
+
+======================================================================
+FAIL: test_v1_to_v2_migration_preserves_data_and_activity (test_secure_foundation.FlowboardIntegrationTests.test_v1_to_v2_migration_preserves_data_and_activity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_secure_foundation.py", line 267, in test_v1_to_v2_migration_preserves_data_and_activity
+    self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 15)
+AssertionError: 16 != 15
+
+======================================================================
+FAIL: test_v6_to_v7_migration_backup_restore_and_idempotence (test_secure_foundation.FlowboardIntegrationTests.test_v6_to_v7_migration_backup_restore_and_idempotence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_secure_foundation.py", line 284, in test_v6_to_v7_migration_backup_restore_and_idempotence
+    self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],15);self.assertEqual(before,[tuple(row) for row in conn.execute("SELECT id,title,board_order FROM tasks ORDER BY id")]);self.assertEqual(conn.execute("SELECT COUNT(*) FROM task_dependencies").fetchone()[0],0);self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok");self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=7").fetchone()[0],"flowboard-schema-v7")
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 16 != 15
+
+======================================================================
+FAIL: test_v7_to_v8_migration_backup_restore_and_idempotence (test_secure_foundation.FlowboardIntegrationTests.test_v7_to_v8_migration_backup_restore_and_idempotence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_secure_foundation.py", line 996, in test_v7_to_v8_migration_backup_restore_and_idempotence
+    self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],15);self.assertEqual(before,[tuple(row) for row in conn.execute("SELECT id,title,parent_id FROM tasks ORDER BY id")]);self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok");self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=8").fetchone()[0],"flowboard-schema-v8")
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 16 != 15
+
+======================================================================
+FAIL: test_v8_to_v9_migration_backup_restore_and_idempotence (test_secure_foundation.FlowboardIntegrationTests.test_v8_to_v9_migration_backup_restore_and_idempotence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_secure_foundation.py", line 980, in test_v8_to_v9_migration_backup_restore_and_idempotence
+    try:self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0],15);self.assertEqual(conn.execute("SELECT COUNT(*) FROM tasks").fetchone()[0],before);self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=9").fetchone()[0],"flowboard-schema-v9");self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(),[]);self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0],"ok")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 16 != 15
+
+----------------------------------------------------------------------
+Ran 118 tests in 234.654s
+
+FAILED (failures=11, errors=13)
+[20/Aug/2026 15:14:16] "POST /api/workspaces/1/boards HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-gwjab3jk\backups\flowboard-pre-v16-20260820-151417-226360.db
+[20/Aug/2026 15:14:19] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:14:19] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:14:19] "POST /api/tasks HTTP/1.1" 403 -
+[20/Aug/2026 15:14:19] "GET /api/bootstrap?board_id=1 HTTP/1.1" 403 -
+[20/Aug/2026 15:14:45] "GET /api/workspaces/1/timeline HTTP/1.1" 401 -
+[20/Aug/2026 15:15:35] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:15:35] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:15:35] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[20/Aug/2026 15:15:35] "GET /api/timeline/projects/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:15:35] "GET /api/timeline/projects/1 HTTP/1.1" 401 -
+[20/Aug/2026 15:15:35] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:15:35] "GET /api/timeline/projects/1 HTTP/1.1" 403 -
+[20/Aug/2026 15:15:38] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:15:38] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:15:38] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:15:38] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:15:38] "GET /api/workspaces/1/timeline/review?project_ids=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:15:41] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:15:41] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:15:41] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 422 -
+[20/Aug/2026 15:15:41] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 403 -
+[20/Aug/2026 15:15:42] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:15:42] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 403 -
+[20/Aug/2026 15:15:45] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:15:45] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:15:45] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 428 -
+[20/Aug/2026 15:15:45] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 409 -
+[20/Aug/2026 15:15:45] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:15:45] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 403 -
+[20/Aug/2026 15:15:45] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:15:45] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 404 -
+[20/Aug/2026 15:15:48] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:15:48] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:15:48] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:15:48] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 403 -
+[20/Aug/2026 15:15:48] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 428 -
+[20/Aug/2026 15:15:48] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 409 -
+[20/Aug/2026 15:15:48] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 422 -
+[20/Aug/2026 15:15:48] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:15:48] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 403 -
+[20/Aug/2026 15:15:48] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:15:48] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:15:48] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 409 -
+[20/Aug/2026 15:15:52] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:15:52] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:15:52] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:15:52] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 403 -
+[20/Aug/2026 15:15:52] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 200 -
+[20/Aug/2026 15:15:52] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 409 -
+[20/Aug/2026 15:15:52] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:15:52] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:15:52] "DELETE /api/workspaces/1/timeline/projects/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:15:52] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 404 -
+[20/Aug/2026 15:15:55] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:15:55] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:15:55] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:15:55] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 403 -
+[20/Aug/2026 15:15:56] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:15:56] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:15:56] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:15:56] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 403 -
+[20/Aug/2026 15:15:56] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 200 -
+[20/Aug/2026 15:15:56] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 200 -
+[20/Aug/2026 15:15:56] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 422 -
+[20/Aug/2026 15:15:56] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:15:56] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 404 -
+[20/Aug/2026 15:15:59] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:15:59] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:15:59] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[20/Aug/2026 15:15:59] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:15:59] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[20/Aug/2026 15:15:59] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[20/Aug/2026 15:16:02] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:16:02] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 403 -
+[20/Aug/2026 15:16:02] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:16:02] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 403 -
+[20/Aug/2026 15:16:02] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:16:02] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 201 -
+[20/Aug/2026 15:16:02] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 409 -
+[20/Aug/2026 15:16:03] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:16:03] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:16:03] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 422 -
+[20/Aug/2026 15:16:03] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:16:03] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 404 -
+[20/Aug/2026 15:16:03] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:16:03] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 403 -
+[20/Aug/2026 15:16:03] "POST /api/workspaces/2/timeline/imports/commit HTTP/1.1" 403 -
+[20/Aug/2026 15:16:06] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:16:06] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:16:06] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:16:06] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:16:06] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:16:06] "GET /api/workspaces/1/timeline/export HTTP/1.1" 404 -
+[20/Aug/2026 15:16:06] "POST /api/workspaces/1/timeline/export HTTP/1.1" 403 -
+[20/Aug/2026 15:16:06] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:16:06] "POST /api/workspaces/1/timeline/export HTTP/1.1" 403 -
+[20/Aug/2026 15:16:07] "POST /api/workspaces/1/timeline/export HTTP/1.1" 422 -
+[20/Aug/2026 15:16:07] "POST /api/workspaces/1/timeline/export HTTP/1.1" 422 -
+[20/Aug/2026 15:16:07] "POST /api/workspaces/1/timeline/export HTTP/1.1" 200 -
+[20/Aug/2026 15:16:07] "POST /api/workspaces/2/timeline/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:16:07] "POST /api/workspaces/2/timeline/imports/commit HTTP/1.1" 201 -
+[20/Aug/2026 15:16:07] "POST /api/workspaces/1/timeline/export HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-e2e-i8bp_pj8\backups\flowboard-pre-v16-20260820-151607-958375.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-e2e-xjow_1we\backups\flowboard-pre-v16-20260820-151610-443791.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-e2e-weoms_6v\backups\flowboard-pre-v16-20260820-151612-722615.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-e2e-g_093i_q\backups\flowboard-pre-v16-20260820-151615-411643.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-e2e-ksbonzgm\backups\flowboard-pre-v16-20260820-151616-996039.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-e2e-6u7m4o64\backups\flowboard-pre-v16-20260820-151618-683174.db
+Future exception was never retrieved
+future: <Future finished exception=PermissionError(13, '拒绝访问。', None, 5, None)>
+Traceback (most recent call last):
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 58, in testPartExecutor
+    yield
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 630, in run
+    self._callSetUp()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\unittest\case.py", line 586, in _callSetUp
+    self.setUp()
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_views_e2e.py", line 22, in setUp
+    self.playwright = sync_playwright().start()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 84, in start
+    return self.__enter__()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 77, in __enter__
+    dispatcher_fiber.switch()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_context_manager.py", line 56, in greenlet_main
+    self._loop.run_until_complete(self._connection.run_as_sync())
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 303, in run_as_sync
+    await self.run()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 312, in run
+    await self._transport.connect()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 133, in connect
+    raise exc
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_transport.py", line 120, in connect
+    self._proc = await asyncio.create_subprocess_exec(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\subprocess.py", line 224, in create_subprocess_exec
+    transport, protocol = await loop.subprocess_exec(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 1742, in subprocess_exec
+    transport = await self._make_subprocess_transport(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 399, in _make_subprocess_transport
+    transp = _WindowsSubprocessTransport(self, protocol, args, shell,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_subprocess.py", line 36, in __init__
+    self._start(args=args, shell=shell, stdin=stdin, stdout=stdout,
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_events.py", line 873, in _start
+    self._proc = windows_utils.Popen(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 136, in __init__
+    stdin_rh, stdin_wh = pipe(overlapped=(False, True), duplex=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\asyncio\windows_utils.py", line 63, in pipe
+    h2 = _winapi.CreateFile(
+         ^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 拒绝访问。

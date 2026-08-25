@@ -1,0 +1,35 @@
+[19/Aug/2026 17:18:02] "GET /api/workspaces/1/timeline HTTP/1.1" 401 -
+test_batch_update_conflict_noop_and_cascade (test_timeline.TimelineCoreTests.test_batch_update_conflict_noop_and_cascade) ... ok
+test_cascade_anchors_status_only_and_date_priority (test_timeline.TimelineCoreTests.test_cascade_anchors_status_only_and_date_priority) ... ok
+test_excel_import_preview_commit_and_export (test_timeline.TimelineCoreTests.test_excel_import_preview_commit_and_export) ... ok
+test_export_exact_1000_and_over_limit_fail_closed (test_timeline.TimelineCoreTests.test_export_exact_1000_and_over_limit_fail_closed) ... ok
+test_group10_backup_content_idempotence_rollback (test_timeline.TimelineCoreTests.test_group10_backup_content_idempotence_rollback) ... ok
+test_group10_true_v15_to_v16_migration_backup_and_idempotence (test_timeline.TimelineCoreTests.test_group10_true_v15_to_v16_migration_backup_and_idempotence) ... ok
+test_group11_import_two_phase_race_and_replay (test_timeline.TimelineCoreTests.test_group11_import_two_phase_race_and_replay) ... ok
+test_group12_empty_and_project_unique_contract (test_timeline.TimelineCoreTests.test_group12_empty_and_project_unique_contract) ... ok
+test_group1_project_permissions_and_lifecycle (test_timeline.TimelineCoreTests.test_group1_project_permissions_and_lifecycle) ... ok
+test_group1_unauthenticated_http_401 (test_timeline.TimelineCoreTests.test_group1_unauthenticated_http_401) ... ok
+test_group2_initial_date_lock_and_group3_conflict_views (test_timeline.TimelineCoreTests.test_group2_initial_date_lock_and_group3_conflict_views) ... ok
+test_group3_missing_versions_and_exact_zero_writes (test_timeline.TimelineCoreTests.test_group3_missing_versions_and_exact_zero_writes) ... ok
+test_group4_undo_guards (test_timeline.TimelineCoreTests.test_group4_undo_guards) ... ok
+test_group4_undo_three_batch_middle_and_reverse_roles (test_timeline.TimelineCoreTests.test_group4_undo_three_batch_middle_and_reverse_roles) ... ok
+test_group5_mixed_batch_audit_kinds (test_timeline.TimelineCoreTests.test_group5_mixed_batch_audit_kinds) ... ok
+test_group6_write_chain_rules_and_snapshot_neighbor (test_timeline.TimelineCoreTests.test_group6_write_chain_rules_and_snapshot_neighbor) ... ok
+test_group7_view_metrics_review_pagination_and_undo_count (test_timeline.TimelineCoreTests.test_group7_view_metrics_review_pagination_and_undo_count) ... ok
+test_group8_excel_negative_controls (test_timeline.TimelineCoreTests.test_group8_excel_negative_controls) ... ok
+test_group9_excel_round_trip_in_new_workspace (test_timeline.TimelineCoreTests.test_group9_excel_round_trip_in_new_workspace) ... ok
+test_import_field_limits_boundaries (test_timeline.TimelineCoreTests.test_import_field_limits_boundaries) ... ok
+test_import_headers_contract_literal (test_timeline.TimelineCoreTests.test_import_headers_contract_literal) ... ok
+test_import_multirow_aggregation_and_counts (test_timeline.TimelineCoreTests.test_import_multirow_aggregation_and_counts) ... ok
+test_import_status_three_states_and_recompute (test_timeline.TimelineCoreTests.test_import_status_three_states_and_recompute) ... ok
+test_import_xlsx_serial_positive_and_boundaries (test_timeline.TimelineCoreTests.test_import_xlsx_serial_positive_and_boundaries) ... ok
+test_initial_correction_undo_and_review (test_timeline.TimelineCoreTests.test_initial_correction_undo_and_review) ... ok
+test_name_conflict_and_viewer_denied (test_timeline.TimelineCoreTests.test_name_conflict_and_viewer_denied) ... ok
+test_project_create_then_batch_nodes_and_derived_view (test_timeline.TimelineCoreTests.test_project_create_then_batch_nodes_and_derived_view) ... ok
+test_single_and_cascade_clamping (test_timeline.TimelineCoreTests.test_single_and_cascade_clamping) ... ok
+test_v16_migration_five_tables_and_checks (test_timeline.TimelineCoreTests.test_v16_migration_five_tables_and_checks) ... ok
+
+----------------------------------------------------------------------
+Ran 29 tests in 39.241s
+
+OK

@@ -1,0 +1,56 @@
+# wave-1 基线快照（planner 探针 · 2026-08-19，coder 施工中工作树·终值）
+
+> 口径（lead 裁定）：本文件为可复跑证据索引，非验收签注；正式四态签注仅对收到
+> CP 报告后的工作树状态出具，并注明「针对 CP{N} 后状态」。
+> 复跑：python b002_probes.py（自含判据原文；产物 b002_probe_results.json）
+
+- `P0` item=0 **PASS_PROBE** 契约字面表头可用
+- `P1a` item=1 **PASS_PROBE** 端点/中段整数换算
+- `P1a` item=1 **PASS_PROBE** 端点/中段整数换算
+- `P1a` item=1 **PASS_PROBE** 端点/中段整数换算
+- `P1b` item=1 **PASS_PROBE** 非整数必须真跑出 422（纪律2 阳性对照）
+- `P1c` item=1 **PASS_PROBE** 
+- `P1c` item=1 **PASS_PROBE** 
+- `P1d` item=1 **PASS_PROBE** 文本路径不得被序列号分支串扰；422 不得由错误理由触发
+- `P1e` item=1 **PASS_PROBE** CSV 合法文本正控
+- `P1f` item=1 **PASS_PROBE** 
+- `P2-weikaishi_past` item=2 **PASS_PROBE** 非完成态不得持久化完成；派生状态按日期重算
+- `P2-jinxingzhong_future` item=2 **PASS_PROBE** 非完成态不得持久化完成；派生状态按日期重算
+- `P2-empty_past` item=2 **PASS_PROBE** 非完成态不得持久化完成；派生状态按日期重算
+- `P2-yiwancheng` item=2 **PASS_PROBE** 非完成态不得持久化完成；派生状态按日期重算
+- `P2-illegal` item=2 **PASS_PROBE** 
+- `P2-weifenjian` item=2 **PASS_PROBE** 「未完成」为旧实现认可值、契约字面三态之外——锋利负例
+- `P3a` item=3 **PASS_PROBE** preview projects=[{"name": "聚合项目", "node_count": 3}]
+- `P3b` item=3 **PASS_PROBE** 
+- `P3c` item=3 **PASS_PROBE** 
+- `P3d` item=3 **PASS_PROBE** partial import/静默跳过即违约
+- `P4a` item=4 **PASS_PROBE** 半边界：恰上限必须接受
+- `P4b` item=4 **PASS_PROBE** 
+- `P4c` item=4 **PASS_PROBE** 
+- `P4d` item=4 **PASS_PROBE** 
+- `P4e` item=4 **PASS_PROBE** 
+- `P4f` item=4 **PASS_PROBE** 中文按字符计数（非字节）——201 中文字=603 UTF-8 字节
+- `P5a` item=5 **PASS_PROBE** 导出物必可再导入（闭环）
+- `P5b` item=5 **PASS_PROBE** 任何 200 返回（哪怕带 1000 行产物）=静默截断违约证据
+- `P6a` item=6 **PASS_PROBE** 喂给 preview 的字节必须与 export 返回值逐字节相同（sha256 铁证）
+- `P6b` item=6 **PASS_PROBE** 
+- `P7a` item=7 **PASS_PROBE** 断言必须打在备份快照本体上，不是迁移后库
+- `P7b` item=7 **PASS_PROBE** 
+- `P7c` item=7 **PASS_PROBE** 
+- `P8a` item=8 **PASS_PROBE** 409 必须是 UNDO_TARGET_STALE（错误理由区分）
+- `P8a-ctl` item=8 **PASS_PROBE** 证明中间批 409 非其他原因
+- `P8b` item=8 **PASS_PROBE** 定位型探针：失败时以行级数据定位病因层（changes 选取/field 匹配/UPDATE 生效），不停留在静态归因
+- `P8c` item=8 **PASS_PROBE** 定位型探针：同 P8b，以行级数据定位病因层
+- `P8d` item=8 **PASS_PROBE** 
+- `P0a` item=10 **PASS_PROBE** 追加项⑩正例：契约表头必须可用
+- `P0c` item=10 **PASS_PROBE** 乱序负例保留
+- `P0d` item=10 **PASS_PROBE** 缺列负例保留
+- `P0b` item=10 **PASS_PROBE** round-trip 前置：导出表头不收敛则真实字节往返必被表头关卡挡住
+- `PX-realdb` item=0 **PASS_PROBE** 
+
+终值合计：43 探针全绿（0 FAIL）。快照过程记录（留痕不删）：
+- 过程快照 A（15:47）：39 探针 36 绿/3 红——P0（契约表头被拒）、P8b/P8c（undo created 反向未软删、deleted 反向未恢复）。
+- 【更正留痕】P8b/P8c 此前的静态归因「created/deleted 参数互换」经 lead 复核现码（timeline.py:624-628 reverse_soft_delete 形态语义正确）予以撤回；过程红仅记快照时刻观察。终值复跑两项转绿，行级定位数据齐全：
+  P8b created 反向→deleted_at=stamp 软删、行保留、undo 反向行 new=NULL；P8c deleted 反向→deleted_at=NULL 恢复。
+- 追加项 10（P0a/P0b/P0c/P0d，lead 裁定并入 B-002）：契约表头正例、导出产列表头逐列==契约字面、乱序/缺列 422 均绿。
+- 零副作用：真实 flowboard.db mtime 保持 2026-08-12（PX-realdb 只读 stat）。

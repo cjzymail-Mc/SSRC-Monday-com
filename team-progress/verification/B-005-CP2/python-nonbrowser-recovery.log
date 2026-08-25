@@ -1,0 +1,905 @@
+test_attachment_attack_matrix_and_failure_atomicity (test_collaboration_http.CollaborationHttpTests.test_attachment_attack_matrix_and_failure_atomicity) ... ok
+test_complete_acl_event_preview_limit_and_request_boundary_matrix (test_collaboration_http.CollaborationHttpTests.test_complete_acl_event_preview_limit_and_request_boundary_matrix) ... ok
+test_http_csrf_state_machine_events_preview_and_acl (test_collaboration_http.CollaborationHttpTests.test_http_csrf_state_machine_events_preview_and_acl) ... ok
+test_omitted_mentions_are_preserved_and_stale_update_is_atomic (test_collaboration.CollaborationTests.test_omitted_mentions_are_preserved_and_stale_update_is_atomic) ... ok
+test_private_attachment_validation_acl_and_soft_delete (test_collaboration.CollaborationTests.test_private_attachment_validation_acl_and_soft_delete) ... ok
+test_subscription_is_single_row_idempotent_and_manual_opt_out_is_sticky (test_collaboration.CollaborationTests.test_subscription_is_single_row_idempotent_and_manual_opt_out_is_sticky) ... ok
+test_thread_mentions_edit_delete_subscription_and_outbox (test_collaboration.CollaborationTests.test_thread_mentions_edit_delete_subscription_and_outbox) ... ok
+test_v12_to_v14_subscription_merge_backup_restore_and_idempotence (test_collaboration.CollaborationTests.test_v12_to_v14_subscription_merge_backup_restore_and_idempotence) ... ok
+test_viewer_can_read_but_cannot_mutate_collaboration (test_collaboration.CollaborationTests.test_viewer_can_read_but_cannot_mutate_collaboration) ... ok
+test_count_numeric_date_tags_and_empty (test_dashboards.AggregationTests.test_count_numeric_date_tags_and_empty) ... ok
+test_cross_board_dynamic_fields_require_explicit_source_mapping (test_dashboards.AggregationTests.test_cross_board_dynamic_fields_require_explicit_source_mapping) ... ok
+test_global_kpi_numeric_ops_empty_and_cross_source_mapping (test_dashboards.AggregationTests.test_global_kpi_numeric_ops_empty_and_cross_source_mapping) ... ok
+test_high_cardinality_series_and_cells_fail_during_accumulation (test_dashboards.AggregationTests.test_high_cardinality_series_and_cells_fail_during_accumulation) ... ok
+test_invalid_combinations_fail_closed (test_dashboards.AggregationTests.test_invalid_combinations_fail_closed) ... ok
+test_aggregation_limit_rejects_before_projection (test_dashboards.DashboardHttpTests.test_aggregation_limit_rejects_before_projection) ... ok
+test_board_chart_and_dashboard_five_widgets_acl_versions (test_dashboards.DashboardHttpTests.test_board_chart_and_dashboard_five_widgets_acl_versions) ... ok
+test_dashboard_source_widget_copy_soft_delete_restore_and_csrf (test_dashboards.DashboardHttpTests.test_dashboard_source_widget_copy_soft_delete_restore_and_csrf) ... ok
+test_pagination_source_change_terminates_after_one_followup (test_dashboards.DashboardHttpTests.test_pagination_source_change_terminates_after_one_followup) ... ok
+test_private_source_revocation_is_generic (test_dashboards.DashboardHttpTests.test_private_source_revocation_is_generic) ... ok
+test_source_and_widget_limits_cover_add_copy_restore_without_mutation (test_dashboards.DashboardHttpTests.test_source_and_widget_limits_cover_add_copy_restore_without_mutation) ... ok
+test_v10_to_v11_backup_preserves_views_and_is_idempotent (test_dashboards.DashboardMigrationTests.test_v10_to_v11_backup_preserves_views_and_is_idempotent) ... ok
+test_http_auth_csrf_pagination_search_notifications_poll_and_audit (test_i12.I12HttpTests.test_http_auth_csrf_pagination_search_notifications_poll_and_audit) ... ok
+test_sse_last_event_id_uses_same_bounded_cursor_as_poll (test_i12.I12HttpTests.test_sse_last_event_id_uses_same_bounded_cursor_as_poll) ... ok
+test_global_search_five_types_special_input_and_acl (test_i12.I12ServiceTests.test_global_search_five_types_special_input_and_acl) ... ok
+test_notification_projection_due_idempotence_read_and_acl_revocation (test_i12.I12ServiceTests.test_notification_projection_due_idempotence_read_and_acl_revocation) ... ok
+test_realtime_cursor_audit_permissions_and_csv_formula_safety (test_i12.I12ServiceTests.test_realtime_cursor_audit_permissions_and_csv_formula_safety) ... ok
+test_realtime_hidden_windows_advance_and_later_visible_event_is_reachable (test_i12.I12ServiceTests.test_realtime_hidden_windows_advance_and_later_visible_event_is_reachable) ... ok
+test_realtime_raw_scan_pages_visible_events_without_loss_or_duplicates (test_i12.I12ServiceTests.test_realtime_raw_scan_pages_visible_events_without_loss_or_duplicates) ... ok
+test_realtime_revocation_after_cursor_does_not_block_later_permitted_event (test_i12.I12ServiceTests.test_realtime_revocation_after_cursor_does_not_block_later_permitted_event) ... ok
+test_v13_to_v14_backup_restore_and_idempotence (test_i12.I12ServiceTests.test_v13_to_v14_backup_restore_and_idempotence) ... ok
+test_backup_manifest_corruption_retention_and_real_restore_with_blob (test_i13_operations.I13OperationsTests.test_backup_manifest_corruption_retention_and_real_restore_with_blob) ... ok
+test_restore_failure_preserves_originally_missing_targets (test_i13_operations.I13OperationsTests.test_restore_failure_preserves_originally_missing_targets) ... ok
+test_restore_injected_failure_rolls_back_current_database_and_attachment (test_i13_operations.I13OperationsTests.test_restore_injected_failure_rolls_back_current_database_and_attachment) ... ok
+test_admin_backup_api_surface_is_verified_and_viewer_is_denied (test_i13.I13BatchTests.test_admin_backup_api_surface_is_verified_and_viewer_is_denied) ... ok
+test_expired_trash_requires_admin_preview_hash_confirmation_and_keeps_audit (test_i13.I13BatchTests.test_expired_trash_requires_admin_preview_hash_confirmation_and_keeps_audit) ... ok
+test_stale_duplicate_viewer_and_cross_workspace_fail_without_any_mutation_or_events (test_i13.I13BatchTests.test_stale_duplicate_viewer_and_cross_workspace_fail_without_any_mutation_or_events) ... ok
+test_v15_description_retention_and_five_atomic_batch_operations (test_i13.I13BatchTests.test_v15_description_retention_and_five_atomic_batch_operations) ... ok
+test_atomic_versions_csrf_validation_and_task_bound (test_schedule.ScheduleHttpTests.test_atomic_versions_csrf_validation_and_task_bound) ... ok
+test_dynamic_date_and_timeline_successor_push_are_source_aware_atomic (test_schedule.ScheduleHttpTests.test_dynamic_date_and_timeline_successor_push_are_source_aware_atomic) ... ok
+test_schedule_read_write_conflicts_permissions_and_saved_views (test_schedule.ScheduleHttpTests.test_schedule_read_write_conflicts_permissions_and_saved_views) ... ok
+test_v9_to_latest_preserves_saved_views_backup_and_is_idempotent (test_schedule.ScheduleMigrationTests.test_v9_to_latest_preserves_saved_views_backup_and_is_idempotent) ... ok
+test_critical_path_filters_hidden_edges_and_blocks_cycles (test_schedule.ScheduleProjectionTests.test_critical_path_filters_hidden_edges_and_blocks_cycles) ... ok
+test_fixed_dynamic_and_cross_year_projection (test_schedule.ScheduleProjectionTests.test_fixed_dynamic_and_cross_year_projection) ... ok
+test_invalid_dates_fail_closed_and_huge_range_is_bounded (test_schedule.ScheduleProjectionTests.test_invalid_dates_fail_closed_and_huge_range_is_bounded) ... ok
+test_admin_can_change_workspace_role (test_secure_foundation.FlowboardIntegrationTests.test_admin_can_change_workspace_role) ... ok
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-collab-http-4la6z6fg\backups\flowboard-pre-v16-20260820-153802-509874.db
+[20/Aug/2026 15:38:03] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:03] "POST /api/tasks/1/attachments HTTP/1.1" 422 -
+[20/Aug/2026 15:38:03] "POST /api/tasks/1/attachments HTTP/1.1" 422 -
+[20/Aug/2026 15:38:03] "POST /api/tasks/1/attachments HTTP/1.1" 422 -
+[20/Aug/2026 15:38:03] "POST /api/tasks/1/attachments HTTP/1.1" 422 -
+[20/Aug/2026 15:38:03] "POST /api/tasks/1/attachments HTTP/1.1" 422 -
+[20/Aug/2026 15:38:03] "POST /api/tasks/1/attachments HTTP/1.1" 422 -
+[20/Aug/2026 15:38:03] "POST /api/tasks/1/attachments HTTP/1.1" 415 -
+[20/Aug/2026 15:38:03] "POST /api/tasks/1/attachments HTTP/1.1" 415 -
+[20/Aug/2026 15:38:03] "POST /api/tasks/1/attachments HTTP/1.1" 415 -
+[20/Aug/2026 15:38:03] "POST /api/tasks/1/attachments HTTP/1.1" 415 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-collab-http-m4c3bimb\backups\flowboard-pre-v16-20260820-153804-630229.db
+[20/Aug/2026 15:38:05] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:06] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/comments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/comments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "PATCH /api/comments/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:06] "DELETE /api/comments/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:06] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/subscription HTTP/1.1" 200 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/subscription HTTP/1.1" 200 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "GET /api/attachments/1/content?preview=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "GET /api/attachments/2/content?preview=1 HTTP/1.1" 415 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 422 -
+[20/Aug/2026 15:38:06] "DELETE /api/attachments/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/attachments HTTP/1.1" 413 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/comments HTTP/1.1" 403 -
+[20/Aug/2026 15:38:06] "PATCH /api/comments/2 HTTP/1.1" 403 -
+[20/Aug/2026 15:38:06] "DELETE /api/comments/2 HTTP/1.1" 403 -
+[20/Aug/2026 15:38:06] "DELETE /api/attachments/2 HTTP/1.1" 403 -
+[20/Aug/2026 15:38:06] "POST /api/tasks/1/subscription HTTP/1.1" 403 -
+[20/Aug/2026 15:38:06] "GET /api/tasks/1 HTTP/1.1" 403 -
+[20/Aug/2026 15:38:06] "GET /api/attachments/2/content HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-collab-http-np845nb2\backups\flowboard-pre-v16-20260820-153807-278336.db
+[20/Aug/2026 15:38:08] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:08] "POST /api/tasks/1/comments HTTP/1.1" 403 -
+[20/Aug/2026 15:38:08] "POST /api/tasks/1/comments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:08] "POST /api/tasks/1/subscription HTTP/1.1" 200 -
+[20/Aug/2026 15:38:08] "POST /api/tasks/1/comments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:08] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:08] "POST /api/tasks/1/subscription HTTP/1.1" 200 -
+[20/Aug/2026 15:38:08] "PATCH /api/comments/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:08] "PATCH /api/comments/1 HTTP/1.1" 409 -
+[20/Aug/2026 15:38:08] "POST /api/tasks/1/attachments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:08] "GET /api/attachments/1/content?preview=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:08] "GET /flowboard-attachments/353bfec8259cbf43271057a8eb85254bca59f8b93730b8ba.txt HTTP/1.1" 404 -
+[20/Aug/2026 15:38:08] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:08] "POST /api/tasks/1/comments HTTP/1.1" 403 -
+[20/Aug/2026 15:38:08] "POST /api/tasks/1/subscription HTTP/1.1" 403 -
+[20/Aug/2026 15:38:08] "POST /api/tasks/1/attachments HTTP/1.1" 403 -
+[20/Aug/2026 15:38:08] "GET /api/attachments/1/content HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmp5dke__yt\backups\flowboard-pre-v16-20260820-153811-534061.db
+[20/Aug/2026 15:38:12] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:12] "POST /api/boards/1/aggregate HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpq348jzzl\backups\flowboard-pre-v16-20260820-153813-353846.db
+[20/Aug/2026 15:38:14] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:14] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:14] "POST /api/boards/1/aggregate HTTP/1.1" 200 -
+[20/Aug/2026 15:38:14] "POST /api/workspaces/1/dashboards HTTP/1.1" 201 -
+[20/Aug/2026 15:38:14] "POST /api/dashboards/1/sources HTTP/1.1" 201 -
+[20/Aug/2026 15:38:14] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:38:14] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:38:14] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:38:14] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:38:14] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:38:14] "POST /api/dashboards/1/widgets/1/data HTTP/1.1" 200 -
+[20/Aug/2026 15:38:14] "POST /api/dashboards/1/widgets/2/data HTTP/1.1" 200 -
+[20/Aug/2026 15:38:14] "POST /api/dashboards/1/widgets/3/data HTTP/1.1" 200 -
+[20/Aug/2026 15:38:14] "POST /api/dashboards/1/widgets/4/data HTTP/1.1" 200 -
+[20/Aug/2026 15:38:14] "POST /api/dashboards/1/widgets/5/data HTTP/1.1" 200 -
+[20/Aug/2026 15:38:14] "PATCH /api/dashboards/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:14] "POST /api/dashboards/1/widgets/1/data HTTP/1.1" 200 -
+[20/Aug/2026 15:38:14] "PATCH /api/dashboards/1/widgets/1 HTTP/1.1" 409 -
+[20/Aug/2026 15:38:15] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:15] "GET /api/workspaces/1/dashboards HTTP/1.1" 200 -
+[20/Aug/2026 15:38:15] "PATCH /api/dashboards/1 HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmp4fbg4vrp\backups\flowboard-pre-v16-20260820-153815-783798.db
+[20/Aug/2026 15:38:17] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:17] "POST /api/workspaces/1/dashboards HTTP/1.1" 201 -
+[20/Aug/2026 15:38:17] "POST /api/dashboards/1/sources HTTP/1.1" 201 -
+[20/Aug/2026 15:38:17] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:38:17] "POST /api/dashboards/1/widgets/1/copy HTTP/1.1" 201 -
+[20/Aug/2026 15:38:17] "DELETE /api/dashboards/1/widgets/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:17] "POST /api/dashboards/1/widgets/2/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:38:17] "DELETE /api/dashboards/1/sources/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:17] "POST /api/dashboards/1/sources/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:38:17] "POST /api/dashboards/1/copy HTTP/1.1" 201 -
+[20/Aug/2026 15:38:17] "DELETE /api/dashboards/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:17] "POST /api/dashboards/2/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:38:17] "PATCH /api/dashboards/1 HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpba36enep\backups\flowboard-pre-v16-20260820-153817-938306.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpt2eyrneu\backups\flowboard-pre-v16-20260820-153819-443317.db
+[20/Aug/2026 15:38:21] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:21] "POST /api/workspaces/1/boards HTTP/1.1" 201 -
+[20/Aug/2026 15:38:21] "POST /api/workspaces/1/dashboards HTTP/1.1" 201 -
+[20/Aug/2026 15:38:21] "POST /api/dashboards/1/sources HTTP/1.1" 201 -
+[20/Aug/2026 15:38:21] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:38:21] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:21] "POST /api/dashboards/1/widgets/1/data HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpg67il48n\backups\flowboard-pre-v16-20260820-153822-157175.db
+[20/Aug/2026 15:38:23] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:23] "POST /api/workspaces/1/dashboards HTTP/1.1" 201 -
+[20/Aug/2026 15:38:23] "POST /api/dashboards/1/sources HTTP/1.1" 201 -
+[20/Aug/2026 15:38:23] "DELETE /api/dashboards/1/sources/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:23] "POST /api/dashboards/1/sources HTTP/1.1" 201 -
+[20/Aug/2026 15:38:23] "POST /api/dashboards/1/sources HTTP/1.1" 422 -
+[20/Aug/2026 15:38:23] "POST /api/dashboards/1/sources/1/restore HTTP/1.1" 422 -
+[20/Aug/2026 15:38:23] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:38:23] "DELETE /api/dashboards/1/widgets/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:23] "POST /api/dashboards/1/widgets HTTP/1.1" 201 -
+[20/Aug/2026 15:38:23] "POST /api/dashboards/1/widgets HTTP/1.1" 422 -
+[20/Aug/2026 15:38:23] "POST /api/dashboards/1/widgets/2/copy HTTP/1.1" 422 -
+[20/Aug/2026 15:38:23] "POST /api/dashboards/1/widgets/1/restore HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpf7dyibby\backups\flowboard-pre-v16-20260820-153825-108546.db
+[20/Aug/2026 15:38:25] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:25] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:25] "GET /api/workspaces/1/search?q=x HTTP/1.1" 401 -
+[20/Aug/2026 15:38:25] "POST /api/workspaces/1/notifications/read-all HTTP/1.1" 200 -
+[20/Aug/2026 15:38:25] "GET /api/workspaces/1/search?q=%25_&limit=51 HTTP/1.1" 422 -
+[20/Aug/2026 15:38:25] "GET /api/admin/workspaces/1/audit HTTP/1.1" 403 -
+[20/Aug/2026 15:38:25] "GET /api/admin/workspaces/1/audit.csv HTTP/1.1" 200 -
+[20/Aug/2026 15:38:25] "GET /api/workspaces/1/events/poll?cursor=0&limit=201 HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpmo6cxvk7\backups\flowboard-pre-v16-20260820-153826-357216.db
+[20/Aug/2026 15:38:26] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:26] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:27] "GET /api/workspaces/1/events/stream?cursor=4&limit=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:27] "GET /api/workspaces/1/events/stream?limit=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:27] "GET /api/workspaces/1/events/poll?cursor=8&limit=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:27] "GET /api/workspaces/1/events/stream?cursor=9&limit=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:27] "GET /api/workspaces/1/events/stream?limit=2 HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpujw1hwbr\backups\flowboard-pre-v16-20260820-153830-958753.db
+[20/Aug/2026 15:38:32] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:32] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:32] "POST /api/tasks/1/schedule HTTP/1.1" 428 -
+[20/Aug/2026 15:38:32] "POST /api/tasks/1/schedule HTTP/1.1" 409 -
+[20/Aug/2026 15:38:32] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:32] "POST /api/tasks/1/schedule HTTP/1.1" 403 -
+[20/Aug/2026 15:38:32] "POST /api/boards/1/schedule HTTP/1.1" 422 -
+[20/Aug/2026 15:38:32] "POST /api/boards/1/schedule HTTP/1.1" 422 -
+[20/Aug/2026 15:38:32] "POST /api/boards/1/schedule HTTP/1.1" 422 -
+[20/Aug/2026 15:38:33] "POST /api/boards/1/schedule HTTP/1.1" 200 -
+[20/Aug/2026 15:38:33] "POST /api/boards/1/schedule HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpzabjklwy\backups\flowboard-pre-v16-20260820-153833-701083.db
+[20/Aug/2026 15:38:35] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:35] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "PATCH /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "PATCH /api/tasks/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "POST /api/tasks/1/schedule HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "POST /api/tasks/1/schedule HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:35] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "PATCH /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "PATCH /api/tasks/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "POST /api/tasks/1/schedule HTTP/1.1" 200 -
+[20/Aug/2026 15:38:35] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:36] "POST /api/tasks/1/schedule HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\tmpr3w9t6tx\backups\flowboard-pre-v16-20260820-153836-558943.db
+[20/Aug/2026 15:38:38] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:38] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:38] "POST /api/tasks/1/schedule HTTP/1.1" 200 -
+[20/Aug/2026 15:38:38] "POST /api/tasks/1/schedule HTTP/1.1" 409 -
+[20/Aug/2026 15:38:38] "POST /api/boards/1/schedule HTTP/1.1" 200 -
+[20/Aug/2026 15:38:38] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:38:38] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:38] "POST /api/tasks/1/schedule HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-39hcvwbn\backups\flowboard-pre-v16-20260820-153839-766134.db
+[20/Aug/2026 15:38:40] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:40] "PATCH /api/admin/workspace-memberships/u2?workspace_id=1 HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-kptua1rh\backups\flowboard-pre-v16-20260820-153841-345435.db
+[20/Aug/2026 15:38:42] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:42] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:38:42] "POST /api/workspaces/1/boards HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "POST /api/boards/2/groups HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "POST /api/groups/3/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "GET /api/bootstrap?board_id=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:42] "POST /api/boards/2/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "PATCH /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:42] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:42] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "POST /api/workspaces/1/templates HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "POST /api/templates/1/instantiate HTTP/1.1" 201 -
+test_advanced_fields_relations_mirror_formula_and_acl (test_secure_foundation.FlowboardIntegrationTests.test_advanced_fields_relations_mirror_formula_and_acl) ... ok
+test_archive_parent_visibility_copy_history_and_strict_inputs (test_secure_foundation.FlowboardIntegrationTests.test_archive_parent_visibility_copy_history_and_strict_inputs) ... ok
+test_authentication_csrf_and_header_spoofing (test_secure_foundation.FlowboardIntegrationTests.test_authentication_csrf_and_header_spoofing) ... ok
+test_board_lifecycle_and_stale_version (test_secure_foundation.FlowboardIntegrationTests.test_board_lifecycle_and_stale_version) ... ok
+test_dynamic_fields_all_types_permissions_and_versions (test_secure_foundation.FlowboardIntegrationTests.test_dynamic_fields_all_types_permissions_and_versions) ... ok
+[20/Aug/2026 15:38:42] "GET /api/bootstrap?board_id=3 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:42] "PATCH /api/fields/18 HTTP/1.1" 422 -
+[20/Aug/2026 15:38:42] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:42] "PATCH /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:42] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:38:42] "PATCH /api/tasks/7 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:42] "PATCH /api/tasks/1 HTTP/1.1" 422 -
+[20/Aug/2026 15:38:43] "POST /api/tasks/1/relations/16 HTTP/1.1" 201 -
+[20/Aug/2026 15:38:43] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:38:43] "GET /api/boards/1/views HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/tasks/6/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/tasks/6/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:43] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "GET /api/groups/3 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/groups/3/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/groups/3/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "DELETE /api/groups/3 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/groups/3/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "DELETE /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/tasks/6/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:44] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/tasks/1/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/tasks/1/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "DELETE /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/tasks/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "GET /api/groups/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/groups/1/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/groups/1/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "DELETE /api/groups/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/groups/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/1/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/1/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "DELETE /api/boards/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "GET /api/bootstrap?board_id=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/2/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/1/query HTTP/1.1" 403 -
+[20/Aug/2026 15:38:45] "POST /api/boards/2/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "DELETE /api/boards/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/1/query HTTP/1.1" 403 -
+test_export_hard_limit_at_1000_before_materialization (test_secure_foundation.FlowboardIntegrationTests.test_export_hard_limit_at_1000_before_materialization) ... ok
+test_group_and_task_lifecycle_parent_restore_and_activity (test_secure_foundation.FlowboardIntegrationTests.test_group_and_task_lifecycle_parent_restore_and_activity) ... ok
+test_hierarchy_dependencies_progress_dates_permissions_and_cycles (test_secure_foundation.FlowboardIntegrationTests.test_hierarchy_dependencies_progress_dates_permissions_and_cycles) ... ok
+test_kanban_move_is_atomic_persistent_and_versioned (test_secure_foundation.FlowboardIntegrationTests.test_kanban_move_is_atomic_persistent_and_versioned) ... ok
+test_migration_preserves_existing_tasks_and_creates_backup (test_secure_foundation.FlowboardIntegrationTests.test_migration_preserves_existing_tasks_and_creates_backup) ... ok
+test_optimistic_version_conflict (test_secure_foundation.FlowboardIntegrationTests.test_optimistic_version_conflict) ... ok
+test_query_hundreds_of_tasks_is_bounded_and_indexed (test_secure_foundation.FlowboardIntegrationTests.test_query_hundreds_of_tasks_is_bounded_and_indexed) ... ok
+test_saved_view_defaults_permissions_copy_delete_and_blocked_config (test_secure_foundation.FlowboardIntegrationTests.test_saved_view_defaults_permissions_copy_delete_and_blocked_config) ... ok
+[20/Aug/2026 15:38:45] "POST /api/boards/1/query HTTP/1.1" 403 -
+[20/Aug/2026 15:38:45] "POST /api/boards/2/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "GET /api/bootstrap?board_id=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:45] "PATCH /api/boards/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:46] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:46] "PATCH /api/fields/17 HTTP/1.1" 403 -
+[20/Aug/2026 15:38:46] "PATCH /api/fields/17 HTTP/1.1" 403 -
+[20/Aug/2026 15:38:46] "PATCH /api/boards/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:46] "PATCH /api/fields/17 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:46] "PATCH /api/boards/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:46] "PATCH /api/admin/workspace-memberships/u2?workspace_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:46] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:46] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:46] "GET /api/fields/16/targets HTTP/1.1" 403 -
+[20/Aug/2026 15:38:46] "POST /api/boards/1/query HTTP/1.1" 403 -
+[20/Aug/2026 15:38:46] "POST /api/boards/1/export HTTP/1.1" 403 -
+[20/Aug/2026 15:38:46] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:46] "DELETE /api/tasks/1/relations/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:46] "DELETE /api/tasks/1/relations/1 HTTP/1.1" 409 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-8vn82at4\backups\flowboard-pre-v16-20260820-153847-224343.db
+[20/Aug/2026 15:38:48] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:48] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:38:48] "POST /api/tasks/1/comments HTTP/1.1" 201 -
+[20/Aug/2026 15:38:48] "POST /api/boards/1/copy HTTP/1.1" 201 -
+[20/Aug/2026 15:38:48] "GET /api/bootstrap?board_id=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "GET /api/boards/2/activity HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "POST /api/groups/1/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "GET /api/boards/1/archived HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "POST /api/groups/1/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "PATCH /api/groups/1 HTTP/1.1" 409 -
+[20/Aug/2026 15:38:49] "DELETE /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "GET /api/boards/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "DELETE /api/boards/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "GET /api/boards/1 HTTP/1.1" 404 -
+[20/Aug/2026 15:38:49] "GET /api/groups/1 HTTP/1.1" 404 -
+[20/Aug/2026 15:38:49] "GET /api/tasks/1 HTTP/1.1" 404 -
+[20/Aug/2026 15:38:49] "GET /api/boards/1/activity HTTP/1.1" 404 -
+[20/Aug/2026 15:38:49] "GET /api/boards/1/archived HTTP/1.1" 404 -
+[20/Aug/2026 15:38:49] "GET /api/workspaces/1/trash HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "POST /api/tasks/1/restore HTTP/1.1" 409 -
+[20/Aug/2026 15:38:49] "POST /api/boards/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "GET /api/groups/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "DELETE /api/groups/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "GET /api/groups/1 HTTP/1.1" 404 -
+[20/Aug/2026 15:38:49] "GET /api/tasks/1 HTTP/1.1" 404 -
+[20/Aug/2026 15:38:49] "POST /api/tasks/1/restore HTTP/1.1" 409 -
+[20/Aug/2026 15:38:49] "POST /api/groups/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "POST /api/tasks/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:38:49] "POST /api/workspaces/1/boards HTTP/1.1" 400 -
+[20/Aug/2026 15:38:49] "POST /api/workspaces/1/boards HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-apa0yz3k\backups\flowboard-pre-v16-20260820-153849-983792.db
+[20/Aug/2026 15:38:50] "GET /api/bootstrap HTTP/1.1" 401 -
+[20/Aug/2026 15:38:50] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:50] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:38:50] "POST /api/tasks HTTP/1.1" 403 -
+[20/Aug/2026 15:38:51] "POST /api/tasks HTTP/1.1" 201 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-axrbfn7f\backups\flowboard-pre-v16-20260820-153851-560625.db
+[20/Aug/2026 15:38:52] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:52] "POST /api/workspaces/1/boards HTTP/1.1" 201 -
+[20/Aug/2026 15:38:52] "PATCH /api/boards/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:52] "PATCH /api/boards/2 HTTP/1.1" 409 -
+[20/Aug/2026 15:38:52] "POST /api/boards/2/copy HTTP/1.1" 201 -
+[20/Aug/2026 15:38:52] "POST /api/boards/2/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:52] "POST /api/boards/2/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:38:52] "DELETE /api/boards/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:52] "GET /api/workspaces/1/trash HTTP/1.1" 200 -
+[20/Aug/2026 15:38:52] "POST /api/boards/2/restore HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-bt2sjeb3\backups\flowboard-pre-v16-20260820-153853-219141.db
+[20/Aug/2026 15:38:54] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:54] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:38:54] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:54] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:54] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:54] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:54] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:54] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:54] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:54] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:38:54] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:54] "PATCH /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:54] "GET /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:54] "POST /api/boards/1/fields/reorder HTTP/1.1" 200 -
+[20/Aug/2026 15:38:54] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:54] "POST /api/boards/1/fields/reorder HTTP/1.1" 409 -
+[20/Aug/2026 15:38:54] "POST /api/boards/1/fields/reorder HTTP/1.1" 422 -
+[20/Aug/2026 15:38:54] "PATCH /api/fields/5 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:54] "PATCH /api/fields/5 HTTP/1.1" 409 -
+[20/Aug/2026 15:38:54] "POST /api/fields/5/delete HTTP/1.1" 200 -
+[20/Aug/2026 15:38:54] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:38:54] "POST /api/fields/5/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:38:54] "POST /api/fields/4/delete HTTP/1.1" 409 -
+[20/Aug/2026 15:38:54] "PATCH /api/fields/7 HTTP/1.1" 422 -
+[20/Aug/2026 15:38:54] "PATCH /api/tasks/1 HTTP/1.1" 422 -
+[20/Aug/2026 15:38:54] "PATCH /api/tasks/1 HTTP/1.1" 422 -
+[20/Aug/2026 15:38:54] "PATCH /api/tasks/1 HTTP/1.1" 422 -
+[20/Aug/2026 15:38:54] "PATCH /api/tasks/1 HTTP/1.1" 422 -
+[20/Aug/2026 15:38:54] "PATCH /api/tasks/1 HTTP/1.1" 409 -
+[20/Aug/2026 15:38:54] "PATCH /api/tasks/1 HTTP/1.1" 422 -
+[20/Aug/2026 15:38:55] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:55] "PATCH /api/tasks/1 HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-qzosstj6\backups\flowboard-pre-v16-20260820-153855-724996.db
+[20/Aug/2026 15:38:57] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:38:57] "POST /api/workspaces/1/boards HTTP/1.1" 201 -
+[20/Aug/2026 15:38:57] "POST /api/boards/2/groups HTTP/1.1" 201 -
+[20/Aug/2026 15:38:57] "POST /api/boards/2/views HTTP/1.1" 201 -
+[20/Aug/2026 15:38:57] "POST /api/boards/2/export HTTP/1.1" 200 -
+[20/Aug/2026 15:38:57] "POST /api/boards/2/export HTTP/1.1" 200 -
+[20/Aug/2026 15:38:58] "POST /api/boards/2/export HTTP/1.1" 200 -
+[20/Aug/2026 15:38:58] "POST /api/boards/2/export HTTP/1.1" 422 -
+[20/Aug/2026 15:38:58] "POST /api/boards/2/export HTTP/1.1" 422 -
+[20/Aug/2026 15:38:58] "POST /api/boards/2/export HTTP/1.1" 422 -
+test_saved_view_presentations_are_typed_and_fail_closed (test_secure_foundation.FlowboardIntegrationTests.test_saved_view_presentations_are_typed_and_fail_closed) ... ok
+test_server_query_ast_dynamic_types_sort_and_fail_closed_validation (test_secure_foundation.FlowboardIntegrationTests.test_server_query_ast_dynamic_types_sort_and_fail_closed_validation) ... ok
+test_static_allowlist_blocks_repository_files (test_secure_foundation.FlowboardIntegrationTests.test_static_allowlist_blocks_repository_files) ... ok
+test_templates_import_export_and_spreadsheet_safety (test_secure_foundation.FlowboardIntegrationTests.test_templates_import_export_and_spreadsheet_safety) ... ok
+test_v1_to_v2_migration_preserves_data_and_activity (test_secure_foundation.FlowboardIntegrationTests.test_v1_to_v2_migration_preserves_data_and_activity) ... ok
+test_v6_to_v7_migration_backup_restore_and_idempotence (test_secure_foundation.FlowboardIntegrationTests.test_v6_to_v7_migration_backup_restore_and_idempotence) ... ok
+test_v7_to_v8_migration_backup_restore_and_idempotence (test_secure_foundation.FlowboardIntegrationTests.test_v7_to_v8_migration_backup_restore_and_idempotence) ... ok
+test_v8_to_v9_migration_backup_restore_and_idempotence (test_secure_foundation.FlowboardIntegrationTests.test_v8_to_v9_migration_backup_restore_and_idempotence) ... ok
+test_validation_viewer_and_cross_board_boundaries (test_secure_foundation.FlowboardIntegrationTests.test_validation_viewer_and_cross_board_boundaries) ... ok
+test_viewer_cannot_write_and_private_board_is_hidden (test_secure_foundation.FlowboardIntegrationTests.test_viewer_cannot_write_and_private_board_is_hidden) ... ok
+test_derived_comparator_type_matrix_is_total_and_deterministic (test_secure_foundation.QueryProjectionTests.test_derived_comparator_type_matrix_is_total_and_deterministic) ... ok
+test_transfer_rejects_malformed_and_unsafe_inputs (test_secure_foundation.QueryProjectionTests.test_transfer_rejects_malformed_and_unsafe_inputs) ... ok
+[20/Aug/2026 15:38:58] "POST /api/boards/2/export HTTP/1.1" 422 -
+[20/Aug/2026 15:38:58] "POST /api/boards/2/export HTTP/1.1" 422 -
+[20/Aug/2026 15:38:58] "POST /api/boards/2/export HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-96fuktlh\backups\flowboard-pre-v16-20260820-153858-952414.db
+[20/Aug/2026 15:39:00] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "POST /api/boards/1/groups HTTP/1.1" 201 -
+[20/Aug/2026 15:39:00] "PATCH /api/groups/3 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "POST /api/groups/3/copy HTTP/1.1" 201 -
+[20/Aug/2026 15:39:00] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "POST /api/groups/3/move HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "POST /api/groups/3/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:39:00] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "PATCH /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "POST /api/tasks/6/comments HTTP/1.1" 201 -
+[20/Aug/2026 15:39:00] "POST /api/tasks/6/copy HTTP/1.1" 201 -
+[20/Aug/2026 15:39:00] "GET /api/tasks/7 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "POST /api/tasks/6/move HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "POST /api/tasks/6/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "POST /api/tasks/6/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "DELETE /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "GET /api/groups/4 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "DELETE /api/groups/4 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "POST /api/tasks/6/restore HTTP/1.1" 409 -
+[20/Aug/2026 15:39:00] "POST /api/groups/4/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "POST /api/tasks/6/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:39:00] "GET /api/boards/1/activity HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-d_o27jii\backups\flowboard-pre-v16-20260820-153901-375133.db
+[20/Aug/2026 15:39:02] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:02] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:39:02] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:39:02] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:39:02] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:39:02] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:39:02] "POST /api/groups/1/tasks HTTP/1.1" 422 -
+[20/Aug/2026 15:39:02] "POST /api/tasks/8/parent HTTP/1.1" 200 -
+[20/Aug/2026 15:39:02] "POST /api/tasks/8/parent HTTP/1.1" 409 -
+[20/Aug/2026 15:39:02] "POST /api/tasks/6/parent HTTP/1.1" 422 -
+[20/Aug/2026 15:39:02] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:03] "PATCH /api/tasks/7 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:03] "GET /api/tasks/6 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:03] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:39:03] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:39:03] "POST /api/tasks/11/dependencies HTTP/1.1" 201 -
+[20/Aug/2026 15:39:03] "GET /api/tasks/11 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:03] "POST /api/tasks/10/dependencies HTTP/1.1" 422 -
+[20/Aug/2026 15:39:03] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:39:03] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:39:03] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:39:03] "POST /api/tasks/13/dependencies HTTP/1.1" 201 -
+[20/Aug/2026 15:39:03] "POST /api/tasks/14/dependencies HTTP/1.1" 201 -
+[20/Aug/2026 15:39:03] "POST /api/tasks/12/dependencies HTTP/1.1" 422 -
+[20/Aug/2026 15:39:03] "POST /api/tasks/13/dependencies HTTP/1.1" 409 -
+[20/Aug/2026 15:39:03] "POST /api/tasks/12/dependencies HTTP/1.1" 422 -
+[20/Aug/2026 15:39:03] "POST /api/tasks/12/archive HTTP/1.1" 200 -
+[20/Aug/2026 15:39:03] "GET /api/tasks/13 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:03] "POST /api/tasks/12/unarchive HTTP/1.1" 200 -
+[20/Aug/2026 15:39:03] "GET /api/tasks/13 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:03] "PATCH /api/tasks/10 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:03] "GET /api/tasks/11 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:03] "DELETE /api/tasks/11/dependencies/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:03] "DELETE /api/tasks/6 HTTP/1.1" 409 -
+[20/Aug/2026 15:39:03] "POST /api/workspaces/1/boards HTTP/1.1" 201 -
+[20/Aug/2026 15:39:03] "POST /api/boards/2/groups HTTP/1.1" 201 -
+[20/Aug/2026 15:39:03] "POST /api/groups/3/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:39:03] "POST /api/tasks/8/parent HTTP/1.1" 422 -
+[20/Aug/2026 15:39:03] "POST /api/tasks/8/dependencies HTTP/1.1" 422 -
+[20/Aug/2026 15:39:03] "PATCH /api/admin/workspace-memberships/u2?workspace_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:03] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:03] "POST /api/tasks/7/parent HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-c0fvutv2\backups\flowboard-pre-v16-20260820-153904-363036.db
+[20/Aug/2026 15:39:06] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:06] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:39:06] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:39:06] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:39:06] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:06] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:39:06] "POST /api/tasks/7/kanban-move HTTP/1.1" 200 -
+[20/Aug/2026 15:39:06] "POST /api/tasks/7/kanban-move HTTP/1.1" 409 -
+[20/Aug/2026 15:39:06] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:06] "POST /api/tasks/7/kanban-move HTTP/1.1" 200 -
+[20/Aug/2026 15:39:06] "PATCH /api/admin/workspace-memberships/u2?workspace_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:06] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:06] "POST /api/tasks/7/kanban-move HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-pvewtbq4\backups\flowboard-pre-v16-20260820-153907-055809.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-y620zqob\backups\flowboard-pre-v16-20260820-153908-297809.db
+[20/Aug/2026 15:39:09] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:09] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:39:09] "PATCH /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:09] "PATCH /api/tasks/1 HTTP/1.1" 409 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-9wf6imt6\backups\flowboard-pre-v16-20260820-153910-081536.db
+[20/Aug/2026 15:39:11] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:11] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:39:11] "POST /api/boards/1/query HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-c99drui4\backups\flowboard-pre-v16-20260820-153911-995537.db
+[20/Aug/2026 15:39:13] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:13] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:39:13] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:39:13] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:39:13] "GET /api/boards/1/views HTTP/1.1" 200 -
+[20/Aug/2026 15:39:13] "POST /api/boards/1/views/clear-personal-default HTTP/1.1" 200 -
+[20/Aug/2026 15:39:13] "POST /api/views/2/copy HTTP/1.1" 201 -
+[20/Aug/2026 15:39:13] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:13] "GET /api/boards/1/views HTTP/1.1" 200 -
+[20/Aug/2026 15:39:13] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:39:13] "PATCH /api/views/2 HTTP/1.1" 403 -
+[20/Aug/2026 15:39:13] "DELETE /api/views/4 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:13] "GET /api/boards/1/views HTTP/1.1" 200 -
+[20/Aug/2026 15:39:13] "GET /api/boards/1/views HTTP/1.1" 200 -
+[20/Aug/2026 15:39:13] "PATCH /api/views/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:13] "DELETE /api/views/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:13] "GET /api/boards/1/views HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-q01imgww\backups\flowboard-pre-v16-20260820-153914-459420.db
+[20/Aug/2026 15:39:16] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:16] "GET /api/bootstrap HTTP/1.1" 200 -
+test_r01_r02_list_and_single_get_auth_permissions_and_shapes (test_timeline_http.TimelineHTTPTests.test_r01_r02_list_and_single_get_auth_permissions_and_shapes) ... ok
+test_r03_review_actor_change_rows_metrics_and_overlap_rows (test_timeline_http.TimelineHTTPTests.test_r03_review_actor_change_rows_metrics_and_overlap_rows) ... ok
+test_r04_create_lifecycle_conflict_csrf_and_viewer (test_timeline_http.TimelineHTTPTests.test_r04_create_lifecycle_conflict_csrf_and_viewer) ... ok
+test_r05_delete_path_version_admin_soft_delete_and_repeat (test_timeline_http.TimelineHTTPTests.test_r05_delete_path_version_admin_soft_delete_and_repeat) ... ok
+test_r06_batch_http_complete_view_csrf_version_atomic_and_interval_bounds (test_timeline_http.TimelineHTTPTests.test_r06_batch_http_complete_view_csrf_version_atomic_and_interval_bounds) ... ok
+test_r07_undo_http_success_csrf_stale_soft_delete_and_zero_write (test_timeline_http.TimelineHTTPTests.test_r07_undo_http_success_csrf_stale_soft_delete_and_zero_write) ... ok
+test_r08_initial_correction_http_noop_no_cascade_permissions_and_invalid_node (test_timeline_http.TimelineHTTPTests.test_r08_initial_correction_http_noop_no_cascade_permissions_and_invalid_node) ... ok
+test_r09_import_d4_d5_d7_error_rows_warnings_and_cell_types (test_timeline_http.TimelineHTTPTests.test_r09_import_d4_d5_d7_error_rows_warnings_and_cell_types) ... ok
+test_r09_r10_import_http_preview_commit_permissions_state_and_race (test_timeline_http.TimelineHTTPTests.test_r09_r10_import_http_preview_commit_permissions_state_and_race) ... ok
+test_r11_export_post_json_order_permissions_and_round_trip (test_timeline_http.TimelineHTTPTests.test_r11_export_post_json_order_permissions_and_round_trip) ... ok
+test_batch_update_conflict_noop_and_cascade (test_timeline.TimelineCoreTests.test_batch_update_conflict_noop_and_cascade) ... ok
+test_cascade_anchors_status_only_and_date_priority (test_timeline.TimelineCoreTests.test_cascade_anchors_status_only_and_date_priority) ... ok
+test_excel_import_preview_commit_and_export (test_timeline.TimelineCoreTests.test_excel_import_preview_commit_and_export) ... ok
+test_export_exact_1000_and_over_limit_fail_closed (test_timeline.TimelineCoreTests.test_export_exact_1000_and_over_limit_fail_closed) ... ok
+test_group10_backup_content_idempotence_rollback (test_timeline.TimelineCoreTests.test_group10_backup_content_idempotence_rollback) ... ok
+test_group10_true_v15_to_v16_migration_backup_and_idempotence (test_timeline.TimelineCoreTests.test_group10_true_v15_to_v16_migration_backup_and_idempotence) ... ok
+test_group11_import_two_phase_race_and_replay (test_timeline.TimelineCoreTests.test_group11_import_two_phase_race_and_replay) ... ok
+test_group12_empty_and_project_unique_contract (test_timeline.TimelineCoreTests.test_group12_empty_and_project_unique_contract) ... ok
+test_group1_project_permissions_and_lifecycle (test_timeline.TimelineCoreTests.test_group1_project_permissions_and_lifecycle) ... ok
+test_group1_unauthenticated_http_401 (test_timeline.TimelineCoreTests.test_group1_unauthenticated_http_401) ... ok
+test_group2_initial_date_lock_and_group3_conflict_views (test_timeline.TimelineCoreTests.test_group2_initial_date_lock_and_group3_conflict_views) ... ok
+test_group3_missing_versions_and_exact_zero_writes (test_timeline.TimelineCoreTests.test_group3_missing_versions_and_exact_zero_writes) ... ok
+test_group4_undo_guards (test_timeline.TimelineCoreTests.test_group4_undo_guards) ... ok
+test_group4_undo_three_batch_middle_and_reverse_roles (test_timeline.TimelineCoreTests.test_group4_undo_three_batch_middle_and_reverse_roles) ... ok
+test_group5_mixed_batch_audit_kinds (test_timeline.TimelineCoreTests.test_group5_mixed_batch_audit_kinds) ... ok
+test_group6_write_chain_rules_and_snapshot_neighbor (test_timeline.TimelineCoreTests.test_group6_write_chain_rules_and_snapshot_neighbor) ... ok
+test_group7_view_metrics_review_pagination_and_undo_count (test_timeline.TimelineCoreTests.test_group7_view_metrics_review_pagination_and_undo_count) ... ok
+test_group8_excel_negative_controls (test_timeline.TimelineCoreTests.test_group8_excel_negative_controls) ... ok
+test_group9_excel_round_trip_in_new_workspace (test_timeline.TimelineCoreTests.test_group9_excel_round_trip_in_new_workspace) ... ok
+test_import_field_limits_boundaries (test_timeline.TimelineCoreTests.test_import_field_limits_boundaries) ... ok
+test_import_headers_contract_literal (test_timeline.TimelineCoreTests.test_import_headers_contract_literal) ... ok
+test_import_multirow_aggregation_and_counts (test_timeline.TimelineCoreTests.test_import_multirow_aggregation_and_counts) ... ok
+test_import_status_three_states_and_recompute (test_timeline.TimelineCoreTests.test_import_status_three_states_and_recompute) ... ok
+test_import_xlsx_serial_positive_and_boundaries (test_timeline.TimelineCoreTests.test_import_xlsx_serial_positive_and_boundaries) ... ok
+test_initial_correction_undo_and_review (test_timeline.TimelineCoreTests.test_initial_correction_undo_and_review) ... ok
+test_name_conflict_and_viewer_denied (test_timeline.TimelineCoreTests.test_name_conflict_and_viewer_denied) ... ok
+test_project_create_then_batch_nodes_and_derived_view (test_timeline.TimelineCoreTests.test_project_create_then_batch_nodes_and_derived_view) ... ok
+test_single_and_cascade_clamping (test_timeline.TimelineCoreTests.test_single_and_cascade_clamping) ... ok
+test_v16_migration_five_tables_and_checks (test_timeline.TimelineCoreTests.test_v16_migration_five_tables_and_checks) ... ok
+
+----------------------------------------------------------------------
+Ran 109 tests in 219.838s
+
+OK
+[20/Aug/2026 15:39:16] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:39:16] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:39:16] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:39:16] "POST /api/boards/1/views HTTP/1.1" 422 -
+[20/Aug/2026 15:39:16] "GET /api/boards/1/views HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-ezxcufdb\backups\flowboard-pre-v16-20260820-153916-840425.db
+[20/Aug/2026 15:39:18] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:18] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:39:18] "POST /api/boards/1/fields HTTP/1.1" 201 -
+[20/Aug/2026 15:39:18] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:18] "PATCH /api/tasks/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:18] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:39:18] "POST /api/boards/1/query HTTP/1.1" 422 -
+[20/Aug/2026 15:39:18] "POST /api/boards/1/query HTTP/1.1" 422 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-9s92w83n\backups\flowboard-pre-v16-20260820-153918-987595.db
+[20/Aug/2026 15:39:19] "GET / HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "HEAD / HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "GET /index.html HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "HEAD /index.html HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "GET /styles.css HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "HEAD /styles.css HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "GET /auth.css HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "HEAD /auth.css HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "GET /lifecycle.css HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "HEAD /lifecycle.css HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "GET /view-state.js HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "HEAD /view-state.js HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "GET /view-ui.js HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "HEAD /view-ui.js HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "GET /app.js HTTP/1.1" 200 -
+[20/Aug/2026 15:39:19] "HEAD /app.js HTTP/1.1" 200 -
+[20/Aug/2026 15:39:20] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:20] "GET /flowboard.db HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "GET /flowboard.db HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "HEAD /flowboard.db HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "HEAD /flowboard.db HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "GET /backups/flowboard-pre-v1-example.db HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "GET /backups/flowboard-pre-v1-example.db HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "HEAD /backups/flowboard-pre-v1-example.db HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "HEAD /backups/flowboard-pre-v1-example.db HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "GET /server.py HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "GET /server.py HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "HEAD /server.py HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "HEAD /server.py HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "GET /.copilot-task.md HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "GET /.copilot-task.md HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "HEAD /.copilot-task.md HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "HEAD /.copilot-task.md HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "GET /tests/test_secure_foundation.py HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "GET /tests/test_secure_foundation.py HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "HEAD /tests/test_secure_foundation.py HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "HEAD /tests/test_secure_foundation.py HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "GET /unknown.txt HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "GET /unknown.txt HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "HEAD /unknown.txt HTTP/1.1" 404 -
+[20/Aug/2026 15:39:20] "HEAD /unknown.txt HTTP/1.1" 404 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-etdv3ac5\backups\flowboard-pre-v16-20260820-153921-096405.db
+[20/Aug/2026 15:39:22] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:22] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:39:22] "POST /api/boards/1/views HTTP/1.1" 201 -
+[20/Aug/2026 15:39:22] "POST /api/workspaces/1/templates HTTP/1.1" 201 -
+[20/Aug/2026 15:39:22] "POST /api/templates/1/instantiate HTTP/1.1" 201 -
+[20/Aug/2026 15:39:22] "GET /api/bootstrap?board_id=2 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:22] "PATCH /api/templates/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:22] "DELETE /api/templates/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:22] "GET /api/workspaces/1/templates HTTP/1.1" 200 -
+[20/Aug/2026 15:39:22] "GET /api/workspaces/1/templates?include_deleted=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:22] "POST /api/templates/1/restore HTTP/1.1" 200 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/imports/commit HTTP/1.1" 201 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/export HTTP/1.1" 200 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/imports/commit HTTP/1.1" 422 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/imports/commit HTTP/1.1" 422 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/query HTTP/1.1" 200 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/imports/commit HTTP/1.1" 422 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/imports/commit HTTP/1.1" 422 -
+[20/Aug/2026 15:39:23] "PATCH /api/admin/workspace-memberships/u2?workspace_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:23] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:23] "POST /api/workspaces/1/templates HTTP/1.1" 403 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/imports/preview HTTP/1.1" 403 -
+[20/Aug/2026 15:39:23] "POST /api/boards/1/export HTTP/1.1" 200 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-5__uyy75\backups\flowboard-pre-v16-20260820-153924-418507.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-j88l47ea\backups\flowboard-pre-v16-20260820-153929-708402.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-3wtylcnb\backups\flowboard-pre-v16-20260820-153935-113437.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-j68nuvtu\backups\flowboard-pre-v16-20260820-153940-081247.db
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-7de4ofzw\backups\flowboard-pre-v16-20260820-153945-192947.db
+[20/Aug/2026 15:39:47] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:47] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:39:47] "POST /api/groups/1/tasks HTTP/1.1" 422 -
+[20/Aug/2026 15:39:47] "POST /api/groups/1/tasks HTTP/1.1" 422 -
+[20/Aug/2026 15:39:47] "POST /api/groups/1/tasks HTTP/1.1" 422 -
+[20/Aug/2026 15:39:47] "POST /api/groups/1/tasks HTTP/1.1" 422 -
+[20/Aug/2026 15:39:47] "POST /api/groups/1/tasks HTTP/1.1" 422 -
+[20/Aug/2026 15:39:47] "POST /api/groups/1/tasks HTTP/1.1" 201 -
+[20/Aug/2026 15:39:48] "POST /api/workspaces/1/boards HTTP/1.1" 201 -
+[20/Aug/2026 15:39:48] "POST /api/boards/2/groups HTTP/1.1" 201 -
+[20/Aug/2026 15:39:48] "GET /api/groups/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:48] "GET /api/groups/3 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:48] "POST /api/tasks/6/move HTTP/1.1" 422 -
+[20/Aug/2026 15:39:48] "PATCH /api/admin/workspace-memberships/u2?workspace_id=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:48] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:48] "POST /api/workspaces/1/boards HTTP/1.1" 403 -
+Pre-migration backup: C:\Users\xy198\AppData\Local\Temp\flowboard-tests-hyx8lm53\backups\flowboard-pre-v16-20260820-153949-417932.db
+[20/Aug/2026 15:39:52] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:52] "GET /api/bootstrap HTTP/1.1" 200 -
+[20/Aug/2026 15:39:52] "POST /api/tasks HTTP/1.1" 403 -
+[20/Aug/2026 15:39:52] "GET /api/bootstrap?board_id=1 HTTP/1.1" 403 -
+[20/Aug/2026 15:39:54] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:54] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:39:55] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[20/Aug/2026 15:39:55] "GET /api/timeline/projects/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:39:55] "GET /api/timeline/projects/1 HTTP/1.1" 401 -
+[20/Aug/2026 15:39:55] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:55] "GET /api/timeline/projects/1 HTTP/1.1" 403 -
+[20/Aug/2026 15:39:58] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:39:58] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:39:58] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:39:58] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:39:58] "GET /api/workspaces/1/timeline/review?project_ids=1 HTTP/1.1" 200 -
+[20/Aug/2026 15:40:02] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:02] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:40:02] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 422 -
+[20/Aug/2026 15:40:02] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 403 -
+[20/Aug/2026 15:40:02] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:02] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 403 -
+[20/Aug/2026 15:40:06] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:06] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:40:06] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 428 -
+[20/Aug/2026 15:40:06] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 409 -
+[20/Aug/2026 15:40:06] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:06] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 403 -
+[20/Aug/2026 15:40:06] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:40:06] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 404 -
+[20/Aug/2026 15:40:09] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:09] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:40:09] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:40:09] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 403 -
+[20/Aug/2026 15:40:09] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 428 -
+[20/Aug/2026 15:40:09] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 409 -
+[20/Aug/2026 15:40:09] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 422 -
+[20/Aug/2026 15:40:10] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:10] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 403 -
+[20/Aug/2026 15:40:10] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:40:10] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:40:10] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 409 -
+[20/Aug/2026 15:40:13] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:13] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:40:13] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:40:13] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 403 -
+[20/Aug/2026 15:40:13] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 200 -
+[20/Aug/2026 15:40:13] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 409 -
+[20/Aug/2026 15:40:13] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:40:13] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:40:13] "DELETE /api/workspaces/1/timeline/projects/2 HTTP/1.1" 200 -
+[20/Aug/2026 15:40:13] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 404 -
+[20/Aug/2026 15:40:16] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:16] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:40:16] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:40:16] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 403 -
+[20/Aug/2026 15:40:17] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:17] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:40:17] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:40:17] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 403 -
+[20/Aug/2026 15:40:17] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 200 -
+[20/Aug/2026 15:40:17] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 200 -
+[20/Aug/2026 15:40:17] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 422 -
+[20/Aug/2026 15:40:17] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 200 -
+[20/Aug/2026 15:40:17] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 404 -
+[20/Aug/2026 15:40:20] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:20] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:40:20] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[20/Aug/2026 15:40:20] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:40:20] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[20/Aug/2026 15:40:20] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[20/Aug/2026 15:40:24] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:24] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 403 -
+[20/Aug/2026 15:40:24] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:24] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 403 -
+[20/Aug/2026 15:40:24] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:40:25] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 201 -
+[20/Aug/2026 15:40:25] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 409 -
+[20/Aug/2026 15:40:25] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:40:25] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:40:25] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 422 -
+[20/Aug/2026 15:40:25] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:25] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 404 -
+[20/Aug/2026 15:40:25] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:40:25] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 403 -
+[20/Aug/2026 15:40:25] "POST /api/workspaces/2/timeline/imports/commit HTTP/1.1" 403 -
+[20/Aug/2026 15:40:28] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:28] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:40:28] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[20/Aug/2026 15:40:28] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:40:28] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[20/Aug/2026 15:40:28] "GET /api/workspaces/1/timeline/export HTTP/1.1" 404 -
+[20/Aug/2026 15:40:29] "POST /api/workspaces/1/timeline/export HTTP/1.1" 403 -
+[20/Aug/2026 15:40:29] "POST /api/auth/login HTTP/1.1" 200 -
+[20/Aug/2026 15:40:29] "POST /api/workspaces/1/timeline/export HTTP/1.1" 403 -
+[20/Aug/2026 15:40:29] "POST /api/workspaces/1/timeline/export HTTP/1.1" 422 -
+[20/Aug/2026 15:40:29] "POST /api/workspaces/1/timeline/export HTTP/1.1" 422 -
+[20/Aug/2026 15:40:29] "POST /api/workspaces/1/timeline/export HTTP/1.1" 200 -
+[20/Aug/2026 15:40:29] "POST /api/workspaces/2/timeline/imports/preview HTTP/1.1" 201 -
+[20/Aug/2026 15:40:29] "POST /api/workspaces/2/timeline/imports/commit HTTP/1.1" 201 -
+[20/Aug/2026 15:40:29] "POST /api/workspaces/1/timeline/export HTTP/1.1" 422 -
+[20/Aug/2026 15:41:01] "GET /api/workspaces/1/timeline HTTP/1.1" 401 -
