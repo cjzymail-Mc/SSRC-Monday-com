@@ -1,6 +1,7 @@
 __pycache__/
 *.py[cod]
-backups/*.db
+# 运维备份目录（含 db/-shm/-wal/manifest/附件，均为运行时数据，不进版本库；备份包哈希以文档记录为准）
+backups/
 flowboard.db-wal
 flowboard.db-shm
 flowboard-attachments/
