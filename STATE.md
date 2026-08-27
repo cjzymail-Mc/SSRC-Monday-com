@@ -1,15 +1,15 @@
 # STATE.md — 项目状态 / 变更日志 / 近期决定
 
-> 最后更新：2026-08-25（feature01 原 v16 为 `WAIT_GATE5_HUMAN`；标签与用户排序 v17 为 `TAG_INCREMENT_WAIT_HUMAN`；全项目组合画布为 `PORTFOLIO_CANVAS_WAIT_HUMAN`；手工归档与最新画布显示增量为 `ARCHIVE_VIEW_WAIT_HUMAN`）
+> 最后更新：2026-08-26（feature01 原 v16 为 `WAIT_GATE5_HUMAN`；标签与用户排序 v17 为 `TAG_INCREMENT_WAIT_HUMAN`；全项目组合画布为 `PORTFOLIO_CANVAS_WAIT_HUMAN`；手工归档与最新画布显示增量为 `ARCHIVE_VIEW_WAIT_HUMAN`）
 > **与契约的分工**：`feature-00-build-up/PROJECT_MAINLINE.md` = 冻结主线（不可变契约，只在用户调整产品方向时改）；本文件 = 会演进的项目状态。
 > **产品**：Flowboard — 面向约 15 人团队的局域网自托管协作看板（monday.com 子集）。
-> **权威范围**：feature01 原 v16 门 4 以 `feature-01-项目时间管理-仪表盘/9-GATE3_TECH_FREEZE.md` 为冻结契约；标签与用户排序 v17 以 `13-TAG_ORDER_TECH_FREEZE.md` 为增量契约；全项目组合画布以 `14-PORTFOLIO_CANVAS_TECH_FREEZE.md` 为增量契约；手工归档与 2026-08-25 最新画布显示以 `15-MANUAL_ARCHIVE_AND_TIMELINE_VIEW_TECH_FREEZE.md` 为增量契约。原主线终签与 Gate 5 交接仍以 `team-progress/planner-report-B005-CP6.md`、`team-progress/B-005-WAIT_GATE5_HUMAN.md` 为准。
+> **权威范围**：feature01 原 v16 门 4 以 `feature-01-项目时间管理-仪表盘/9-GATE3_TECH_FREEZE.md` 为冻结契约；标签与用户排序 v17 以 `13-TAG_ORDER_TECH_FREEZE.md` 为增量契约；全项目组合画布以 `14-PORTFOLIO_CANVAS_TECH_FREEZE.md` 为增量契约；手工归档与最新画布显示以 `15-MANUAL_ARCHIVE_AND_TIMELINE_VIEW_TECH_FREEZE.md` 为增量契约；2026-08-26 当前 UI 覆盖以 `mainline-feature01.md` §7.1 为准。原主线终签与 Gate 5 交接仍以 `team-progress/planner-report-B005-CP6.md`、`team-progress/B-005-WAIT_GATE5_HUMAN.md` 为准。
 
 ---
 
 ## 0. 一句话当前状态
 
-**第一阶段已交付。feature01 原 v16 为 `WAIT_GATE5_HUMAN`；标签与用户排序 v17 为 `TAG_INCREMENT_WAIT_HUMAN`；E＋D4＋P1 全项目组合画布为 `PORTFOLIO_CANVAS_WAIT_HUMAN`；手工归档与最新画布显示增量已完成生产代码施工及隔离自动验收，状态为 `ARCHIVE_VIEW_WAIT_HUMAN`。用户已于 2026-08-25 单独授权真实操作：根 `flowboard.db` 已备份并迁移为 schema v18（该库时间项目为 0）；当前 99 项目的隔离体验库已备份并一次性归档 74 个过期项目，留下 25 个活跃项目。未执行 commit、push、发布或部署。** feature01 冷启动入口：`feature-01-项目时间管理-仪表盘/STATE.md`。
+**第一阶段已交付。feature01 原 v16 为 `WAIT_GATE5_HUMAN`；标签与用户排序 v17 为 `TAG_INCREMENT_WAIT_HUMAN`；E＋D4＋P1 全项目组合画布为 `PORTFOLIO_CANVAS_WAIT_HUMAN`；手工归档与最新画布显示增量为 `ARCHIVE_VIEW_WAIT_HUMAN`。生产施工、隔离自动验收、根 `flowboard.db` 备份迁移至 schema v18，以及当前体验库 99→25 active + 74 archived 均已完成；此前施工与证据已由用户分批提交至 `d1d9b75`。2026-08-26 三项人工反馈及主动巡检 AUD-01/02 已修复并通过专项验证，AUD-03 窄屏导航仍待审核；当前只剩整合后的真实数据人工体验门。尚未 push、发布或部署，本次治理、真源蒸馏及体验修复尚未提交。** feature01 冷启动入口：`feature-01-项目时间管理-仪表盘/STATE.md`。
 
 ---
 
@@ -20,6 +20,8 @@
 
 | 日期 | 变更内容 |
 |------|---------|
+| 2026-08-26 | **feature01 最新体验覆盖完成施工与专项验证**：侧栏收起按钮固定在浏览器视口中线；归档操作只保留在单项目仪表盘，全项目行与时间表编辑器移除；操作条改为草稿/当前会话撤销驱动，全项目提交后自动收起、项目列 hover 显示红色撤销；项目列滚轮只纵向滚动，右侧画布滚轮才缩放。Node UI 全绿，对应 Chromium 专项均通过；各 `WAIT_HUMAN` 状态不提升。 |
+| 2026-08-25 | **Gate 5 工作方式复盘与真源蒸馏**：确认当天反复调试主体属于真实数据人工验收/视觉收口及允许的阶段回退，未扩产品范围；同时确认纯 Markdown 问卷不足以冻结密度、手势、视角记忆等体验项。`AGENTS.md` 新增“决策证据保真度匹配”和分层验证规则，feature01 主线新增当前 as-built UI 基线，避免冷会话从早期问卷复活已停用入口或视角记忆。 |
 | 2026-08-25 | **feature01 仪表盘缩放记忆按最新反馈临时停用**：单双仪表盘继续支持当前页临时滚轮缩放与拖拽，但不再读写视角本地存储；每次切换标签、页面或项目均恢复完整时间范围（`viewportDays == fullDays`）。全屏切标签保持全屏并同时恢复 100% 全局视角。Node UI 与单双画布 Chromium 专项通过。 |
 | 2026-08-25 | **feature01 画布与主页信息密度按最新反馈收口**：全项目移除三段画布说明及季度层；单项目复用全项目彩色年/月/日标尺。团队项目每成员超过 10 个自动折叠并提供剩余数量展开；最新动态压缩为动作＋一条核心摘要，禁止 raw/JSON 直出。Node UI、团队页 Chromium 展开/收起及单双画布 Chromium 专项通过。 |
 | 2026-08-25 | **feature01 单双仪表盘日历缩放纠偏完成**：日期标尺改为按每日像素宽度自适应“日号＋星期 / 日号 / 抽样月日”，消除特定缩放比例的汉字与数字重叠；今天红轴从日历顶部贯穿并置于日历之上；进行中项目左侧白色蒙版由 80% 覆盖为最新 70%。Node UI 与真实 Chromium 专项通过。 |
@@ -66,7 +68,7 @@
   - 代码（根目录）：`server.py`、`flowboard/`（database/service/query/aggregation/schedule/transfer/advanced/operations）、`app.js`、`view-*.js`、`schedule-ui.js`、`dashboard-ui.js`、`index.html`、`styles.css` 等。
   - 运维：`flowboard_ops.py` + `feature-00-build-up/WINDOWS_OPERATIONS.md`。
   - 测试：`tests/`（12 Python + 5 Node）。
-  - 运行库：`flowboard.db`（schema v15 / user_version=15 / integrity ok / FK clean）。
+  - 运行库：第一阶段交付基线为 schema v15；根 `flowboard.db` 已在 feature01 用户授权运维中备份并纯增量迁移为 schema v18（见下一节），未回写或破坏第一阶段业务数据。
   - 第一阶段文档：全部在 `feature-00-build-up/`（见 §4 目录索引）。
 - **状态边界**：第三阶段候选池（C06 工作负载 / E 项目管理 / G 自动化 / F 表单 / H Webhook）**是候选，不是已批准计划**——planner 不得擅自把候选升级成任务，需用户依据真实使用反馈拍板（冻结主线 §7 纠偏第 4 问）。
 
@@ -74,14 +76,17 @@
 
 - **当前阶段**：原 v16、v17 标签增量与 E＋D4＋P1 组合画布状态不变；手工归档与最新画布显示增量已完成生产代码施工及隔离自动验收，为 `ARCHIVE_VIEW_WAIT_HUMAN`。根 `flowboard.db` 已按用户单独授权备份并迁移为 v18（0 个时间项目）；99 项目的当前体验库已一次性归档 74 项、留下 25 项 active。
 - **当前模型**：固定六阶段；一行一个节点；一个日期字段；主线/并行两轨各自计算一列间隔、各自顺延；状态三态（未开始/进行中/已完成）；仪表盘行模型 = 每项目默认主线/并行两行 + 展开按钮拆重叠阶段（未展开仅重叠段上下分半）；拖拽 = 节点右键四项菜单双模式（拖拽/拖拽顺延/已完成/未完成）、无默认档、草稿批次统一提交；视觉 = **方向 A 浅色（大标题·白卡）+ v3.2 亮色六色 + ) 形分界 + 白圈节点**，三页共享浅色语义 token，暗色皮肤不进 v1；权限 = workspace admin 全改 / member 仅改自己创建的项目，查看对所有注册成员开放；项目入口 = admin/member 网页新建、仅 admin 软删、v1 不改名。**门 3 冻结**：数据模型 = 新增五张专表（timeline_projects/nodes + 批次审计两表 + timeline_import_batches，间隔/状态不落库实时派生）；已完成载体 = 内部 done_at；派生指标契约（当前阶段=已动工阶段序最大跨两轨、临近节点=今天起最早未完成同日全返、逾期数两轨合并、**橙点=本周（周一~周日）内有未完成节点**、指标服务端实时计算、今天=Asia/Shanghai）；Excel 导入状态矛盾 = 日期优先只认「已完成」；API 恒返 nodes+segments+stage_intervals 三份，段算法可切换。
-- **下一步**：用户在当前体验环境人工确认 v17 标签/排序、既有组合画布与归档后的 25 active / 74 archived 显示效果；原 v16 Gate 5、commit、push、发布、部署与上线仍是独立待办。
+- **下一步**：用户在当前体验环境按 `feature-01-项目时间管理-仪表盘/mainline-feature01.md` §7.1 as-built 基线综合确认 v17 标签/排序、既有组合画布、归档后的 25 active / 74 archived、壳层/全屏、标尺密度、归档入口、操作条、缩放锚点、键盘撤销和当前“视角不记忆”手感；另审核根清单 AUD-03 是否纳入窄屏支持。原 v16 Gate 5 人工终验、push、发布、部署与上线仍是独立待办。此前施工与证据已经提交，不再把旧 commit 列为待办；本次治理、文档蒸馏及 2026-08-26 体验修复是否提交仍须另行授权。
 - **冷启动入口**：`feature-01-项目时间管理-仪表盘/STATE.md`。
 
 ---
 
 ## 3. 近期决定
 
-- **2026-08-25 ｜ feature01 手工归档与画布显示（用户拍板）｜** 永久只手工归档；admin/创建者可归档和取消；归档高优先级、只读、保留普通标签/个人顺序，只在两个归档入口出现；Q1–Q8=A/A/A/A/A/B/A/A。一次性初始化选全部日期候选但真实库另行授权；最初确认 80% 今日蒙版，后于同日最新覆盖为 70%，并要求单双仪表盘日期标尺无重叠、今天轴覆盖至日历顶部；方案 B 密集点、单项目横向缩放/拖拽与全项目全屏恢复不变。
+- **2026-08-26 ｜ 主动巡检 AUD-01/02（用户授权）｜** 先修复全项目滚轮缩放锚点日期漂移与提交后红色撤销无键盘路径；AUD-03 窄屏导航未获授权，继续待审核。
+- **2026-08-26 ｜ feature01 体验覆盖（用户拍板）｜** 侧栏收起按钮恒定在视口中线；归档只能前往单项目仪表盘执行，全项目行与时间表编辑器不提供入口；操作条只有草稿或当前会话撤销时生成，其中全项目提交后默认收起、项目列 hover 显示红色撤销；项目列滚轮上下滚动，右侧画布滚轮缩放。
+- **2026-08-25 ｜ 体验决策证据升级（用户拍板）｜** 权限、数据语义、规则和并发等逻辑项仍可用文字问卷；布局、可见性、密度、手势、视角记忆和整体手感不得只凭 Markdown 冻结，须使用代表性数据下的可交互原型、隔离试用或等价动态证据。纯展示微调可先专项验证并在验收轮收尾集中全量回归，结构/交互/数据/API/权限/迁移仍按风险即时扩大验证。
+- **2026-08-25 ｜ feature01 手工归档与画布显示（用户拍板）｜** 永久只手工归档；admin/创建者可归档和取消；归档高优先级、只读、保留普通标签/个人顺序，只进入两个归档展示页；Q1–Q8=A/A/A/A/A/B/A/A。一次性初始化选全部日期候选但真实库另行授权；最初确认 80% 今日蒙版，后于同日最新覆盖为 70%，并要求单双仪表盘日期标尺无重叠、今天轴覆盖至日历顶部；方案 B 密集点、单项目横向缩放/拖拽与全项目全屏恢复不变。归档操作入口位置由 2026-08-26 最新拍板覆盖。
 - **2026-08-25 ｜ 一次性归档执行授权（用户拍板）｜** 用户明确“直接归档，仅留下活跃项目”；已对当前 99 项目体验库执行冻结快照，74 archived / 25 active，未来仍不自动归档。
 - **2026-08-24 ｜ feature01 全项目组合画布（用户拍板）｜** E＋D4＋P1；Q1–Q9=A/A/A/A/A/A/B/A/A，按 `14-PORTFOLIO_CANVAS_TECH_FREEZE.md` 实施。
 - **2026-08-24 ｜ feature01 标签与排序增量方案 A（用户拍板）｜** 标签目录与项目标签关系全局共享；所有成员可维护标签及项目归属、仅 admin 删除标签；“我的项目”及“全项目仪表盘”各标签下的排序按用户隔离；标签管理采用单标签双栏静态方案 A，按 v17 独立增量实施。
