@@ -114,7 +114,16 @@ class TimelineTagOrderServiceTests(unittest.TestCase):
         self.assertEqual(stale.exception.code, "TAG_VERSION_CONFLICT")
         renamed = self.service.rename_tag(self.admin, 1, first["tag_id"], {"name": "新名称", "base_version": first_view["tag"]["version"]})
         self.assertEqual(renamed["name"], "新名称")
-        self.assertEqual(self.service.list_tags(self.admin, 1)["virtual"][1]["project_count"], 0)
+        catalog = self.service.list_tags(self.admin, 1)
+        self.assertEqual([item["name"] for item in catalog["virtual"]], ["全部", "我的项目", "未分类", "已归档项目"])
+        self.assertEqual(catalog["virtual"][1], {"context_type": "mine", "name": "我的项目", "project_count": 1})
+        self.assertEqual(catalog["virtual"][2]["project_count"], 0)
+        with self.assertRaises(ApiError) as reserved_create:
+            self.service.create_tag(self.admin, 1, {"name": "我的项目"})
+        self.assertEqual(reserved_create.exception.code, "TAG_NAME_CONFLICT")
+        with self.assertRaises(ApiError) as reserved_rename:
+            self.service.rename_tag(self.admin, 1, second["tag_id"], {"name": "我的项目", "base_version": second["version"]})
+        self.assertEqual(reserved_rename.exception.code, "TAG_NAME_CONFLICT")
 
     def test_personal_orders_are_isolated_and_scope_checked(self):
         p1 = self.project(self.admin, "A1")

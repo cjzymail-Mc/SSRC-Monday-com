@@ -220,6 +220,59 @@ class TimelineProductionE2E(unittest.TestCase):
             target.addEventListener(type, event => window.__timelineClicks.push(event.type));
         }""", selector)
 
+    def test_week_and_month_are_shared_portfolio_scopes(self):
+        today = datetime.now(timezone(timedelta(hours=8))).date()
+        month_start = today.replace(day=1)
+        month_end = (month_start.replace(day=28) + timedelta(days=4)).replace(day=1)
+        db = connect(self.db_path)
+        try:
+            now = datetime.now(timezone.utc).isoformat()
+            for name, done_at in (("范围活跃项目", None), ("范围内仅完成项目", now)):
+                project = db.execute("INSERT INTO timeline_projects(workspace_id,name,created_by,version,created_at,updated_at) VALUES (1,?,'u1',1,?,?)", (name, now, now))
+                value = today.isoformat()
+                db.execute("INSERT INTO timeline_nodes(project_id,track,stage,name,date,initial_date,done_at,remark,created_at,updated_at) VALUES (?,'main','设计','范围节点',?,?,?,'',?,?)", (project.lastrowid, value, value, done_at, now, now))
+            db.commit()
+        finally:
+            db.close()
+
+        context, page = self.login("u1")
+        nav_ids = page.locator(".main-nav > button").evaluate_all("items => items.map(item => item.id)")
+        self.assertLess(nav_ids.index("timelineBtn"), nav_ids.index("timelineWeekBtn"))
+        self.assertLess(nav_ids.index("timelineWeekBtn"), nav_ids.index("timelineMonthBtn"))
+        self.assertLess(nav_ids.index("timelineMonthBtn"), nav_ids.index("timelineAllBtn"))
+        self.assertTrue(page.locator("#timelineWeekBtn").evaluate("el => el.classList.contains('nav-child')"))
+        self.assertTrue(page.locator("#timelineMonthBtn").evaluate("el => el.classList.contains('nav-child')"))
+
+        self.physical_click(page, page.locator("#timelineMonthBtn"))
+        chart = page.locator('[data-timeline-page="month"] .timeline-portfolio-chart')
+        chart.wait_for()
+        self.assertEqual(chart.get_attribute("data-calendar-start"), month_start.isoformat())
+        self.assertEqual(chart.get_attribute("data-calendar-end"), month_end.isoformat())
+        self.assertEqual(float(chart.get_attribute("data-full-days")), float((month_end - month_start).days))
+        self.assertEqual(float(chart.get_attribute("data-viewport-days")), float((month_end - month_start).days))
+        self.assertEqual(page.locator('.timeline-portfolio-meta strong', has_text="范围活跃项目").count(), 1)
+        self.assertEqual(page.locator('.timeline-portfolio-meta strong', has_text="范围内仅完成项目").count(), 0)
+        page.locator('[data-portfolio-zoom-out]').evaluate("el => el.click()")
+        self.assertEqual(float(chart.get_attribute("data-viewport-days")), float((month_end - month_start).days), "month view must not zoom beyond its month")
+        page.locator('[data-portfolio-zoom-in]').evaluate("el => el.click()")
+        page.wait_for_function("full => Number(document.querySelector('[data-timeline-page=month] .timeline-portfolio-chart').dataset.viewportDays) < full", arg=(month_end - month_start).days)
+        page.locator('[data-portfolio-cancel-zoom]').wait_for(state="visible")
+        self.physical_click(page, page.locator('[data-portfolio-cancel-zoom]'))
+        page.wait_for_function("full => Number(document.querySelector('[data-timeline-page=month] .timeline-portfolio-chart').dataset.viewportDays) === full", arg=(month_end - month_start).days)
+
+        self.physical_click(page, page.locator("#timelineWeekBtn"))
+        page.locator('[data-timeline-page="week"] .timeline-portfolio-chart').wait_for()
+        self.assertEqual(page.locator('[data-timeline-page="week"] [data-portfolio-zoom-in]').count(), 0)
+        self.assertEqual(page.locator('.timeline-portfolio-meta strong', has_text="范围活跃项目").count(), 1)
+        self.assertEqual(page.locator('.timeline-portfolio-meta strong', has_text="范围内仅完成项目").count(), 0)
+
+        self.physical_click(page, page.locator("#timelineAllBtn"))
+        page.locator('[data-timeline-page="all"] .timeline-portfolio-chart').wait_for()
+        self.assertEqual(page.locator('.timeline-portfolio-meta strong', has_text="范围活跃项目").count(), 1)
+        self.assertEqual(page.locator('.timeline-portfolio-meta strong', has_text="范围内仅完成项目").count(), 1)
+        self.assert_clean_browser(page)
+        context.close()
+
     def test_admin_real_entry_modes_create_delete_and_refresh_persistence(self):
         context, page = self.login("u1")
         responses = []
@@ -229,8 +282,10 @@ class TimelineProductionE2E(unittest.TestCase):
         page.locator('[data-timeline-page="home"]').wait_for()
         self.assertEqual(page.evaluate("window.__timelineClicks"), ["mousedown", "mouseup", "click"])
 
-        page.locator('[data-timeline-create] input[name="name"]').fill("浏览器项目")
-        page.locator('[data-timeline-create] button[type="submit"]').click()
+        self.physical_click(page, page.locator('[data-timeline-create-open]'))
+        page.locator('#timelineModal [data-timeline-create]').wait_for()
+        page.locator('#timelineModal input[name="name"]').fill("浏览器项目")
+        page.locator('#timelineModal button[type="submit"]').click()
         page.locator('[data-timeline-page="editor"] .timeline-sheet-project', has_text="浏览器项目").wait_for()
         self.assertTrue(any(method == "POST" and url.endswith("/api/workspaces/1/timeline/projects") and status == 201 for method, url, status in responses))
         self.assertTrue(any(method == "GET" and url.endswith("/api/workspaces/1/timeline") and status == 200 for method, url, status in responses))
@@ -240,27 +295,30 @@ class TimelineProductionE2E(unittest.TestCase):
         page.locator('[data-timeline-page="single"] > .timeline-project-card > header h2', has_text="浏览器项目").wait_for()
         self.assertEqual(page.evaluate("window.__timelineClicks"), ["mousedown", "mouseup", "click"])
         self.assertTrue(any(method == "GET" and "/api/timeline/projects/" in url and status == 200 for method, url, status in responses))
-        page.locator('[data-timeline-mode-target="all"]').click()
+        page.locator('#timelineAllBtn').click()
         page.locator('[data-timeline-page="all"] .timeline-all').wait_for()
 
         page.reload()
         page.locator("#timelineBtn").click()
         page.locator('[data-timeline-page="home"]').wait_for()
         page.locator('[data-project-choice] strong', has_text="浏览器项目").wait_for()
-        self.assertEqual(page.locator('[data-timeline-create] input[name="name"]').get_attribute("maxlength"), "200")
+        self.assertEqual(page.locator('.tl-home-head input[name="name"]').count(), 0)
+        self.physical_click(page, page.locator('[data-timeline-create-open]'))
+        duplicate_form = page.locator('#timelineModal [data-timeline-create]')
+        duplicate_form.wait_for()
+        self.assertEqual(duplicate_form.locator('input[name="name"]').get_attribute("maxlength"), "200")
         stable = self.timeline_content_hash()
         console_before = len(page.flowboard_console_errors)
-        page.locator('[data-timeline-create] input[name="name"]').fill("  浏览器项目  ")
-        with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith("/api/workspaces/1/timeline/projects")) as duplicate:
-            self.physical_click(page, page.locator('[data-timeline-create] button[type="submit"]'))
-        self.assertEqual(duplicate.value.status, 422)
-        self.assertEqual(duplicate.value.json()["error"]["code"], "NAME_CONFLICT")
-        page.locator("#toast").wait_for()
-        expected_console = page.flowboard_console_errors[console_before:]
-        self.assertEqual(len(expected_console), 1)
-        self.assertIn("422", expected_console[0])
-        del page.flowboard_console_errors[console_before:]
+        create_posts_before = len([item for item in responses if item[0] == "POST" and item[1].endswith("/api/workspaces/1/timeline/projects")])
+        duplicate_form.locator('input[name="name"]').fill("  浏览器项目  ")
+        self.physical_click(page, duplicate_form.locator('button[type="submit"]'))
+        duplicate_form.locator('[data-timeline-create-error]', has_text="项目名称已存在").wait_for()
+        page.wait_for_timeout(200)
+        create_posts_after = len([item for item in responses if item[0] == "POST" and item[1].endswith("/api/workspaces/1/timeline/projects")])
+        self.assertEqual(create_posts_after, create_posts_before, "known duplicate must be rejected before POST")
+        self.assertEqual(page.flowboard_console_errors[console_before:], [])
         self.assertEqual(self.timeline_content_hash(), stable, "trimmed duplicate project create must write nothing")
+        self.physical_click(page, duplicate_form.locator('[data-timeline-create-cancel]').last)
 
         stale_context, stale_page = self.login("u1")
         self.open_timeline_home(stale_page)
@@ -306,8 +364,9 @@ class TimelineProductionE2E(unittest.TestCase):
         context, page = self.login("u2")
         page.locator("#timelineBtn").click()
         page.locator('[data-timeline-page="home"]').wait_for()
-        page.locator('[data-timeline-create] input[name="name"]').fill("成员项目")
-        page.locator('[data-timeline-create] button[type="submit"]').click()
+        self.physical_click(page, page.locator('[data-timeline-create-open]'))
+        page.locator('#timelineModal input[name="name"]').fill("成员项目")
+        page.locator('#timelineModal button[type="submit"]').click()
         page.locator('[data-timeline-page="editor"] .timeline-sheet-project', has_text="成员项目").wait_for()
         page.locator('[data-timeline-mode-target="single"]').click()
         page.locator('[data-timeline-page="single"] > .timeline-project-card > header h2', has_text="成员项目").wait_for()
@@ -509,12 +568,42 @@ class TimelineProductionE2E(unittest.TestCase):
     def test_timeline_single_dashboard_structure(self):
         (project_id, _, _), _today = self.seed_cp4_dashboard_projects()
         context, page = self.login("u1")
+        page.evaluate("""() => { const header=document.createElement('header'); header.innerHTML='<button id="timelineClose">←</button>'; document.querySelector('#timelineView>.timeline-shell').prepend(header) }""")
+        self.assertFalse(page.locator('.timeline-shell>header').is_visible())
         self.open_cp4_single(page, project_id)
         card = page.locator(f'[data-dashboard-project="{project_id}"]')
         self.assertEqual(card.locator("h2").inner_text(), "CP4 重叠双轨")
-        self.assertIn("当前阶段", card.locator(".timeline-summary").inner_text())
+        self.assertIn("当前", card.locator(".tl-proj-kpi").inner_text())
+        self.assertEqual(card.locator(".timeline-summary, .timeline-single-caption, .timeline-dashboard-footer").count(), 0)
+        self.assertEqual(card.get_by_text("PROJECT · 时间管理", exact=True).count(), 0)
+        self.assertEqual(card.get_by_text("审计 · 预留", exact=True).count(), 0)
+        self.assertEqual(card.locator('[data-timeline-mode-target="all"]').count(), 0)
+        self.assertNotIn("阶段分界", card.locator(".tl-legend").inner_text())
+        blank_calendar = card.locator('[data-e-calendar]')
+        self.assertEqual(blank_calendar.inner_text(), "")
+        self.assertEqual(blank_calendar.evaluate("el => getComputedStyle(el).height"), "18px")
+        self.assertEqual(page.locator('.timeline-shell>header, #timelineClose').count(), 0)
+        self.assertEqual(page.evaluate("typeof removeLegacyTimelineBackRows"), "function")
         self.assertEqual(card.locator('[data-track="main"]').count(), 1)
         self.assertEqual(card.locator('[data-track="parallel"]').count(), 1)
+        labels = card.locator('.timeline-single-chart .timeline-track-label')
+        self.assertEqual(labels.count(), 2)
+        for label in labels.all():
+            style = label.evaluate("""el => { const s=getComputedStyle(el); return {
+              position:s.position,zIndex:Number(s.zIndex),width:s.width,display:s.display,
+              placeContent:s.placeContent,textAlign:s.textAlign,background:s.backgroundColor,
+              rightBorder:s.borderRightWidth,bottomBorder:s.borderBottomWidth
+            }}""")
+            self.assertEqual(style["position"], "sticky")
+            self.assertGreater(style["zIndex"], 1205)
+            self.assertEqual(style["width"], "112px")
+            self.assertEqual(style["display"], "grid")
+            self.assertIn("center", style["placeContent"])
+            self.assertEqual(style["textAlign"], "center")
+            self.assertEqual(style["background"], "rgb(255, 255, 255)")
+            self.assertEqual(style["rightBorder"], "1px")
+            self.assertEqual(style["bottomBorder"], "6px")
+            self.assertTrue(label.evaluate("""el => { const r=el.getBoundingClientRect(); const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2); return hit===el||el.contains(hit) }"""))
         self.assertEqual(card.locator(".timeline-editor").count(), 0, "dashboard must not embed the editor")
         self.assert_clean_browser(page); context.close()
 
@@ -522,11 +611,13 @@ class TimelineProductionE2E(unittest.TestCase):
         (project_id, _, _), today = self.seed_cp4_dashboard_projects()
         context, page = self.login("u1")
         self.open_cp4_single(page, project_id)
-        self.physical_click(page, page.locator('[data-timeline-mode-target="all"]'))
+        self.physical_click(page, page.locator('#timelineAllBtn'))
         page.locator('[data-timeline-page="all"] [data-shared-calendar="true"]').wait_for()
         portfolio = page.locator('[data-timeline-page="all"] .timeline-portfolio-chart')
         self.assertEqual(portfolio.count(), 1)
         self.assertEqual(portfolio.locator('.timeline-calendar').count(), 1)
+        self.assertEqual(portfolio.locator('.timeline-calendar').inner_text(), "")
+        self.assertEqual(portfolio.locator('.timeline-calendar').evaluate("el => getComputedStyle(el).height"), "18px")
         self.assertEqual(portfolio.locator('.timeline-today-line').count(), 1)
         self.assertEqual(page.locator('[data-timeline-page="all"] .timeline-project-card').count(), 0)
         cards = page.locator("[data-dashboard-project]")
@@ -534,8 +625,60 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertTrue(portfolio.get_attribute("data-calendar-start"))
         self.assertTrue(portfolio.get_attribute("data-calendar-end"))
         self.assertEqual(portfolio.locator(".timeline-today-line").get_attribute("data-today"), today)
-        self.assertIn("今天", portfolio.locator(".timeline-today-line span").inner_text())
+        self.assertIn("今天", portfolio.locator(".timeline-portfolio-today-label").inner_text())
         self.assertEqual(portfolio.locator(".timeline-today-line").evaluate("node => getComputedStyle(node).backgroundColor"), "rgb(229, 72, 77)")
+        self.assert_clean_browser(page); context.close()
+
+    def test_past_only_parallel_project_keeps_masks_in_single_and_portfolio(self):
+        today = datetime.now(timezone(timedelta(hours=8))).date()
+        db = connect(self.db_path)
+        try:
+            now = datetime.now(timezone.utc).isoformat()
+            created = db.execute(
+                "INSERT INTO timeline_projects(workspace_id,name,created_by,version,created_at,updated_at) VALUES (1,'历史并行项目','u1',1,?,?)",
+                (now, now),
+            )
+            project_id = created.lastrowid
+            for index, node_date in enumerate((today - timedelta(days=30), today - timedelta(days=1)), 1):
+                value = node_date.isoformat()
+                db.execute(
+                    "INSERT INTO timeline_nodes(project_id,track,stage,name,date,initial_date,remark,version,created_at,updated_at) VALUES (?,'parallel','测试',?,?,?,'',1,?,?)",
+                    (project_id, f"历史节点 {index}", value, value, now, now),
+                )
+            db.commit()
+        finally:
+            db.close()
+
+        context, page = self.login("u1")
+        self.open_cp4_single(page, project_id)
+        single = page.locator('[data-timeline-page="single"] .timeline-single-chart')
+        single.wait_for()
+        self.assertEqual(single.locator('.timeline-past-mask').count(), 2)
+        single_today_x = single.locator('.timeline-today-line').bounding_box()["x"]
+        for mask in single.locator('.timeline-past-mask').all():
+            box = mask.bounding_box()
+            self.assertAlmostEqual(box["x"] + box["width"], single_today_x, delta=1)
+        self.assertTrue(all(node["x"] <= single_today_x + 1 for node in single.locator('.timeline-dashboard-node').evaluate_all(
+            "els => els.map(el => ({x:el.getBoundingClientRect().x}))"
+        )))
+        self.assertTrue(all(stage["right"] <= single_today_x + 1 for stage in single.locator('.timeline-stage').evaluate_all(
+            "els => els.map(el => ({right:el.getBoundingClientRect().right}))"
+        )))
+
+        self.physical_click(page, page.locator('#timelineAllBtn'))
+        row = page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{project_id}"]')
+        row.wait_for()
+        self.assertEqual(row.locator('.timeline-past-mask').count(), 2)
+        portfolio_today_x = page.locator('[data-timeline-page="all"] .timeline-today-line').bounding_box()["x"]
+        for mask in row.locator('.timeline-past-mask').all():
+            box = mask.bounding_box()
+            self.assertAlmostEqual(box["x"] + box["width"], portfolio_today_x, delta=1)
+        self.assertTrue(all(node["x"] <= portfolio_today_x + 1 for node in row.locator('.timeline-dashboard-node').evaluate_all(
+            "els => els.map(el => ({x:el.getBoundingClientRect().x}))"
+        )))
+        self.assertTrue(all(stage["right"] <= portfolio_today_x + 1 for stage in row.locator('.timeline-stage').evaluate_all(
+            "els => els.map(el => ({right:el.getBoundingClientRect().right}))"
+        )))
         self.assert_clean_browser(page); context.close()
 
     def test_timeline_overlap_split_and_expand(self):
@@ -586,6 +729,10 @@ class TimelineProductionE2E(unittest.TestCase):
         self.open_cp4_single(page, project_id)
         stable_hash = self.timeline_content_hash()
         baseline = len(requests)
+        single_card = page.locator(f'[data-dashboard-project="{project_id}"]')
+        self.assertEqual(single_card.locator('.timeline-dashboard-actions').count(), 0)
+        single_card.locator('header').hover()
+        self.assertEqual(single_card.locator('.timeline-dashboard-actions').count(), 0, "hover alone must not expose single-project draft actions")
         node = page.locator(f'[data-dashboard-project="{project_id}"] .timeline-dashboard-node').first
         expected_node = node.get_attribute("data-node-id")
         node_box = node.bounding_box()
@@ -599,17 +746,60 @@ class TimelineProductionE2E(unittest.TestCase):
         self.physical_click(page, menu.locator('[data-draft-action="cascade"]'))
         self.assertEqual(page.evaluate("window.__timelineClicks"), ["mousedown", "mouseup", "click"])
         self.assertIn("尚未写入服务器", page.locator('[data-dashboard-hint]').inner_text())
+        self.assertEqual(single_card.locator('.timeline-dashboard-actions').count(), 0, "arming drag without changing a date must not expose actions")
         self.assertEqual(len(requests), baseline, "dashboard context action must issue zero network requests")
         self.assertEqual(self.timeline_content_hash(), stable_hash)
-        self.physical_click(page, page.locator('[data-timeline-mode-target="all"]'))
+        self.physical_click(page, node, button="right")
+        self.physical_click(page, page.locator('[data-timeline-context] [data-draft-action="done"]'))
+        single_actions = page.locator(f'[data-dashboard-project="{project_id}"] .timeline-dashboard-actions')
+        single_actions.wait_for()
+        self.assertTrue(single_actions.is_visible())
+        self.physical_click(page, single_actions.locator('[data-dashboard-discard]'))
+        single_actions.wait_for(state="detached")
+        self.physical_click(page, page.locator('#timelineAllBtn'))
         page.locator('[data-timeline-page="all"] .timeline-dashboard-node').first.wait_for()
         baseline = len(requests)
-        self.physical_click(page, page.locator('[data-timeline-page="all"] .timeline-dashboard-node').first, button="right")
+        first_row = page.locator('[data-timeline-page="all"] [data-dashboard-project]').first
+        self.assertEqual(first_row.locator('.timeline-portfolio-actions').count(), 0)
+        first_row.locator('.timeline-portfolio-meta').hover()
+        self.assertEqual(first_row.locator('.timeline-portfolio-actions').count(), 0, "hover alone must not expose all-project row actions")
+        self.assertEqual(page.locator('[data-timeline-page="all"] .timeline-row-menu, [data-timeline-page="all"] [data-timeline-archive]').count(), 0)
+        all_node = page.locator('[data-timeline-page="all"] .timeline-dashboard-node').first
+        all_project_id = all_node.get_attribute("data-project-id")
+        self.physical_click(page, all_node, button="right")
         self.assertEqual(page.locator('[data-timeline-page="all"] [data-timeline-context] [role="menuitem"]').count(), 4)
         self.physical_click(page, page.locator('[data-timeline-page="all"] [data-draft-action="done"]'))
-        self.assertIn("尚未写入服务器", page.locator('[data-timeline-page="all"] [data-dashboard-hint]').first.inner_text())
+        all_actions = page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{all_project_id}"] .timeline-portfolio-actions')
+        all_actions.wait_for()
+        self.assertTrue(all_actions.is_visible())
+        self.assertIn("尚未写入服务器", page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{all_project_id}"] [data-dashboard-hint]').inner_text())
         self.assertEqual(len(requests), baseline)
         self.assertEqual(self.timeline_content_hash(), stable_hash)
+        with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith("/timeline/batches")) as updated:
+            self.physical_click(page, all_actions.locator('[data-dashboard-submit]'))
+        self.assertEqual(updated.value.status, 200)
+        undo_only = page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{all_project_id}"] .timeline-portfolio-actions.is-undo-only')
+        undo_only.wait_for(state="attached")
+        self.assertTrue(undo_only.is_hidden(), "submitted actions must hide immediately even while the pointer remains over the former update button")
+        page.locator('[data-timeline-page="all"] .timeline-portfolio-axis-detail').hover()
+        self.assertTrue(undo_only.is_hidden(), "submitted actions must collapse when the project column is not hovered")
+        undo_meta = page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{all_project_id}"] .timeline-portfolio-meta')
+        self.assertEqual(undo_meta.get_attribute("tabindex"), "0")
+        self.assertEqual(undo_meta.get_attribute("role"), "group")
+        undo_meta.focus()
+        self.assertTrue(undo_only.is_visible(), "keyboard focus must reveal the submitted undo action")
+        page.keyboard.press("Tab")
+        self.assertEqual(
+            page.evaluate("document.activeElement?.dataset.dashboardUndo || null"),
+            all_project_id,
+            "the next Tab stop from the project column must reach Undo",
+        )
+        page.evaluate("document.activeElement?.blur()")
+        page.locator('[data-timeline-page="all"] .timeline-portfolio-axis-detail').hover()
+        self.assertTrue(undo_only.is_hidden())
+        undo_meta.hover()
+        self.assertTrue(undo_only.is_visible(), "submitted undo must reappear on project-column hover")
+        self.assertIn("danger", undo_only.locator('[data-dashboard-undo]').get_attribute("class"))
         self.assert_clean_browser(page); context.close()
 
     def test_timeline_all_dashboard_filter_and_sort(self):
@@ -618,7 +808,7 @@ class TimelineProductionE2E(unittest.TestCase):
         requests = []
         page.on("request", lambda request: requests.append((request.method, request.url)))
         self.open_cp4_single(page, project_id)
-        self.physical_click(page, page.locator('[data-timeline-mode-target="all"]'))
+        self.physical_click(page, page.locator('#timelineAllBtn'))
         page.locator('[data-timeline-page="all"] [data-dashboard-project]').first.wait_for()
         stable_hash = self.timeline_content_hash()
         baseline = len(requests)
@@ -642,6 +832,29 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(self.timeline_content_hash(), stable_hash)
         self.assert_clean_browser(page); context.close()
 
+    def test_timeline_all_dashboard_system_my_projects_context(self):
+        self.seed_cp4_dashboard_projects()
+        member_project_id = self.seed_timeline(created_by="u2", name="成员二负责项目")
+        context, page = self.login("u2")
+        self.open_cp4_single(page, member_project_id)
+        self.physical_click(page, page.locator('#timelineAllBtn'))
+        nav = page.locator('[data-timeline-page="all"] .tl-tag-filter')
+        nav.wait_for()
+        system_labels = nav.locator('[data-timeline-tag-context]').evaluate_all(
+            "els => els.slice(0,4).map(el => el.childNodes[0].textContent.trim())"
+        )
+        self.assertEqual(system_labels, ["全部", "我的项目", "未分类", "已归档项目"])
+        mine = nav.locator('[data-timeline-tag-context="mine"]')
+        self.assertEqual(mine.get_attribute("data-tag-id"), "")
+        self.assertEqual(mine.locator("small").inner_text(), "1")
+        self.physical_click(page, mine)
+        page.locator('[data-timeline-tag-context="mine"].active').wait_for()
+        rows = page.locator('[data-timeline-page="all"] [data-dashboard-project]')
+        self.assertEqual(rows.count(), 1)
+        self.assertEqual(rows.first.get_attribute("data-dashboard-project"), str(member_project_id))
+        self.assertEqual(page.locator('[data-timeline-page="all"] [data-tag-rename], [data-timeline-page="all"] [data-tag-delete]').count(), 0)
+        self.assert_clean_browser(page); context.close()
+
     def test_timeline_portfolio_e_d4_p1_canvas(self):
         (project_id, _, _), today_value = self.seed_cp4_dashboard_projects()
         today = datetime.fromisoformat(today_value).date()
@@ -658,7 +871,7 @@ class TimelineProductionE2E(unittest.TestCase):
 
         context, page = self.login("u1")
         self.open_cp4_single(page, project_id)
-        self.physical_click(page, page.locator('[data-timeline-mode-target="all"]'))
+        self.physical_click(page, page.locator('#timelineAllBtn'))
         chart = page.locator('[data-timeline-page="all"] .timeline-portfolio-chart')
         chart.wait_for()
 
@@ -669,13 +882,62 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(page.locator(".timeline-e-quarters").count(), 0)
         self.assertEqual(page.locator(".timeline-shared-caption").count(), 0)
         row_height = page.locator('.timeline-portfolio-project').first.bounding_box()["height"]
-        self.assertGreaterEqual(row_height, 61)
-        self.assertLessEqual(row_height, 63)
+        self.assertGreaterEqual(row_height, 47)
+        self.assertLessEqual(row_height, 49)
+        first_meta = page.locator('.timeline-portfolio-meta').first
+        self.assertEqual(first_meta.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(255, 255, 255)")
+        self.assertEqual(first_meta.evaluate("el => getComputedStyle(el).borderBottomWidth"), "6px")
         overlap_project = page.locator(f'[data-dashboard-project="{project_id}"]')
         self.physical_click(page, overlap_project.locator('[data-timeline-expand$=":main"]'))
-        self.assertGreater(overlap_project.bounding_box()["height"], 62)
+        self.assertGreater(overlap_project.bounding_box()["height"], 48)
         self.physical_click(page, overlap_project.locator('[data-timeline-expand$=":main"]'))
-        self.assertLessEqual(overlap_project.bounding_box()["height"], 63)
+        self.assertLessEqual(overlap_project.bounding_box()["height"], 49)
+        self.assertEqual(page.locator('.timeline-portfolio-axis-label span').count(), 0)
+        self.assertEqual(page.locator('.timeline-track-label.is-portfolio-label strong').count(), 0)
+        parallel_bar = overlap_project.locator('[data-track="parallel"] .timeline-stage').first
+        self.assertEqual(parallel_bar.evaluate("el => getComputedStyle(el).height"), "3px")
+        self.assertEqual(parallel_bar.evaluate("el => getComputedStyle(el).opacity"), "1")
+        self.assertEqual(parallel_bar.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(217, 140, 0)")
+        self.assertEqual(overlap_project.locator('.timeline-past-mask').first.evaluate("el => getComputedStyle(el).display"), "block")
+        self.assertNotEqual(
+            parallel_bar.evaluate("el => getComputedStyle(el).backgroundColor"),
+            chart.locator('.timeline-today-line').evaluate("el => getComputedStyle(el).backgroundColor"),
+        )
+
+        scroll = page.locator('[data-portfolio-scroll]')
+        today_label = page.locator('.timeline-portfolio-today-label')
+        label_top = today_label.bounding_box()["y"]
+        label_box = today_label.bounding_box()
+        line_box = chart.locator('.timeline-today-line').bounding_box()
+        self.assertAlmostEqual(label_box["x"] + label_box["width"] / 2, line_box["x"] + line_box["width"] / 2, delta=1)
+        scroll.evaluate("el => el.scrollTop=120")
+        page.wait_for_timeout(120)
+        self.assertAlmostEqual(today_label.bounding_box()["y"], label_top, delta=1, msg="today label must remain pinned while projects scroll")
+        scroll.evaluate("el => el.scrollTop=0")
+
+        detail = overlap_project.locator('.timeline-portfolio-detail')
+        self.assertTrue(detail.is_hidden())
+        overlap_project.locator('.timeline-portfolio-meta strong').hover()
+        page.wait_for_timeout(800)
+        self.assertTrue(detail.is_hidden(), "current/upcoming detail must stay hidden before the one-second dwell")
+        page.wait_for_timeout(350)
+        self.assertTrue(detail.is_visible(), "current/upcoming detail must appear after the one-second dwell")
+        risk = overlap_project.locator('.timeline-portfolio-risk')
+        risk.hover()
+        self.assertTrue(risk.locator('b').is_visible(), "risk red dot must reveal red text immediately")
+        self.assertIn("逾期", risk.locator('b').inner_text())
+        self.assertIn("本周", risk.locator('b').inner_text())
+
+        self.physical_click(page, overlap_project.locator('.timeline-portfolio-meta strong'))
+        page.wait_for_timeout(220)
+        self.assertGreaterEqual(overlap_project.bounding_box()["height"], 107)
+        self.assertLessEqual(overlap_project.bounding_box()["height"], 109)
+        second_project = page.locator('.timeline-portfolio-project').nth(1)
+        self.physical_click(page, second_project.locator('.timeline-portfolio-meta strong'))
+        page.wait_for_timeout(220)
+        self.assertEqual(page.locator('.timeline-portfolio-project.is-focused').count(), 1)
+        self.assertLessEqual(overlap_project.bounding_box()["height"], 49)
+        self.assertGreaterEqual(second_project.bounding_box()["height"], 107)
         sticky = page.evaluate("""() => ({
           axis:getComputedStyle(document.querySelector('.timeline-portfolio-axis')).position,
           axisLabel:getComputedStyle(document.querySelector('.timeline-portfolio-axis-label')).position,
@@ -685,6 +947,129 @@ class TimelineProductionE2E(unittest.TestCase):
 
         self.assertFalse(page.locator('.timeline-portfolio-head').is_hidden())
         self.assertTrue(page.locator('.tl-order-note').is_hidden())
+        scroll = page.locator('[data-portfolio-scroll]')
+
+        def pointer_date_at(client_x):
+            return page.evaluate(
+                """x => {
+                  const scroll=document.querySelector('[data-portfolio-scroll]');
+                  const chart=scroll.querySelector('.timeline-portfolio-chart');
+                  const axis=chart.querySelector('.timeline-e-axis');
+                  const scrollRect=scroll.getBoundingClientRect();
+                  const chartRect=chart.getBoundingClientRect();
+                  const axisRect=axis.getBoundingClientRect();
+                  const leftWidth=Math.max(0,Math.round(axisRect.left-chartRect.left));
+                  const rightWidth=Math.max(0,Math.round(chartRect.right-axisRect.right));
+                  const available=Math.max(320,scroll.clientWidth-leftWidth-rightWidth);
+                  const ratio=Math.max(0,Math.min(1,(x-scrollRect.left-leftWidth)/available));
+                  const days=Number(chart.dataset.viewportDays);
+                  const rangeStart=new Date(`${chart.dataset.calendarStart}T00:00:00Z`).getTime();
+                  const rangeEnd=new Date(`${chart.dataset.calendarEnd}T00:00:00Z`).getTime();
+                  const plotRatio=Math.max(0,Math.min(1,(scroll.scrollLeft+(x-scrollRect.left)-leftWidth)/axisRect.width));
+                  return {
+                    time:rangeStart+(rangeEnd-rangeStart)*plotRatio,
+                    leftWidth,
+                    available,
+                    axisOffset:Math.round(axisRect.left-chartRect.left),
+                    rightWidth,
+                    ratio,
+                    plotRatio,
+                    days,
+                    center:chart.dataset.viewportCenter,
+                    centerMs:Number(chart.dataset.viewportCenterMs),
+                    scrollLeft:scroll.scrollLeft,
+                    scrollClientWidth:scroll.clientWidth,
+                    chartWidth:chartRect.width
+                  };
+                }""",
+                client_x,
+            )
+
+        cancel_zoom = page.locator('[data-portfolio-cancel-zoom]')
+        self.assertEqual(cancel_zoom.count(), 1)
+        self.assertTrue(cancel_zoom.is_hidden())
+        scroll.evaluate("el => { el.scrollTop=80 }")
+        page.wait_for_timeout(180)
+        scroll_box = scroll.bounding_box()
+        geometry = pointer_date_at(scroll_box["x"] + scroll_box["width"] / 2)
+        client_x = scroll_box["x"] + geometry["leftWidth"] + geometry["available"] * .35
+        page.mouse.move(client_x, scroll_box["y"] + 126)
+        page.mouse.wheel(0, -120)
+        cancel_zoom.wait_for(state="visible")
+        self.assertEqual(cancel_zoom.inner_text(), "取消缩放")
+        self.assertEqual(cancel_zoom.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(229, 72, 77)")
+        self.assertLess(cancel_zoom.bounding_box()["x"], page.locator('[data-portfolio-fullscreen]').bounding_box()["x"])
+        self.physical_click(page, cancel_zoom)
+        page.wait_for_function(
+            "() => { const c=document.querySelector('.timeline-portfolio-chart'), b=document.querySelector('[data-portfolio-cancel-zoom]'); return Number(c.dataset.viewportDays) === Number(c.dataset.fullDays) && b?.hidden }"
+        )
+        self.assertAlmostEqual(page.locator('[data-portfolio-scroll]').evaluate("el => el.scrollTop"), 80, delta=2)
+
+        # AUD-01: three screen-space anchors must retain the same represented date
+        # after a wheel zoom.  The project column is wider than the old 220 px
+        # constant, so this guards the real rendered geometry rather than a mock.
+        for anchor_ratio in (.2, .5, .8):
+            page.locator('[data-portfolio-fit]').evaluate("el => el.click()")
+            page.wait_for_function(
+                "() => { const c=document.querySelector('.timeline-portfolio-chart'); return Number(c.dataset.viewportDays) === Number(c.dataset.fullDays) }"
+            )
+            scroll_box = scroll.bounding_box()
+            geometry = pointer_date_at(scroll_box["x"] + scroll_box["width"] / 2)
+            client_x = scroll_box["x"] + geometry["leftWidth"] + geometry["available"] * anchor_ratio
+            before_anchor = pointer_date_at(client_x)
+            before_days = float(page.locator('.timeline-portfolio-chart').get_attribute("data-viewport-days"))
+            page.mouse.move(client_x, scroll_box["y"] + 126)
+            page.mouse.wheel(0, -120)
+            page.wait_for_function(
+                "before => Number(document.querySelector('.timeline-portfolio-chart').dataset.viewportDays) < before",
+                arg=before_days,
+            )
+            after_anchor = pointer_date_at(client_x)
+            drift_days = abs(after_anchor["time"] - before_anchor["time"]) / 86400000
+            self.assertLessEqual(
+                drift_days,
+                .15,
+                f"zoom anchor {anchor_ratio:.0%} drifted by {drift_days:.2f} days",
+            )
+
+        self.physical_click(page, page.locator('[data-portfolio-fullscreen]'))
+        page.locator('.timeline-portfolio-card.is-fullscreen').wait_for()
+        page.locator('[data-portfolio-fit]').evaluate("el => el.click()")
+        page.wait_for_function(
+            "() => { const c=document.querySelector('.timeline-portfolio-chart'); return Number(c.dataset.viewportDays) === Number(c.dataset.fullDays) }"
+        )
+        page.wait_for_timeout(200)
+        for zoom_level in range(3):
+            scroll = page.locator('[data-portfolio-scroll]')
+            scroll_box = scroll.bounding_box()
+            geometry = pointer_date_at(scroll_box["x"] + scroll_box["width"] / 2)
+            client_x = scroll_box["x"] + geometry["leftWidth"] + geometry["available"] * .5
+            before_anchor = pointer_date_at(client_x)
+            before_days = float(page.locator('.timeline-portfolio-chart').get_attribute("data-viewport-days"))
+            page.mouse.move(client_x, scroll_box["y"] + 126)
+            page.mouse.wheel(0, -120)
+            page.wait_for_function(
+                "before => Number(document.querySelector('.timeline-portfolio-chart').dataset.viewportDays) < before",
+                arg=before_days,
+            )
+            after_anchor = pointer_date_at(client_x)
+            drift_days = abs(after_anchor["time"] - before_anchor["time"]) / 86400000
+            self.assertLessEqual(
+                drift_days,
+                .15,
+                f"fullscreen zoom level {zoom_level + 1} drifted by {drift_days:.2f} days; before={before_anchor}; after={after_anchor}",
+            )
+        self.physical_click(page, page.locator('[data-portfolio-fullscreen]'))
+        page.wait_for_function("() => !document.querySelector('.timeline-portfolio-card')?.classList.contains('is-fullscreen')")
+        scroll = page.locator('[data-portfolio-scroll]')
+
+        initial_days = float(chart.get_attribute("data-viewport-days"))
+        page.locator('.timeline-portfolio-meta').first.hover()
+        page.mouse.wheel(0, 420)
+        page.wait_for_timeout(180)
+        self.assertGreater(scroll.evaluate("el => el.scrollTop"), 0, "wheel over the project column must scroll project rows")
+        self.assertEqual(float(page.locator('[data-timeline-page="all"] .timeline-portfolio-chart').get_attribute("data-viewport-days")), initial_days, "project-column wheel must not zoom the calendar")
+        scroll.evaluate("el => { el.scrollTop=0 }")
         axis_detail = page.locator('.timeline-portfolio-axis-detail')
         axis_box = axis_detail.bounding_box()
         page.mouse.move(axis_box["x"] + axis_box["width"] * .55, axis_box["y"] + 54)
@@ -733,9 +1118,20 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(float(restored_chart.get_attribute("data-viewport-days")), float(restored_chart.get_attribute("data-full-days")))
 
         scroll = page.locator('[data-portfolio-scroll]')
+        for _ in range(2):
+            before_days = float(page.locator('.timeline-portfolio-chart').get_attribute("data-viewport-days"))
+            page.locator('[data-portfolio-zoom-in]').evaluate("el => el.click()")
+            page.wait_for_function(
+                "before => Number(document.querySelector('.timeline-portfolio-chart').dataset.viewportDays) < before",
+                arg=before_days,
+            )
         node = page.locator('[data-timeline-page="all"] .timeline-dashboard-node').first
         node.evaluate("el => el.scrollIntoView({block:'center',inline:'center'})")
         page.wait_for_timeout(180)
+        edge_room = scroll.evaluate("el => ({current:el.scrollLeft,max:el.scrollWidth-el.clientWidth})")
+        if edge_room["max"] - edge_room["current"] < 100:
+            scroll.evaluate("el => { el.scrollLeft=Math.max(0,el.scrollWidth-el.clientWidth-140) }")
+            page.wait_for_timeout(80)
         node_box = node.bounding_box()
         hit_node_id = page.evaluate("point => document.elementFromPoint(point.x,point.y)?.closest('.timeline-dashboard-node')?.dataset.nodeId || null", {"x": node_box["x"] + node_box["width"] / 2, "y": node_box["y"] + node_box["height"] / 2})
         self.assertEqual(hit_node_id, node.get_attribute("data-node-id"))
@@ -750,9 +1146,14 @@ class TimelineProductionE2E(unittest.TestCase):
         page.mouse.move(scroll_box["x"] + scroll_box["width"] - 12, node_box["y"] + node_box["height"] / 2, steps=8)
         guides = page.locator('[data-portfolio-drag-guides]')
         self.assertFalse(guides.is_hidden())
-        self.assertTrue(guides.locator('.target-label').inner_text())
+        guide_label = guides.locator('.target-label')
+        self.assertRegex(guide_label.inner_text(), r'^\d{4}-\d{2}-\d{2} \| [+-]?\d+天$')
+        self.assertEqual(guide_label.locator('.target-delta').evaluate("el => getComputedStyle(el).color"), "rgb(255, 77, 90)")
+        self.assertGreater(int(guides.evaluate("el => getComputedStyle(el).zIndex")), int(page.locator('.timeline-portfolio-today').evaluate("el => getComputedStyle(el).zIndex")))
+        self.assertTrue(guide_label.evaluate("""el => { const r=el.getBoundingClientRect(),previous=el.style.pointerEvents;el.style.pointerEvents='auto';const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);el.style.pointerEvents=previous;return hit===el||el.contains(hit) }"""), "drag target label must paint above the sticky axis, masks and nodes")
         self.assertEqual(page.locator('.timeline-e-month.is-target').count(), 1)
         self.assertEqual(page.locator('.timeline-e-day-tick.is-target').count(), 1)
+        self.assertEqual(page.locator('.timeline-e-day-tick.is-target').inner_text(), "", "drag target must not render the duplicate short-date badge")
         page.wait_for_timeout(520)
         self.assertGreater(scroll.evaluate("el => el.scrollLeft"), edge_before)
         page.mouse.up()
@@ -775,6 +1176,7 @@ class TimelineProductionE2E(unittest.TestCase):
         )
         initial_days = float(chart.get_attribute("data-viewport-days"))
         self.assertEqual(initial_days, float(chart.get_attribute("data-full-days")))
+        label_before = chart.locator('.timeline-track-label').first.bounding_box()
         box = single.bounding_box()
         page.mouse.move(box["x"] + box["width"] * .72, box["y"] + 36)
         page.mouse.wheel(0, -120)
@@ -783,6 +1185,9 @@ class TimelineProductionE2E(unittest.TestCase):
             arg=initial_days,
         )
         single = page.locator('[data-timeline-page="single"] [data-single-scroll]')
+        label_after = single.locator('.timeline-track-label').first.bounding_box()
+        self.assertAlmostEqual(label_after["width"], label_before["width"], delta=.5)
+        self.assertAlmostEqual(label_after["x"], label_before["x"], delta=.5)
         single_labels = single.locator('.timeline-e-day-tick b').evaluate_all(
             "els => els.map(el => { const r=el.getBoundingClientRect(); return {left:r.left,right:r.right,text:el.textContent.trim()} }).filter(x => x.text).sort((a,b) => a.left-b.left)"
         )
@@ -821,7 +1226,7 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertLess(after["left"], before["left"])
         self.assertEqual(after["top"], before["top"], "single-project canvas must never pan vertically")
 
-        self.physical_click(page, page.locator('[data-timeline-mode-target="all"]'))
+        self.physical_click(page, page.locator('#timelineAllBtn'))
         portfolio = page.locator('[data-timeline-page="all"] .timeline-portfolio-chart')
         portfolio.wait_for()
         self.assertEqual(float(portfolio.get_attribute("data-viewport-days")), float(portfolio.get_attribute("data-full-days")))
@@ -850,10 +1255,40 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(float(fullscreen_chart.get_attribute("data-viewport-days")), float(fullscreen_chart.get_attribute("data-full-days")))
         self.assertEqual(page.locator('.timeline-portfolio-card.is-fullscreen').count(), 1)
         self.assertEqual(page.locator('.timeline-portfolio-card.is-fullscreen').evaluate("el => getComputedStyle(el).display"), "grid")
+        cluster = page.locator('.timeline-portfolio-card.is-fullscreen .timeline-node-cluster[aria-label*="较早逾期节点"][aria-label*="逾期节点"]')
+        self.assertEqual(cluster.count(), 1)
+        self.assertIsNone(cluster.get_attribute("title"), "dense clusters must not create a second, uncontrolled browser tooltip")
+        self.assertEqual(cluster.get_attribute("tabindex"), "0")
+        cluster.hover()
+        cluster_tip = page.locator('[data-timeline-node-tooltip]')
+        cluster_tip.wait_for(state="visible")
+        cluster_metrics = cluster_tip.evaluate("""el => {
+          const r=el.getBoundingClientRect(),axis=document.querySelector('.timeline-portfolio-card.is-fullscreen .timeline-portfolio-axis')?.getBoundingClientRect(),meta=document.querySelector('.timeline-portfolio-card.is-fullscreen .timeline-portfolio-project:has(.timeline-node-cluster[aria-describedby="timelineNodeTooltip"]) .timeline-portfolio-meta')?.getBoundingClientRect();
+          const overlaps=(a,b)=>Boolean(a&&b&&a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top);
+          const previous=el.style.pointerEvents;el.style.pointerEvents='auto';const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);el.style.pointerEvents=previous;
+          return {topmost:hit===el||el.contains(hit),axisOverlap:overlaps(r,axis),metaOverlap:overlaps(r,meta),left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:innerWidth,height:innerHeight};
+        }""")
+        self.assertTrue(cluster_metrics["topmost"], "cluster tooltip must paint above all dashboard layers")
+        self.assertFalse(cluster_metrics["axisOverlap"], "cluster tooltip must stay below the sticky calendar axis")
+        self.assertFalse(cluster_metrics["metaOverlap"], "cluster tooltip must stay right of the sticky project column")
+        self.assertGreaterEqual(cluster_metrics["left"], 0)
+        self.assertLessEqual(cluster_metrics["right"], cluster_metrics["width"])
+        self.assertGreaterEqual(cluster_metrics["top"], 0)
+        self.assertLessEqual(cluster_metrics["bottom"], cluster_metrics["height"])
+        layers = page.evaluate("""() => Object.fromEntries(Object.entries({tooltip:'[data-timeline-node-tooltip]',menu:'[data-timeline-context]',guides:'[data-portfolio-drag-guides]',loupe:'[data-dashboard-loupe]',today:'.timeline-portfolio-today',past:'.timeline-past-mask',axis:'.timeline-portfolio-axis',meta:'.timeline-portfolio-meta'}).map(([key,selector])=>[key,Number(getComputedStyle(document.querySelector('.timeline-portfolio-card.is-fullscreen '+selector)||document.querySelector(selector)).zIndex)||0]))""")
+        self.assertGreater(layers["tooltip"], layers["menu"])
+        self.assertGreater(layers["menu"], layers["guides"])
+        self.assertEqual(layers["guides"], layers["loupe"])
+        self.assertGreater(layers["guides"], layers["today"])
+        self.assertGreater(layers["today"], layers["past"])
+        self.assertGreater(layers["past"], layers["axis"])
+        self.assertGreater(layers["axis"], layers["meta"])
+        page.mouse.move(10, 10)
+        cluster_tip.wait_for(state="hidden")
         self.physical_click(page, page.locator('[data-portfolio-fullscreen]'))
         self.assertEqual(page.locator('.timeline-portfolio-card.is-fullscreen').count(), 0)
 
-        crowded = page.locator('.timeline-node-cluster[title*="较早逾期节点"][title*="逾期节点"]')
+        crowded = page.locator('.timeline-node-cluster[aria-label*="较早逾期节点"][aria-label*="逾期节点"]')
         self.assertEqual(crowded.count(), 1)
         axis = page.locator('.timeline-portfolio-axis-detail')
         axis_box = axis.bounding_box()
@@ -867,12 +1302,19 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(page.locator('.timeline-dashboard-node[aria-label^="节点 逾期节点，"]').count(), 1)
 
         row = page.locator(f'[data-dashboard-project="{project_id}"]')
-        row.locator('.timeline-row-menu summary').click()
+        self.assertEqual(row.locator('.timeline-row-menu, [data-timeline-archive]').count(), 0, "all-project rows must not expose archive")
+        self.open_cp4_single(page, project_id)
+        single_card = page.locator(f'[data-timeline-page="single"] [data-dashboard-project="{project_id}"]')
+        single_card.locator('.tl-project-menu summary').click()
+        self.assertEqual(single_card.locator(f'[data-timeline-archive="{project_id}"]').count(), 1, "archive remains available on the single-project page")
         page.once("dialog", lambda dialog: dialog.accept())
         with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith(f"/timeline/projects/{project_id}/archive")) as archived:
-            row.locator(f'[data-timeline-archive="{project_id}"]').click()
+            single_card.locator(f'[data-timeline-archive="{project_id}"]').click()
         self.assertEqual(archived.value.status, 200)
-        page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{project_id}"]').wait_for(state="detached")
+        page.locator('[data-timeline-page="home"]').wait_for()
+
+        self.physical_click(page, page.locator('#timelineAllBtn'))
+        page.locator('[data-timeline-page="all"] .timeline-portfolio-chart').wait_for()
 
         self.physical_click(page, page.locator('[data-timeline-tag-context="archived"]'))
         page.locator('[data-timeline-tag-context="archived"].active').wait_for()
@@ -892,6 +1334,7 @@ class TimelineProductionE2E(unittest.TestCase):
         self.physical_click(page, page.locator('#archivedBtn'))
         archive_page_row = page.locator(f'[data-timeline-page="archived"] .tl-archive-row:has-text("CP4 重叠双轨")')
         archive_page_row.wait_for()
+        self.assertEqual(page.locator('.timeline-shell>header, #timelineClose').count(), 0)
         self.assertEqual(page.locator('[data-timeline-page="archived"] .timeline-portfolio-chart').count(), 0)
         with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith(f"/timeline/projects/{project_id}/unarchive")) as unarchived:
             self.physical_click(page, archive_page_row.locator('[data-timeline-unarchive]'))
@@ -1159,7 +1602,7 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(page.locator('[data-timeline-context] [role="menuitem"]').count(), 4)
         self.physical_click(page, page.locator('[data-timeline-context] [data-draft-action="done"]'))
         self.assertIn("尚未写入服务器", card.locator('[data-dashboard-hint]').inner_text())
-        self.physical_click(page, page.locator('[data-timeline-mode-target="all"]'))
+        self.physical_click(page, page.locator('#timelineAllBtn'))
         page.locator('[data-timeline-page="all"] [data-dashboard-project]').first.wait_for()
         self.assertFalse(page.locator('.timeline-portfolio-head').is_hidden())
         self.assertFalse(page.locator('[data-portfolio-fullscreen]').is_hidden())
@@ -1242,6 +1685,7 @@ class TimelineProductionE2E(unittest.TestCase):
         project_ids = [self.seed_timeline(name=f"v17 项目 {index}") for index in range(1, 4)]
         context, page = self.login("u1")
         page.locator("#timelineTagsBtn").click()
+        self.assertEqual(page.locator('.timeline-shell>header, #timelineClose').count(), 0)
         page.locator('[data-tag-create] input[name="name"]').fill("喜爱")
         with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith("/timeline/tags")) as created:
             page.locator('[data-tag-create] button[type="submit"]').click()

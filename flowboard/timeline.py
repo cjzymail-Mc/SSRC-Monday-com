@@ -1112,6 +1112,10 @@ class TimelineService:
             all_count = conn.execute(
                 "SELECT COUNT(*) FROM timeline_projects WHERE workspace_id=? AND deleted_at IS NULL AND archived_at IS NULL", (workspace_id,)
             ).fetchone()[0]
+            mine_count = conn.execute(
+                "SELECT COUNT(*) FROM timeline_projects WHERE workspace_id=? AND created_by=? AND deleted_at IS NULL AND archived_at IS NULL",
+                (workspace_id, user["id"]),
+            ).fetchone()[0]
             uncategorized_count = conn.execute(
                 """SELECT COUNT(*) FROM timeline_projects p
                    WHERE p.workspace_id=? AND p.deleted_at IS NULL AND p.archived_at IS NULL
@@ -1127,6 +1131,7 @@ class TimelineService:
                 "role": role,
                 "virtual": [
                     {"context_type": "all", "name": "全部", "project_count": all_count},
+                    {"context_type": "mine", "name": "我的项目", "project_count": mine_count},
                     {"context_type": "uncategorized", "name": "未分类", "project_count": uncategorized_count},
                     {"context_type": "archived", "name": "已归档项目", "project_count": archived_count},
                 ],
@@ -1138,7 +1143,7 @@ class TimelineService:
     def create_tag(self, user, workspace_id, data):
         reject_unknown(data, {"name"})
         name = require_text(data, "name", max_length=80)
-        if name.casefold() in {"全部".casefold(), "未分类".casefold(), "已归档项目".casefold()}:
+        if name.casefold() in {"全部".casefold(), "我的项目".casefold(), "未分类".casefold(), "已归档项目".casefold()}:
             raise ApiError(409, "TAG_NAME_CONFLICT", "该名称为系统标签")
         conn = self._db()
         try:
@@ -1166,7 +1171,7 @@ class TimelineService:
         if "base_version" not in data:
             raise ApiError(428, "VERSION_REQUIRED", "base_version is required")
         base_version = require_int(data["base_version"], "base_version", minimum=1)
-        if name.casefold() in {"全部".casefold(), "未分类".casefold(), "已归档项目".casefold()}:
+        if name.casefold() in {"全部".casefold(), "我的项目".casefold(), "未分类".casefold(), "已归档项目".casefold()}:
             raise ApiError(409, "TAG_NAME_CONFLICT", "该名称为系统标签")
         conn = self._db()
         try:

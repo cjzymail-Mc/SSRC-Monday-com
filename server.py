@@ -56,6 +56,11 @@ class Handler(SimpleHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print(f"[{self.log_date_time_string()}] {fmt % args}")
 
+    def end_headers(self):
+        if urlparse(self.path).path in {"/", "/index.html"}:
+            self.send_header("Cache-Control", "no-store")
+        super().end_headers()
+
     def send_json(self, status, payload, *, cookie=None):
         raw = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self.send_response(status)

@@ -11,21 +11,23 @@
 /* Timeline-first shell: the classic board stays mounted for compatibility but is never exposed. */
 #boardWorkspace{display:none!important}
 #timelineProjectNav{display:none!important}
-.sidebar{position:relative;flex:0 0 248px;transition:width .28s cubic-bezier(.34,1.18,.64,1),flex-basis .28s cubic-bezier(.34,1.18,.64,1),padding .28s cubic-bezier(.34,1.18,.64,1)}
-.sidebar>.sidebar-collapse{position:absolute;z-index:20;top:50%;right:-13px;display:grid;place-items:center;width:27px;height:58px;padding:0;border:1px solid #d8deea;border-radius:999px;background:#fff;color:#66738a;box-shadow:0 5px 15px #24304a1c;cursor:pointer;font-size:17px;line-height:1;opacity:.72;transform:translateY(-50%);transition:opacity .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .28s cubic-bezier(.34,1.18,.64,1)}
+.sidebar{--sidebar-current-width:248px;position:relative;flex:0 0 248px;transition:width .28s cubic-bezier(.34,1.18,.64,1),flex-basis .28s cubic-bezier(.34,1.18,.64,1),padding .28s cubic-bezier(.34,1.18,.64,1)}
+.sidebar>.sidebar-collapse{position:fixed;z-index:120;top:50vh;left:calc(var(--sidebar-current-width) - 13px);display:grid;place-items:center;width:27px;height:58px;padding:0;border:1px solid #d8deea;border-radius:999px;background:#fff;color:#66738a;box-shadow:0 5px 15px #24304a1c;cursor:pointer;font-size:17px;line-height:1;opacity:.72;transform:translateY(-50%);transition:left .28s cubic-bezier(.34,1.18,.64,1),opacity .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .28s cubic-bezier(.34,1.18,.64,1)}
 .sidebar>.sidebar-collapse:hover,.sidebar>.sidebar-collapse:focus-visible{border-color:#9eb5df;color:#214f9f;box-shadow:0 7px 20px #24304a29;opacity:1;outline:0;transform:translateY(-50%) scale(1.04)}
 .sidebar .nav-button{width:100%;border:0;background:transparent;text-align:left;font:inherit;cursor:pointer}
+.sidebar .nav-item.nav-child{margin-left:18px;width:calc(100% - 18px);padding-left:17px;font-size:13px}.sidebar .nav-item.nav-child .nav-icon{color:#a5adc0;font-size:13px}
 .sidebar .nav-icon{display:inline-grid;place-items:center;flex:0 0 17px}
 .sidebar .nav-label,.sidebar .brand-label,.sidebar .workspace-label{display:inline-block;max-width:180px;overflow:hidden;opacity:1;transform:translateX(0);transition:max-width .16s ease,opacity .14s ease,transform .16s ease}
 .sidebar .nav-label{width:auto;text-align:left;font-size:14px;white-space:nowrap}
-.sidebar.is-collapsed{width:64px;flex-basis:64px;padding-inline:8px}
+.sidebar.is-collapsed{--sidebar-current-width:64px;width:64px;flex-basis:64px;padding-inline:8px}
 .sidebar.is-collapsed .brand{justify-content:center;padding-inline:0}
 .sidebar.is-collapsed .brand-label,.sidebar.is-collapsed .workspace-label,.sidebar.is-collapsed .nav-label{max-width:0;opacity:0;transform:translateX(-7px);pointer-events:none}
 .sidebar.is-collapsed .workspace-switcher{justify-content:center;padding-inline:5px}
 .sidebar.is-collapsed .main-nav{padding-top:20px}
 .sidebar.is-collapsed .nav-item{justify-content:center;gap:0;padding-inline:5px}
+.sidebar.is-collapsed .nav-item.nav-child{margin-left:0;width:100%;padding-inline:5px}
 .sidebar.is-collapsed .nav-icon{width:20px;flex-basis:20px}
 .sidebar.is-collapsed .sidebar-bottom{padding-top:13px}
-@media(max-width:900px) and (min-width:681px){.sidebar{flex-basis:205px}.sidebar.is-collapsed{width:64px;flex-basis:64px}}
+@media(max-width:900px) and (min-width:681px){.sidebar{--sidebar-current-width:205px;flex-basis:205px}.sidebar.is-collapsed{--sidebar-current-width:64px;width:64px;flex-basis:64px}}
 @media(prefers-reduced-motion:reduce){.sidebar,.sidebar>.sidebar-collapse,.sidebar .nav-label,.sidebar .brand-label,.sidebar .workspace-label{transition-duration:1ms!important}}
 .nav-item.nav-button{border:0;background:none;font:inherit;cursor:pointer;width:100%;text-align:left}

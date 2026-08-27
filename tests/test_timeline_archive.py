@@ -66,7 +66,9 @@ class TimelineArchiveServiceTests(unittest.TestCase):
         self.assertEqual([row["project_id"] for row in self.service.list_projects(self.creator, 1, "archived")["projects"]], [first["project_id"]])
         catalog = self.service.list_tags(self.creator, 1)
         self.assertEqual(catalog["tags"][0]["project_count"], 0)
+        self.assertEqual(catalog["virtual"][1], {"context_type": "mine", "name": "我的项目", "project_count": 0})
         self.assertEqual(catalog["virtual"][-1], {"context_type": "archived", "name": "已归档项目", "project_count": 1})
+        self.assertEqual(self.service.get_personal_order(self.creator, 1, "mine")["project_ids"], [])
         self.assertEqual(self.service.get_personal_order(self.creator, 1, "all")["project_ids"], [second["project_id"]])
 
         with self.assertRaises(ApiError) as write_denied:
