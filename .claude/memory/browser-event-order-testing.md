@@ -34,3 +34,10 @@ document.addEventListener('mousedown', e => {
 - **根因**：控件只在父级 `:hover` 后才可命中，而 Playwright 命中测试要求指针完成 hover 前目标就有效；`opacity: 0` + `pointer-events: none` 组合把自己锁进「要先 hover 才可命中、要可命中才能 hover」的死循环，可见性断言照样过。
 - **诊断流**：① 取 `getBoundingClientRect()` + computed `opacity`/`visibility`/`pointer-events`；② `document.elementFromPoint()` 在控件中心探针、查最近可操作祖先；③ 用真实指针点击复现——**禁止以 `force`、DOM `.click()`、直调 handler 收尾**（与主坑同源：合成路径掩盖真 bug）。
 - **修法规则**：视觉淡入保留、但操作层始终可命中；`:focus-within` 留键盘通道；`@media (hover: none)` 触屏直接常显；终态用真实指针移动 + 物理点击验证（覆盖浏览器命中测试与事件序，而非只测应用 handler）。
+
+## 同族增补：`:focus-within` 纸面键盘通道订正（2026-08-26 AUD-02 实证）
+
+- 上文「`:focus-within` 留键盘通道」在无 tabindex 时是**纸面通道**：hover 呈现的控件 `display:none` 且无可聚焦子元素时 `:focus-within` 永不触发——实测连按 Tab 45 次均无法到达目标撤销按钮。CSS 规则存在 ≠ 键盘可达。
+- **升级规则**：hover-only 操作必须有**条件性 `tabindex=0` + `role=group` + 明确 ARIA 提示**——仅当操作可用（如该项目处于 is-undo-only）时给 tabindex，避免无条件全局 tabindex 污染 Tab 序；父级聚焦即触发展开、失焦由既有 focus-within 收起、给可见焦点框。
+- **验证标准**：真实 Tab 巡检命中目标按钮才算数；不是 CSS 里写了 focus-within 就算数。
+
