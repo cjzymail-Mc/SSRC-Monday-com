@@ -2,7 +2,6 @@ import base64
 import hashlib
 import json
 import os
-import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -10,11 +9,12 @@ from pathlib import Path
 from flowboard.database import SCHEMA_VERSION, connect, migrate
 from flowboard.operations import OperationsError, apply_retention, create_backup, restore_backup, verify_backup
 from flowboard.service import FlowboardService
+from test_secure_foundation import create_legacy_database
 
 
 class I13OperationsTests(unittest.TestCase):
     def setUp(self):
-        self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name);self.db=self.root/"flowboard.db";self.attachments=self.root/"blobs";self.backups=self.root/"safe-backups";shutil.copy2(Path(__file__).parents[1]/"flowboard.db",self.db);migrate(self.db);self.previous=os.environ.get("FLOWBOARD_ATTACHMENT_DIR");os.environ["FLOWBOARD_ATTACHMENT_DIR"]=str(self.attachments);self.service=FlowboardService(self.db);conn=connect(self.db);self.admin=dict(conn.execute("SELECT * FROM users WHERE id='u1'").fetchone());conn.close()
+        self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name);self.db=self.root/"flowboard.db";self.attachments=self.root/"blobs";self.backups=self.root/"safe-backups";create_legacy_database(self.db);migrate(self.db,initial_password="test-password");self.previous=os.environ.get("FLOWBOARD_ATTACHMENT_DIR");os.environ["FLOWBOARD_ATTACHMENT_DIR"]=str(self.attachments);self.service=FlowboardService(self.db);conn=connect(self.db);self.admin=dict(conn.execute("SELECT * FROM users WHERE id='u1'").fetchone());conn.close()
 
     def tearDown(self):
         if self.previous is None:os.environ.pop("FLOWBOARD_ATTACHMENT_DIR",None)

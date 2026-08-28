@@ -7,7 +7,7 @@ from pathlib import Path
 from .security import hash_password
 
 
-SCHEMA_VERSION = 18
+SCHEMA_VERSION = 19
 
 
 def utc_now():
@@ -119,6 +119,8 @@ def migrate(path, initial_password=None):
             _migration_v17(conn)
         if version < 18:
             _migration_v18(conn)
+        if version < 19:
+            _migration_v19(conn)
         conn.execute("PRAGMA journal_mode = WAL")
         conn.execute("PRAGMA foreign_keys = ON")
         return backup
@@ -1118,6 +1120,40 @@ def _migration_v18(conn):
         raise RuntimeError("foreign key check failed after v18 migration")
     if conn.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
         raise RuntimeError("database integrity check failed after v18 migration")
+
+
+def _migration_v19(conn):
+    """Enforce active timeline-project names case-insensitively."""
+    with transaction(conn):
+        duplicate = conn.execute(
+            """SELECT workspace_id,name,COUNT(*) AS total,MIN(id) AS first_id,MAX(id) AS last_id
+               FROM timeline_projects
+               WHERE deleted_at IS NULL
+               GROUP BY workspace_id,name COLLATE NOCASE
+               HAVING COUNT(*) > 1
+               LIMIT 1"""
+        ).fetchone()
+        if duplicate:
+            raise RuntimeError(
+                "case-insensitive active timeline project name conflict: "
+                f"workspace={duplicate['workspace_id']} name={duplicate['name']!r} "
+                f"ids={duplicate['first_id']}..{duplicate['last_id']}"
+            )
+        conn.execute("DROP INDEX IF EXISTS idx_timeline_projects_active_name")
+        conn.execute(
+            """CREATE UNIQUE INDEX idx_timeline_projects_active_name
+               ON timeline_projects(workspace_id,name COLLATE NOCASE)
+               WHERE deleted_at IS NULL"""
+        )
+        conn.execute(
+            "INSERT INTO schema_migrations VALUES (19,?,?,?)",
+            ("case-insensitive active timeline project names", "flowboard-schema-v19", utc_now()),
+        )
+        conn.execute("PRAGMA user_version = 19")
+    if conn.execute("PRAGMA foreign_key_check").fetchall():
+        raise RuntimeError("foreign key check failed after v19 migration")
+    if conn.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+        raise RuntimeError("database integrity check failed after v19 migration")
 
 
 def copy_database(source, target):

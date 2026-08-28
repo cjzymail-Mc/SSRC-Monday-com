@@ -1,6 +1,7 @@
 import hashlib
 import json
 import re
+import sqlite3
 from datetime import datetime, timedelta, timezone
 
 from .database import connect, transaction, utc_now
@@ -10,7 +11,12 @@ from .transfer import MAX_ROWS, XlsxNumericCell, make_xlsx, parse_upload
 
 TRACKS = ("main", "parallel")
 STAGES = ("创意", "设计", "开发", "测试", "量产", "应用迭代")
-IMPORT_HEADERS = ["项目名称", "阶段", "轨道", "节点", "日期", "间隔", "状态", "备注"]
+IMPORT_HEADERS = ["项目名称", "阶段", "主线/并行", "节点", "日期", "状态", "备注"]
+INTERVAL_IMPORT_HEADERS = ["项目名称", "阶段", "主线/并行", "节点", "日期", "间隔", "状态", "备注"]
+LEGACY_IMPORT_HEADERS = ["项目名称", "阶段", "轨道", "节点", "日期", "间隔", "状态", "备注"]
+LEGACY_NO_INTERVAL_IMPORT_HEADERS = ["项目名称", "阶段", "轨道", "节点", "日期", "状态", "备注"]
+IMPORT_TRACKS = {"main": "main", "parallel": "parallel", "主线": "main", "并行": "parallel"}
+EXPORT_TRACKS = {"main": "主线", "parallel": "并行"}
 IMPORT_STATUSES = ("已完成", "未开始", "进行中")
 SERIAL_MIN = 18264  # 1950-01-01（1899-12-30 基准，避开 1900 纪元闰年 bug 区）
 SERIAL_MAX = 73051  # 2100-01-01
@@ -345,10 +351,14 @@ class TimelineService:
     def _validate_timeline_rows(self, rows, workspace_names, file_format):
         clean = []
         first_seen = {}
+        project_spellings = {}
+        workspace_name_keys = {name.casefold() for name in workspace_names}
         conflicts = [
             {"row": row_number, "project": row.get("project")}
             for row_number, row in enumerate(rows, 2)
-            if isinstance(row, dict) and row.get("project") in workspace_names
+            if isinstance(row, dict)
+            and isinstance(row.get("project"), str)
+            and row.get("project").strip().casefold() in workspace_name_keys
         ]
         if conflicts:
             raise ApiError(422, "NAME_CONFLICT", "项目名称唯一：已存在同名项目", {"row": conflicts[0]["row"], "rows": conflicts})
@@ -358,10 +368,16 @@ class TimelineService:
             try:
                 reject_unknown(row, {"project", "track", "stage", "name", "date", "status", "remark"})
                 project = require_text({"value": row.get("project")}, "value", max_length=200)
+                project_key = project.casefold()
+                project = project_spellings.setdefault(project_key, project)
+                track = row.get("track")
+                track = track.strip() if isinstance(track, str) else track
+                if track not in IMPORT_TRACKS:
+                    raise ApiError(422, "VALIDATION_ERROR", "track 必须是 主线/并行（兼容 main/parallel）")
                 values = {
                     "row": row_number,
                     "project": project,
-                    "track": validate_choice(row.get("track"), "track", set(TRACKS)),
+                    "track": IMPORT_TRACKS[track],
                     "stage": validate_choice(row.get("stage"), "stage", set(STAGES)),
                     "name": require_text({"value": row.get("name")}, "value", max_length=500),
                     "status": None,
@@ -377,7 +393,7 @@ class TimelineService:
                 if error.status == 422 and error.details is None:
                     error.details = {"row": row_number}
                 raise
-            key = (values["project"], values["track"], values["date"], values["name"])
+            key = (project_key, values["track"], values["date"], values["name"])
             if key in first_seen:
                 raise ApiError(422, "VALIDATION_ERROR", f"与第 {first_seen[key]} 行重复", {"row": row_number, "duplicate_of": first_seen[key]})
             first_seen[key] = row_number
@@ -398,15 +414,102 @@ class TimelineService:
         try:
             with transaction(conn):
                 self._workspace_access(conn, user["id"], workspace_id)
-                if conn.execute("SELECT 1 FROM timeline_projects WHERE workspace_id=? AND name=? AND deleted_at IS NULL", (workspace_id, name)).fetchone():
+                if conn.execute("SELECT 1 FROM timeline_projects WHERE workspace_id=? AND name=? COLLATE NOCASE AND deleted_at IS NULL", (workspace_id, name)).fetchone():
                     raise ApiError(422, "NAME_CONFLICT", "项目名称已存在")
                 stamp = utc_now()
-                project_id = conn.execute(
-                    "INSERT INTO timeline_projects(workspace_id,name,created_by,created_at,updated_at) VALUES (?,?,?,?,?)",
-                    (workspace_id, name, user["id"], stamp, stamp),
-                ).lastrowid
+                try:
+                    project_id = conn.execute(
+                        "INSERT INTO timeline_projects(workspace_id,name,created_by,created_at,updated_at) VALUES (?,?,?,?,?)",
+                        (workspace_id, name, user["id"], stamp, stamp),
+                    ).lastrowid
+                except sqlite3.IntegrityError as error:
+                    raise ApiError(422, "NAME_CONFLICT", "项目名称已存在") from error
                 self._audit(conn, workspace_id, user["id"], project_id, "timeline.project_created", "timeline_project")
                 return {"project_id": project_id, "name": name, "created_by": user["id"], "version": 1}
+        finally:
+            conn.close()
+
+    def rename_project(self, user, workspace_id, project_id, data):
+        reject_unknown(data, {"name", "base_version"})
+        name = require_text(data, "name", max_length=200)
+        if "base_version" not in data:
+            raise ApiError(428, "VERSION_REQUIRED", "base_version is required")
+        base_version = require_int(data["base_version"], "base_version", minimum=1)
+        conn = self._db()
+        try:
+            with transaction(conn):
+                project = self._project_access(
+                    conn,
+                    user["id"],
+                    project_id,
+                    workspace_id=workspace_id,
+                    write=True,
+                    require_active=True,
+                )
+                if project["version"] != base_version:
+                    raise ApiError(
+                        409,
+                        "VERSION_CONFLICT",
+                        "项目版本冲突",
+                        {"project": self._view(conn, project, user_id=user["id"], role=project["role"])},
+                    )
+                old_name = project["name"]
+                if name == old_name:
+                    return self._view(conn, project, user_id=user["id"], role=project["role"])
+                if conn.execute(
+                    """SELECT 1 FROM timeline_projects
+                       WHERE workspace_id=? AND id<>? AND name=? COLLATE NOCASE AND deleted_at IS NULL""",
+                    (workspace_id, project_id, name),
+                ).fetchone():
+                    raise ApiError(422, "NAME_CONFLICT", "项目名称已存在")
+                stamp = utc_now()
+                try:
+                    updated = conn.execute(
+                        """UPDATE timeline_projects
+                           SET name=?,version=version+1,updated_at=?
+                           WHERE id=? AND workspace_id=? AND version=? AND deleted_at IS NULL AND archived_at IS NULL""",
+                        (name, stamp, project_id, workspace_id, base_version),
+                    )
+                except sqlite3.IntegrityError as error:
+                    raise ApiError(422, "NAME_CONFLICT", "项目名称已存在") from error
+                if updated.rowcount != 1:
+                    latest = self._project_access(
+                        conn,
+                        user["id"],
+                        project_id,
+                        workspace_id=workspace_id,
+                        write=True,
+                        require_active=True,
+                    )
+                    raise ApiError(
+                        409,
+                        "VERSION_CONFLICT",
+                        "项目版本冲突",
+                        {"project": self._view(conn, latest, user_id=user["id"], role=latest["role"])},
+                    )
+                latest = self._project_access(
+                    conn,
+                    user["id"],
+                    project_id,
+                    workspace_id=workspace_id,
+                    write=True,
+                    require_active=True,
+                )
+                self._audit(
+                    conn,
+                    workspace_id,
+                    user["id"],
+                    project_id,
+                    "timeline.project_renamed",
+                    "timeline_project",
+                    {
+                        "old_name": old_name,
+                        "name": name,
+                        "version_before": base_version,
+                        "version_after": latest["version"],
+                    },
+                )
+                return self._view(conn, latest, user_id=user["id"], role=latest["role"])
         finally:
             conn.close()
 
@@ -976,12 +1079,9 @@ class TimelineService:
             for project in projects:
                 nodes = self._nodes(conn, project["id"])
                 for track in TRACKS:
-                    previous = None
                     for node in self._chain(nodes, track):
-                        interval = "" if previous is None else str((self._date(node["date"]) - self._date(previous["date"])).days)
                         status = "已完成" if node["done_at"] else ("未开始" if self._date(node["date"]) >= today else "进行中")
-                        rows.append([project["name"], node["stage"], node["track"], node["name"], node["date"], interval, status, node["remark"]])
-                        previous = node
+                        rows.append([project["name"], node["stage"], EXPORT_TRACKS[node["track"]], node["name"], node["date"], status, node["remark"]])
             if len(rows) > MAX_ROWS:
                 raise ApiError(422, "EXPORT_LIMIT", "导出行数超过上限", {"total": len(rows), "max": MAX_ROWS})
             return rows
@@ -996,14 +1096,28 @@ class TimelineService:
             parsed = parse_upload(filename, raw)
         except Exception as error:
             raise ApiError(422, getattr(error, "code", "IMPORT_INVALID"), str(error), getattr(error, "details", None))
-        if parsed["headers"] != IMPORT_HEADERS:
+        supported_headers = (IMPORT_HEADERS, INTERVAL_IMPORT_HEADERS, LEGACY_IMPORT_HEADERS, LEGACY_NO_INTERVAL_IMPORT_HEADERS)
+        if parsed["headers"] not in supported_headers:
             raise ApiError(422, "IMPORT_HEADERS_MISMATCH", f"Excel 表头不匹配，标准表头：{'｜'.join(IMPORT_HEADERS)}", {"headers": IMPORT_HEADERS})
         conn = self._db()
         try:
             with transaction(conn):
                 self._workspace_access(conn, user["id"], workspace_id)
                 names = {row[0] for row in conn.execute("SELECT name FROM timeline_projects WHERE workspace_id=? AND deleted_at IS NULL", (workspace_id,))}
-                rows = [{"project": row[0], "stage": row[1], "track": row[2], "name": row[3], "date": row[4], "status": row[6], "remark": row[7]} for row in parsed["rows"]]
+                columns = {header: index for index, header in enumerate(parsed["headers"])}
+                track_header = "主线/并行" if "主线/并行" in columns else "轨道"
+                rows = [
+                    {
+                        "project": row[columns["项目名称"]],
+                        "stage": row[columns["阶段"]],
+                        "track": row[columns[track_header]],
+                        "name": row[columns["节点"]],
+                        "date": row[columns["日期"]],
+                        "status": row[columns["状态"]],
+                        "remark": row[columns["备注"]],
+                    }
+                    for row in parsed["rows"]
+                ]
                 clean = self._validate_timeline_rows(rows, names, parsed["format"])
                 preview = json.dumps(clean, ensure_ascii=False)
                 stamp = utc_now()

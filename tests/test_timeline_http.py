@@ -114,6 +114,38 @@ class TimelineHTTPTests(unittest.TestCase):
         status, error, _ = self.request("GET", f"/api/timeline/projects/{created['project_id']}", cookie=viewer_cookie)
         self.assertEqual((status, error["error"]["code"]), (403, "PROJECT_FORBIDDEN"))
 
+    def test_project_rename_patch_permissions_conflicts_and_csrf(self):
+        admin_cookie, admin_csrf = self.login()
+        project = self.create_project(admin_cookie, admin_csrf, "HTTP 旧名称")
+        self.create_project(admin_cookie, admin_csrf, "HTTP 已存在")
+        path = f"/api/workspaces/1/timeline/projects/{project['project_id']}"
+
+        status, error, _ = self.request("PATCH", path, {"name": "无 CSRF", "base_version": 1}, cookie=admin_cookie)
+        self.assertEqual((status, error["error"]["code"]), (403, "CSRF_INVALID"))
+        status, renamed, _ = self.request(
+            "PATCH", path, {"name": "HTTP 新名称", "base_version": 1}, cookie=admin_cookie, csrf=admin_csrf
+        )
+        self.assertEqual((status, renamed["name"], renamed["version"]), (200, "HTTP 新名称", 2))
+
+        status, error, _ = self.request(
+            "PATCH", path, {"name": "过期名称", "base_version": 1}, cookie=admin_cookie, csrf=admin_csrf
+        )
+        self.assertEqual((status, error["error"]["code"], error["error"]["details"]["project"]["name"]), (409, "VERSION_CONFLICT", "HTTP 新名称"))
+        status, error, _ = self.request(
+            "PATCH", path, {"name": "http 已存在", "base_version": 2}, cookie=admin_cookie, csrf=admin_csrf
+        )
+        self.assertEqual((status, error["error"]["code"]), (422, "NAME_CONFLICT"))
+
+        member_cookie, member_csrf = self.login("u2")
+        status, error, _ = self.request(
+            "PATCH", path, {"name": "成员越权", "base_version": 2}, cookie=member_cookie, csrf=member_csrf
+        )
+        self.assertEqual((status, error["error"]["code"]), (403, "PROJECT_FORBIDDEN"))
+        db = connect(self.db_path)
+        self.assertEqual(db.execute("SELECT COUNT(*) FROM timeline_change_batches").fetchone()[0], 0)
+        self.assertEqual(db.execute("SELECT COUNT(*) FROM audit_log WHERE action_code='timeline.project_renamed'").fetchone()[0], 1)
+        db.close()
+
     def test_r03_review_actor_change_rows_metrics_and_overlap_rows(self):
         cookie, csrf = self.login()
         created = self.create_project(cookie, csrf, "复盘项目")
@@ -137,8 +169,8 @@ class TimelineHTTPTests(unittest.TestCase):
 
     def test_r04_create_lifecycle_conflict_csrf_and_viewer(self):
         cookie, csrf = self.login()
-        created = self.create_project(cookie, csrf, "唯一 HTTP 名")
-        status, error, _ = self.request("POST", "/api/workspaces/1/timeline/projects", {"name": "唯一 HTTP 名"}, cookie=cookie, csrf=csrf)
+        created = self.create_project(cookie, csrf, "Mc Prj 01")
+        status, error, _ = self.request("POST", "/api/workspaces/1/timeline/projects", {"name": "mc prj 01"}, cookie=cookie, csrf=csrf)
         self.assertEqual((status, error["error"]["code"]), (422, "NAME_CONFLICT"))
         status, error, _ = self.request("POST", "/api/workspaces/1/timeline/projects", {"name": "缺 CSRF"}, cookie=cookie)
         self.assertEqual((status, error["error"]["code"]), (403, "CSRF_INVALID"))
@@ -386,10 +418,10 @@ class TimelineHTTPTests(unittest.TestCase):
         raw = base64.b64decode(exported["content_base64"], validate=True)
         self.assertEqual(exported["sha256"], hashlib.sha256(raw).hexdigest())
         parsed = parse_upload(exported["filename"], raw)
-        self.assertEqual(parsed["headers"], ["项目名称", "阶段", "轨道", "节点", "日期", "间隔", "状态", "备注"])
+        self.assertEqual(parsed["headers"], ["项目名称", "阶段", "主线/并行", "节点", "日期", "状态", "备注"])
         self.assertEqual(len(parsed["sheets"]), 1)
         self.assertEqual([(row[0], row[2], row[3]) for row in parsed["rows"]], [
-            ("P10", "main", "B2"), ("P10", "main", "B10"), ("P10", "parallel", "B10"), ("P2", "main", "N")
+            ("P10", "主线", "B2"), ("P10", "主线", "B10"), ("P10", "并行", "B10"), ("P2", "主线", "N")
         ])
 
         db = connect(self.db_path)

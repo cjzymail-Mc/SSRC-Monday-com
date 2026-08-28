@@ -198,8 +198,9 @@ class Handler(SimpleHTTPRequestHandler):
             return 200,self.timeline.undo_batches(user,int(parts[2]),data),None
         if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","batches","initial-correction"] and method=="POST":
             return 200,self.timeline.initial_correction(user,int(parts[2]),data),None
-        if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:5]==["timeline","projects"] and method=="DELETE":
-            return 200,self.timeline.delete_project(user,int(parts[2]),int(parts[5]),data),None
+        if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:5]==["timeline","projects"]:
+            if method=="PATCH":return 200,self.timeline.rename_project(user,int(parts[2]),int(parts[5]),data),None
+            if method=="DELETE":return 200,self.timeline.delete_project(user,int(parts[2]),int(parts[5]),data),None
         if len(parts)==7 and parts[:2]==["api","workspaces"] and parts[3:5]==["timeline","projects"] and method=="POST":
             if parts[6]=="archive":return 200,self.timeline.archive_project(user,int(parts[2]),int(parts[5]),data),None
             if parts[6]=="unarchive":return 200,self.timeline.unarchive_project(user,int(parts[2]),int(parts[5]),data),None
@@ -415,12 +416,15 @@ class Handler(SimpleHTTPRequestHandler):
                 self.service.realtime_poll(user,workspace_id,cursor=cursor,limit=limit)
                 self.send_response(200);self.send_header("Content-Type","text/event-stream; charset=utf-8");self.send_header("Cache-Control","no-cache, no-store");self.send_header("Connection","close");self.end_headers();PRESENCE.enter(workspace_id,user["id"])
                 try:
-                    deadline=time.monotonic()+15
+                    deadline=time.monotonic()+15;next_heartbeat=time.monotonic()
                     while time.monotonic()<deadline and not self.server.stop_event.is_set():
                         previous_cursor=cursor;payload=self.service.realtime_poll(user,workspace_id,cursor=cursor,limit=limit);payload["online"]=PRESENCE.list(workspace_id);cursor=payload["cursor"]
                         if payload["events"] or int(cursor)>int(previous_cursor):
                             raw=json.dumps(payload,ensure_ascii=False);self.wfile.write(f"id: {cursor}\nevent: update\ndata: {raw}\n\n".encode("utf-8"));self.wfile.flush();break
-                        self.wfile.write(f": heartbeat {int(time.time())}\n\n".encode("utf-8"));self.wfile.flush();time.sleep(.5)
+                        now=time.monotonic()
+                        if now>=next_heartbeat:
+                            self.wfile.write(f": heartbeat {int(time.time())}\n\n".encode("utf-8"));self.wfile.flush();next_heartbeat=now+5
+                        time.sleep(1)
                 finally:PRESENCE.leave(workspace_id,user["id"])
             except (BrokenPipeError,ConnectionResetError,ConnectionAbortedError,OSError):pass
             except ApiError as error:self.send_json(error.status,error.payload())

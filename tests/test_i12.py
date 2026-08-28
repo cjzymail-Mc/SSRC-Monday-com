@@ -1,6 +1,5 @@
 import http.client
 import json
-import shutil
 import tempfile
 import threading
 import unittest
@@ -15,7 +14,7 @@ from test_secure_foundation import create_legacy_database
 
 class I12ServiceTests(unittest.TestCase):
     def setUp(self):
-        self.temp=tempfile.TemporaryDirectory();self.db=Path(self.temp.name)/"flowboard.db";shutil.copy2(Path(__file__).parents[1]/"flowboard.db",self.db);migrate(self.db);self.service=FlowboardService(self.db)
+        self.temp=tempfile.TemporaryDirectory();self.db=Path(self.temp.name)/"flowboard.db";create_legacy_database(self.db);migrate(self.db,initial_password="test-password");self.service=FlowboardService(self.db)
         conn=connect(self.db);self.admin=dict(conn.execute("SELECT * FROM users WHERE id='u1'").fetchone());self.member=dict(conn.execute("SELECT * FROM users WHERE id='u2'").fetchone());conn.close()
     def tearDown(self):self.temp.cleanup()
 
@@ -87,7 +86,7 @@ class I12ServiceTests(unittest.TestCase):
 
 class I12HttpTests(unittest.TestCase):
     def setUp(self):
-        self.temp=tempfile.TemporaryDirectory();self.db=Path(self.temp.name)/"flowboard.db";shutil.copy2(Path(__file__).parents[1]/"flowboard.db",self.db);self.server=create_server("127.0.0.1",0,self.db);self.thread=threading.Thread(target=self.server.serve_forever,daemon=True);self.thread.start();self.port=self.server.server_address[1];self.cookies={};self.csrf={}
+        self.temp=tempfile.TemporaryDirectory();self.db=Path(self.temp.name)/"flowboard.db";create_legacy_database(self.db);self.server=create_server("127.0.0.1",0,self.db);self.thread=threading.Thread(target=self.server.serve_forever,daemon=True);self.thread.start();self.port=self.server.server_address[1];self.cookies={};self.csrf={}
         for user in ("u1","u2"):self._login(user)
     def tearDown(self):self.server.shutdown();self.server.server_close();self.temp.cleanup()
     def _request(self,user,method,path,body=None):

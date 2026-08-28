@@ -118,16 +118,24 @@ class Gate5HomeE2E(unittest.TestCase):
     def test_gate5_default_lands_timeline_home_when_projects_exist(self):
         """有项目且可写：登录后默认落「我的工作」主页；经典看板区块隐藏但 #boardList 留在 DOM。"""
         self.seed_timeline(created_by="u1", name="落地项目")
+        for index in range(25):
+            self.seed_timeline(created_by="u1", name=f"一屏滚动项目 {index + 1:02d}")
         context, page = self.login("u1")
         page.locator('[data-timeline-page="home"]').wait_for()
         self.assertEqual(page.request.get(self.base + "/").headers.get("cache-control"), "no-store")
         self.assertEqual(page.locator('.timeline-shell>header, #timelineClose').count(), 0)
         self.assertFalse(page.locator("#boardWorkspace").is_visible())
         self.assertFalse(page.locator(".breadcrumbs").is_visible())
-        self.assertGreater(page.locator(".top-actions").bounding_box()["x"], 700)
+        self.assertEqual(page.locator(".topbar").count(), 0)
+        self.assertEqual(page.locator("#appSidebar > .sidebar-bottom .top-actions").count(), 1)
+        self.assertLess(page.locator(".top-actions").bounding_box()["x"], 248)
         self.assertEqual(page.locator("#boardList").count(), 1)
         self.assertFalse(page.locator("#boardList").is_visible())
-        self.assertTrue(page.locator("#dashboardBtn").is_visible())
+        self.assertEqual(page.locator("#dashboardBtn").count(), 0)
+        self.assertEqual(page.locator(".workspace-switcher").count(), 0)
+        self.assertEqual(page.locator(".main-nav > [data-sidebar-settings]").count(), 1)
+        self.assertEqual(page.locator("#appSidebar").evaluate("el => getComputedStyle(el).position"), "sticky")
+        self.assertAlmostEqual(page.locator("#appSidebar").bounding_box()["height"], 800, delta=1)
         self.assertIn("落地项目", page.locator('[data-timeline-section="mine"]').inner_text())
         self.assertIn("我的项目", page.locator('[data-timeline-kpi="mine"]').inner_text())
         self.assert_clean_browser(page)
@@ -138,6 +146,15 @@ class Gate5HomeE2E(unittest.TestCase):
         self.physical_click(page, page.locator("#timelineAllBtn"))
         page.locator('[data-timeline-page="all"]').wait_for()
         self.assertEqual(page.locator('.timeline-shell>header, #timelineClose').count(), 0)
+        viewport_metrics = page.evaluate("""() => ({
+            viewport: innerHeight,
+            pageHeight: document.documentElement.scrollHeight,
+            canvasHeight: document.querySelector('[data-portfolio-scroll]').clientHeight,
+            canvasScrollHeight: document.querySelector('[data-portfolio-scroll]').scrollHeight
+        })""")
+        self.assertLessEqual(viewport_metrics["pageHeight"], viewport_metrics["viewport"] + 1)
+        self.assertGreater(viewport_metrics["canvasHeight"], 300)
+        self.assertGreater(viewport_metrics["canvasScrollHeight"], viewport_metrics["canvasHeight"])
         for selector, mode in (("#timelineTagsBtn", "tags"), ("#archivedBtn", "archived"), ("#timelineBtn", "home")):
             page.evaluate("""() => { const header=document.createElement('header'); header.innerHTML='<button id="timelineClose">←</button>'; document.querySelector('#timelineView>.timeline-shell').prepend(header) }""")
             self.assertFalse(page.locator('.timeline-shell>header').is_visible())
@@ -145,6 +162,27 @@ class Gate5HomeE2E(unittest.TestCase):
             page.locator(f'[data-timeline-page="{mode}"]').wait_for()
             self.assertEqual(page.locator('.timeline-shell>header, #timelineClose').count(), 0)
         self.assertFalse(page.locator("#boardWorkspace").is_visible())
+        self.assert_clean_browser(page); context.close()
+
+    def test_sidebar_hover_treatment_is_shared_and_current_avatar_uses_name_initial(self):
+        db = connect(self.db_path)
+        try:
+            db.execute("UPDATE users SET name='陈晶',avatar='林' WHERE id='u1'")
+            db.commit()
+        finally:
+            db.close()
+        context, page = self.login("u1")
+        page.locator('[data-timeline-page="home"]').wait_for()
+        self.assertEqual(page.locator('#currentUser .avatar').inner_text(), '陈')
+        self.assertEqual(page.locator('#currentUser > span:not(.avatar)').inner_text(), '陈晶')
+        items = page.locator('.main-nav > .nav-item')
+        self.assertGreater(items.count(), 1)
+        hover_styles = []
+        for index in range(items.count()):
+            item = items.nth(index)
+            item.hover()
+            hover_styles.append(item.evaluate("el => ({shadow:getComputedStyle(el).boxShadow,background:getComputedStyle(el).backgroundColor,color:getComputedStyle(el).color})"))
+        self.assertTrue(all(style["shadow"] != "none" for style in hover_styles))
         self.assert_clean_browser(page); context.close()
 
     def test_gate5_default_lands_empty_timeline_without_projects(self):
@@ -188,6 +226,10 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertAlmostEqual(toggle_box["x"] + toggle_box["width"] / 2, sidebar_box["x"] + sidebar_box["width"], delta=2)
         self.assertAlmostEqual(toggle_box["width"], 27, delta=1)
         self.assertAlmostEqual(toggle_box["height"], 58, delta=1)
+        self.assertTrue(page.locator("#sidebarToggle").evaluate("""el => {
+            const r=el.getBoundingClientRect(), points=[[r.left+6,r.top+r.height/2],[r.right-6,r.top+r.height/2],[r.left+r.width/2,r.top+6],[r.left+r.width/2,r.bottom-6]];
+            return points.every(([x,y]) => document.elementFromPoint(x,y) === el);
+        }"""), "the full visible collapse capsule must own pointer hit testing")
         self.assertGreater(float(page.locator("#sidebarToggle").evaluate("el => getComputedStyle(el).borderRadius").replace("px", "")), 20)
         self.assertFalse(page.locator("#timelineAllBtn .nav-label").is_visible())
         self.assertTrue(page.locator("#timelineAllBtn .nav-icon").is_visible())
@@ -207,7 +249,8 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertEqual(page.locator('[data-timeline-page="home"] h1').inner_text(), "我的工作")
         self.assertEqual(page.locator('[data-timeline-mode="home"] > .timeline-toolbar').count(), 0)
         self.assertEqual(page.locator('[data-timeline-mode="home"] > .timeline-transfer').count(), 0)
-        self.assertEqual(page.locator(".tl-home-head [data-timeline-import-file]").count(), 1)
+        self.assertEqual(page.locator(".tl-home-head [data-timeline-import-open]").count(), 1)
+        self.assertEqual(page.locator(".tl-home-head [data-timeline-import-file]").count(), 0)
         self.assertEqual(page.locator(".tl-home-head [data-timeline-export]").count(), 1)
         self.assertTrue(page.locator(".tl-home-head [data-timeline-create-open]").is_visible())
         self.assertEqual(page.locator('.tl-home-head input[name="name"]').count(), 0)
@@ -217,6 +260,9 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertIn("我的项目（11）", page.locator('[data-timeline-tab="mine"]').inner_text())
         self.assertEqual(page.locator('[data-timeline-section="mine"] [data-project-choice]').count(), 11)
         self.assertIn("今日团队动态", page.locator('[data-timeline-kpi="feed"]').inner_text())
+        feed_top = page.locator('.tl-feed').bounding_box()["y"]
+        mine_border_top = page.locator('[data-timeline-section="mine"]').bounding_box()["y"]
+        self.assertAlmostEqual(feed_top, mine_border_top, delta=1)
         # 切到团队项目：成员长条 + 每项目一枚药丸（全 DOM 唯一下钻钩子）
         page.locator('[data-timeline-tab="team"]').click()
         self.assertFalse(page.locator('[data-timeline-section="team"]').is_hidden())
@@ -264,14 +310,14 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertTrue(source.is_hidden(), "节点长名称源默认不得常驻挤压年度轴")
         self.assertTrue(tip.is_hidden(), "顶层节点提示框默认隐藏")
         self.assertIsNone(node.get_attribute("title"), "节点信息只保留自定义悬停卡，不再叠加浏览器原生 title")
-        self.assertGreaterEqual(card.locator(".timeline-e-month").count(), 1)
+        self.assertGreaterEqual(page.locator('[data-timeline-page="single"] .timeline-e-month').count(), 1)
 
         batch_requests = []
         page.on("request", lambda request: batch_requests.append(request) if request.method == "POST" and request.url.endswith("/timeline/batches") else None)
         node.hover()
         tip.wait_for(state="visible")
         tooltip_metrics = tip.evaluate("""el => {
-          const r=el.getBoundingClientRect(), axis=document.querySelector('.timeline-single-chart .timeline-e-axis')?.getBoundingClientRect(), label=el.getAttribute('data-placement');
+          const r=el.getBoundingClientRect(), axis=document.querySelector('[data-timeline-page="single"] .timeline-portfolio-chart .timeline-e-axis')?.getBoundingClientRect(), label=el.getAttribute('data-placement');
           const overlaps=(a,b)=>Boolean(a&&b&&a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top);
           const previous=el.style.pointerEvents;el.style.pointerEvents='auto';
           const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);el.style.pointerEvents=previous;
@@ -285,32 +331,45 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertLessEqual(tooltip_metrics["bottom"], tooltip_metrics["viewportHeight"])
         self.assertIn(tooltip_metrics["placement"], {"left", "right", "above", "below"})
         self.physical_click(page, node, button="right")
-        menu = card.locator("[data-timeline-context]")
+        menu = page.locator('[data-timeline-page="single"] [data-timeline-context]')
         menu.wait_for(state="visible")
         tip.wait_for(state="hidden")
         self.assertTrue(menu.evaluate("""el => { const r=el.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return hit===el||el.contains(hit) }"""), "右键菜单不得被今日线或过去蒙版覆盖")
         self.assertLess(int(menu.evaluate("el => getComputedStyle(el).zIndex")), tooltip_metrics["z"])
         self.assertTrue(node.evaluate("element => element.classList.contains('is-context-open')"))
-        self.physical_click(page, card.locator('[data-draft-action="single"]'))
+        self.physical_click(page, menu.locator('[data-draft-action="single"]'))
         self.assertTrue(menu.is_hidden())
         self.assertFalse(node.evaluate("element => element.classList.contains('is-context-open')"))
         node = card.locator('.timeline-dashboard-node[data-node-date="2026-08-01"]')
         box = node.bounding_box()
         page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
         page.mouse.down()
-        page.mouse.move(box["x"] + box["width"] / 2 + 70, box["y"] + box["height"] / 2, steps=6)
-        loupe = card.locator("[data-dashboard-loupe]")
-        self.assertFalse(loupe.is_hidden())
-        self.assertEqual(loupe.locator(".timeline-loupe-scale i").count(), 21)
-        self.assertIn("→", loupe.locator(".timeline-loupe-head").inner_text())
-        self.assertGreater(int(loupe.evaluate("el => getComputedStyle(el).zIndex")), int(card.locator('.timeline-today-overlay').evaluate("el => getComputedStyle(el).zIndex")))
-        self.assertTrue(loupe.evaluate("""el => { const r=el.getBoundingClientRect(),previous=el.style.pointerEvents;el.style.pointerEvents='auto';const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);el.style.pointerEvents=previous;return hit===el||el.contains(hit) }"""), "拖拽放大镜不得被节点、蒙版或今日线覆盖")
+        page.mouse.move(box["x"] + box["width"] / 2 + 24, box["y"] + box["height"] / 2, steps=6)
+        guides = page.locator('[data-timeline-page="single"] [data-portfolio-drag-guides]')
+        self.assertFalse(guides.is_hidden())
+        guide_label = guides.locator('.target-label')
+        self.assertRegex(guide_label.inner_text(), r'^\d{4}-\d{2}-\d{2} \| [+-]?\d+天$')
+        self.assertEqual(guide_label.locator('.target-delta').evaluate("el => getComputedStyle(el).color"), "rgb(255, 77, 90)")
+        self.assertGreater(int(guides.evaluate("el => getComputedStyle(el).zIndex")), int(page.locator('[data-timeline-page="single"] .timeline-portfolio-today').evaluate("el => getComputedStyle(el).zIndex")))
+        target_date = guide_label.inner_text().split(" | ", 1)[0]
         self.assertEqual(batch_requests, [], "拖动期间保持零网络")
         page.mouse.up()
 
-        card.locator('[data-dashboard-draft-count]', has_text="1 项草稿").wait_for()
+        actions = card.locator('.timeline-dashboard-actions')
+        actions.wait_for()
+        self.assertEqual(actions.locator('button').all_inner_texts(), ['放弃', '更新 1'])
+        self.assertEqual(actions.locator('[data-dashboard-undo]').count(), 0)
+        scroll = page.locator('[data-timeline-page="single"] [data-portfolio-scroll]')
+        axis = scroll.locator('.timeline-portfolio-axis-detail')
+        for _ in range(8):
+            if card.locator('.timeline-dashboard-node[data-node-id="1"]').count():
+                break
+            axis_box = axis.bounding_box()
+            page.mouse.move(axis_box["x"] + axis_box["width"] * .35, axis_box["y"] + axis_box["height"] * .65)
+            page.mouse.wheel(0, -120)
+            page.wait_for_timeout(80)
         moved = card.locator('.timeline-dashboard-node[data-node-id="1"]').get_attribute("data-node-date")
-        self.assertNotEqual(moved, "2026-08-01")
+        self.assertEqual(moved, target_date)
         self.assertEqual(card.locator(".timeline-dashboard-origin").count(), 1)
         self.assertEqual(batch_requests, [], "松手只落本地草稿")
 
@@ -324,8 +383,16 @@ class Gate5HomeE2E(unittest.TestCase):
         with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith("/timeline/batches")) as saved:
             self.physical_click(page, card.locator(f'[data-dashboard-submit="{project_id}"]'))
         self.assertEqual(saved.value.status, 200)
-        card.locator('[data-dashboard-draft-count]', has_text="0 项草稿").wait_for()
+        actions.wait_for(state="detached")
         self.assertEqual(len(batch_requests), 1)
+        undo_meta = card.locator('.timeline-portfolio-meta')
+        self.physical_click(page, undo_meta, button="right")
+        undo_menu = page.locator('[data-timeline-page="single"] [data-portfolio-undo-menu]')
+        undo_menu.wait_for(state="visible")
+        with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith("/timeline/batches/undo")) as undone:
+            self.physical_click(page, undo_menu.locator('[data-portfolio-undo-action]'))
+        self.assertEqual(undone.value.status, 200)
+        self.assertEqual(card.locator('.timeline-dashboard-node[data-node-id="1"]').get_attribute("data-node-date"), "2026-08-01")
         self.assert_clean_browser(page); context.close()
 
     def test_gate5_viewer_never_sees_classic_home_without_probe_noise(self):

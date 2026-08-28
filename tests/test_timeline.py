@@ -2,6 +2,7 @@ import json
 import base64
 import http.client
 import io
+import sqlite3
 import zipfile
 import shutil
 import tempfile
@@ -73,17 +74,65 @@ class TimelineCoreTests(unittest.TestCase):
         self.assertEqual([node["name"] for node in view["nodes"]], ["1试穿报告", "鞋底确认"])
 
     def test_name_conflict_and_viewer_denied(self):
-        self.service.create_project(self.admin, 1, {"name": "独家项目"})
+        self.service.create_project(self.admin, 1, {"name": "Mc Prj 01"})
         db = connect(self.db)
         db.execute("UPDATE workspace_memberships SET role='viewer' WHERE user_id='u2'")
         db.commit()
         db.close()
         with self.assertRaises(Exception) as conflict:
-            self.service.create_project(self.admin, 1, {"name": "独家项目"})
-        self.assertEqual(conflict.exception.status, 422)
+            self.service.create_project(self.admin, 1, {"name": "  mc prj 01  "})
+        self.assertEqual((conflict.exception.status, conflict.exception.code), (422, "NAME_CONFLICT"))
+        db = connect(self.db)
+        try:
+            with self.assertRaises(sqlite3.IntegrityError):
+                db.execute(
+                    """INSERT INTO timeline_projects(workspace_id,name,created_by,created_at,updated_at)
+                       VALUES (1,'MC PRJ 01','u1','2026-08-28T00:00:00+00:00','2026-08-28T00:00:00+00:00')"""
+                )
+        finally:
+            db.close()
         with self.assertRaises(Exception) as viewer:
             self.service.list_projects({"id": "u2"}, 1)
         self.assertEqual(viewer.exception.status, 403)
+
+    def test_project_rename_is_versioned_audited_and_not_undoable(self):
+        first = self.service.create_project(self.admin, 1, {"name": "旧项目名"})
+        self.service.create_project(self.admin, 1, {"name": "已存在名称"})
+
+        renamed = self.service.rename_project(
+            self.admin, 1, first["project_id"], {"name": "新项目名", "base_version": first["version"]}
+        )
+
+        self.assertEqual((renamed["name"], renamed["version"]), ("新项目名", 2))
+        db = connect(self.db)
+        audit = db.execute(
+            "SELECT details_json FROM audit_log WHERE action_code='timeline.project_renamed' AND entity_id=?",
+            (str(first["project_id"]),),
+        ).fetchone()
+        self.assertEqual(db.execute("SELECT COUNT(*) FROM timeline_change_batches").fetchone()[0], 0)
+        db.close()
+        self.assertEqual(
+            json.loads(audit["details_json"]),
+            {"old_name": "旧项目名", "name": "新项目名", "version_before": 1, "version_after": 2},
+        )
+
+        with self.assertRaises(Exception) as stale:
+            self.service.rename_project(self.admin, 1, first["project_id"], {"name": "过期提交", "base_version": 1})
+        self.assertEqual((stale.exception.status, stale.exception.code), (409, "VERSION_CONFLICT"))
+        self.assertEqual(stale.exception.details["project"]["name"], "新项目名")
+        with self.assertRaises(Exception) as duplicate:
+            self.service.rename_project(self.admin, 1, first["project_id"], {"name": "  已存在名称  ", "base_version": 2})
+        self.assertEqual((duplicate.exception.status, duplicate.exception.code), (422, "NAME_CONFLICT"))
+
+        member, member_project_id = self._create_as_member("成员项目")
+        member_view = self.service.get_project(member, member_project_id)
+        self.assertEqual(
+            self.service.rename_project(member, 1, member_project_id, {"name": "成员新名称", "base_version": member_view["version"]})["name"],
+            "成员新名称",
+        )
+        with self.assertRaises(Exception) as forbidden:
+            self.service.rename_project(self._member(), 1, member_project_id, {"name": "越权名称", "base_version": 2})
+        self.assertEqual((forbidden.exception.status, forbidden.exception.code), (403, "PROJECT_FORBIDDEN"))
 
     def _member(self):
         return {"id": "u3"}
@@ -476,8 +525,8 @@ class TimelineCoreTests(unittest.TestCase):
             self.service.preview_import(self.admin, 1, "fractional.xlsx", fractional_serial)
         self.assertEqual(serial.exception.status, 422)
 
-        self.service.create_project(self.admin, 1, {"name": "同名项目"})
-        same_name = make_xlsx(headers, [["同名项目", "创意", "main", "节点", "2026-08-01", "", "未开始", ""]])
+        self.service.create_project(self.admin, 1, {"name": "Existing Project"})
+        same_name = make_xlsx(headers, [["existing project", "创意", "main", "节点", "2026-08-01", "", "未开始", ""]])
         with self.assertRaises(Exception) as existing_name:
             self.service.preview_import(self.admin, 1, "same.xlsx", same_name)
         self.assertEqual((existing_name.exception.status, existing_name.exception.code), (422, "NAME_CONFLICT"))
@@ -517,7 +566,8 @@ class TimelineCoreTests(unittest.TestCase):
         self.assertIsInstance(raw, bytes)
         self.assertGreater(len(raw), 0)
         parsed = parse_upload("roundtrip.xlsx", raw)
-        self.assertEqual(parsed["headers"], ["项目名称", "阶段", "轨道", "节点", "日期", "间隔", "状态", "备注"])
+        self.assertEqual(parsed["headers"], ["项目名称", "阶段", "主线/并行", "节点", "日期", "状态", "备注"])
+        self.assertEqual({row[2] for row in parsed["rows"]}, {"主线", "并行"})
         self.assertEqual(len(parsed["rows"]), 6)
 
         db = connect(self.db)
@@ -665,15 +715,23 @@ class TimelineCoreTests(unittest.TestCase):
         self.assertTrue(exported)
 
     def test_import_headers_contract_literal(self):
-        contract = ["项目名称", "阶段", "轨道", "节点", "日期", "间隔", "状态", "备注"]
-        accepted = self.service.preview_import(self.admin, 1, "contract.xlsx", make_xlsx(contract, [["表头项目", "创意", "main", "节点", "2026-08-01", "", "未开始", ""]]))
+        contract = ["项目名称", "阶段", "主线/并行", "节点", "日期", "状态", "备注"]
+        accepted = self.service.preview_import(self.admin, 1, "contract.xlsx", make_xlsx(contract, [["表头项目", "创意", "主线", "节点", "2026-08-01", "未开始", ""]]))
         self.assertEqual(accepted["row_count"], 1)
 
+        with_interval = ["项目名称", "阶段", "主线/并行", "节点", "日期", "间隔", "状态", "备注"]
+        interval_accepted = self.service.preview_import(self.admin, 1, "with-interval.xlsx", make_xlsx(with_interval, [["带间隔项目", "设计", "并行", "节点", "2026-08-02", "1", "进行中", ""]]))
+        self.assertEqual(interval_accepted["row_count"], 1)
+
+        legacy = ["项目名称", "阶段", "轨道", "节点", "日期", "间隔", "状态", "备注"]
+        legacy_accepted = self.service.preview_import(self.admin, 1, "legacy.xlsx", make_xlsx(legacy, [["旧格式项目", "设计", "parallel", "旧节点", "2026-08-02", "", "进行中", ""]]))
+        self.assertEqual(legacy_accepted["row_count"], 1)
+
         for label, headers, cells in (
-            ("旧表头", ["项目", "轨道", "阶段", "节点", "日期", "状态", "备注", "间隔"], ["表头项目", "main", "创意", "节点", "2026-08-01", "未开始", "", ""]),
-            ("乱序", ["项目名称", "轨道", "阶段", "节点", "日期", "间隔", "状态", "备注"], ["表头项目", "创意", "main", "节点", "2026-08-01", "", "未开始", ""]),
-            ("缺列", contract[:7], ["表头项目", "创意", "main", "节点", "2026-08-01", "", "未开始"]),
-            ("多列", contract + ["备注二"], ["表头项目", "创意", "main", "节点", "2026-08-01", "", "未开始", "", ""]),
+            ("过时表头", ["项目", "轨道", "阶段", "节点", "日期", "状态", "备注", "间隔"], ["表头项目", "main", "创意", "节点", "2026-08-01", "未开始", "", ""]),
+            ("乱序", ["项目名称", "主线/并行", "阶段", "节点", "日期", "状态", "备注"], ["表头项目", "创意", "主线", "节点", "2026-08-01", "未开始", ""]),
+            ("缺列", contract[:6], ["表头项目", "创意", "主线", "节点", "2026-08-01", "未开始"]),
+            ("多列", contract + ["备注二"], ["表头项目", "创意", "主线", "节点", "2026-08-01", "未开始", "", ""]),
         ):
             with self.assertRaises(Exception) as rejected:
                 self.service.preview_import(self.admin, 1, f"{label}.xlsx", make_xlsx(headers, [cells]))

@@ -14,7 +14,7 @@ from test_secure_foundation import create_legacy_database
 class CollaborationTests(unittest.TestCase):
     def setUp(self):
         self.root=tempfile.TemporaryDirectory(); self.db=Path(self.root.name)/"flowboard.db"
-        shutil.copy2(Path(__file__).parents[1]/"flowboard.db",self.db); migrate(self.db)
+        create_legacy_database(self.db); migrate(self.db, initial_password="test-password")
         self.service=FlowboardService(self.db); db=connect(self.db); self.admin=dict(db.execute("SELECT * FROM users WHERE id='u1'").fetchone()); db.close()
 
     def tearDown(self):

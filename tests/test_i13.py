@@ -1,18 +1,18 @@
 import json
 import base64
-import shutil
 import tempfile
 import unittest
 from pathlib import Path
 
 from flowboard.database import SCHEMA_VERSION, connect, migrate
 from flowboard.service import ApiError, FlowboardService
+from test_secure_foundation import create_legacy_database
 
 
 class I13BatchTests(unittest.TestCase):
     def setUp(self):
-        self.temp=tempfile.TemporaryDirectory();self.db=Path(self.temp.name)/"flowboard.db";shutil.copy2(Path(__file__).parents[1]/"flowboard.db",self.db);migrate(self.db);self.service=FlowboardService(self.db)
-        conn=connect(self.db);self.admin=dict(conn.execute("SELECT * FROM users WHERE id='u1'").fetchone());self.viewer=dict(conn.execute("SELECT * FROM users WHERE id='u3'").fetchone());conn.execute("UPDATE workspace_memberships SET role='viewer' WHERE workspace_id=1 AND user_id='u3'");conn.commit();conn.close()
+        self.temp=tempfile.TemporaryDirectory();self.db=Path(self.temp.name)/"flowboard.db";create_legacy_database(self.db);migrate(self.db,initial_password="test-password");self.service=FlowboardService(self.db)
+        conn=connect(self.db);self.admin=dict(conn.execute("SELECT * FROM users WHERE id='u1'").fetchone());self.viewer=dict(conn.execute("SELECT * FROM users WHERE id='u2'").fetchone());conn.execute("UPDATE workspace_memberships SET role='viewer' WHERE workspace_id=1 AND user_id='u2'");conn.commit();conn.close()
 
     def tearDown(self):self.temp.cleanup()
 

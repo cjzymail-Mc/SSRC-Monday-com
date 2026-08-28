@@ -38,19 +38,20 @@ class TimelineTagOrderServiceTests(unittest.TestCase):
     def project(self, user, name):
         return self.service.create_project(user, 1, {"name": name})["project_id"]
 
-    def test_v17_and_v18_migrations_are_additive_and_healthy(self):
+    def test_v17_to_v19_migrations_are_additive_and_healthy(self):
         conn = connect(self.db)
         tables = {row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
         self.assertTrue({"timeline_tags", "timeline_project_tags", "timeline_order_contexts", "timeline_order_items"} <= tables)
         self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], SCHEMA_VERSION)
         self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=17").fetchone()[0], "flowboard-schema-v17")
         self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=18").fetchone()[0], "flowboard-schema-v18")
+        self.assertEqual(conn.execute("SELECT checksum FROM schema_migrations WHERE version=19").fetchone()[0], "flowboard-schema-v19")
         self.assertTrue({"archived_at", "archived_by"} <= {row["name"] for row in conn.execute("PRAGMA table_info(timeline_projects)")})
         self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(), [])
         self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0], "ok")
         conn.close()
 
-    def test_v16_to_v18_preserves_existing_timeline_rows_and_is_idempotent(self):
+    def test_v16_to_latest_preserves_existing_timeline_rows_and_is_idempotent(self):
         legacy = Path(self.temp.name) / "v16-shape.db"
         migrate(legacy, initial_password="test-password")
         conn = connect(legacy)
@@ -60,19 +61,47 @@ class TimelineTagOrderServiceTests(unittest.TestCase):
         conn.execute("DROP TABLE timeline_tags")
         conn.execute("DELETE FROM schema_migrations WHERE version=17")
         conn.execute("DELETE FROM schema_migrations WHERE version=18")
+        conn.execute("DELETE FROM schema_migrations WHERE version=19")
         now = "2026-08-24T00:00:00+00:00"
         conn.execute("INSERT INTO timeline_projects(workspace_id,name,created_by,created_at,updated_at) VALUES (1,'v16 存量','u1',?,?)", (now, now))
         conn.execute("PRAGMA user_version=16")
         conn.commit(); conn.close()
         backup = migrate(legacy)
-        self.assertIn("-pre-v18-", Path(backup).name)
+        self.assertIn(f"-pre-v{SCHEMA_VERSION}-", Path(backup).name)
         self.assertIsNone(migrate(legacy))
         conn = connect(legacy)
         self.assertEqual(conn.execute("SELECT COUNT(*) FROM timeline_projects WHERE name='v16 存量'").fetchone()[0], 1)
         self.assertEqual(conn.execute("SELECT COUNT(*) FROM schema_migrations WHERE version=17").fetchone()[0], 1)
         self.assertEqual(conn.execute("SELECT COUNT(*) FROM schema_migrations WHERE version=18").fetchone()[0], 1)
-        self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 18)
+        self.assertEqual(conn.execute("SELECT COUNT(*) FROM schema_migrations WHERE version=19").fetchone()[0], 1)
+        self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], SCHEMA_VERSION)
         self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(), [])
+        conn.close()
+
+    def test_v19_rejects_existing_case_insensitive_duplicates_without_partial_migration(self):
+        legacy = Path(self.temp.name) / "v18-case-conflict.db"
+        migrate(legacy, initial_password="test-password")
+        conn = connect(legacy)
+        conn.execute("DROP INDEX idx_timeline_projects_active_name")
+        conn.execute(
+            """CREATE UNIQUE INDEX idx_timeline_projects_active_name
+               ON timeline_projects(workspace_id,name) WHERE deleted_at IS NULL"""
+        )
+        conn.execute("DELETE FROM schema_migrations WHERE version=19")
+        now = "2026-08-28T00:00:00+00:00"
+        conn.execute("INSERT INTO timeline_projects(workspace_id,name,created_by,created_at,updated_at) VALUES (1,'Mc Prj 01','u1',?,?)", (now, now))
+        conn.execute("INSERT INTO timeline_projects(workspace_id,name,created_by,created_at,updated_at) VALUES (1,'mc prj 01','u1',?,?)", (now, now))
+        conn.execute("PRAGMA user_version=18")
+        conn.commit(); conn.close()
+
+        with self.assertRaisesRegex(RuntimeError, "case-insensitive active timeline project name conflict"):
+            migrate(legacy)
+
+        conn = connect(legacy)
+        self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], 18)
+        self.assertEqual(conn.execute("SELECT COUNT(*) FROM schema_migrations WHERE version=19").fetchone()[0], 0)
+        self.assertEqual(conn.execute("SELECT COUNT(*) FROM timeline_projects WHERE deleted_at IS NULL").fetchone()[0], 2)
+        self.assertEqual(conn.execute("PRAGMA integrity_check").fetchone()[0], "ok")
         conn.close()
 
     def test_shared_tag_permissions_membership_and_soft_delete(self):
