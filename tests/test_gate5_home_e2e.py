@@ -355,7 +355,7 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertEqual(batch_requests, [], "拖动期间保持零网络")
         page.mouse.up()
 
-        actions = card.locator('.timeline-dashboard-actions')
+        actions = page.locator('[data-single-dashboard-draft-actions]')
         actions.wait_for()
         self.assertEqual(actions.locator('button').all_inner_texts(), ['放弃', '更新 1'])
         self.assertEqual(actions.locator('[data-dashboard-undo]').count(), 0)
@@ -381,7 +381,7 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertEqual(card.locator('.timeline-dashboard-node[data-node-id="1"]').get_attribute("data-node-date"), moved)
 
         with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith("/timeline/batches")) as saved:
-            self.physical_click(page, card.locator(f'[data-dashboard-submit="{project_id}"]'))
+            self.physical_click(page, actions.locator(f'[data-dashboard-submit="{project_id}"]'))
         self.assertEqual(saved.value.status, 200)
         actions.wait_for(state="detached")
         self.assertEqual(len(batch_requests), 1)
