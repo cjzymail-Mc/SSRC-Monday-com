@@ -56,13 +56,13 @@ schema v7 为普通任务增加同看板父子关系与兄弟顺序，并用独�
 
 ## 启动
 
-门 5 本机体验建议直接双击仓库根目录的 `start-gate5-trial.cmd`，或在 PowerShell 中执行：
+正式使用时直接双击仓库根目录的 `start-flowboard.cmd`，或在 PowerShell 中执行：
 
 ```powershell
-.\start-gate5-trial.cmd
+.\start-flowboard.cmd
 ```
 
-启动器会在 `%TEMP%\flowboard-gate5-trial` 创建并复用隔离数据库、附件目录和备份目录，不修改仓库中的真实 `flowboard.db`。停止服务后再次启动会保留上次体验数据。
+启动器使用仓库根目录的真实 `flowboard.db`、`flowboard-attachments` 和 `backups`，监听局域网端口 `8080`。同事使用期间需保持启动窗口运行；按 `Ctrl+C` 可停止服务。
 
 ## I11 评论协作、提及、附件与订阅
 
