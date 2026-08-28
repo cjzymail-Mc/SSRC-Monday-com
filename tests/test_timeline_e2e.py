@@ -1126,6 +1126,14 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(guide_label.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(255, 255, 255, 0.97)")
         self.assertIn(guide_label.get_attribute("data-placement"), ("above-left", "above-right", "below-left", "below-right"))
 
+        visible_node = page.locator(f'[data-dashboard-project="{project_id}"] .timeline-dashboard-node').first
+        visible_node.hover()
+        guide.wait_for(state="hidden")
+        self.assertTrue(guide_label.is_hidden(), "node tooltip owns hover feedback, so the moving date label must retreat")
+        page.mouse.move(insert_x, insert_y)
+        guide.wait_for(state="visible")
+        self.assertEqual(guide.locator("b").inner_text(), inserted_date)
+
         page.mouse.down(button="right"); page.mouse.up(button="right")
         insert_menu = page.locator('[data-dashboard-insert-menu]')
         insert_menu.wait_for(state="visible")
@@ -2108,11 +2116,40 @@ class TimelineProductionE2E(unittest.TestCase):
         context, page = self.login("u1")
         page.locator("#timelineTagsBtn").click()
         self.assertEqual(page.locator('.timeline-shell>header, #timelineClose').count(), 0)
-        page.locator('[data-tag-create] input[name="name"]').fill("喜爱")
+        page.locator('[data-tag-create-open]').click()
+        page.locator('[data-timeline-tag-create] input[name="name"]').fill("喜爱")
         with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith("/timeline/tags")) as created:
-            page.locator('[data-tag-create] button[type="submit"]').click()
+            page.locator('[data-timeline-tag-create] button[type="submit"]').click()
         self.assertEqual(created.value.status, 201)
         page.locator('.tl-tag-workbench h2', has_text="喜爱").wait_for()
+
+        active_row = page.locator('.tl-tag-row.active')
+        active_row.hover()
+        active_row.locator('[data-tag-rename-open]').click()
+        active_row.locator('[data-tag-rename-form] input[name="name"]').fill("喜爱更新")
+        with page.expect_response(lambda response: response.request.method == "PATCH" and "/timeline/tags/" in response.url) as renamed:
+            active_row.locator('[data-tag-rename-form] button[type="submit"]').click()
+        self.assertEqual(renamed.value.status, 200)
+        page.locator('.tl-tag-workbench h2', has_text="喜爱更新").wait_for()
+
+        page.locator('[data-tag-create-open]').click()
+        page.locator('[data-timeline-tag-create] input[name="name"]').fill("临时删除")
+        with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith("/timeline/tags")) as temporary:
+            page.locator('[data-timeline-tag-create] button[type="submit"]').click()
+        self.assertEqual(temporary.value.status, 201)
+        page.locator('.tl-tag-workbench h2', has_text="临时删除").wait_for()
+        active_row = page.locator('.tl-tag-row.active')
+        active_row.hover()
+        delete_open = active_row.locator('[data-tag-delete-open]')
+        delete_style = delete_open.evaluate("node => ({size: parseFloat(getComputedStyle(node).fontSize), weight: Number(getComputedStyle(node).fontWeight)})")
+        self.assertGreaterEqual(delete_style["size"], 20)
+        self.assertGreaterEqual(delete_style["weight"], 800)
+        delete_open.click()
+        with page.expect_response(lambda response: response.request.method == "DELETE" and "/timeline/tags/" in response.url) as deleted:
+            active_row.locator('[data-tag-delete]').click()
+        self.assertEqual(deleted.value.status, 200)
+        page.locator('.tl-tag-workbench h2', has_text="喜爱更新").wait_for()
+
         source = page.locator(f'[data-tag-project="{project_ids[0]}"]')
         target = page.locator('[data-tag-drop="included"]')
         with page.expect_response(lambda response: response.request.method == "PUT" and "/timeline/tags/" in response.url and "/projects/" in response.url) as added:
