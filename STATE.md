@@ -1,6 +1,6 @@
 # STATE.md — 项目状态 / 变更日志 / 近期决定
 
-> 最后更新：2026-08-26（feature01 原 v16 为 `WAIT_GATE5_HUMAN`；标签与用户排序 v17 为 `TAG_INCREMENT_WAIT_HUMAN`；全项目组合画布为 `PORTFOLIO_CANVAS_WAIT_HUMAN`；手工归档与最新画布显示增量为 `ARCHIVE_VIEW_WAIT_HUMAN`）
+> 最后更新：2026-08-28（feature01 原 v16 为 `WAIT_GATE5_HUMAN`；标签与用户排序 v17 为 `TAG_INCREMENT_WAIT_HUMAN`；全项目组合画布为 `PORTFOLIO_CANVAS_WAIT_HUMAN`；手工归档与最新画布显示增量为 `ARCHIVE_VIEW_WAIT_HUMAN`）
 > **与契约的分工**：`feature-00-build-up/PROJECT_MAINLINE.md` = 冻结主线（不可变契约，只在用户调整产品方向时改）；本文件 = 会演进的项目状态。
 > **产品**：Flowboard — 面向约 15 人团队的局域网自托管协作看板（monday.com 子集）。
 > **权威范围**：feature01 原 v16 门 4 以 `feature-01-项目时间管理-仪表盘/9-GATE3_TECH_FREEZE.md` 为冻结契约；标签与用户排序 v17 以 `13-TAG_ORDER_TECH_FREEZE.md` 为增量契约；全项目组合画布以 `14-PORTFOLIO_CANVAS_TECH_FREEZE.md` 为增量契约；手工归档与最新画布显示以 `15-MANUAL_ARCHIVE_AND_TIMELINE_VIEW_TECH_FREEZE.md` 为增量契约；2026-08-26 当前 UI 覆盖以 `mainline-feature01.md` §7.1 为准。原主线终签与 Gate 5 交接仍以 `team-progress/planner-report-B005-CP6.md`、`team-progress/B-005-WAIT_GATE5_HUMAN.md` 为准。
@@ -83,6 +83,7 @@
 
 ## 3. 近期决定
 
+- **2026-08-28 ｜ 初学者 Git 协作 Skill（用户拍板）｜** 新增仓库级显式 Skill `$sync-main` 与 `$submit-fix-pr`：前者在新一轮工作前安全切回并快进同步 `origin/main`，遇到脏工作区或本地主线独有提交则停下保护；后者兼容修复已发生在本地 `main` 的现场，先搬到临时 `fix/*`，再 rebase、全量测试，经外部写入确认后 push 并创建 PR。两者均不自动 merge、部署或破坏性清理分支。
 - **2026-08-26 ｜ 主动巡检 AUD-01/02（用户授权）｜** 先修复全项目滚轮缩放锚点日期漂移与提交后红色撤销无键盘路径；AUD-03 窄屏导航未获授权，继续待审核。
 - **2026-08-26 ｜ feature01 体验覆盖（用户拍板）｜** 侧栏收起按钮恒定在视口中线；归档只能前往单项目仪表盘执行，全项目行与时间表编辑器不提供入口；操作条只有草稿或当前会话撤销时生成，其中全项目提交后默认收起、项目列 hover 显示红色撤销；项目列滚轮上下滚动，右侧画布滚轮缩放。
 - **2026-08-25 ｜ 体验决策证据升级（用户拍板）｜** 权限、数据语义、规则和并发等逻辑项仍可用文字问卷；布局、可见性、密度、手势、视角记忆和整体手感不得只凭 Markdown 冻结，须使用代表性数据下的可交互原型、隔离试用或等价动态证据。纯展示微调可先专项验证并在验收轮收尾集中全量回归，结构/交互/数据/API/权限/迁移仍按风险即时扩大验证。
@@ -109,6 +110,7 @@
 | `tests/` | 测试 | 第一阶段回归 + feature01 service / HTTP / Chromium / Node 测试 |
 | `backups/` | 迁移与运维备份 | `flowboard-pre-vN-*` 历史快照，勿手删 |
 | `mc-plan/` | 规划产物 | 阶段决策记录（如阶段完工与下阶段计划） |
+| `.agents/skills/` | **仓库级协作 Skill** | 显式调用的 `$sync-main` / `$submit-fix-pr`；保护本地工作、同步主线、验证修复并提交人工审核 PR |
 | `.claude/` | 记忆层 | `auto-memory/` 用户偏好（每会话加载）+ `memory/` 技术细节（按需读），各自 MEMORY.md 索引；由 `/mc-update` 流程维护 |
 | `.codex/memory-inbox/` | **Codex 记忆提案与审计** | schema v2 `proposed` 提案、审核及应用轨迹；不是正式记忆，Codex 不直接写 `.claude/` |
 | `flowboard.db` | 运行库 | schema v18；2026-08-25 已按用户授权备份迁移，当前时间项目为 0；**只读操作可直接做，禁止未经授权 purge/restore/重建** |

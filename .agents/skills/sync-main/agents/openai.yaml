@@ -1,0 +1,6 @@
+interface:
+  display_name: "同步主线"
+  short_description: "安全切回并同步最新的 origin/main"
+  default_prompt: "Use $sync-main to safely return this checkout to a clean, current origin/main before new work."
+policy:
+  allow_implicit_invocation: false
