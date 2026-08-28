@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Flowboard｜项目拖拽排序动画效果对照</title>
+  <style>
+    :root{
+      --ink:#17233c;--muted:#69758c;--line:#dfe5ef;--soft:#f4f6f9;--navy:#263f68;
+      --blue:#2457c5;--blue-soft:#eef4ff;--red:#ef4954;--orange:#d98900;--green:#0aa77f;
+      --meta:286px;--row-h:68px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:#f2f4f7;color:var(--ink);font-family:"Segoe UI","Microsoft YaHei",sans-serif}
+    button{font:inherit}
+    .page{width:min(1460px,calc(100% - 32px));margin:24px auto 48px}
+    .intro{display:flex;align-items:flex-start;justify-content:space-between;gap:32px;margin-bottom:18px;padding:24px 28px;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 10px 35px rgba(35,51,78,.05)}
+    .eyebrow{margin:0 0 7px;color:#7b88a1;font-size:12px;font-weight:700;letter-spacing:.14em}
+    h1{margin:0;font-size:25px;letter-spacing:-.02em}
+    .intro p:last-child{margin:9px 0 0;color:var(--muted);font-size:13px;line-height:1.65}
+    .decision{flex:0 0 310px;border-left:3px solid var(--blue);padding:4px 0 4px 15px;color:#526078;font-size:12px;line-height:1.7}
+    .decision b{display:block;color:var(--blue);font-size:13px}
+    .option-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px}
+    .option-tab{position:relative;min-height:82px;border:1px solid #d8dfeb;border-radius:12px;background:#fff;padding:13px 14px;text-align:left;color:#526078;cursor:pointer;transition:border-color .18s,box-shadow .18s,transform .18s}
+    .option-tab:hover{transform:translateY(-1px);border-color:#9bb4e9;box-shadow:0 8px 22px rgba(40,72,130,.08)}
+    .option-tab.active{border-color:#6f91df;background:#f8faff;box-shadow:0 0 0 2px rgba(74,116,211,.12)}
+    .option-tab b{display:block;margin-bottom:5px;color:var(--ink);font-size:14px}
+    .option-tab small{display:block;font-size:11px;line-height:1.5}
+    .option-tab .mark{position:absolute;right:10px;top:10px;border-radius:99px;background:#e8efff;padding:3px 7px;color:var(--blue);font-size:9px;font-weight:800}
+    .board{overflow:hidden;border:1px solid #d9e0ea;border-radius:14px;background:#fff;box-shadow:0 12px 38px rgba(31,45,70,.07)}
+    .board-head{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 16px 13px;border-bottom:1px solid var(--line)}
+    .board-title{display:flex;align-items:center;gap:10px}
+    .board-title b{font-size:15px}
+    .mode-chip{border-radius:99px;background:var(--blue-soft);padding:4px 8px;color:var(--blue);font-size:10px;font-weight:800}
+    .board-actions{display:flex;gap:8px}
+    .board-actions button{border:1px solid #d4dce8;border-radius:7px;background:#fff;padding:7px 11px;color:#3c4a62;font-size:12px;font-weight:650;cursor:pointer}
+    .board-actions button.primary{border-color:#214db0;background:#214db0;color:#fff}
+    .board-actions button:hover{filter:brightness(.98)}
+    .motion-note{display:grid;grid-template-columns:90px 1fr 160px;align-items:center;gap:12px;min-height:43px;padding:8px 16px;border-bottom:1px solid var(--line);background:#fbfcfe;color:#66738a;font-size:11px}
+    .motion-note strong{color:#293a58}
+    .motion-meter{height:5px;overflow:hidden;border-radius:5px;background:#e4e9f1}
+    .motion-meter i{display:block;width:45%;height:100%;border-radius:inherit;background:#5e83db;transition:width .2s}
+    .axis{display:grid;grid-template-columns:var(--meta) 1fr;height:96px;border-bottom:1px solid var(--line)}
+    .axis-label{display:flex;align-items:center;padding:0 18px;border-right:1px solid var(--line);font-size:13px;font-weight:800}
+    .calendar{position:relative;overflow:hidden;background:#fff}
+    .year{height:27px;background:var(--navy);padding:6px 12px;color:#fff;font-size:10px;font-weight:800}
+    .months{display:grid;grid-template-columns:repeat(6,1fr);height:42px}
+    .month{border-right:3px solid #7395de;background:#e9eff8;padding:8px 9px;color:#214a85;font-size:16px;font-weight:800}
+    .month small{margin-left:4px;font-size:8px;vertical-align:5px}
+    .days{display:grid;grid-template-columns:repeat(12,1fr);height:27px}
+    .days span{display:grid;place-items:center;border-right:1px solid #e2e7ef;color:#69758b;font-size:8px}
+    .today{position:absolute;z-index:3;left:55%;top:0;bottom:0;width:1px;background:var(--red)}
+    .today::before{content:"今天 2026-08-27";position:absolute;right:-38px;top:2px;width:max-content;background:#fff;color:var(--red);font-size:9px;font-weight:800}
+    .list{position:relative;min-height:calc(var(--row-h) * 6);background:#f7f8fa;isolation:isolate}
+    .project-row{position:relative;display:grid;grid-template-columns:var(--meta) 1fr;height:var(--row-h);background:#f7f8fa;touch-action:none;user-select:none;will-change:transform}
+    .project-row+.project-row{border-top:6px solid #edf1f5}
+    .project-meta{position:relative;z-index:4;display:flex;align-items:center;gap:10px;border-right:1px solid #d8e0eb;background:#fff;padding:0 13px;cursor:grab}
+    .project-meta:active{cursor:grabbing}
+    .grip{display:grid;place-items:center;width:21px;height:34px;flex:none;border:0;background:transparent;color:#8ea0bc;font-size:16px;line-height:.7;cursor:grab}
+    .copy{min-width:0;flex:1}
+    .copy strong{display:block;overflow:hidden;font-size:13px;text-overflow:ellipsis;white-space:nowrap}
+    .copy small{display:block;margin-top:4px;color:#7a869a;font-size:9px}
+    .risk{display:grid;place-items:center;width:13px;height:13px;flex:none;border:1px solid #ffbac0;border-radius:50%}
+    .risk::after{content:"";width:6px;height:6px;border-radius:50%;background:#f2525f}
+    .lane{position:relative;overflow:hidden;background:#f8f9fb}
+    .lane::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(8.333% - 1px),rgba(214,221,232,.38) calc(8.333% - 1px),rgba(214,221,232,.38) 8.333%)}
+    .track{position:absolute;left:var(--start);right:calc(100% - var(--end));top:28px;height:7px;border-radius:5px;background:var(--color);opacity:.92}
+    .track::before,.track::after{content:"";position:absolute;top:50%;width:13px;height:13px;border:2px solid #fff;border-radius:50%;background:var(--color);box-shadow:0 1px 5px rgba(31,45,70,.22);transform:translate(-50%,-50%)}
+    .track::before{left:0}.track::after{left:100%}
+    .track.parallel{top:45px;height:3px;opacity:.55}
+    .track.parallel::before,.track.parallel::after{width:7px;height:7px}
+    .drag-source{z-index:2}
+    .drag-source .project-meta,.drag-source .lane{transition:opacity .12s,background .12s}
+    .drag-float{position:fixed;z-index:1000;margin:0!important;border:1px solid #aebed7!important;border-radius:8px;background:#fff!important;pointer-events:none;overflow:hidden;transform-origin:center;will-change:top,transform;box-shadow:0 16px 36px rgba(26,44,75,.22)}
+    .drag-float .project-meta{border-right:1px solid #d4ddeb}
+    .drag-float .lane{background:#fff}
+    .landing{z-index:5}
+    .landing .project-meta::after{content:"";position:absolute;inset:3px;border:1px solid rgba(52,98,200,.36);border-radius:6px;pointer-events:none;animation:landing-ring .55s ease-out both}
+    @keyframes landing-ring{0%{opacity:0;transform:scale(.96)}30%{opacity:1}100%{opacity:0;transform:scale(1.015)}}
+
+    /* A：克制平移 */
+    .board[data-motion="calm"] .drag-source .project-meta,.board[data-motion="calm"] .drag-source .lane{opacity:.22}
+    .board[data-motion="calm"] .drag-float{transform:scale(1.012);box-shadow:0 12px 30px rgba(31,57,99,.20)}
+
+    /* B：弹性卡片 */
+    .board[data-motion="spring"] .drag-source .project-meta,.board[data-motion="spring"] .drag-source .lane{opacity:.12}
+    .board[data-motion="spring"] .drag-float{transform:scale(1.035) rotate(.25deg);box-shadow:0 22px 52px rgba(28,53,95,.28)}
+    .board[data-motion="spring"] .landing{animation:spring-land .48s cubic-bezier(.18,.84,.32,1.25)}
+    @keyframes spring-land{0%{transform:scale(.975)}45%{transform:scale(1.012)}72%{transform:scale(.994)}100%{transform:scale(1)}}
+
+    /* C：插入线 */
+    .board[data-motion="line"] .drag-source .project-meta,.board[data-motion="line"] .drag-source .lane{opacity:.08}
+    .board[data-motion="line"] .drag-source::before{content:"";position:absolute;z-index:20;left:8px;right:8px;top:-4px;height:3px;border-radius:3px;background:#2a63dc;box-shadow:0 0 0 3px rgba(42,99,220,.11)}
+    .board[data-motion="line"] .drag-source::after{content:"";position:absolute;z-index:21;left:7px;top:-8px;width:10px;height:10px;border-radius:50%;background:#2a63dc}
+    .board[data-motion="line"] .drag-float{transform:scale(.995);box-shadow:0 10px 28px rgba(29,55,96,.18)}
+
+    /* D：极速轻量 */
+    .board[data-motion="quick"] .drag-source .project-meta,.board[data-motion="quick"] .drag-source .lane{opacity:.32}
+    .board[data-motion="quick"] .drag-float{transform:none;border-color:#cad3e1!important;box-shadow:0 7px 18px rgba(30,47,76,.16)}
+    .board[data-motion="quick"] .landing .project-meta::after{display:none}
+
+    .comparison{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
+    .comparison article{border:1px solid var(--line);border-radius:11px;background:#fff;padding:13px 14px}
+    .comparison b{display:block;margin-bottom:5px;font-size:12px}
+    .comparison p{margin:0;color:#6d788e;font-size:10px;line-height:1.6}
+    .comparison .recommended{border-color:#92ace7;background:#f8faff}
+    @media(max-width:900px){:root{--meta:220px}.page{width:calc(100% - 16px);margin-top:8px}.intro{display:block}.decision{margin-top:15px}.option-tabs,.comparison{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="intro">
+      <div>
+        <p class="eyebrow">FLOWBOARD · MOTION STUDY</p>
+        <h1>项目拖拽排序｜四种动画效果对照</h1>
+        <p>请拖动项目名称或左侧把手。四案只改变动态反馈，不改变个人排序、标签范围及保存逻辑。</p>
+      </div>
+      <div class="decision"><b>建议优先比较 A 与 C</b>A 更自然、接近高级工作台；C 的落点最明确，适合长项目列表。B 更有表现力，D 更追求速度。</div>
+    </section>
+
+    <nav class="option-tabs" aria-label="动画方案">
+      <button class="option-tab active" data-mode="calm"><span class="mark">推荐</span><b>A｜克制平移</b><small>邻行平滑让位，拖拽行轻抬升，落位后柔和确认。</small></button>
+      <button class="option-tab" data-mode="spring"><b>B｜弹性卡片</b><small>明显抬升与弹性回落，聚焦感最强，动画时间稍长。</small></button>
+      <button class="option-tab" data-mode="line"><b>C｜插入线定位</b><small>蓝色插入线实时指示落点，长列表操作最明确。</small></button>
+      <button class="option-tab" data-mode="quick"><b>D｜极速轻量</b><small>极短位移动画，不缩放不弹跳，适合高频连续排序。</small></button>
+    </nav>
+
+    <section class="board" data-motion="calm">
+      <header class="board-head">
+        <div class="board-title"><b>全项目仪表盘 · 排序交互实验</b><span class="mode-chip" data-mode-name>A｜克制平移</span></div>
+        <div class="board-actions"><button type="button" data-reset>恢复顺序</button><button type="button" class="primary" data-preview>▶ 自动演示</button></div>
+      </header>
+      <div class="motion-note"><strong data-motion-title>180ms 平滑让位</strong><span data-motion-copy>位置变化清晰但不过度抢眼；适合作为正式系统默认动效。</span><span class="motion-meter"><i data-meter></i></span></div>
+      <div class="axis">
+        <div class="axis-label">项目</div>
+        <div class="calendar"><div class="year">2026 年</div><div class="months"><span class="month">07<small>7月</small></span><span class="month">08<small>8月</small></span><span class="month">09<small>9月</small></span><span class="month">10<small>10月</small></span><span class="month">11<small>11月</small></span><span class="month">12<small>12月</small></span></div><div class="days"><span>7/3</span><span>7/17</span><span>8/1</span><span>8/15</span><span>9/1</span><span>9/15</span><span>10/1</span><span>10/15</span><span>11/1</span><span>11/15</span><span>12/1</span><span>12/15</span></div><i class="today"></i></div>
+      </div>
+      <div class="list" data-list>
+        <article class="project-row" data-id="1"><div class="project-meta" data-drag><button class="grip" tabindex="-1">⋮⋮</button><span class="copy"><strong>跑鞋研发 2026</strong><small>当前 测试 · 临近 10/15</small></span></div><div class="lane"><i class="track" style="--start:18%;--end:92%;--color:#4caf42"></i><i class="track parallel" style="--start:12%;--end:70%;--color:#d98900"></i></div></article>
+        <article class="project-row" data-id="2"><div class="project-meta" data-drag><button class="grip" tabindex="-1">⋮⋮</button><span class="copy"><strong>【真实表】羽速 PRO</strong><small>当前 开发 · 临近 12/31</small></span><span class="risk"></span></div><div class="lane"><i class="track" style="--start:8%;--end:84%;--color:#0aa77f"></i><i class="track parallel" style="--start:22%;--end:62%;--color:#1f4fb9"></i></div></article>
+        <article class="project-row" data-id="3"><div class="project-meta" data-drag><button class="grip" tabindex="-1">⋮⋮</button><span class="copy"><strong>【真实表】幻影4 MAX（雨林、正）</strong><small>当前 测试 · 临近 09/10</small></span><span class="risk"></span></div><div class="lane"><i class="track" style="--start:3%;--end:68%;--color:#d98900"></i><i class="track parallel" style="--start:31%;--end:79%;--color:#d98900"></i></div></article>
+        <article class="project-row" data-id="4"><div class="project-meta" data-drag><button class="grip" tabindex="-1">⋮⋮</button><span class="copy"><strong>【真实表】轻鸿 2.0(A) 明辉</strong><small>当前 测试 · 临近 08/30</small></span><span class="risk"></span></div><div class="lane"><i class="track" style="--start:20%;--end:58%;--color:#d98900"></i><i class="track parallel" style="--start:9%;--end:88%;--color:#d98900"></i></div></article>
+        <article class="project-row" data-id="5"><div class="project-meta" data-drag><button class="grip" tabindex="-1">⋮⋮</button><span class="copy"><strong>【真实表】轻鸿 2 GT(A) 庆铭</strong><small>当前 设计 · 临近 10/10</small></span></div><div class="lane"><i class="track" style="--start:16%;--end:72%;--color:#2457c5"></i><i class="track parallel" style="--start:40%;--end:91%;--color:#0aa77f"></i></div></article>
+        <article class="project-row" data-id="6"><div class="project-meta" data-drag><button class="grip" tabindex="-1">⋮⋮</button><span class="copy"><strong>匹克球鞋 庆铭</strong><small>当前 开发 · 临近 10/30</small></span></div><div class="lane"><i class="track" style="--start:29%;--end:96%;--color:#0aa77f"></i><i class="track parallel" style="--start:6%;--end:47%;--color:#2457c5"></i></div></article>
+      </div>
+    </section>
+
+    <section class="comparison">
+      <article class="recommended"><b>A｜推荐默认</b><p>高级、稳定、不会让密集时间轴显得跳动；兼顾确认感与效率。</p></article>
+      <article><b>B｜强调聚焦</b><p>最能体现“抓起一张项目卡”，但连续多次排序时动感稍强。</p></article>
+      <article><b>C｜推荐长列表</b><p>插入目标最明确，适合项目很多或行高较小的全项目仪表盘。</p></article>
+      <article><b>D｜高频效率</b><p>反馈最克制、完成最快，但落位确认感也最弱。</p></article>
+    </section>
+  </main>
+
+  <script>
+    (()=>{
+      const board=document.querySelector('.board'),list=document.querySelector('[data-list]');
+      const names={calm:'A｜克制平移',spring:'B｜弹性卡片',line:'C｜插入线定位',quick:'D｜极速轻量'};
+      const specs={
+        calm:{duration:180,easing:'cubic-bezier(.2,.75,.25,1)',title:'180ms 平滑让位',copy:'位置变化清晰但不过度抢眼；适合作为正式系统默认动效。',meter:'45%'},
+        spring:{duration:360,easing:'cubic-bezier(.18,.9,.25,1.18)',title:'360ms 弹性让位',copy:'拖拽行明显抬升，邻行带轻微弹性，落下时产生卡片回弹。',meter:'88%'},
+        line:{duration:130,easing:'cubic-bezier(.25,.7,.35,1)',title:'130ms 插入定位',copy:'以持续可见的插入线标记目标，移动快速，视觉判断最直接。',meter:'32%'},
+        quick:{duration:90,easing:'linear',title:'90ms 极速换位',copy:'只保留必要位移，不做缩放和弹跳，适合高频整理项目。',meter:'20%'}
+      };
+      const initial=[...list.children].map(row=>row.dataset.id);
+      let active=null,previewing=false;
+
+      function spec(){return specs[board.dataset.motion]}
+      function rows(){return [...list.querySelectorAll('.project-row')]}
+      function capture(){return new Map(rows().map(row=>[row,row.getBoundingClientRect()]))}
+      function flip(before,exclude=null){
+        const motion=spec();
+        rows().forEach(row=>{
+          if(row===exclude)return;
+          const old=before.get(row),next=row.getBoundingClientRect();
+          if(!old)return;
+          const dy=old.top-next.top;
+          if(Math.abs(dy)>.5)row.animate([{transform:`translateY(${dy}px)`},{transform:'translateY(0)'}],{duration:motion.duration,easing:motion.easing});
+        });
+      }
+      function land(row){
+        row.classList.remove('landing');
+        void row.offsetWidth;
+        row.classList.add('landing');
+        setTimeout(()=>row.classList.remove('landing'),650);
+      }
+      function reorder(row,beforeNode){
+        const before=capture();
+        if(beforeNode)list.insertBefore(row,beforeNode);else list.appendChild(row);
+        flip(before,row);
+      }
+      function reset(animate=true){
+        const before=capture();
+        initial.forEach(id=>list.appendChild(list.querySelector(`[data-id="${id}"]`)));
+        if(animate)flip(before);
+      }
+      function setMode(mode){
+        if(active)finishDrag(false);
+        board.dataset.motion=mode;
+        document.querySelectorAll('[data-mode]').forEach(button=>button.classList.toggle('active',button.dataset.mode===mode));
+        document.querySelector('[data-mode-name]').textContent=names[mode];
+        document.querySelector('[data-motion-title]').textContent=spec().title;
+        document.querySelector('[data-motion-copy]').textContent=spec().copy;
+        document.querySelector('[data-meter]').style.width=spec().meter;
+        reset(false);
+      }
+      function makeFloat(row,rect){
+        const clone=row.cloneNode(true);
+        clone.classList.add('drag-float');
+        clone.removeAttribute('data-id');
+        Object.assign(clone.style,{left:`${rect.left}px`,top:`${rect.top}px`,width:`${rect.width}px`,height:`${rect.height}px`});
+        document.body.appendChild(clone);
+        return clone;
+      }
+      function beginDrag(event,row){
+        if(previewing||event.button!==0)return;
+        event.preventDefault();
+        const rect=row.getBoundingClientRect(),float=makeFloat(row,rect);
+        active={row,float,startY:event.clientY,offsetY:event.clientY-rect.top,lastY:event.clientY};
+        row.classList.add('drag-source');
+        document.body.style.cursor='grabbing';
+        window.addEventListener('pointermove',dragMove,{passive:false});
+        window.addEventListener('pointerup',()=>finishDrag(true),{once:true});
+        window.addEventListener('pointercancel',()=>finishDrag(true),{once:true});
+      }
+      function dragMove(event){
+        if(!active)return;
+        event.preventDefault();
+        active.lastY=event.clientY;
+        active.float.style.top=`${event.clientY-active.offsetY}px`;
+        const others=rows().filter(row=>row!==active.row);
+        let beforeNode=null;
+        for(const row of others){if(event.clientY<row.getBoundingClientRect().top+row.offsetHeight/2){beforeNode=row;break}}
+        const currentNext=active.row.nextElementSibling;
+        if(beforeNode!==currentNext&&beforeNode!==active.row)reorder(active.row,beforeNode);
+        else if(!beforeNode&&currentNext)reorder(active.row,null);
+      }
+      function finishDrag(animate){
+        if(!active)return;
+        const {row,float}=active,target=row.getBoundingClientRect(),from=float.getBoundingClientRect();
+        active=null;
+        window.removeEventListener('pointermove',dragMove);
+        document.body.style.cursor='';
+        const done=()=>{float.remove();row.classList.remove('drag-source');land(row)};
+        if(!animate){done();return}
+        const motion=spec(),dx=target.left-from.left,dy=target.top-from.top;
+        const frames=board.dataset.motion==='spring'
+          ?[{transform:'scale(1.035) rotate(.25deg)'},{transform:`translate(${dx}px,${dy}px) scale(.985)`,offset:.76},{transform:`translate(${dx}px,${dy}px) scale(1)`}]
+          :[{transform:getComputedStyle(float).transform==='none'?'none':getComputedStyle(float).transform},{transform:`translate(${dx}px,${dy}px) scale(1)`}];
+        const animation=float.animate(frames,{duration:Math.max(120,motion.duration),easing:motion.easing,fill:'forwards'});
+        animation.onfinish=done;animation.oncancel=done;
+      }
+      async function preview(){
+        if(previewing||active)return;
+        previewing=true;reset(false);
+        const row=list.querySelector('[data-id="2"]'),target=list.querySelector('[data-id="5"]'),start=row.getBoundingClientRect(),float=makeFloat(row,start);
+        row.classList.add('drag-source');
+        await float.animate([{transform:'translateY(0)'},{transform:`translateY(${target.getBoundingClientRect().top-start.top+10}px)`}],{duration:620,easing:'cubic-bezier(.25,.7,.25,1)',fill:'forwards'}).finished;
+        const before=capture();list.insertBefore(row,target.nextElementSibling);flip(before,row);
+        const end=row.getBoundingClientRect(),current=float.getBoundingClientRect(),motion=spec();
+        await float.animate([{transform:getComputedStyle(float).transform},{transform:`translate(${end.left-current.left}px,${end.top-current.top}px) scale(1)`}],{duration:Math.max(150,motion.duration),easing:motion.easing,fill:'forwards'}).finished;
+        float.remove();row.classList.remove('drag-source');land(row);previewing=false;
+      }
+
+      document.querySelectorAll('[data-mode]').forEach(button=>button.addEventListener('click',()=>setMode(button.dataset.mode)));
+      list.addEventListener('pointerdown',event=>{const handle=event.target.closest('[data-drag]');if(handle)beginDrag(event,handle.closest('.project-row'))});
+      document.querySelector('[data-reset]').addEventListener('click',()=>reset(true));
+      document.querySelector('[data-preview]').addEventListener('click',preview);
+    })();
+  </script>
+</body>
+</html>
