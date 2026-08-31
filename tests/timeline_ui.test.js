@@ -12,6 +12,8 @@ const project={project_id:1,name:'项目 A',version:1,metrics:{start_date:'2026-
 ]};
 const bounds=Timeline.bounds([project]);ok(bounds.min==='2026-08-01'&&bounds.max==='2026-08-10','bounds use both tracks');
 const html=Timeline.renderSingle(project,{today:'2026-08-04'});ok(html.includes('data-dashboard-project="1"')&&html.includes('主线')&&html.includes('并行')&&html.includes('<div class="timeline-portfolio-axis-label"></div>'),'single project renders both tracks without the redundant axis heading');
+ok(html.includes('class="back" data-timeline-mode-target="home"')&&html.includes('class="timeline-back-arrow"')&&html.includes('class="timeline-back-label">我的工作'),'ordinary single-project entry renders the animated My Work back button');
+const allOriginSingle=Timeline.renderSingle(project,{today:'2026-08-04',backMode:'all'});ok(allOriginSingle.includes('class="back" data-timeline-mode-target="all"')&&allOriginSingle.includes('class="timeline-back-label">返回'),'all-dashboard entry renders an animated Return button targeting the portfolio');
 ok(html.includes('data-timeline-rename-start="1"')&&html.includes('class="timeline-project-rename-pencil"')&&html.includes('data-project-rename-form="1"')&&html.includes('data-project-rename-scope="single"'),'editable single dashboard renders a hover pencil and an inline rename form');
 ok(!Timeline.renderSingle(project,{today:'2026-08-04',editable:false}).includes('data-timeline-rename-start'),'read-only single dashboard does not expose project rename controls');
 ok(!html.includes('data-dashboard-submit')&&!html.includes('data-dashboard-discard')&&!html.includes('data-dashboard-undo'),'single dashboard omits the draft action bar before any local change');
@@ -23,12 +25,22 @@ ok(Timeline.stageClass('量产')==='stage-production','stage class maps semantic
 ok([['创意','idea'],['设计','design'],['开发','develop'],['测试','test'],['量产','production'],['应用迭代','iteration']].every(([stage,token])=>Timeline.stageClass(stage)===`stage-${token}`),'all frozen stages map to stable semantic classes');
 ok(html.includes('data-e-calendar aria-hidden="true"></div>')&&html.includes('今天 2026-08-04')&&!html.includes('共享绝对日历'),'single dashboard keeps a blank calendar spacer with the today label');
 ok(!html.includes('PROJECT · 时间管理')&&!html.includes('timeline-summary')&&!html.includes('timeline-single-caption')&&!html.includes('审计 · 预留')&&!html.includes('data-timeline-mode-target="all"')&&!html.includes('阶段分界 ) 形')&&!html.includes('右键节点选择拖拽模式'),'single dashboard removes every user-marked redundant label and the default footer instruction');
-ok(html.includes('data-row-index="1"')&&html.includes('data-overlap-split="true"')&&html.includes('展开重叠'),'collapsed overlap uses server row_index and offers expansion');
-ok(html.includes('data-stage="设计"')&&html.includes('class="timeline-stage stage-design')&&html.includes('aria-label="阶段 设计'),'stage interval carries matching data, class and redundant label');
-const expanded=Timeline.renderSingle(project,{today:'2026-08-04',expanded:new Set(['1:main'])});
+const overlapProject={...project,nodes:[...project.nodes,{id:4,track:'main',stage:'开发',name:'联调',date:'2026-08-08'}],segments:[
+  {start_node_id:1,end_node_id:2},{start_node_id:2,end_node_id:4}
+],stage_intervals:[
+  {track:'main',stage:'创意',start_date:'2026-08-01',end_date:'2026-08-05',row_index:0,node_ids:[1]},
+  {track:'main',stage:'设计',start_date:'2026-08-05',end_date:'2026-08-08',row_index:1,node_ids:[2]},
+  {track:'parallel',stage:'测试',start_date:'2026-08-10',end_date:'2026-08-10',row_index:0,node_ids:[3]}
+]};
+const overlapHtml=Timeline.renderSingle(overlapProject,{today:'2026-08-04'});
+ok(overlapHtml.includes('data-row-index="1"')&&overlapHtml.includes('data-overlap-split="true"')&&overlapHtml.includes('展开重叠'),'collapsed overlap uses server row_index and offers expansion');
+ok(overlapHtml.includes('data-stage="设计"')&&overlapHtml.includes('class="timeline-stage stage-design')&&overlapHtml.includes('aria-label="阶段 设计'),'stage interval carries matching data, class and redundant label');
+const expanded=Timeline.renderSingle(overlapProject,{today:'2026-08-04',expanded:new Set(['1:main'])});
 ok(expanded.includes('is-expanded')&&expanded.includes('收起重叠'),'expanded overlap splits deterministic server rows');
 ok(html.indexOf('timeline-risk overdue')<html.indexOf('timeline-risk this-week')&&html.includes('逾期 2')&&html.includes('本周 3'),'risk markers are red-left orange-right with text');
 ok((html.match(/role="menuitem"/g)||[]).length===7&&html.includes('data-draft-action="remark"')&&html.includes('class="danger" role="menuitem" data-draft-action="remove"')&&html.includes('data-dashboard-insert-action'),'single dashboard exposes drag, status, remark, recoverable delete and the dedicated insert action');
+ok(html.includes('data-draft-action="single">拖拽（仅当前节点）</button>')&&html.includes('data-draft-action="cascade">拖拽（顺延）</button>'),'dashboard drag menu uses the approved exact wording');
+ok(!html.includes('data-stage-interval data-stage="测试"'),'a zero-length final stage interval renders no trailing tail');
 ok(html.includes('data-dashboard-date-guide')&&html.includes('data-dashboard-node-editor-form')&&html.includes('name="remark"'),'shared dashboard renders the hover date guide and centered node editor');
 ok(html.includes('data-dashboard-hit-target="node"')&&html.includes('aria-label="节点 概念'),'dashboard nodes expose an explicit physical hit target and redundant label');
 ok(!/class="timeline-dashboard-node[^>]*\stitle=/.test(html),'dashboard nodes avoid a duplicate native title tooltip');
@@ -36,6 +48,7 @@ ok(html.includes('data-node-tooltip-source')&&html.includes('<b>概念</b><small
 const projectB={...project,project_id:2,name:'项目 B',metrics:{...project.metrics,start_date:'2026-07-15',current_stage:'开发',upcoming:[{date:'2026-08-02'}],overdue_count:5,this_week_count:0}};
 const all=Timeline.renderAll([project,projectB],{project_ids:[2],sort_key:'overdue',today:'2026-08-04'});
 ok(all.includes('data-shared-calendar="true"')&&!all.includes('data-dashboard-project="1"')&&all.includes('data-dashboard-project="2"'),'all dashboard keeps internal project shaping on one shared chart');
+ok(all.includes('data-portfolio-view-single')&&all.includes('>在单仪表盘中查看</button>')&&all.includes('data-portfolio-undo-action disabled>撤销</button>'),'all-dashboard project-column menu always renders view and disabled undo actions');
 ok(all.includes('class="timeline-portfolio-detail">当前 开发 · 临近 2026-08-02')&&all.includes('class="timeline-portfolio-risk"')&&all.includes('<b>逾期 5</b>'),'all-dashboard project metadata renders delayed detail plus one immediate red-dot risk disclosure');
 ok(!all.includes('<strong>主线</strong>')&&!all.includes('<strong>并行</strong>')&&!all.includes('<span>主线 / 并行</span>')&&all.includes('timeline-track-label is-portfolio-label'),'all dashboard removes repeated track words while preserving the two semantic track containers');
 const focusedAll=Timeline.renderAll([project,projectB],{today:'2026-08-04',focusedProjectId:2});
@@ -43,11 +56,11 @@ ok(/timeline-portfolio-project is-focused[^>]+data-dashboard-project="2"/.test(f
 ok(!all.includes('data-dashboard-submit')&&!all.includes('timeline-portfolio-actions'),'all dashboard omits row actions before any local draft');
 const allDraftState=Timeline.editorState(project);allDraftState.lastBatchId=90;Timeline.moveNode(allDraftState,2,'2026-08-06','single');
 const allDraft=Timeline.renderAll([project],{today:'2026-08-04',states:new Map([[1,allDraftState]]),editable:()=>true,canArchive:()=>true});
-ok(allDraft.includes('data-dashboard-submit="1"')&&allDraft.includes('data-dashboard-discard="1"')&&allDraft.includes('timeline-portfolio-actions has-draft')&&!allDraft.includes('data-dashboard-undo="1"')&&!allDraft.includes('data-portfolio-undo-menu'),'all dashboard draft actions contain only discard and update, and pending drafts suppress prior-batch undo');
+ok(allDraft.includes('data-dashboard-submit="1"')&&allDraft.includes('data-dashboard-discard="1"')&&allDraft.includes('timeline-portfolio-actions has-draft')&&!allDraft.includes('data-dashboard-undo="1"')&&allDraft.includes('data-portfolio-undo-action disabled'),'all dashboard draft actions contain only discard and update, while its menu keeps undo visibly disabled');
 ok(!allDraft.includes('timeline-row-menu')&&!allDraft.includes('data-timeline-archive'),'all dashboard never exposes the archive row menu even when the user has archive permission');
 const allUndoState=Timeline.editorState(project);allUndoState.lastBatchId=91;
 const allUndo=Timeline.renderAll([project],{today:'2026-08-04',states:new Map([[1,allUndoState]]),editable:()=>true});
-ok(!allUndo.includes('timeline-portfolio-actions')&&allUndo.includes('data-portfolio-undo-menu hidden')&&allUndo.includes('class="danger" role="menuitem" data-portfolio-undo-action>撤销'),'submitted all-dashboard state exposes undo only through the shared project-column context menu');
+ok(!allUndo.includes('timeline-portfolio-actions')&&allUndo.includes('data-portfolio-undo-menu hidden')&&allUndo.includes('data-portfolio-view-single')&&allUndo.includes('data-portfolio-undo-action disabled>撤销'),'submitted all-dashboard state exposes both actions through the shared project-column context menu');
 const singleUndo=Timeline.renderSingle(project,{today:'2026-08-04',state:allUndoState,editable:true});
 ok(singleUndo.includes('data-canvas-profile="single"')&&!singleUndo.includes('timeline-portfolio-actions')&&singleUndo.includes('data-portfolio-undo-menu hidden'),'submitted single dashboard reuses the same project-column undo menu without persistent actions');
 const allUndoStateB=Timeline.editorState(projectB);allUndoStateB.lastBatchId=92;
@@ -55,7 +68,7 @@ const allMultiUndo=Timeline.renderAll([project,projectB],{today:'2026-08-04',sta
 ok((allMultiUndo.match(/data-portfolio-undo-menu/g)||[]).length===1&&!allMultiUndo.includes('timeline-portfolio-actions'),'multiple submitted projects still reuse one hidden undo context menu and render no persistent undo buttons');
 ok((all.match(/class="timeline-portfolio-chart"/g)||[]).length===1&&(all.match(/class="timeline-calendar"/g)||[]).length===1&&all.includes('data-e-calendar aria-hidden="true"></div>')&&(all.match(/class="timeline-today-line"/g)||[]).length===1&&all.includes('timeline-portfolio-today-label')&&!all.includes('timeline-project-card'),'all dashboard keeps one blank calendar spacer with one sticky today label and one today line');
 ok(!all.includes('红色竖线 = 今天')&&!all.includes('左键拖动时间图 = 移动画布'),'all dashboard legend removes the two redundant text instructions');
-ok((all.match(/data-timeline-context/g)||[]).length===1&&(all.match(/data-dashboard-insert-menu/g)||[]).length===1&&(all.match(/role="menuitem"/g)||[]).length===7&&all.includes('data-dashboard-insert-action'),'all dashboard reuses one node context controller and one dedicated insert menu');
+ok((all.match(/data-timeline-context/g)||[]).length===1&&(all.match(/data-dashboard-insert-menu/g)||[]).length===1&&(all.match(/role="menuitem"/g)||[]).length===9&&all.includes('data-dashboard-insert-action'),'all dashboard reuses one node context controller, one insert menu and one two-action project menu');
 ok(all.includes('data-portfolio-cancel-zoom hidden'),'default 100% portfolio view keeps cancel zoom hidden');
 const portfolio=Timeline.renderAll([project,projectB],{today:'2026-08-04',viewport:{center:'2026-08-05',days:2,scrollTop:31},fullscreen:true});
 ok(portfolio.includes('data-calendar-start="2026-07-02"')&&portfolio.includes('data-calendar-end="2026-09-09"'),'portfolio calendar uses all node data bounds plus 30 days on both sides');
@@ -74,6 +87,8 @@ const detailedCalendar=Timeline.renderAll([project,projectB],{today:'2026-08-04'
 ok(detailedCalendar.includes('data-day-density="weekday"'),'portfolio calendar restores weekday glyphs only when each day has enough pixels');
 const compactSingle=Timeline.renderSingle(project,{today:'2026-08-04',viewport:{center:'2026-08-05',days:42},viewportWidth:760});
 ok(compactSingle.includes('timeline-e-years')&&compactSingle.includes('timeline-e-months')&&compactSingle.includes('timeline-e-days')&&!compactSingle.includes('timeline-e-quarters')&&compactSingle.includes('data-day-density="day"')&&!compactSingle.includes('>13 四<'),'single-project calendar reuses the same colored, collision-safe year/month/day scale');
+const zoomedSingle=Timeline.renderSingle(project,{today:'2026-08-04',viewport:{center:'2026-08-05',days:14},viewportWidth:760});
+ok(zoomedSingle.includes('class="danger" data-portfolio-cancel-zoom >取消缩放</button>')&&zoomedSingle.indexOf('data-portfolio-cancel-zoom')<zoomedSingle.indexOf('data-portfolio-fullscreen'),'zoomed single-project dashboard exposes the shared red cancel-zoom action before fullscreen');
 ok((Timeline.renderSingle(project,{today:'2026-08-04'}).match(/timeline-past-mask/g)||[]).length===2,'running project masks today-left on both tracks');
 ok((Timeline.renderSingle(project,{today:'2026-09-04'}).match(/timeline-past-mask/g)||[]).length===2,'past-only project keeps today-left masks after its final node has passed');
 const futureProject={...project,nodes:project.nodes.map(node=>({...node,date:'2026-10-04'})),stage_intervals:[]};
@@ -81,7 +96,7 @@ ok(!Timeline.renderSingle(futureProject,{today:'2026-09-04'}).includes('timeline
 const denseProject={...project,project_id:7,nodes:[{id:71,track:'main',stage:'设计',name:'白圈一',date:'2026-08-01'},{id:72,track:'main',stage:'设计',name:'白圈二',date:'2026-08-02'}],stage_intervals:[],segments:[]};
 const denseCollapsed=Timeline.renderAll([denseProject],{today:'2026-07-01',viewport:{center:'2026-08-01',days:61},viewportWidth:760});
 const denseExpanded=Timeline.renderAll([denseProject],{today:'2026-07-01',viewport:{center:'2026-08-01',days:14},viewportWidth:760});
-ok((denseCollapsed.match(/timeline-node-cluster/g)||[]).length===1&&!denseCollapsed.includes('data-node-id="71"'),'overlapping all-dashboard nodes collapse to one small-dot surrogate');
+ok((denseCollapsed.match(/timeline-node-cluster/g)||[]).length===1&&denseCollapsed.includes('data-cluster-drag-proxy="earliest"')&&denseCollapsed.includes('data-node-id="71"'),'overlapping all-dashboard nodes keep one visual cluster with an earliest-node drag proxy');
 ok(!/class="timeline-node-cluster"[^>]*\stitle=/.test(denseCollapsed)&&denseCollapsed.includes('class="timeline-node-cluster" role="img" tabindex="0"')&&denseCollapsed.includes('data-node-tooltip-source'),'dense clusters replace the uncontrolled native title with a focusable portal-tooltip source');
 ok(!denseExpanded.includes('timeline-node-cluster')&&denseExpanded.includes('data-node-id="71"')&&denseExpanded.includes('data-node-id="72"'),'zoom restores normal nodes once their pixels no longer overlap');
 ok(html.includes('is-single-profile')&&html.includes('data-canvas-profile="single"')&&html.includes('data-portfolio-scroll')&&html.includes('timeline-portfolio-chart')&&html.includes('data-viewport-days')&&!html.includes('data-portfolio-focus-project'),'single dashboard reuses the portfolio wheel-zoom and pan canvas without multi-project focus toggling');
@@ -135,6 +150,8 @@ const manyProjects=Array.from({length:12},(_,index)=>({...project,project_id:100
 const compactTeam=Timeline.renderWorkspace(manyProjects,{mode:'home',admin:true,members:[{id:'u1',name:'林晓'}],currentUser:{id:'u1',name:'林晓'},review:[{name:'成员项目 1',batches:[{batch_id:1,created_at:'2026-08-25T06:30:00',change_kind:'direct_edit',actor:{name:'林晓'},change_rows:[{node_name:'鞋底转图',field:'created',old_value:null,new_value:'{"row":551,"project":"成员项目 1","remark":"很长的 raw"}'},{node_name:'一轮高频',field:'date',old_value:'2026-08-18',new_value:'2026-08-26'}]}]}]});
 ok((compactTeam.match(/data-member-extra hidden/g)||[]).length===2&&compactTeam.includes('显示全部（剩余 2 个）'),'team member projects collapse after ten and expose a prominent remaining-count control');
 ok(compactTeam.includes('鞋底转图 · 新建节点（共 2 项）')&&!compactTeam.includes('&quot;row&quot;')&&!compactTeam.includes('很长的 raw'),'home feed summarizes the core change in one detail line without rendering raw JSON');
+ok(compactTeam.includes('08-25 14:30'),'home feed treats timezone-less server audit stamps as UTC and displays Beijing time');
+ok(Timeline.formatShanghaiTimestamp('2026-08-31T02:30:00+00:00')==='2026-08-31 10:30'&&Timeline.formatShanghaiTimestamp('2026-08-31T16:30:00+00:00',{seconds:true})==='2026-09-01 00:30:00','Beijing formatter handles UTC conversion and cross-day boundaries');
 const owned={...project,created_by:'u1'},ownedB={...projectB,created_by:'u1'};
 const orderedHome=Timeline.renderWorkspace([owned,ownedB],{mode:'home',write:true,currentUser:{id:'u1',name:'林晓'},mineOrder:{order_version:3,project_ids:[2,1]}});
 ok(orderedHome.indexOf('data-order-project="2"')<orderedHome.indexOf('data-order-project="1"')&&orderedHome.includes('data-order-list="mine"'),'my projects renders the current user personal order with drag hooks');
@@ -158,10 +175,20 @@ ok(transferError.includes('data-timeline-import-error="NAME_CONFLICT"')&&(transf
 const transferExport=Timeline.renderTransfer({exportReady:{filename:'timeline.xlsx',sha256:'abc123',url:'blob:test'}},{mode:'export'});
 ok(transferExport.includes('data-timeline-transfer-dialog="export"')&&transferExport.includes('data-timeline-download')&&transferExport.includes('href="blob:test"')&&transferExport.includes('SHA-256 abc123'),'export uses its own dialog and links only the verified server blob');
 const state=Timeline.editorState(project);
-ok(Timeline.moveNode(state,1,'2026-08-20','single')==='2026-08-05','single clamps at next same-track node');
+ok(Timeline.moveNode(state,1,'2026-08-20','single')==='2026-08-20'&&state.project.nodes.find(node=>node.id===2).date==='2026-08-21','single drag pushes a colliding successor to preserve the one-day minimum');
+const collisionState=Timeline.editorState({...project,nodes:[
+  {id:11,track:'main',stage:'创意',name:'A',date:'2026-08-01'},
+  {id:12,track:'main',stage:'设计',name:'B',date:'2026-08-08'},
+  {id:13,track:'main',stage:'开发',name:'C',date:'2026-08-12'}
+]});
+Timeline.moveNode(collisionState,11,'2026-08-07','single');
+ok(collisionState.project.nodes.map(node=>node.date).join(',')==='2026-08-07,2026-08-08,2026-08-12','single drag can compress a seven-day interval down to one day');
+Timeline.moveNode(collisionState,11,'2026-08-12','single');
+ok(collisionState.project.nodes.map(node=>node.date).join(',')==='2026-08-12,2026-08-13,2026-08-14'&&collisionState.draft.size===1,'single drag collision-pushes only the local preview while submitting one direct anchor');
 Timeline.discard(state);Timeline.moveNode(state,1,'2026-08-03','cascade');
 ok(state.project.nodes.find(node=>node.id===2).date==='2026-08-07'&&state.project.nodes.find(node=>node.id===3).date==='2026-08-10','cascade shifts only the same track');
-Timeline.toggleDone(state,2,true);ok(state.draft.get(2).set.done_at===true&&state.draft.get(2).set.date==='2026-08-07','date and status share one draft row');
+ok(state.draft.size===1&&state.draft.get(1).set.date==='2026-08-03'&&!state.draft.has(2)&&!state.draft.has(3),'cascade preview submits only the direct drag anchor');
+Timeline.toggleDone(state,2,true);ok(state.draft.get(2).set.done_at===true&&!Object.prototype.hasOwnProperty.call(state.draft.get(2).set,'date'),'status stays direct while the server derives cascaded dates');
 const editorHtml=Timeline.renderEditor(state.project,{state,editable:true,admin:true});
 ok(editorHtml.includes('时间表编辑器')&&editorHtml.includes('class="timeline-sheet"')&&editorHtml.includes('项目阶段')&&editorHtml.includes('时间间隔（天）')&&editorHtml.includes('状态')&&editorHtml.includes('备注'),'editor renders the frozen Excel-like table and fixed business columns');
 ok(editorHtml.includes('data-project-shell="editor"')&&editorHtml.includes('<h2>项目 A</h2>')&&editorHtml.includes('tl-proj-kpi')&&!editorHtml.includes('timeline-sheet-head')&&!editorHtml.includes('timeline-sheet-project')&&!editorHtml.includes('PROJECT · 时间管理'),'editor reuses the project header shell and removes the redundant secondary heading');

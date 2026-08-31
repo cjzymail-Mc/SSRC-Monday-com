@@ -1,6 +1,0 @@
-interface:
-  display_name: "提交修复 PR"
-  short_description: "将 main 上的本地修复安全转换为 GitHub PR"
-  default_prompt: "Use $submit-fix-pr to move my completed local fixes into a temporary fix branch, verify them, and prepare a GitHub pull request."
-policy:
-  allow_implicit_invocation: false

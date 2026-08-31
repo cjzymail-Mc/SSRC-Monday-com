@@ -1,6 +1,6 @@
 ---
 name: sync-main
-description: Safely return this Flowboard checkout to a clean, current origin/main before starting new work or after a pull request is merged. Use only when the user explicitly invokes $sync-main; do not use it to submit local changes.
+description: Safely validate the Flowboard origin and return this checkout to a clean, current origin/main before starting new work or after a pull request is merged. Use only when the user explicitly invokes $sync-main; do not use it to submit local changes.
 ---
 
 # Sync Main
@@ -13,6 +13,7 @@ Bring the checkout to the latest `origin/main` without losing local work. This i
 - Never use `reset --hard`, `clean`, checkout-overwrite, automatic stash, or forced branch deletion to make the tree look clean.
 - Never write, migrate, restore, rebuild, stage, or commit `flowboard.db`, its WAL/SHM files, `backups/`, credentials, `.env` files, or machine-local state.
 - Do not proceed through an in-progress merge, rebase, cherry-pick, or revert.
+- Accept only the configured Flowboard repository `cjzymail-Mc/SSRC-Monday-com` as `origin`; normalize ordinary GitHub HTTPS and SSH URL forms before comparing, and stop on any other host or repository.
 - Fetching and pulling change external/local Git state. Treat the explicit `$sync-main` invocation as the requested workflow, while still honoring any tool approval required immediately before network access.
 
 ## Workflow
@@ -26,9 +27,9 @@ Bring the checkout to the latest `origin/main` without losing local work. This i
    git remote get-url origin
    ```
 
-2. If tracked or untracked work exists, stop. List the affected paths and tell the user to run `$submit-fix-pr <short summary>` if those files are intended work. Do not stash or move the changes automatically.
+2. If tracked or untracked work exists, stop. List the affected paths and tell the user to run `$commit-push-pr <short summary>` if those files are intended work. Do not stash or move the changes automatically.
 
-3. If local `main` contains commits not present on `origin/main`, stop and route to `$submit-fix-pr`; those commits may be novice fixes made directly on `main`. If `main` and `origin/main` have diverged, do not rebase or rewrite `main` automatically.
+3. Normalize the configured `origin` URL and verify that it identifies `github.com/cjzymail-Mc/SSRC-Monday-com`. Do this before fetch. If local `main` contains commits not present on `origin/main`, stop and route to `$commit-push-pr`; those commits may be novice fixes made directly on `main`. If `main` and `origin/main` have diverged, do not rebase or rewrite `main` automatically.
 
 4. With a clean tree, use the bundled deterministic script for fetch, branch switching, fast-forward, postcondition checks, and the merged-branch report:
 
@@ -53,4 +54,4 @@ Bring the checkout to the latest `origin/main` without losing local work. This i
 
 ## Stop conditions
 
-Stop without expanding scope when the origin is missing, authentication/network access fails, the worktree is dirty, local `main` is ahead or diverged, an operation is already in progress, or fast-forward is impossible. Preserve all work and state the exact next action.
+Stop without expanding scope when the origin is missing or points anywhere except the configured Flowboard repository, authentication/network access fails, the worktree is dirty, local `main` is ahead or diverged, an operation is already in progress, or fast-forward is impossible. Preserve all work and state the exact next action.

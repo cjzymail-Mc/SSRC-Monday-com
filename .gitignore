@@ -9,6 +9,9 @@ flowboard-attachments/
 # 运行库（运行时数据，不进版本库；结构由迁移脚本保证）
 flowboard.db
 
+# 本机开发调试数据（由 local-test.cmd 创建，可随时删除重建）
+local-test-data/
+
 # double-session 接力状态机（易变机器状态，不入库）
 .copilot-message.md
 .copilot-state.json

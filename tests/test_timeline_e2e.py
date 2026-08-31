@@ -121,6 +121,33 @@ class TimelineProductionE2E(unittest.TestCase):
         finally:
             db.close()
 
+    def extend_cp4_stage_intervals(self, project_id):
+        """Give the interval-visual tests positive-width, boundary-overlapping runs."""
+        today = datetime.now(timezone(timedelta(hours=8))).date()
+        day_one = (today + timedelta(days=1)).isoformat()
+        day_two = (today + timedelta(days=2)).isoformat()
+        now = datetime.now(timezone.utc).isoformat()
+        db = connect(self.db_path)
+        try:
+            for name in ("主线重叠二", "并行重叠二"):
+                db.execute(
+                    "UPDATE timeline_nodes SET date=?,initial_date=? WHERE project_id=? AND name=?",
+                    (day_one, day_one, project_id, name),
+                )
+            for track, stage, name, value in (
+                ("main", "设计", "主线重叠一续", day_one),
+                ("main", "开发", "主线重叠二续", day_two),
+                ("parallel", "测试", "并行重叠一续", day_one),
+                ("parallel", "量产", "并行重叠二续", day_two),
+            ):
+                db.execute(
+                    "INSERT INTO timeline_nodes(project_id,track,stage,name,date,initial_date,remark,version,created_at,updated_at) VALUES (?,?,?,?,?,?,'',1,?,?)",
+                    (project_id, track, stage, name, value, value, now, now),
+                )
+            db.commit()
+        finally:
+            db.close()
+
     def open_cp4_single(self, page, project_id):
         self.physical_click(page, page.locator("#timelineBtn"))
         page.locator('[data-timeline-page="home"]').wait_for()
@@ -295,6 +322,7 @@ class TimelineProductionE2E(unittest.TestCase):
     def test_week_and_month_reorder_visible_subset_updates_full_personal_order(self):
         today = datetime.now(timezone(timedelta(hours=8))).date()
         next_month = (today.replace(day=28) + timedelta(days=4)).replace(day=1)
+        outside_scope = (next_month.replace(day=28) + timedelta(days=4)).replace(day=1)
         db = connect(self.db_path)
         try:
             now = datetime.now(timezone.utc).isoformat()
@@ -305,7 +333,7 @@ class TimelineProductionE2E(unittest.TestCase):
                     (name, now, now),
                 )
                 project_ids.append(project.lastrowid)
-                node_date = today if index in (0, 2, 4) else next_month
+                node_date = today if index in (0, 2, 4) else outside_scope
                 value = node_date.isoformat()
                 db.execute(
                     "INSERT INTO timeline_nodes(project_id,track,stage,name,date,initial_date,remark,version,created_at,updated_at) VALUES (?,'main','设计',?,?,?,'',1,?,?)",
@@ -964,6 +992,7 @@ class TimelineProductionE2E(unittest.TestCase):
 
     def test_timeline_overlap_split_and_expand(self):
         (project_id, _, _), _today = self.seed_cp4_dashboard_projects()
+        self.extend_cp4_stage_intervals(project_id)
         context, page = self.login("u1")
         self.open_cp4_single(page, project_id)
         card = page.locator(f'[data-dashboard-project="{project_id}"]')
@@ -983,6 +1012,7 @@ class TimelineProductionE2E(unittest.TestCase):
 
     def test_timeline_stage_intervals_semantics(self):
         (project_id, _, _), _today = self.seed_cp4_dashboard_projects()
+        self.extend_cp4_stage_intervals(project_id)
         context, page = self.login("u1")
         self.open_cp4_single(page, project_id)
         card = page.locator(f'[data-dashboard-project="{project_id}"]')
@@ -1102,7 +1132,7 @@ class TimelineProductionE2E(unittest.TestCase):
         with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith("/timeline/batches/undo")) as undone:
             self.physical_click(page, undo_menu.locator('[data-portfolio-undo-action]'))
         self.assertEqual(undone.value.status, 200)
-        undo_menu.wait_for(state="detached")
+        undo_menu.wait_for(state="hidden")
         self.assert_clean_browser(page); context.close()
 
     def test_dashboard_hover_date_insert_remark_and_delete_share_draft_pipeline(self):
@@ -1254,6 +1284,7 @@ class TimelineProductionE2E(unittest.TestCase):
 
     def test_timeline_portfolio_e_d4_p1_canvas(self):
         (project_id, _, _), today_value = self.seed_cp4_dashboard_projects()
+        self.extend_cp4_stage_intervals(project_id)
         today = datetime.fromisoformat(today_value).date()
         db = connect(self.db_path)
         try:
@@ -2099,6 +2130,7 @@ class TimelineProductionE2E(unittest.TestCase):
 
     def test_timeline_light_tokens_and_redundant_labels(self):
         (project_id, _, _), _today = self.seed_cp4_dashboard_projects()
+        self.extend_cp4_stage_intervals(project_id)
         context, page = self.login("u1")
         self.open_cp4_single(page, project_id)
         card = page.locator('[data-timeline-page="single"] > .timeline-project-card')
