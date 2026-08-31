@@ -1,7 +1,10 @@
 [CmdletBinding()]
 param(
     [string]$Remote = "origin",
-    [string]$MainBranch = "main"
+    [string]$MainBranch = "main",
+    [ValidateNotNullOrEmpty()]
+    [string]$ExpectedRepository = "cjzymail-Mc/SSRC-Monday-com",
+    [switch]$ValidateOriginOnly
 )
 
 Set-StrictMode -Version Latest
@@ -22,6 +25,25 @@ function Stop-Sync {
     exit $Code
 }
 
+function Get-GitHubRepositorySlug {
+    param([Parameter(Mandatory)][string]$Url)
+
+    $candidate = $Url.Trim().TrimEnd("/")
+    if ($candidate.EndsWith(".git", [System.StringComparison]::OrdinalIgnoreCase)) {
+        $candidate = $candidate.Substring(0, $candidate.Length - 4)
+    }
+
+    $match = [regex]::Match(
+        $candidate,
+        "^(?:https?://|ssh://git@|git@)github\.com[:/](?<slug>[^/\s]+/[^/\s]+)$",
+        [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+    )
+    if (-not $match.Success) {
+        return $null
+    }
+    return $match.Groups["slug"].Value
+}
+
 $root = (Invoke-Git -Arguments @("rev-parse", "--show-toplevel") | Select-Object -First 1).Trim()
 Set-Location -LiteralPath $root
 
@@ -39,14 +61,26 @@ foreach ($operation in $operationPaths) {
     }
 }
 
+$originUrl = (Invoke-Git -Arguments @("remote", "get-url", $Remote) | Select-Object -First 1).Trim()
+$actualRepository = Get-GitHubRepositorySlug -Url $originUrl
+if ($null -eq $actualRepository -or
+    -not $actualRepository.Equals($ExpectedRepository, [System.StringComparison]::OrdinalIgnoreCase)) {
+    Stop-Sync -Code 15 -Message "SYNC_MAIN_UNEXPECTED_ORIGIN: expected=github.com/$ExpectedRepository actual=$originUrl"
+}
+if ($ValidateOriginOnly) {
+    Write-Output "SYNC_MAIN_ORIGIN_OK"
+    Write-Output "root=$root"
+    Write-Output "origin=$originUrl"
+    exit 0
+}
+
 $status = @(Invoke-Git -Arguments @("status", "--porcelain=v1", "--untracked-files=all"))
 if ($status.Count -gt 0 -and ($status -join "").Length -gt 0) {
-    [Console]::Error.WriteLine("SYNC_MAIN_DIRTY: local work was preserved; run `$submit-fix-pr if it is intended work.")
+    [Console]::Error.WriteLine("SYNC_MAIN_DIRTY: local work was preserved; run `$commit-push-pr if it is intended work.")
     $status | ForEach-Object { [Console]::Error.WriteLine($_) }
     exit 10
 }
 
-[void](Invoke-Git -Arguments @("remote", "get-url", $Remote))
 [void](Invoke-Git -Arguments @("fetch", "--prune", $Remote))
 
 & git show-ref --verify --quiet "refs/remotes/$Remote/$MainBranch"
@@ -64,7 +98,7 @@ if (-not $localMainExists) {
     $localOnly = [int]$counts[0]
     $remoteOnly = [int]$counts[1]
     if ($localOnly -gt 0) {
-        Stop-Sync -Code 11 -Message "SYNC_MAIN_LOCAL_MAIN_AHEAD_OR_DIVERGED: local=$localOnly remote=$remoteOnly; run `$submit-fix-pr to preserve novice main commits."
+        Stop-Sync -Code 11 -Message "SYNC_MAIN_LOCAL_MAIN_AHEAD_OR_DIVERGED: local=$localOnly remote=$remoteOnly; run `$commit-push-pr to preserve novice main commits."
     }
     [void](Invoke-Git -Arguments @("switch", $MainBranch))
     [void](Invoke-Git -Arguments @("merge", "--ff-only", "$Remote/$MainBranch"))
@@ -84,6 +118,7 @@ if ($finalStatus.Count -gt 0 -and ($finalStatus -join "").Length -gt 0) {
 $mergedFixBranches = @(Invoke-Git -Arguments @("for-each-ref", "--merged=refs/remotes/$Remote/$MainBranch", "--format=%(refname:short)", "refs/heads/fix"))
 Write-Output "SYNC_MAIN_OK"
 Write-Output "root=$root"
+Write-Output "origin=$originUrl"
 Write-Output "branch=$MainBranch"
 Write-Output "commit=$localCommit"
 if ($mergedFixBranches.Count -gt 0 -and ($mergedFixBranches -join "").Length -gt 0) {
