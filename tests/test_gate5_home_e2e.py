@@ -4,6 +4,7 @@
 独立 harness，不继承 test_timeline_e2e（避免父类用例被收集双跑）。
 """
 
+import json
 import os
 import tempfile
 import threading
@@ -134,6 +135,7 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertEqual(page.locator("#dashboardBtn").count(), 0)
         self.assertEqual(page.locator(".workspace-switcher").count(), 0)
         self.assertEqual(page.locator(".main-nav > [data-sidebar-settings]").count(), 1)
+        self.assertFalse(page.locator("#trashBtn").is_visible())
         self.assertEqual(page.locator("#appSidebar").evaluate("el => getComputedStyle(el).position"), "sticky")
         self.assertAlmostEqual(page.locator("#appSidebar").bounding_box()["height"], 800, delta=1)
         self.assertIn("落地项目", page.locator('[data-timeline-section="mine"]').inner_text())
@@ -163,6 +165,39 @@ class Gate5HomeE2E(unittest.TestCase):
             self.assertEqual(page.locator('.timeline-shell>header, #timelineClose').count(), 0)
         self.assertFalse(page.locator("#boardWorkspace").is_visible())
         self.assert_clean_browser(page); context.close()
+
+    def test_home_feed_displays_audit_time_in_beijing_timezone(self):
+        project_id = self.seed_timeline(created_by="u1", name="北京时间动态")
+        stamp = datetime.now(timezone.utc).replace(second=0, microsecond=0)
+        expected = "今天 " + stamp.astimezone(timezone(timedelta(hours=8))).strftime("%H:%M")
+        db = connect(self.db_path)
+        try:
+            node_id = db.execute(
+                "SELECT id FROM timeline_nodes WHERE project_id=? ORDER BY id LIMIT 1",
+                (project_id,),
+            ).fetchone()["id"]
+            batch_id = db.execute(
+                """INSERT INTO timeline_change_batches(
+                       project_id,actor_user_id,change_kind,trigger_source,
+                       project_version_before,project_version_after,details_json,created_at
+                   ) VALUES (?,'u1','direct_edit','editor',1,2,'{}',?)""",
+                (project_id, stamp.isoformat()),
+            ).lastrowid
+            db.execute(
+                """INSERT INTO timeline_node_changes(
+                       batch_id,node_id,change_role,field,old_value,new_value
+                   ) VALUES (?,?,'direct','remark','','北京时间测试')""",
+                (batch_id, node_id),
+            )
+            db.commit()
+        finally:
+            db.close()
+        context, page = self.login("u1")
+        feed_time = page.locator('[data-timeline-feed="mine"] .tl-feed-item time').first
+        feed_time.wait_for()
+        self.assertEqual(feed_time.inner_text(), expected)
+        self.assert_clean_browser(page)
+        context.close()
 
     def test_sidebar_hover_treatment_is_shared_and_current_avatar_uses_name_initial(self):
         db = connect(self.db_path)
@@ -394,6 +429,245 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertEqual(undone.value.status, 200)
         self.assertEqual(card.locator('.timeline-dashboard-node[data-node-id="1"]').get_attribute("data-node-date"), "2026-08-01")
         self.assert_clean_browser(page); context.close()
+
+    def test_all_dashboard_project_menu_routes_back_and_uses_approved_hover_motion(self):
+        project_id = self.seed_timeline(created_by="u1", name="返回路径项目")
+        context, page = self.login("u1")
+        self.physical_click(page, page.locator("#timelineAllBtn"))
+        page.locator('[data-timeline-page="all"]').wait_for()
+
+        meta = page.locator(f'[data-dashboard-project="{project_id}"] .timeline-portfolio-meta')
+        meta.wait_for()
+        self.physical_click(page, meta, button="right")
+        menu = page.locator('[data-timeline-page="all"] [data-portfolio-undo-menu]')
+        menu.wait_for(state="visible")
+        self.assertEqual(menu.locator('button').all_inner_texts(), ["在单仪表盘中查看", "撤销"])
+        self.assertFalse(menu.locator('[data-portfolio-view-single]').is_disabled())
+        self.assertTrue(menu.locator('[data-portfolio-undo-action]').is_disabled())
+
+        # 仪表盘三类右键菜单全局互斥：项目 → 插入 → 项目 → 节点 → 项目。
+        plot = page.locator(f'[data-dashboard-project="{project_id}"] .timeline-stage-plot').first
+        plot_box = plot.bounding_box()
+        page.mouse.move(plot_box["x"] + plot_box["width"] * .92, plot_box["y"] + plot_box["height"] / 2)
+        page.mouse.down(button="right"); page.mouse.up(button="right")
+        insert_menu = page.locator('[data-timeline-page="all"] [data-dashboard-insert-menu]')
+        insert_menu.wait_for(state="visible")
+        self.assertTrue(menu.is_hidden())
+        self.assertEqual(page.locator('[data-timeline-page="all"] [role="menu"]:visible').count(), 1)
+
+        self.physical_click(page, meta, button="right")
+        menu.wait_for(state="visible")
+        self.assertTrue(insert_menu.is_hidden())
+        node = page.locator(f'[data-dashboard-project="{project_id}"] .timeline-dashboard-node').first
+        self.physical_click(page, node, button="right")
+        node_menu = page.locator('[data-timeline-page="all"] [data-timeline-context]')
+        node_menu.wait_for(state="visible")
+        self.assertTrue(menu.is_hidden())
+        self.assertEqual(page.locator('[data-timeline-page="all"] [role="menu"]:visible').count(), 1)
+
+        self.physical_click(page, meta, button="right")
+        menu.wait_for(state="visible")
+        self.assertTrue(node_menu.is_hidden())
+        self.assertEqual(page.locator('[data-timeline-page="all"] [role="menu"]:visible').count(), 1)
+
+        self.physical_click(page, menu.locator('[data-portfolio-view-single]'))
+        page.locator('[data-timeline-page="single"]').wait_for()
+        back = page.locator('[data-timeline-mode-target="all"]')
+        self.assertEqual(" ".join(back.inner_text().split()), "← 返回")
+        back.hover()
+        self.assertEqual(back.locator('.timeline-back-arrow').evaluate("el => getComputedStyle(el).animationName"), "timeline-back-arrow-spring")
+
+        cancel_zoom = page.locator('[data-timeline-page="single"] [data-portfolio-cancel-zoom]')
+        self.assertEqual(cancel_zoom.count(), 1)
+        self.assertTrue(cancel_zoom.is_hidden())
+        page.locator('[data-timeline-page="single"] [data-portfolio-zoom-in]').evaluate("el => el.click()")
+        cancel_zoom.wait_for(state="visible")
+        self.assertEqual(cancel_zoom.inner_text(), "取消缩放")
+        self.assertEqual(cancel_zoom.evaluate("el => getComputedStyle(el).backgroundColor"), "rgb(229, 72, 77)")
+        self.physical_click(page, cancel_zoom)
+        page.wait_for_function("""() => {
+            const card=document.querySelector('[data-timeline-page="single"]');
+            const chart=card?.querySelector('.timeline-portfolio-chart');
+            const button=card?.querySelector('[data-portfolio-cancel-zoom]');
+            return chart && Number(chart.dataset.viewportDays) === Number(chart.dataset.fullDays) && button?.hidden;
+        }""")
+
+        self.physical_click(page, page.locator('[data-timeline-mode-target="editor"]'))
+        page.locator('[data-timeline-page="editor"]').wait_for()
+        self.assertEqual(" ".join(page.locator('[data-timeline-mode-target="all"]').inner_text().split()), "← 返回")
+        self.physical_click(page, page.locator('[data-timeline-mode-target="all"]'))
+        page.locator('[data-timeline-page="all"]').wait_for()
+
+        self.physical_click(page, page.locator("#timelineBtn"))
+        page.locator('[data-timeline-page="home"]').wait_for()
+        self.physical_click(page, page.locator(f'[data-timeline-open="single"][data-project-id="{project_id}"]'))
+        page.locator('[data-timeline-page="single"]').wait_for()
+        home_back = page.locator('[data-timeline-mode-target="home"]')
+        self.assertEqual(" ".join(home_back.inner_text().split()), "← 我的工作")
+        home_back.hover()
+        self.assertEqual(home_back.locator('.timeline-back-arrow').evaluate("el => getComputedStyle(el).animationName"), "timeline-back-arrow-spring")
+        self.assert_clean_browser(page); context.close()
+
+    def test_drag_modes_persist_only_the_intended_dates_and_audit_roles(self):
+        """真实拖拽提交：single 只改当前节点；cascade 由服务端生成 cascaded 行。"""
+        single_project = self.seed_timeline(created_by="u1", name="仅当前节点项目")
+        cascade_project = self.seed_timeline(created_by="u1", name="顺延审计项目")
+        context, page = self.login("u1")
+
+        def project_snapshot(project_id):
+            db = connect(self.db_path)
+            try:
+                return [dict(row) for row in db.execute(
+                    "SELECT id,name,date FROM timeline_nodes WHERE project_id=? AND track='main' ORDER BY date,name,id",
+                    (project_id,),
+                )]
+            finally:
+                db.close()
+
+        def drag_first_node(project_id, action):
+            self.physical_click(page, page.locator(f'[data-timeline-open="single"][data-project-id="{project_id}"]'))
+            card = page.locator(f'[data-dashboard-project="{project_id}"]')
+            card.wait_for()
+            first_id = project_snapshot(project_id)[0]["id"]
+            node = card.locator(f'.timeline-dashboard-node[data-node-id="{first_id}"]')
+            self.physical_click(page, node, button="right")
+            menu = page.locator('[data-timeline-page="single"] [data-timeline-context]')
+            menu.wait_for(state="visible")
+            self.physical_click(page, menu.locator(f'[data-draft-action="{action}"]'))
+            box = node.bounding_box()
+            page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+            page.mouse.down()
+            page.mouse.move(box["x"] + box["width"] / 2 + 24, box["y"] + box["height"] / 2, steps=6)
+            page.mouse.up()
+            actions = page.locator('[data-single-dashboard-draft-actions]')
+            actions.wait_for()
+            self.assertEqual(actions.locator('[data-dashboard-submit]').inner_text(), "更新 1")
+            with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith("/timeline/batches")) as saved:
+                self.physical_click(page, actions.locator('[data-dashboard-submit]'))
+            self.assertEqual(saved.value.status, 200)
+            actions.wait_for(state="detached")
+
+        single_before = project_snapshot(single_project)
+        drag_first_node(single_project, "single")
+        single_after = project_snapshot(single_project)
+        self.assertNotEqual(single_after[0]["date"], single_before[0]["date"])
+        self.assertEqual(single_after[1]["date"], single_before[1]["date"])
+
+        self.physical_click(page, page.locator('[data-timeline-mode-target="home"]'))
+        page.locator('[data-timeline-page="home"]').wait_for()
+        cascade_before = project_snapshot(cascade_project)
+        drag_first_node(cascade_project, "cascade")
+        cascade_after = project_snapshot(cascade_project)
+        first_delta = (datetime.fromisoformat(cascade_after[0]["date"]) - datetime.fromisoformat(cascade_before[0]["date"])).days
+        second_delta = (datetime.fromisoformat(cascade_after[1]["date"]) - datetime.fromisoformat(cascade_before[1]["date"])).days
+        self.assertNotEqual(first_delta, 0)
+        self.assertEqual(second_delta, first_delta)
+
+        db = connect(self.db_path)
+        try:
+            batches = db.execute(
+                "SELECT id,project_id,details_json FROM timeline_change_batches WHERE project_id IN (?,?) ORDER BY id",
+                (single_project, cascade_project),
+            ).fetchall()
+            self.assertEqual([json.loads(row["details_json"])["mode"] for row in batches], ["single", "cascade"])
+            single_rows = [tuple(row) for row in db.execute(
+                "SELECT c.node_id,c.change_role,c.field FROM timeline_node_changes c WHERE c.batch_id=? ORDER BY c.id",
+                (batches[0]["id"],),
+            )]
+            cascade_rows = [tuple(row) for row in db.execute(
+                "SELECT c.node_id,c.change_role,c.field FROM timeline_node_changes c WHERE c.batch_id=? ORDER BY c.id",
+                (batches[1]["id"],),
+            )]
+            self.assertEqual(single_rows, [(single_before[0]["id"], "direct", "date")])
+            self.assertEqual(cascade_rows, [
+                (cascade_before[0]["id"], "direct", "date"),
+                (cascade_before[1]["id"], "cascaded", "date"),
+            ])
+        finally:
+            db.close()
+        self.assert_clean_browser(page)
+        context.close()
+
+    def test_all_dashboard_dense_cluster_single_drag_uses_one_day_collision_push(self):
+        """全局视图保持原缩放/聚合，但拥挤簇可代理最早节点并按 1 天碰撞顺延。"""
+        project_id = self.seed_timeline(created_by="u1", name="一日最小间隔项目")
+        range_project_id = self.seed_timeline(created_by="u1", name="全局范围项目")
+        db = connect(self.db_path)
+        try:
+            main_nodes = db.execute(
+                "SELECT id,name,date FROM timeline_nodes WHERE project_id=? AND track='main' ORDER BY date,id",
+                (project_id,),
+            ).fetchall()
+            first_id, second_id = main_nodes[0]["id"], main_nodes[1]["id"]
+            db.execute("UPDATE timeline_nodes SET date='2026-08-08',initial_date='2026-08-08' WHERE id=?", (second_id,))
+            range_nodes = db.execute(
+                "SELECT id FROM timeline_nodes WHERE project_id=? AND track='main' ORDER BY date,id",
+                (range_project_id,),
+            ).fetchall()
+            db.execute("UPDATE timeline_nodes SET date='2025-01-01',initial_date='2025-01-01' WHERE id=?", (range_nodes[0]["id"],))
+            db.execute("UPDATE timeline_nodes SET date='2027-12-31',initial_date='2027-12-31' WHERE id=?", (range_nodes[1]["id"],))
+            db.commit()
+        finally:
+            db.close()
+
+        context, page = self.login("u1")
+        self.physical_click(page, page.locator("#timelineAllBtn"))
+        all_page = page.locator('[data-timeline-page="all"]')
+        all_page.wait_for()
+        chart = all_page.locator(".timeline-portfolio-chart")
+        self.assertEqual(chart.get_attribute("data-viewport-days"), chart.get_attribute("data-full-days"))
+        card = all_page.locator(f'[data-dashboard-project="{project_id}"]')
+        cluster = card.locator(
+            f'.timeline-node-cluster[data-cluster-drag-proxy="earliest"][data-node-id="{first_id}"]'
+        )
+        cluster.wait_for()
+        self.assertEqual(card.locator('[data-stage-interval][data-stage="测试"]').count(), 0)
+
+        self.physical_click(page, cluster, button="right")
+        menu = all_page.locator("[data-timeline-context]")
+        menu.wait_for(state="visible")
+        self.assertEqual(
+            menu.locator('[data-draft-action="single"], [data-draft-action="cascade"]').all_inner_texts(),
+            ["拖拽（仅当前节点）", "拖拽（顺延）"],
+        )
+        self.physical_click(page, menu.locator('[data-draft-action="single"]'))
+        box = cluster.bounding_box()
+        page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+        page.mouse.down()
+        page.mouse.move(box["x"] + box["width"] / 2 + 24, box["y"] + box["height"] / 2, steps=6)
+        page.mouse.up()
+        submit = card.locator(f'[data-dashboard-submit="{project_id}"]')
+        submit.wait_for()
+        self.assertEqual(submit.inner_text(), "更新 1")
+        with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith("/timeline/batches")) as saved:
+            self.physical_click(page, submit)
+        self.assertEqual(saved.value.status, 200)
+
+        db = connect(self.db_path)
+        try:
+            after = db.execute(
+                "SELECT id,date FROM timeline_nodes WHERE id IN (?,?) ORDER BY date,id",
+                (first_id, second_id),
+            ).fetchall()
+            self.assertEqual([row["id"] for row in after], [first_id, second_id])
+            first_date = datetime.fromisoformat(after[0]["date"])
+            second_date = datetime.fromisoformat(after[1]["date"])
+            self.assertGreater(first_date, datetime.fromisoformat("2026-08-01"))
+            self.assertEqual((second_date - first_date).days, 1)
+            batch = db.execute(
+                "SELECT id,details_json FROM timeline_change_batches WHERE project_id=? ORDER BY id DESC LIMIT 1",
+                (project_id,),
+            ).fetchone()
+            self.assertEqual(json.loads(batch["details_json"])["mode"], "single")
+            rows = [tuple(row) for row in db.execute(
+                "SELECT node_id,change_role,field FROM timeline_node_changes WHERE batch_id=? ORDER BY id",
+                (batch["id"],),
+            )]
+            self.assertEqual(rows, [(first_id, "direct", "date"), (second_id, "cascaded", "date")])
+        finally:
+            db.close()
+        self.assert_clean_browser(page)
+        context.close()
 
     def test_gate5_viewer_never_sees_classic_home_without_probe_noise(self):
         """只读成员不自动探测时间轴，经典主页仍保持彻底隐藏。"""

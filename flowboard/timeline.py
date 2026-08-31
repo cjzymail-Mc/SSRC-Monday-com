@@ -804,8 +804,9 @@ class TimelineService:
                 raise ApiError(422, "VALIDATION_ERROR", "节点无效", {"node_id": node_id})
             desired = self._date(state["date"])
             lower = self._date(chain[index - 1]["date"]) if index else None
-            if mode == "cascade":
-                state["date"] = (max(desired, lower) if lower else desired).isoformat()
+            lower_bound = lower + timedelta(days=1) if lower is not None and trigger == "drag" else lower
+            if mode == "cascade" or trigger == "drag":
+                state["date"] = (max(desired, lower_bound) if lower_bound else desired).isoformat()
             else:
                 upper = self._date(chain[index + 1]["date"]) if index + 1 < len(chain) else None
                 if lower is not None:
@@ -814,36 +815,60 @@ class TimelineService:
                     desired = min(desired, upper)
                 state["date"] = desired.isoformat()
 
-        for track in TRACKS:
-            shift = 0
-            for node in self._chain(snapshot, track):
-                state = final_states.get(node["id"])
-                if state is None:
-                    continue
-                if state.get("date_anchor"):
-                    shift = (self._date(state["date"]) - self._date(node["date"])).days
-                    continue
-                state["date"] = (self._date(node["date"]) + timedelta(days=shift)).isoformat()
+        if mode == "cascade":
+            for track in TRACKS:
+                shift = 0
+                for node in self._chain(snapshot, track):
+                    state = final_states.get(node["id"])
+                    if state is None:
+                        continue
+                    if state.get("date_anchor"):
+                        shift = (self._date(state["date"]) - self._date(node["date"])).days
+                        continue
+                    state["date"] = (self._date(node["date"]) + timedelta(days=shift)).isoformat()
 
-        changed = bool(creates)
+        if trigger == "drag":
+            for track in TRACKS:
+                previous = None
+                collision_active = False
+                for node in self._chain(snapshot, track):
+                    state = final_states.get(node["id"])
+                    if state is None:
+                        continue
+                    if previous is not None and collision_active:
+                        minimum = previous + timedelta(days=1)
+                        if self._date(state["date"]) < minimum:
+                            state["date"] = minimum.isoformat()
+                    if state.get("date_anchor"):
+                        collision_active = True
+                    previous = self._date(state["date"])
+
+        has_direct_edit = bool(creates)
+        has_status_toggle = False
         for node in snapshot:
             state = final_states.get(node["id"])
             if state is None:
-                changed = True
+                has_direct_edit = True
                 continue
-            changed = changed or any(
+            has_direct_edit = has_direct_edit or any(
                 node[field] != state[field]
                 for field in ("track", "stage", "name", "date", "remark")
-            ) or bool(node["done_at"]) != state["done"]
-        if not changed:
+            )
+            has_status_toggle = has_status_toggle or bool(node["done_at"]) != state["done"]
+        if not has_direct_edit and not has_status_toggle:
             return {"project_id": project["id"], "version": project["version"], "no_op": True, "view": self._view(conn, project)}
 
         stamp = utc_now()
-        kinds = ["direct_edit", "status_toggle"]
+        kinds = []
+        if has_direct_edit:
+            kinds.append("direct_edit")
+        if has_status_toggle:
+            kinds.append("status_toggle")
+        change_kind = "direct_edit" if has_direct_edit else "status_toggle"
         batch_id = conn.execute(
             """INSERT INTO timeline_change_batches(project_id,actor_user_id,change_kind,trigger_source,project_version_before,project_version_after,details_json,created_at)
                VALUES (?,?,?,?,?,?,?,?)""",
-            (project["id"], user["id"], "direct_edit", trigger, project["version"], project["version"] + 1, json.dumps({**details, "mode": mode, "kinds": kinds}, ensure_ascii=False), stamp),
+            (project["id"], user["id"], change_kind, trigger, project["version"], project["version"] + 1, json.dumps({**details, "mode": mode, "kinds": kinds}, ensure_ascii=False), stamp),
         ).lastrowid
         for node in snapshot:
             state = final_states.get(node["id"])

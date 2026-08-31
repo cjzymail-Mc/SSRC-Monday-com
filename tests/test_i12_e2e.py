@@ -34,5 +34,15 @@ class I12E2E(unittest.TestCase):
         mobile_context,mobile=self.login("u1",390);self.assertTrue(mobile.locator("#notificationBtn").is_visible());self.assertEqual(mobile.evaluate("document.documentElement.scrollWidth <= innerWidth"),True);mobile.locator("#notificationBtn").click();modal=mobile.locator("#listModal.open .task-modal");modal.wait_for();box=modal.bounding_box();self.assertIsNotNone(box);self.assertLessEqual(box["width"],390)
         admin_context.close();member_context.close();mobile_context.close()
 
+    def test_audit_displays_beijing_time_without_rewriting_canonical_timestamp(self):
+        conn=connect(self.db);conn.execute("INSERT INTO audit_log(source_key,workspace_id,actor_user_id,action_code,outcome,entity_type,entity_id,details_json,created_at) VALUES ('timezone-fixture',1,'u1','time.zone.fixture','success','task','1','{}','2026-08-31T02:30:00+00:00')");conn.commit();conn.close()
+        context=self.browser.new_context(viewport={"width":1280,"height":844});page=context.new_page();page.goto(self.base);page.locator("#loginUser").fill("u1");page.locator("#loginPassword").fill("test-password");page.locator("#loginForm button").click();page.locator("#timelineView").wait_for(state="visible")
+        page.evaluate("showAudit()")
+        audit_fixture=page.locator("#listModal.open .audit-item",has_text="time.zone.fixture");audit_fixture.wait_for()
+        self.assertEqual(audit_fixture.locator("small").inner_text(),"2026-08-31 10:30:00")
+        raw=page.evaluate("api('/api/admin/workspaces/1/audit?limit=100').then(result => result.items.find(item => item.action_code === 'time.zone.fixture').created_at)")
+        self.assertEqual(raw,"2026-08-31T02:30:00+00:00")
+        context.close()
+
 
 if __name__=="__main__":unittest.main()

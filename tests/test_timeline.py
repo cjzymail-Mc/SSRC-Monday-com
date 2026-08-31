@@ -339,6 +339,40 @@ class TimelineCoreTests(unittest.TestCase):
         finally:
             db.close()
 
+    def test_audit_kinds_follow_actual_changed_fields(self):
+        project_id, created = self._create_with_nodes("审计分类", [
+            {"track": "main", "stage": "创意", "name": "概念", "date": "2026-08-01"},
+            {"track": "main", "stage": "设计", "name": "方案", "date": "2026-08-05"},
+        ])
+        first_id, second_id = [node["id"] for node in created["view"]["nodes"]]
+        status = self.service.submit_batches(self.admin, 1, {"requests": [{
+            "project_id": project_id,
+            "base_version": 2,
+            "changes": [{"node_id": second_id, "set": {"done_at": True}}],
+        }]})["results"][0]
+        date = self.service.submit_batches(self.admin, 1, {"requests": [{
+            "project_id": project_id,
+            "base_version": 3,
+            "changes": [{"node_id": first_id, "set": {"date": "2026-08-02"}}],
+        }]})["results"][0]
+
+        db = connect(self.db)
+        try:
+            status_batch = db.execute(
+                "SELECT change_kind,details_json FROM timeline_change_batches WHERE id=?",
+                (status["batch_id"],),
+            ).fetchone()
+            date_batch = db.execute(
+                "SELECT change_kind,details_json FROM timeline_change_batches WHERE id=?",
+                (date["batch_id"],),
+            ).fetchone()
+            self.assertEqual(status_batch["change_kind"], "status_toggle")
+            self.assertEqual(json.loads(status_batch["details_json"])["kinds"], ["status_toggle"])
+            self.assertEqual(date_batch["change_kind"], "direct_edit")
+            self.assertEqual(json.loads(date_batch["details_json"])["kinds"], ["direct_edit"])
+        finally:
+            db.close()
+
     def test_cascade_anchors_status_only_and_date_priority(self):
         project_id, created = self._create_with_nodes("多锚点项目", [
             {"track": "main", "stage": "创意", "name": "概念", "date": "2026-08-01"},
@@ -395,8 +429,71 @@ class TimelineCoreTests(unittest.TestCase):
         ]})["results"]
         single_dates = tuple(node["date"] for node in results[0]["view"]["nodes"])
         cascade_dates = tuple(node["date"] for node in results[1]["view"]["nodes"])
-        self.assertEqual(single_dates, ("2026-08-01", "2026-08-08", "2026-08-11"))
+        self.assertEqual(single_dates, ("2026-08-01", "2026-08-08", "2026-08-08"))
         self.assertEqual(cascade_dates, ("2026-08-01", "2026-08-01", "2026-08-04"))
+        db = connect(self.db)
+        try:
+            single_rows = [tuple(row) for row in db.execute(
+                "SELECT node_id,change_role,field,old_value,new_value FROM timeline_node_changes WHERE batch_id=? ORDER BY id",
+                (results[0]["batch_id"],),
+            )]
+            cascade_rows = [tuple(row) for row in db.execute(
+                "SELECT node_id,change_role,field,old_value,new_value FROM timeline_node_changes WHERE batch_id=? ORDER BY id",
+                (results[1]["batch_id"],),
+            )]
+            self.assertEqual(single_rows, [
+                (single_second, "direct", "date", "2026-08-05", "2026-08-08"),
+            ])
+            self.assertEqual(cascade_rows, [
+                (cascade_second, "direct", "date", "2026-08-05", "2026-08-01"),
+                (cascade_created["view"]["nodes"][2]["id"], "cascaded", "date", "2026-08-08", "2026-08-04"),
+            ])
+        finally:
+            db.close()
+
+    def test_drag_single_uses_one_day_minimum_and_pushes_only_colliding_tail(self):
+        project_id, created = self._create_with_nodes("拖拽一日边界", [
+            {"track": "main", "stage": "创意", "name": "A", "date": "2026-08-01"},
+            {"track": "main", "stage": "设计", "name": "B", "date": "2026-08-08"},
+            {"track": "main", "stage": "开发", "name": "C", "date": "2026-08-12"},
+        ])
+        first_id, second_id, third_id = [node["id"] for node in created["view"]["nodes"]]
+        compressed = self.service.submit_batches(self.admin, 1, {"requests": [{
+            "project_id": project_id,
+            "base_version": 2,
+            "trigger_source": "drag",
+            "details": {"mode": "single"},
+            "changes": [{"node_id": first_id, "set": {"date": "2026-08-07"}}],
+        }]})["results"][0]
+        self.assertEqual(
+            tuple(node["date"] for node in compressed["view"]["nodes"]),
+            ("2026-08-07", "2026-08-08", "2026-08-12"),
+        )
+
+        pushed = self.service.submit_batches(self.admin, 1, {"requests": [{
+            "project_id": project_id,
+            "base_version": 3,
+            "trigger_source": "drag",
+            "details": {"mode": "single"},
+            "changes": [{"node_id": first_id, "set": {"date": "2026-08-12"}}],
+        }]})["results"][0]
+        self.assertEqual(
+            tuple(node["date"] for node in pushed["view"]["nodes"]),
+            ("2026-08-12", "2026-08-13", "2026-08-14"),
+        )
+        db = connect(self.db)
+        try:
+            rows = [tuple(row) for row in db.execute(
+                "SELECT node_id,change_role,field,old_value,new_value FROM timeline_node_changes WHERE batch_id=? ORDER BY id",
+                (pushed["batch_id"],),
+            )]
+            self.assertEqual(rows, [
+                (first_id, "direct", "date", "2026-08-07", "2026-08-12"),
+                (second_id, "cascaded", "date", "2026-08-08", "2026-08-13"),
+                (third_id, "cascaded", "date", "2026-08-12", "2026-08-14"),
+            ])
+        finally:
+            db.close()
 
     def test_group6_write_chain_rules_and_snapshot_neighbor(self):
         project_id, created = self._create_with_nodes("写入规则", [

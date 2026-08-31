@@ -31,6 +31,7 @@
 @media(max-width:900px) and (min-width:681px){.sidebar{--sidebar-current-width:205px;flex-basis:205px}.sidebar.is-collapsed{--sidebar-current-width:64px;width:64px;flex-basis:64px}}
 @media(prefers-reduced-motion:reduce){.sidebar,.sidebar>.sidebar-collapse,.sidebar .nav-label,.sidebar .brand-label,.sidebar .workspace-label{transition-duration:1ms!important}}
 .nav-item.nav-button{border:0;background:none;font:inherit;cursor:pointer;width:100%;text-align:left}
+.main-nav>.nav-item[hidden]{display:none!important}
 .main-nav>.nav-item{transition:background-color .14s ease,color .14s ease,box-shadow .14s ease,transform .14s ease}.main-nav>.nav-item:hover,.main-nav>.nav-item:focus-visible{outline:0;background:#ecebfa;color:#554ac7;box-shadow:0 5px 14px rgba(71,61,150,.14),inset 0 0 0 1px rgba(98,83,216,.08);transform:translateY(-1px)}.main-nav>.nav-item.active{box-shadow:inset 0 0 0 1px rgba(98,83,216,.08)}
 
 /* 2026-08-27: remove the desktop top bar and keep navigation/account controls in one fixed sidebar viewport. */

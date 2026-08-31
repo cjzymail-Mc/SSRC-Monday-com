@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Flowboard｜返回按钮悬停动画四案</title>
+  <style>
+    :root{--ink:#17233c;--muted:#6e7a90;--line:#dfe5ef;--blue:#2457c5;--blue-soft:#eef4ff}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:#f3f5f8;color:var(--ink);font-family:"Segoe UI","Microsoft YaHei",sans-serif}
+    main{width:min(920px,calc(100% - 32px));margin:42px auto}
+    header{margin-bottom:18px}h1{margin:0;font-size:23px}header p{margin:8px 0 0;color:var(--muted);font-size:13px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    article{position:relative;border:1px solid var(--line);border-radius:13px;background:#fff;padding:20px;box-shadow:0 8px 25px rgba(31,45,70,.04)}
+    article.recommended{border-color:#9cb5e8;box-shadow:0 0 0 2px rgba(36,87,197,.08)}
+    h2{margin:0 0 5px;font-size:15px}article p{margin:0 0 22px;color:var(--muted);font-size:11px;line-height:1.5}
+    .mark{position:absolute;right:14px;top:14px;border-radius:99px;background:#e8efff;padding:3px 8px;color:var(--blue);font-size:9px;font-weight:800}
+    .buttons{display:flex;flex-wrap:wrap;gap:14px}
+    button{--arrow-x:0;position:relative;display:inline-flex;align-items:center;gap:7px;min-width:108px;overflow:hidden;border:0;border-radius:7px;background:transparent;padding:10px 12px;color:#59657a;font:700 12px "Segoe UI","Microsoft YaHei",sans-serif;cursor:pointer;isolation:isolate}
+    button:focus-visible{outline:3px solid rgba(36,87,197,.22);outline-offset:2px}
+    .arrow{display:inline-block;transform:translateX(var(--arrow-x));transition:transform .18s cubic-bezier(.2,.75,.3,1)}.label{position:relative;z-index:1}
+
+    /* A：箭头轻退 + 淡蓝底色 */
+    .a button{transition:color .18s,background .18s,box-shadow .18s}
+    .a button:hover{--arrow-x:-4px;background:var(--blue-soft);color:#1746a3;box-shadow:inset 0 0 0 1px #d9e6ff}
+
+    /* B：底线从左向右扫过 */
+    .b button::after{content:"";position:absolute;left:12px;right:12px;bottom:5px;height:2px;border-radius:2px;background:var(--blue);transform:scaleX(0);transform-origin:left;transition:transform .2s cubic-bezier(.2,.7,.2,1)}
+    .b button:hover{color:#1746a3}.b button:hover::after{transform:scaleX(1)}
+
+    /* C：胶囊轻浮起 */
+    .c button{transition:transform .18s,background .18s,box-shadow .18s,color .18s}
+    .c button:hover{--arrow-x:-2px;background:#fff;box-shadow:0 6px 18px rgba(37,71,126,.14),inset 0 0 0 1px #cad8ef;color:#1746a3;transform:translateY(-2px)}
+
+    /* D：箭头短促回弹 */
+    .d button{transition:background .18s,color .18s}.d button:hover{background:#f4f6f9;color:#253b61}.d button:hover .arrow{animation:arrow-spring .42s cubic-bezier(.2,.8,.25,1)}
+    @keyframes arrow-spring{0%{transform:translateX(0)}40%{transform:translateX(-6px)}72%{transform:translateX(1px)}100%{transform:translateX(0)}}
+    @media(max-width:650px){.grid{grid-template-columns:1fr}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+  </style>
+</head>
+<body>
+  <main>
+    <header><h1>返回按钮｜鼠标扫过动画</h1><p>直接把鼠标移到按钮上比较即可；两种文字使用完全相同的动画。</p></header>
+    <section class="grid">
+      <article class="a recommended"><span class="mark">推荐</span><h2>A · 箭头轻退</h2><p>箭头向左移动 4px，同时出现淡蓝底色。</p><div class="buttons"><button><span class="arrow">←</span><span class="label">我的工作</span></button><button><span class="arrow">←</span><span class="label">返回</span></button></div></article>
+      <article class="b"><h2>B · 底线扫过</h2><p>文字不移动，仅从左向右绘制蓝色底线。</p><div class="buttons"><button><span class="arrow">←</span><span class="label">我的工作</span></button><button><span class="arrow">←</span><span class="label">返回</span></button></div></article>
+      <article class="c"><h2>C · 胶囊浮起</h2><p>按钮轻抬 2px，并出现边框与柔和阴影。</p><div class="buttons"><button><span class="arrow">←</span><span class="label">我的工作</span></button><button><span class="arrow">←</span><span class="label">返回</span></button></div></article>
+      <article class="d"><h2>D · 箭头回弹</h2><p>箭头短促左移后回弹，文字保持不动。</p><div class="buttons"><button><span class="arrow">←</span><span class="label">我的工作</span></button><button><span class="arrow">←</span><span class="label">返回</span></button></div></article>
+    </section>
+  </main>
+</body>
+</html>
