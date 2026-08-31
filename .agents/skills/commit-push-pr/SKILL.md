@@ -1,6 +1,6 @@
 ---
 name: commit-push-pr
-description: Move completed Flowboard fixes made directly on local main into a fresh fix branch, verify them, commit and push the branch, create a GitHub pull request, then safely return the checkout to current main. Use only when the user explicitly invokes $commit-push-pr after local testing; do not merge or deploy the pull request.
+description: Move completed Flowboard fixes made directly on local main into a fresh fix branch, verify them proportionately, commit and push the branch, create a GitHub pull request, then safely return the checkout to current main. Use only when the user explicitly invokes $commit-push-pr after local testing; do not expand the fix, merge, or deploy the pull request.
 ---
 
 # Commit Push PR
@@ -15,6 +15,7 @@ Turn novice work performed directly on local `main` into a reviewable temporary 
 - Stage explicit paths only. Never use `git add .`, `git add -A`, or a wildcard that can sweep unrelated files into the pull request.
 - Never append a new fix to a branch that already has an open, merged, or closed pull request. Each invocation creates a fresh `fix/*` branch from work that began on `main`.
 - Do not weaken, delete, or rewrite existing tests to accommodate an incorrect implementation.
+- Submission is a packaging workflow, not a new implementation task. Do not modify code or tests outside the reviewed submission merely to make a broad checker green. A test failure authorizes diagnosis, not repair beyond the user's submitted scope.
 - Do not commit, push, create a PR, merge, delete branches, publish, or deploy beyond the workflow and approval described below.
 
 ## Preconditions and inspection
@@ -80,15 +81,17 @@ Turn novice work performed directly on local `main` into a reviewable temporary 
 
    Resolve only conflicts whose intended behavior is supported by current code, tests, or frozen contracts. After each resolution inspect the combined diff. If resolution is ambiguous, abort the rebase and report; do not guess.
 
-11. Run the bundled complete-check script from the root. It uses the repository test commands, isolated temporary databases and ports, syntax/whitespace checks, and before/after content guards for the real database, WAL/SHM files, backups, attachments, and root `.env*` files:
+11. Verify in proportion to the submitted diff and reuse credible PASS evidence from the just-completed work. The minimum submission checks are `git diff --check`, syntax checks for changed executable files, focused tests for the touched behavior, and confirmation that protected real-data paths were not changed. Use isolated temporary databases and ports.
+
+    Run the bundled complete checker only when the diff touches permissions, migrations, API/data semantics, deletion/recovery, or several coupled product areas; when existing evidence is insufficient; or when the user explicitly requests full regression:
 
    ```powershell
    pwsh -NoProfile -File .agents/skills/commit-push-pr/scripts/run-flowboard-checks.ps1
    ```
 
-   `FLOWBOARD_CHECKS_OK` is required. Any guarded-path change is a hard failure. If sandboxing blocks Chromium or Node subprocesses, request controlled execution rather than skipping coverage. Use `-PlanOnly` only to inspect the planned commands, never as PR acceptance evidence.
+   When the complete checker is required, `FLOWBOARD_CHECKS_OK` is required. Any guarded-path change is always a hard failure. If sandboxing blocks Chromium or Node subprocesses, request controlled execution rather than skipping required coverage. Use `-PlanOnly` only to inspect the planned commands, never as acceptance evidence.
 
-12. When checks fail, diagnose and repair only within the submitted fix scope, then rerun the relevant test. Inspect and commit the repair through explicit paths before rerunning the full checks; the final index and worktree must be clean. Stop after two consecutive failed implementation/test cycles, on contract conflict, or when a product decision is required. Never push a failing or dirty branch.
+12. When checks fail, first classify the failure as an in-scope regression, an unrelated/pre-existing failure, a stale test expectation, or an environment/tooling failure. Repair only an in-scope regression. For every other class, preserve the evidence and stop that repair path; do not edit unrelated production files or tests without the user's explicit authorization. Rerun only the relevant check after an in-scope repair, and expand verification only if its risk requires it. Stop after two consecutive failed implementation/test cycles, on contract conflict, scope ambiguity, or when a product decision is required. Never hide a known relevant failure or push a dirty branch.
 
 ## External submission gate
 
@@ -96,7 +99,7 @@ Turn novice work performed directly on local `main` into a reviewable temporary 
 
    - branch and commit list relative to `origin/main`;
    - intended changed paths and diff summary;
-   - complete test results;
+   - tests/checks run, their results, and why that verification level matches the diff;
    - proposed PR title and short body;
    - confirmation that the real database was not changed.
 
