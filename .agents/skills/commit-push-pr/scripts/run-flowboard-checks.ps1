@@ -1,6 +1,9 @@
 # Runtime-data-safe full checks for $commit-push-pr.
 [CmdletBinding()]
-param([switch]$PlanOnly)
+param(
+    [switch]$PlanOnly,
+    [switch]$CollectAllFailures
+)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -86,8 +89,12 @@ if ($LASTEXITCODE -ne 0) {
 $root = ($rootOutput | Select-Object -First 1).Trim()
 Set-Location -LiteralPath $root
 
+$pythonPlan = "python -m unittest discover -s tests -p 'test_*.py' -v"
+if (-not $CollectAllFailures) {
+    $pythonPlan += " -f"
+}
 $plan = @(
-    "python -m unittest discover -s tests -p 'test_*.py' -v",
+    $pythonPlan,
     "node --test <all tests/*.test.js>",
     "python -m py_compile <all repository *.py>",
     "node --check <all repository *.js>",
@@ -110,10 +117,16 @@ foreach ($entry in $guardedPaths.GetEnumerator()) {
     $guardSnapshotsBefore[$entry.Key] = Get-PathSnapshot -Path $entry.Value
 }
 $environmentSnapshotBefore = Get-RootEnvironmentSnapshot -Root $root
+$checkFailure = $null
+$guardFailure = $null
 
 try {
     Invoke-Checked -Label "Python full suite" -Command {
-        & python -m unittest discover -s tests -p "test_*.py" -v
+        $arguments = @("-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py", "-v")
+        if (-not $CollectAllFailures) {
+            $arguments += "-f"
+        }
+        & python @arguments
     }
 
     $nodeTests = @(Get-ChildItem -LiteralPath (Join-Path $root "tests") -Filter "*.test.js" -File | ForEach-Object FullName)
@@ -155,22 +168,41 @@ try {
     if ($status.Count -gt 0 -and ($status -join "").Length -gt 0) {
         throw "GIT_CLEANLINESS_FAILED: checks must finish with a clean worktree and index.`n$($status -join [Environment]::NewLine)"
     }
+} catch {
+    $checkFailure = $_
 } finally {
-    $guardViolations = [System.Collections.Generic.List[string]]::new()
-    foreach ($entry in $guardedPaths.GetEnumerator()) {
-        $before = $guardSnapshotsBefore[$entry.Key]
-        $after = Get-PathSnapshot -Path $entry.Value
-        if ($before.Exists -ne $after.Exists -or $before.Kind -ne $after.Kind -or $before.Digest -ne $after.Digest) {
-            $guardViolations.Add($entry.Key)
+    try {
+        $guardViolations = [System.Collections.Generic.List[string]]::new()
+        foreach ($entry in $guardedPaths.GetEnumerator()) {
+            $before = $guardSnapshotsBefore[$entry.Key]
+            $after = Get-PathSnapshot -Path $entry.Value
+            if ($before.Exists -ne $after.Exists -or $before.Kind -ne $after.Kind -or $before.Digest -ne $after.Digest) {
+                $guardViolations.Add($entry.Key)
+            }
         }
+        $environmentSnapshotAfter = Get-RootEnvironmentSnapshot -Root $root
+        if ($environmentSnapshotBefore -ne $environmentSnapshotAfter) {
+            $guardViolations.Add(".env*")
+        }
+        if ($guardViolations.Count -gt 0) {
+            throw "REAL_DATA_GUARD_FAILED: protected runtime data changed during checks: $($guardViolations -join ', ')."
+        }
+    } catch {
+        $guardFailure = $_
     }
-    $environmentSnapshotAfter = Get-RootEnvironmentSnapshot -Root $root
-    if ($environmentSnapshotBefore -ne $environmentSnapshotAfter) {
-        $guardViolations.Add(".env*")
-    }
-    if ($guardViolations.Count -gt 0) {
-        throw "REAL_DATA_GUARD_FAILED: protected runtime data changed during checks: $($guardViolations -join ', ')."
-    }
+}
+
+if ($null -ne $checkFailure -and $null -ne $guardFailure) {
+    throw [System.AggregateException]::new(
+        "CHECKS_AND_REAL_DATA_GUARD_FAILED: both the original check and protected-data verification failed.",
+        [System.Exception[]]@($checkFailure.Exception, $guardFailure.Exception)
+    )
+}
+if ($null -ne $checkFailure) {
+    throw $checkFailure
+}
+if ($null -ne $guardFailure) {
+    throw $guardFailure
 }
 
 Write-Output "FLOWBOARD_CHECKS_OK"

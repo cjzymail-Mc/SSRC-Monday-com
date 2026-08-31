@@ -66,6 +66,11 @@ class Gate5HomeE2E(unittest.TestCase):
         page.locator("#loginForm button[type=submit]").click()
         page.locator("#currentUser > span:not(.avatar)").wait_for()
         page.locator("#loadState", has_text="刚刚同步").wait_for()
+        page.wait_for_function("""() => {
+            if (typeof state === 'undefined' || !state.current_user) return false;
+            const canUseTimeline = Boolean(state.capabilities?.write || state.capabilities?.admin);
+            return !canUseTimeline || Boolean(document.querySelector('[data-timeline-page="home"]'));
+        }""")
         page.flowboard_console_errors.clear()
         page.flowboard_page_errors.clear()
         return context, page
@@ -210,7 +215,7 @@ class Gate5HomeE2E(unittest.TestCase):
         page.locator('[data-timeline-page="home"]').wait_for()
         self.assertEqual(page.locator('#currentUser .avatar').inner_text(), '陈')
         self.assertEqual(page.locator('#currentUser > span:not(.avatar)').inner_text(), '陈晶')
-        items = page.locator('.main-nav > .nav-item')
+        items = page.locator('.main-nav > .nav-item:visible')
         self.assertGreater(items.count(), 1)
         hover_styles = []
         for index in range(items.count()):

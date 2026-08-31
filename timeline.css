@@ -296,7 +296,7 @@ body.timeline-dragging{cursor:grabbing;user-select:none}
 
 /* 2026-08-25：保留紧凑全屏入口；其余组合画布标题与工具继续隐藏。 */
 .timeline-portfolio-card>.timeline-portfolio-head{display:flex!important;justify-content:flex-end;min-height:43px;padding:5px 10px;border-bottom:1px solid var(--timeline-hairline)}
-.timeline-portfolio-card>.timeline-portfolio-head>div:first-child,.timeline-portfolio-card>.timeline-portfolio-head .timeline-portfolio-controls>label,.timeline-portfolio-card>.timeline-portfolio-head .timeline-portfolio-view-actions>button:not([data-portfolio-fullscreen]):not([data-portfolio-cancel-zoom]){display:none!important}
+.timeline-portfolio-card>.timeline-portfolio-head>div:first-child:not(.timeline-portfolio-controls),.timeline-portfolio-card>.timeline-portfolio-head .timeline-portfolio-controls>label,.timeline-portfolio-card>.timeline-portfolio-head .timeline-portfolio-view-actions>button:not([data-portfolio-fullscreen]):not([data-portfolio-cancel-zoom]){display:none!important}
 .timeline-portfolio-card>.tl-order-note{display:none!important}
 
 /* feature01 v18：手工归档、今日蒙版、密集节点与单项目横向画布 */

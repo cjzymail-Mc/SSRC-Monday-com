@@ -7,6 +7,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 from flowboard.database import SCHEMA_VERSION
+from legacy_board_e2e import reveal_legacy_board
 from server import create_server
 from test_secure_foundation import create_legacy_database
 
@@ -20,7 +21,7 @@ class I13E2E(unittest.TestCase):
         for key in ("FLOWBOARD_INITIAL_PASSWORD","FLOWBOARD_ATTACHMENT_DIR","FLOWBOARD_BACKUP_DIR"):os.environ.pop(key,None)
 
     def login(self,width):
-        context=self.browser.new_context(viewport={"width":width,"height":844});page=context.new_page();page.goto(self.base);page.locator("#loginUser").fill("u1");page.locator("#loginPassword").fill("test-password");page.locator("#loginForm button").click();page.locator(".task-row").first.wait_for();return context,page
+        context=self.browser.new_context(viewport={"width":width,"height":844});page=context.new_page();page.goto(self.base);page.locator("#loginUser").fill("u1");page.locator("#loginPassword").fill("test-password");page.locator("#loginForm button").click();reveal_legacy_board(page);return context,page
 
     def test_mobile_atomic_batch_and_admin_backup_surface(self):
         context,page=self.login(390);selectors=page.locator("[data-select-task]");self.assertGreaterEqual(selectors.count(),2);selected_ids=[int(selectors.nth(i).get_attribute("data-select-task")) for i in range(2)];selectors.nth(0).click();page.locator("[data-select-task]").nth(1).click();page.locator("#batchBar:not([hidden])").wait_for();self.assertIn("已选 2 项",page.locator("#batchCount").text_content());self.assertTrue(page.evaluate("document.documentElement.scrollWidth <= innerWidth"))
