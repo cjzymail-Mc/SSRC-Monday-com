@@ -1,6 +1,6 @@
 ---
 name: commit-push-pr
-description: Move completed Flowboard fixes made directly on local main into a fresh fix branch, verify them proportionately, commit and push the branch, create a GitHub pull request, then safely return the checkout to current main. Use only when the user explicitly invokes $commit-push-pr after local testing; do not expand the fix, merge, or deploy the pull request.
+description: Move completed Flowboard fixes made directly on local main into a fresh fix branch, reuse fresh test evidence and run only risk-triggered checks, commit and push the branch, create a GitHub pull request, then safely return the checkout to current main. Use only when the user explicitly invokes $commit-push-pr after local testing; do not expand the fix, merge, or deploy the pull request.
 ---
 
 # Commit Push PR
@@ -81,15 +81,25 @@ Turn novice work performed directly on local `main` into a reviewable temporary 
 
    Resolve only conflicts whose intended behavior is supported by current code, tests, or frozen contracts. After each resolution inspect the combined diff. If resolution is ambiguous, abort the rebase and report; do not guess.
 
-11. Verify in proportion to the submitted diff and reuse credible PASS evidence from the just-completed work. The minimum submission checks are `git diff --check`, syntax checks for changed executable files, focused tests for the touched behavior, and confirmation that protected real-data paths were not changed. Use isolated temporary databases and ports.
+11. Treat credible PASS evidence from the just-completed repair as submission evidence; entering this packaging workflow does not by itself justify repeating tests. Evidence is reusable when it identifies the commands and results, covers the submitted behavior at a risk-appropriate level, and the relevant files have not changed since those checks. Switching branches, staging, or committing identical content does not invalidate it.
 
-    Run the bundled complete checker only when the diff touches permissions, migrations, API/data semantics, deletion/recovery, or several coupled product areas; when existing evidence is insufficient; or when the user explicitly requests full regression:
+    Always perform only the submission-integrity checks that test evidence cannot cover: review the final changed paths and diff, run `git diff --check`, run low-cost syntax checks for changed executable files, and confirm that protected real-data paths were not changed. Do not rerun a focused or full suite merely to obtain a second PASS.
+
+    Rerun the smallest relevant test only when one or more of these triggers applies:
+
+    - credible PASS evidence is missing, failed, incomplete, or does not cover the submitted behavior;
+    - a relevant implementation or test file changed after the recorded PASS;
+    - fetch/rebase introduced a relevant base change, or conflict resolution changed the tested result;
+    - the submitted diff requires stronger coverage than the recorded evidence because it touches permissions, migrations, API/data semantics, deletion/recovery, or several coupled product areas;
+    - the user explicitly requests another run.
+
+    High-risk changes require adequate evidence, not duplicate execution: reuse a fresh full-regression PASS for unchanged final content. Run the bundled complete checker only when full regression is required by the triggers above and no reusable full PASS already covers the final content:
 
    ```powershell
    pwsh -NoProfile -File .agents/skills/commit-push-pr/scripts/run-flowboard-checks.ps1
    ```
 
-   When the complete checker is required, `FLOWBOARD_CHECKS_OK` is required. Any guarded-path change is always a hard failure. If sandboxing blocks Chromium or Node subprocesses, request controlled execution rather than skipping required coverage. Use `-PlanOnly` only to inspect the planned commands, never as acceptance evidence.
+   When the complete checker is actually required, `FLOWBOARD_CHECKS_OK` is required. Any guarded-path change is always a hard failure. If sandboxing blocks Chromium or Node subprocesses, request controlled execution rather than skipping required coverage. Use `-PlanOnly` only to inspect the planned commands, never as acceptance evidence.
 
    The complete checker fails fast on the first Python failure so a stale or environmental E2E does not multiply 30-second waits. Use `-CollectAllFailures` only after the first failure has been classified and a complete failure inventory is genuinely needed; it does not raise the acceptance standard or authorize unrelated repairs.
 
@@ -101,7 +111,7 @@ Turn novice work performed directly on local `main` into a reviewable temporary 
 
    - branch and commit list relative to `origin/main`;
    - intended changed paths and diff summary;
-   - tests/checks run, their results, and why that verification level matches the diff;
+   - tests/checks run or reused, their results, and why that evidence level matches the final diff;
    - proposed PR title and short body;
    - confirmation that the real database was not changed.
 

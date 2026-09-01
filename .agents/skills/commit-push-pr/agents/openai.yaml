@@ -1,5 +1,5 @@
 interface:
-  display_name: "提交并推送 PR"
+  display_name: "commit-push-pr 提交并推送 PR"
   short_description: "将 main 上的修复提交为 PR 并安全归位"
   default_prompt: "Use $commit-push-pr to move my completed local fixes into a fresh fix branch, verify them, commit and push the branch, create a GitHub pull request, then safely return to main."
 policy:
