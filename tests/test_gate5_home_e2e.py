@@ -139,7 +139,7 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertFalse(page.locator("#boardList").is_visible())
         self.assertEqual(page.locator("#dashboardBtn").count(), 0)
         self.assertEqual(page.locator(".workspace-switcher").count(), 0)
-        self.assertEqual(page.locator(".main-nav > [data-sidebar-settings]").count(), 1)
+        self.assertEqual(page.locator(".main-nav > [data-sidebar-settings]").count(), 0)
         self.assertFalse(page.locator("#trashBtn").is_visible())
         self.assertEqual(page.locator("#appSidebar").evaluate("el => getComputedStyle(el).position"), "sticky")
         self.assertAlmostEqual(page.locator("#appSidebar").bounding_box()["height"], 800, delta=1)
