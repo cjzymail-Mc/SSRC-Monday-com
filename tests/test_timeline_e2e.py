@@ -298,6 +298,18 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(float(chart.get_attribute("data-viewport-days")), float((month_end - month_start).days))
         self.assertEqual(page.locator('.timeline-portfolio-meta strong', has_text="范围活跃项目").count(), 1)
         self.assertEqual(page.locator('.timeline-portfolio-meta strong', has_text="范围内仅完成项目").count(), 0)
+        month_row = page.locator('[data-timeline-page="month"] .timeline-portfolio-project', has_text="范围活跃项目")
+        self.assertEqual(month_row.locator('.timeline-node-flag').count(), 0)
+        self.physical_click(page, month_row.locator('.timeline-portfolio-meta strong'))
+        self.assertEqual(month_row.locator('.timeline-node-flag').count(), 1)
+        month_flag = month_row.locator('.timeline-node-flag').first
+        self.physical_click(page, month_flag, button="right")
+        month_flag_menu = page.locator('[data-timeline-page="month"] [data-timeline-context]')
+        month_flag_menu.wait_for(state="visible")
+        self.assertEqual(month_flag_menu.get_attribute('data-node-id'), month_flag.get_attribute('data-node-id'))
+        self.assertEqual(month_flag_menu.get_attribute('data-project-id'), month_flag.get_attribute('data-project-id'))
+        page.keyboard.press('Escape')
+        month_flag_menu.wait_for(state="hidden")
         page.locator('[data-portfolio-zoom-out]').evaluate("el => el.click()")
         self.assertEqual(float(chart.get_attribute("data-viewport-days")), float((month_end - month_start).days), "month view must not zoom beyond its month")
         page.locator('[data-portfolio-zoom-in]').evaluate("el => el.click()")
@@ -311,6 +323,44 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(page.locator('[data-timeline-page="week"] [data-portfolio-zoom-in]').count(), 0)
         self.assertEqual(page.locator('.timeline-portfolio-meta strong', has_text="范围活跃项目").count(), 1)
         self.assertEqual(page.locator('.timeline-portfolio-meta strong', has_text="范围内仅完成项目").count(), 0)
+        week_row = page.locator('[data-timeline-page="week"] .timeline-portfolio-project', has_text="范围活跃项目")
+        self.assertEqual(week_row.locator('.timeline-node-flag').count(), 0)
+        self.physical_click(page, week_row.locator('.timeline-portfolio-meta strong'))
+        week_node = week_row.locator('.timeline-dashboard-node').first
+        week_key = week_node.get_attribute('data-node-flag-key')
+        week_node.hover()
+        self.assertTrue(week_row.locator(
+            f'.timeline-node-flag[data-node-flag-key="{week_key}"]'
+        ).evaluate("el => el.classList.contains('is-probed')"))
+        week_flag = week_row.locator(f'.timeline-node-flag[data-node-flag-key="{week_key}"]')
+        week_probe = week_row.locator(f'.timeline-node-flag-hit.is-active[data-node-flag-key="{week_key}"]')
+        week_flag_target = week_probe if week_probe.is_visible() else week_flag
+        week_flag_target.scroll_into_view_if_needed()
+        week_target_point = week_flag_target.evaluate("""target => {
+          const rect = target.getBoundingClientRect();
+          const left = Math.max(0, Math.ceil(rect.left));
+          const right = Math.min(innerWidth - 1, Math.floor(rect.right));
+          const top = Math.max(0, Math.ceil(rect.top));
+          const bottom = Math.min(innerHeight - 1, Math.floor(rect.bottom));
+          for (let y = top + 2; y <= bottom - 2; y += 2) {
+            for (let x = left + 2; x <= right - 2; x += 2) {
+              const owner = document.elementFromPoint(x, y)?.closest('.timeline-node-flag,.timeline-node-flag-hit');
+              if (owner?.dataset.nodeFlagKey === target.dataset.nodeFlagKey) return {x, y};
+            }
+          }
+          return {x: null, y: null, rect: {left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom}, viewport: {width: innerWidth, height: innerHeight}};
+        }""")
+        self.assertIsNotNone(week_target_point["x"], week_target_point)
+        page.mouse.move(week_target_point["x"], week_target_point["y"])
+        self.assertEqual(page.evaluate("point => document.elementFromPoint(point.x, point.y)?.closest('.timeline-node-flag,.timeline-node-flag-hit')?.dataset.nodeFlagKey", week_target_point), week_key)
+        page.mouse.down(button="right")
+        page.mouse.up(button="right")
+        week_flag_menu = page.locator('[data-timeline-page="week"] [data-timeline-context]')
+        week_flag_menu.wait_for(state="visible")
+        self.assertEqual(week_flag_menu.get_attribute('data-node-id'), week_node.get_attribute('data-node-id'))
+        self.assertEqual(week_flag_menu.get_attribute('data-project-id'), week_node.get_attribute('data-project-id'))
+        page.keyboard.press('Escape')
+        week_flag_menu.wait_for(state="hidden")
 
         self.physical_click(page, page.locator("#timelineAllBtn"))
         page.locator('[data-timeline-page="all"] .timeline-portfolio-chart').wait_for()
@@ -877,6 +927,39 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(card.locator('.timeline-portfolio-card.is-single-profile[data-canvas-profile="single"]').count(), 1)
         self.assertEqual(card.locator('.timeline-portfolio-chart').count(), 1)
         self.assertEqual(card.locator('[data-portfolio-focus-project]').count(), 0)
+        self.assertAlmostEqual(card.locator('.timeline-portfolio-project').bounding_box()["height"], 190, delta=1)
+        self.assertEqual(card.locator('.timeline-node-flag').count(), card.locator('.timeline-dashboard-node').count())
+        single_node = card.locator('.timeline-dashboard-node').first
+        single_key = single_node.get_attribute('data-node-flag-key')
+        single_flag = card.locator(f'.timeline-node-flag[data-node-flag-key="{single_key}"]')
+        single_node.hover()
+        self.assertTrue(single_flag.evaluate("el => el.classList.contains('is-probed')"))
+        self.assertTrue(page.locator('[data-timeline-node-tooltip]').is_hidden())
+        card.locator('.timeline-portfolio-axis-label').hover()
+        self.assertFalse(single_flag.evaluate("el => el.classList.contains('is-probed')"))
+        single_probe = card.locator(f'.timeline-node-flag-hit.is-active[data-node-flag-key="{single_key}"]')
+        single_flag_target = single_probe if single_probe.is_visible() else single_flag
+        single_flag_target.hover(position={"x": 4, "y": 8})
+        self.assertTrue(single_flag.evaluate("el => el.classList.contains('is-probed')"), "hovering the flag itself must promote that exact flag")
+        self.physical_click(page, single_flag_target, button="right")
+        single_flag_menu = card.locator('[data-timeline-context]')
+        single_flag_menu.wait_for(state="visible")
+        self.assertEqual(single_flag_menu.get_attribute('data-node-id'), single_node.get_attribute('data-node-id'))
+        self.assertEqual(single_flag_menu.get_attribute('data-project-id'), single_node.get_attribute('data-project-id'))
+        self.assertEqual(single_flag_menu.locator('[role="menuitem"]').all_inner_texts(), ['拖拽（仅当前节点）', '拖拽（顺延）', '已完成', '未完成', '编辑备注', '删除节点'])
+        self.physical_click(page, single_flag_menu.locator('[data-draft-action="cascade"]'))
+        single_flag_menu.wait_for(state="hidden")
+        self.assertTrue(single_node.evaluate("el => el.classList.contains('is-armed')"), "flag menu actions must target the underlying node")
+        self.assertFalse(single_flag.evaluate("el => el.classList.contains('is-armed')"), "the visual flag must not become the drag target")
+        single_geometry = card.locator('.timeline-portfolio-project').evaluate("""row => {
+          const rr=row.getBoundingClientRect(),flags=[...row.querySelectorAll('.timeline-node-flag')].map(el=>el.getBoundingClientRect());
+          return {top:Math.min(...flags.map(r=>r.top))-rr.top,bottom:rr.bottom-Math.max(...flags.map(r=>r.bottom))};
+        }""")
+        self.assertGreaterEqual(single_geometry["top"], -1)
+        self.assertGreaterEqual(single_geometry["bottom"], -1)
+        self.assertAlmostEqual(single_geometry["top"], single_geometry["bottom"], delta=6)
+        self.assertGreaterEqual(single_geometry["top"], 20, "single dashboard should retain more outer whitespace than the portfolio row")
+        self.assertGreaterEqual(single_geometry["bottom"], 20, "single dashboard should retain more outer whitespace than the portfolio row")
         axis_label = card.locator('.timeline-portfolio-axis-label')
         self.assertEqual(axis_label.inner_text(), "")
         self.assertAlmostEqual(axis_label.bounding_box()["width"], 73.333, delta=1)
@@ -898,6 +981,13 @@ class TimelineProductionE2E(unittest.TestCase):
             self.assertEqual(style["background"], "rgb(255, 255, 255)")
             self.assertEqual(style["bottomBorder"], "6px")
             self.assertTrue(label.evaluate("""el => { const r=el.getBoundingClientRect(); const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2); return hit===el||el.contains(hit) }"""))
+        track_alignment = card.evaluate("""root => {
+          const center=el=>{const r=el.getBoundingClientRect();return r.top+r.height/2},labels=[...root.querySelectorAll('.timeline-single-track-key > span')],main=root.querySelector('.timeline-stage-lane[data-track="main"]'),parallel=root.querySelector('.timeline-stage-lane[data-track="parallel"]');
+          return {mainLabel:center(labels[0]),parallelLabel:center(labels[1]),mainLane:center(main),parallelLane:center(parallel)};
+        }""")
+        self.assertAlmostEqual(track_alignment["mainLabel"], track_alignment["mainLane"], delta=1)
+        self.assertAlmostEqual(track_alignment["parallelLabel"], track_alignment["parallelLane"], delta=1)
+        self.assertAlmostEqual(track_alignment["parallelLane"] - track_alignment["mainLane"], 44, delta=1)
         self.assertEqual(card.locator(".timeline-editor").count(), 0, "dashboard must not embed the editor")
         header_before = card.locator(":scope > header").bounding_box()
         tabs_before = card.locator(":scope > .timeline-project-tabs").bounding_box()
@@ -1314,6 +1404,16 @@ class TimelineProductionE2E(unittest.TestCase):
                 created = db.execute("INSERT INTO timeline_projects(workspace_id,name,created_by,version,created_at,updated_at) VALUES (1,?,'u1',1,?,?)", (f"画布压力项目 {index + 1:02d}", now, now))
                 node_date = (today + timedelta(days=index - 4)).isoformat()
                 db.execute("INSERT INTO timeline_nodes(project_id,track,stage,name,date,initial_date,remark,version,created_at,updated_at) VALUES (?,?,?,?,?,?,'',1,?,?)", (created.lastrowid, "main", "开发", f"压力节点 {index + 1:02d}", node_date, node_date, now, now))
+            dense = db.execute("INSERT INTO timeline_projects(workspace_id,name,created_by,version,created_at,updated_at) VALUES (1,'极密集旗标项目','u1',1,?,?)", (now, now))
+            dense_project_id = dense.lastrowid
+            dense_date = today.isoformat()
+            for index in range(24):
+                db.execute("INSERT INTO timeline_nodes(project_id,track,stage,name,date,initial_date,remark,version,created_at,updated_at) VALUES (?,'main','开发',?,?,?,?,1,?,?)", (dense_project_id, f"极密集节点 {index + 1:02d}", dense_date, dense_date, '', now, now))
+            adaptive = db.execute("INSERT INTO timeline_projects(workspace_id,name,created_by,version,created_at,updated_at) VALUES (1,'自适应旗标项目','u1',1,?,?)", (now, now))
+            adaptive_project_id = adaptive.lastrowid
+            for index in range(7):
+                node_date = (today + timedelta(days=index * 2 - 4)).isoformat()
+                db.execute("INSERT INTO timeline_nodes(project_id,track,stage,name,date,initial_date,remark,version,created_at,updated_at) VALUES (?,'parallel','测试',?,?,?,?,1,?,?)", (adaptive_project_id, f"碳板力值测试（第{index + 1}次）", node_date, node_date, '', now, now))
             db.commit()
         finally:
             db.close()
@@ -1377,16 +1477,127 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertIn("逾期", risk.locator('b').inner_text())
         self.assertIn("本周", risk.locator('b').inner_text())
 
+        unfocused_node = overlap_project.locator(
+            '.timeline-dashboard-node, .timeline-node-cluster'
+        ).first
+        self.assertEqual(overlap_project.locator('.timeline-node-flag').count(), 0)
+        unfocused_node.hover()
+        self.assertFalse(page.locator('[data-timeline-node-tooltip]').is_hidden(), "collapsed row must keep the existing node tooltip")
+
         self.physical_click(page, overlap_project.locator('.timeline-portfolio-meta strong'))
         page.wait_for_timeout(220)
-        self.assertGreaterEqual(overlap_project.bounding_box()["height"], 107)
-        self.assertLessEqual(overlap_project.bounding_box()["height"], 109)
+        self.assertGreaterEqual(overlap_project.bounding_box()["height"], 167)
+        self.assertLessEqual(overlap_project.bounding_box()["height"], 169)
+        self.assertEqual(overlap_project.locator('.timeline-node-flag').count(), overlap_project.locator('.timeline-dashboard-node').count())
+        focused_node = overlap_project.locator('.timeline-dashboard-node').first
+        focused_key = focused_node.get_attribute('data-node-flag-key')
+        focused_flag = overlap_project.locator(f'.timeline-node-flag[data-node-flag-key="{focused_key}"]')
+        other_flag = overlap_project.locator(
+            f'.timeline-node-flag:not(.is-density-hidden):not([data-node-flag-key="{focused_key}"])'
+        ).first
+        focused_node.hover()
+        self.assertTrue(focused_flag.evaluate("el => el.classList.contains('is-probed')"))
+        if other_flag.count():
+            self.assertFalse(other_flag.evaluate("el => el.classList.contains('is-probed')"))
+            other_key = other_flag.get_attribute('data-node-flag-key')
+            other_probe = overlap_project.locator(f'.timeline-node-flag-hit.is-active[data-node-flag-key="{other_key}"]')
+            self.assertTrue(other_probe.is_visible(), "overlapping flags must expose a non-overlapping pointer probe")
+            other_probe.hover(position={"x": 4, "y": 8})
+            self.assertTrue(other_flag.evaluate("el => el.classList.contains('is-probed')"), "hovering a flag must promote that exact flag")
+            self.assertFalse(focused_flag.evaluate("el => el.classList.contains('is-probed')"))
+            self.physical_click(page, other_probe, button="right")
+            flag_menu = page.locator('[data-timeline-page="all"] [data-timeline-context]')
+            flag_menu.wait_for(state="visible")
+            self.assertEqual(flag_menu.get_attribute('data-node-id'), other_flag.get_attribute('data-node-id'))
+            self.assertEqual(flag_menu.get_attribute('data-project-id'), other_flag.get_attribute('data-project-id'))
+            self.assertEqual(flag_menu.locator('[role="menuitem"]').count(), 6)
+            page.keyboard.press('Escape')
+            flag_menu.wait_for(state="hidden")
+        self.assertTrue(page.locator('[data-timeline-node-tooltip]').is_hidden(), "expanded row must replace the node tooltip with its flag")
+        flag_geometry = overlap_project.evaluate("""row => {
+          const rr=row.getBoundingClientRect(),byTrack=track=>[...row.querySelectorAll(`.timeline-node-flag[data-node-track="${track}"]`)].filter(el=>getComputedStyle(el).visibility!=='hidden').map(el=>el.getBoundingClientRect()),main=byTrack('main'),parallel=byTrack('parallel'),all=[...main,...parallel];
+          const parallelDots=[...row.querySelectorAll('.timeline-stage-lane[data-track="parallel"] .timeline-dashboard-node i')].map(el=>el.getBoundingClientRect()),parallelAxes=[...row.querySelectorAll('.timeline-stage-lane[data-track="parallel"] .timeline-stage')].map(el=>el.getBoundingClientRect());
+          const overlapRatios=[main,parallel].flatMap(rects=>{const sorted=rects.slice().sort((a,b)=>a.left-b.left);return sorted.slice(1).map((rect,index)=>Math.max(0,sorted[index].right-rect.left)/rect.width)});
+          const probeOverlapCount=[...row.querySelectorAll('.timeline-stage-lane')].reduce((count,lane)=>{const rects=[...lane.querySelectorAll('.timeline-node-flag-hit.is-active')].map(el=>el.getBoundingClientRect()).sort((a,b)=>a.left-b.left);return count+rects.slice(1).filter((rect,index)=>rect.left<rects[index].right-.5).length},0);
+          const parallelTop=Math.min(...parallel.map(r=>r.top));
+          return {top:Math.min(...all.map(r=>r.top))-rr.top,bottom:rr.bottom-Math.max(...all.map(r=>r.bottom)),maxOverlapRatio:Math.max(0,...overlapRatios),probeOverlapCount,nodeClearance:parallelTop-Math.max(...parallelDots.map(r=>r.bottom)),axisClearance:parallelTop-Math.max(...parallelAxes.map(r=>r.bottom))};
+        }""")
+        self.assertGreaterEqual(flag_geometry["top"], -1, "main flags must stay inside the expanded row")
+        self.assertGreaterEqual(flag_geometry["bottom"], -1, "parallel flags must stay inside the expanded row")
+        self.assertAlmostEqual(flag_geometry["top"], flag_geometry["bottom"], delta=6, msg="expanded row must keep symmetric outer whitespace")
+        self.assertLessEqual(flag_geometry["maxOverlapRatio"], .51, "visible flags must retain at least half of their horizontal width")
+        self.assertEqual(flag_geometry["probeOverlapCount"], 0, "overlapping flags must own disjoint pointer probe regions")
+        self.assertGreaterEqual(flag_geometry["nodeClearance"], -1, "parallel flags must begin below their node circles")
+        self.assertGreaterEqual(flag_geometry["axisClearance"], 0, "parallel flags must not cover the parallel axis")
+        flag_layer = focused_flag.evaluate("el => Number(getComputedStyle(el).zIndex)")
+        mask_layer = overlap_project.locator('.timeline-past-mask').first.evaluate("el => Number(getComputedStyle(el).zIndex)")
+        today_layer = chart.locator('.timeline-portfolio-today').evaluate("el => Number(getComputedStyle(el).zIndex)")
+        self.assertGreater(flag_layer, mask_layer)
+        self.assertLess(flag_layer, today_layer)
+        probe_layer = overlap_project.locator('.timeline-node-flag-hit.is-active').first.evaluate("el => Number(getComputedStyle(el).zIndex)")
+        self.assertGreater(probe_layer, flag_layer)
+        self.assertLess(probe_layer, today_layer)
         second_project = page.locator('.timeline-portfolio-project').nth(1)
         self.physical_click(page, second_project.locator('.timeline-portfolio-meta strong'))
         page.wait_for_timeout(220)
         self.assertEqual(page.locator('.timeline-portfolio-project.is-focused').count(), 1)
         self.assertLessEqual(overlap_project.bounding_box()["height"], 49)
-        self.assertGreaterEqual(second_project.bounding_box()["height"], 107)
+        self.assertGreaterEqual(second_project.bounding_box()["height"], 167)
+        self.assertLessEqual(second_project.bounding_box()["height"], 169)
+        dense_project = page.locator(f'[data-dashboard-project="{dense_project_id}"]')
+        dense_project.scroll_into_view_if_needed()
+        self.assertEqual(dense_project.locator('.timeline-node-flag').count(), 0)
+        self.physical_click(page, dense_project.locator('.timeline-portfolio-meta strong'))
+        page.wait_for_function("id => document.querySelectorAll(`[data-dashboard-project=\"${id}\"] .timeline-node-flag.is-density-hidden`).length >= 1", arg=dense_project_id)
+        dense_flags = dense_project.locator('.timeline-node-flag')
+        dense_horizontal = dense_project.evaluate("""row => {
+          const plot=row.querySelector('.timeline-stage-plot').getBoundingClientRect(),flags=[...row.querySelectorAll('.timeline-node-flag')],visible=flags.filter(el=>getComputedStyle(el).visibility!=='hidden'),rects=visible.map(el=>el.getBoundingClientRect()).sort((a,b)=>a.left-b.left);
+          const overlapRatios=rects.slice(1).map((rect,index)=>Math.max(0,rects[index].right-rect.left)/rect.width);
+          return {inside:rects.every(rect=>rect.left>=plot.left-1&&rect.right<=plot.right+1),visible:visible.map(el=>el.dataset.nodeId),hidden:flags.filter(el=>getComputedStyle(el).visibility==='hidden').length,overlapRatios,firstShift:parseFloat(visible[0].style.getPropertyValue('--timeline-node-flag-shift'))};
+        }""")
+        self.assertTrue(dense_horizontal["inside"], "adaptive layout must keep visible flags inside the plot")
+        self.assertEqual(len(dense_horizontal["visible"]), 3, "a dense exact-date crowd should retain the maximum flags that keep at least half visible")
+        self.assertEqual(dense_horizontal["hidden"], 21)
+        self.assertTrue(any(ratio > .05 for ratio in dense_horizontal["overlapRatios"]))
+        self.assertTrue(all(ratio <= .51 for ratio in dense_horizontal["overlapRatios"]))
+        self.assertGreaterEqual(dense_horizontal["firstShift"], -0.5, "the first flag must not be pushed before its first node")
+        self.assertEqual(dense_horizontal["visible"][0], dense_flags.first.get_attribute('data-node-id'))
+        self.assertEqual(dense_horizontal["visible"][-1], dense_flags.last.get_attribute('data-node-id'))
+        dense_probe = dense_flags.nth(6)
+        dense_probe_key = dense_probe.get_attribute('data-node-flag-key')
+        self.assertTrue(dense_probe.evaluate("el => getComputedStyle(el).visibility === 'hidden'"))
+        dense_project.locator(f'.timeline-dashboard-node[data-node-flag-key="{dense_probe_key}"]').focus()
+        self.assertTrue(dense_project.locator(f'.timeline-node-flag[data-node-flag-key="{dense_probe_key}"]').evaluate("el => el.classList.contains('is-probed')"))
+        self.assertTrue(dense_project.locator(f'.timeline-node-flag[data-node-flag-key="{dense_probe_key}"]').is_visible())
+        self.assertEqual(dense_project.locator('.timeline-node-flag.is-probed').count(), 1)
+
+        adaptive_project = page.locator(f'[data-dashboard-project="{adaptive_project_id}"]')
+        adaptive_project.scroll_into_view_if_needed()
+        self.physical_click(page, adaptive_project.locator('.timeline-portfolio-meta strong'))
+        page.wait_for_function("id => document.querySelectorAll(`[data-dashboard-project=\"${id}\"] .timeline-node-flag.is-density-hidden`).length >= 1", arg=adaptive_project_id)
+        adaptive_summary = adaptive_project.evaluate("""row => {
+          const flags=[...row.querySelectorAll('.timeline-node-flag')],visible=flags.filter(el=>getComputedStyle(el).visibility!=='hidden'),rects=visible.map(el=>el.getBoundingClientRect()).sort((a,b)=>a.left-b.left),overlapRatios=rects.slice(1).map((rect,index)=>Math.max(0,rects[index].right-rect.left)/rect.width);
+          return {visible:visible.map(el=>el.dataset.nodeId),first:flags[0].dataset.nodeId,last:flags.at(-1).dataset.nodeId,firstShift:parseFloat(flags[0].style.getPropertyValue('--timeline-node-flag-shift')),overlapRatios};
+        }""")
+        self.assertGreaterEqual(len(adaptive_summary["visible"]), 2)
+        self.assertLess(len(adaptive_summary["visible"]), 7)
+        self.assertEqual(adaptive_summary["visible"][0], adaptive_summary["first"], "adaptive sampling must preserve the first temporal endpoint")
+        self.assertEqual(adaptive_summary["visible"][-1], adaptive_summary["last"], "adaptive sampling must preserve the last temporal endpoint")
+        self.assertGreaterEqual(adaptive_summary["firstShift"], -0.5, "the first parallel flag must start at or after its node")
+        self.assertTrue(any(ratio > 0.05 for ratio in adaptive_summary["overlapRatios"]), "moderately crowded flags should be allowed to overlap")
+        self.assertTrue(all(ratio <= 0.51 for ratio in adaptive_summary["overlapRatios"]), "no visible flag may be covered by more than half its width")
+        adaptive_middle = adaptive_project.locator('.timeline-node-flag.is-density-hidden').first
+        adaptive_middle_key = adaptive_middle.get_attribute('data-node-flag-key')
+        adaptive_middle = adaptive_project.locator(f'.timeline-dashboard-node[data-node-flag-key="{adaptive_middle_key}"]')
+        adaptive_middle.hover()
+        self.assertTrue(adaptive_project.locator(f'.timeline-node-flag[data-node-flag-key="{adaptive_middle_key}"]').is_visible(), "hovering a hidden flag's node must temporarily reveal that exact flag")
+        for _ in range(6):
+            page.locator('[data-timeline-page="all"] [data-portfolio-zoom-in]').evaluate("el => el.click()")
+            page.wait_for_timeout(80)
+        page.wait_for_function("id => [...document.querySelectorAll(`[data-dashboard-project=\"${id}\"] .timeline-node-flag`)].every(el => getComputedStyle(el).visibility !== 'hidden')", arg=adaptive_project_id)
+        self.assertEqual(adaptive_project.locator('.timeline-node-flag:visible').count(), 7, "zooming in must automatically restore flags when enough width becomes available")
+        self.physical_click(page, page.locator('[data-timeline-page="all"] [data-portfolio-cancel-zoom]'))
+        page.wait_for_function("() => { const chart=document.querySelector('[data-timeline-page=\"all\"] .timeline-portfolio-chart'); return chart && Number(chart.dataset.viewportDays) === Number(chart.dataset.fullDays) }")
         sticky = page.evaluate("""() => ({
           axis:getComputedStyle(document.querySelector('.timeline-portfolio-axis')).position,
           axisLabel:getComputedStyle(document.querySelector('.timeline-portfolio-axis-label')).position,

@@ -47,14 +47,17 @@
     if(!menu)return {hide(){}};
     const closeMenu=()=>{
       contextNode?.element?.classList.remove('is-context-open');
+      contextNode?.triggerElement?.classList.remove('is-context-open');
       menu.hidden=true;
+      delete menu.dataset.nodeId;delete menu.dataset.projectId;
       contextNode=null;
     };
-    root.querySelectorAll(selector).forEach(node=>node.addEventListener('contextmenu',event=>{
+    root.querySelectorAll(selector).forEach(triggerElement=>triggerElement.addEventListener('contextmenu',event=>{
       event.preventDefault();
       closeMenu();
-      contextNode={id:Number(node.dataset.nodeId),projectId:Number(node.dataset.projectId||root.dataset.timelineProject||0),element:node,cluster:node.matches('.timeline-node-cluster')};
-      node.classList.add('is-context-open');
+      const id=Number(triggerElement.dataset.nodeId),projectId=Number(triggerElement.dataset.projectId||root.dataset.timelineProject||0),element=triggerElement.matches('.timeline-node-flag,.timeline-node-flag-hit')?[...root.querySelectorAll('.timeline-dashboard-node')].find(node=>Number(node.dataset.nodeId)===id&&Number(node.dataset.projectId||root.dataset.timelineProject||0)===projectId)||triggerElement:triggerElement;
+      contextNode={id,projectId,element,triggerElement,cluster:element.matches('.timeline-node-cluster')};
+      element.classList.add('is-context-open');triggerElement.classList.add('is-context-open');menu.dataset.nodeId=String(id);menu.dataset.projectId=String(projectId);
       menu.querySelectorAll('[data-draft-action]').forEach(button=>button.disabled=false);
       onOpen?.(contextNode,menu);
       menu.hidden=false;
@@ -186,7 +189,7 @@
     }
     return groups;
   }
-  function renderProjectLanes(source,{start,end,today=shanghaiToday(),expanded=new Set(),state=null,pixelPerDay=Infinity,portfolio=false,clipRange=false}={}){
+  function renderProjectLanes(source,{start,end,today=shanghaiToday(),expanded=new Set(),state=null,pixelPerDay=Infinity,portfolio=false,clipRange=false,showNodeLabels=false}={}){
     const project=state?.project?.project_id===source.project_id?state.project:source;
     const range=start&&end?{start,end,today}:dashboardRange([project],today),intervals=project.stage_intervals||[],nodes=project.nodes||[],nodesById=new Map(nodes.map(node=>[Number(node.id),node]));
     const inRange=date=>!clipRange||(date>=range.start&&date<range.end),visibleNodes=nodes.filter(node=>inRange(node.date));
@@ -205,15 +208,16 @@
          const original=originalById.get(Number(node.id)),changed=original&&original.date!==node.date;
          return changed&&inRange(original.date)?`<span class="timeline-dashboard-origin" style="left:${position(original.date,range.start,range.end)}%" title="最近已提交位置 ${esc(original.date)}"></span>`:'';
        }).join('');
-       const trackNodes=visibleNodes.filter(node=>node.track===track),groups=denseNodeGroups(trackNodes,pixelPerDay);
+        const trackNodes=visibleNodes.filter(node=>node.track===track),groups=showNodeLabels?trackNodes.slice().sort(compareNodes).map(node=>[node]):denseNodeGroups(trackNodes,pixelPerDay);
       const buttons=groups.map((group,nodeOrder)=>{
         if(group.length>1){
           const proxy=group[0],middle=new Date(group.reduce((total,node)=>total+iso(node.date).getTime(),0)/group.length).toISOString().slice(0,10),description=group.map(node=>`${node.date} ${node.name}`).join('；');
           const preview=group.slice(0,6).map(node=>`${node.date} ${node.name}`).join('；'),more=group.length>6?`；另有 ${group.length-6} 个节点`:'';
           return `<span class="timeline-node-cluster" role="img" tabindex="0" data-cluster-drag-proxy="earliest" data-node-id="${proxy.id}" data-project-id="${project.project_id}" data-node-date="${proxy.date}" aria-label="${group.length} 个拥挤节点：${esc(description)}；右键可拖拽最早节点" style="left:${position(middle,range.start,range.end)}%;z-index:${1000-nodeOrder}"><span data-node-tooltip-source aria-hidden="true"><b>${group.length} 个拥挤节点</b><small>${esc(preview+more)}</small></span></span>`;
         }
-        const node=group[0],action=state?.dashboardContext?.nodeId===Number(node.id)?state.dashboardContext.action:'',draft=state?.draft?.has(Number(node.id)),overdue=!node.done_at&&node.date<range.today;
-        return `<button type="button" class="timeline-dashboard-node ${stageClass(node.stage)} ${node.done_at?'is-done':''} ${overdue?'is-overdue':''} ${draft?'is-draft':''} ${state?.armed?.nodeId===Number(node.id)?'is-armed':''} ${action?'is-context-target':''}" data-dashboard-hit-target="node" data-node-id="${node.id}" data-project-id="${project.project_id}" data-node-date="${node.date}" ${action?`data-dashboard-action="${esc(action)}"`:''} aria-label="节点 ${esc(node.name)}，${esc(node.stage)}，${esc(node.date)}；右键操作" style="left:${position(node.date,range.start,range.end)}%;z-index:${1000-nodeOrder}"><i></i><span data-node-tooltip-source aria-hidden="true"><b>${esc(node.name)}</b><small>${esc(node.stage)} · ${esc(node.date)}</small></span></button>`;
+         const node=group[0],action=state?.dashboardContext?.nodeId===Number(node.id)?state.dashboardContext.action:'',draft=state?.draft?.has(Number(node.id)),overdue=!node.done_at&&node.date<range.today,left=position(node.date,range.start,range.end),flagKey=`${project.project_id}:${node.id}`;
+         const flag=showNodeLabels?`<i class="timeline-node-flag-leader" data-node-flag-key="${flagKey}" aria-hidden="true" style="left:${left}%"></i><span class="timeline-node-flag" data-node-flag-key="${flagKey}" data-node-id="${node.id}" data-project-id="${project.project_id}" data-node-track="${track}" aria-hidden="true" style="left:${left}%"><b>${esc(node.name)}</b><small>${esc(node.date)}</small></span><i class="timeline-node-flag-hit" data-node-flag-key="${flagKey}" data-node-id="${node.id}" data-project-id="${project.project_id}" aria-hidden="true" style="left:${left}%"></i>`:'';
+         return `<button type="button" class="timeline-dashboard-node ${stageClass(node.stage)} ${node.done_at?'is-done':''} ${overdue?'is-overdue':''} ${draft?'is-draft':''} ${state?.armed?.nodeId===Number(node.id)?'is-armed':''} ${action?'is-context-target':''}" data-dashboard-hit-target="node" data-node-id="${node.id}" data-project-id="${project.project_id}" data-node-date="${node.date}" ${showNodeLabels?`data-node-flag-key="${flagKey}" data-node-flag-visible="true"`:''} ${action?`data-dashboard-action="${esc(action)}"`:''} aria-label="节点 ${esc(node.name)}，${esc(node.stage)}，${esc(node.date)}；右键操作" style="left:${left}%;z-index:${1000-nodeOrder}"><i></i><span data-node-tooltip-source aria-hidden="true"><b>${esc(node.name)}</b><small>${esc(node.stage)} · ${esc(node.date)}</small></span></button>${flag}`;
       }).join('');
       return `<div class="timeline-stage-lane ${open?'is-expanded':''}" data-track="${track}" data-overlap-rows="${maxRow+1}"><div class="timeline-track-label ${portfolio?'is-portfolio-label':''}">${portfolio?'':`<strong>${track==='main'?'主线':'并行'}</strong>`}${maxRow?`<button type="button" data-timeline-expand="${key}" aria-expanded="${open}">${open?'收起重叠':'展开重叠'}</button>`:''}</div><div class="timeline-stage-plot" style="--overlap-rows:${open?maxRow+1:1}">${bars}${origins}${buttons}${pastMask}</div></div>`;
     }).join('');
@@ -248,7 +252,7 @@
       const hint=state?.armed?`已解锁「${esc(armedNode?.name||'节点')}」${state.armed.mode==='cascade'?'（顺延后续）':'（仅此节点）'}：按住左键拖动；尚未写入服务器。`:draftCount?`${draftCount} 项草稿待更新；尚未写入服务器。`:'右键节点选择拖拽模式或完成状态。';
       const controls=canEdit?(draftCount&&!singleProfile?`<div class="timeline-dashboard-actions timeline-portfolio-actions has-draft"><button type="button" data-dashboard-discard="${project.project_id}">放弃</button><button type="button" class="primary" data-dashboard-submit="${project.project_id}">更新${draftCount?` ${draftCount}`:''}</button></div>`:''):`<span class="timeline-portfolio-status">${project.archived_at?'已归档 · 只读':'只读'}</span>`;
       const focusAttr=singleProfile?'':` data-portfolio-focus-project="${project.project_id}"`,meta=singleProfile?`<span class="timeline-single-track-key" aria-label="项目轨道"><span>主线</span><span>并行</span></span>${controls}`:`${canReorder?'<button type="button" class="tl-order-grip" draggable="true" aria-label="拖拽调整个人顺序" tabindex="-1">⋮⋮</button>':''}<strong>${esc(project.name)}</strong><small class="timeline-portfolio-detail">${project.archived_at?`归档于 ${esc(String(project.archived_at).slice(0,16).replace('T',' '))}`:`当前 ${esc(metrics.current_stage||'—')} · 临近 ${esc(metrics.upcoming?.[0]?.date||'—')}`}</small>${project.archived_at?'':portfolioRiskMarker(project)}<p class="timeline-dashboard-hint" data-dashboard-hint>${project.archived_at?'归档期间只读；取消归档后可编辑。':hint}</p>${controls}`;
-      return `<article class="timeline-portfolio-project ${focused?'is-focused':''} ${project.archived_at?'is-archived':''}" data-dashboard-project="${project.project_id}" data-order-project="${project.project_id}"${focusAttr}><div class="timeline-portfolio-meta">${meta}</div><div class="timeline-portfolio-lanes">${renderProjectLanes(project,{...range,expanded:filters.expanded||new Set(),state,pixelPerDay,portfolio:true,clipRange:boundedPeriod})}</div></article>`;
+      return `<article class="timeline-portfolio-project ${focused?'is-focused has-node-flags':''} ${project.archived_at?'is-archived':''}" data-dashboard-project="${project.project_id}" data-order-project="${project.project_id}"${focusAttr}><div class="timeline-portfolio-meta">${meta}</div><div class="timeline-portfolio-lanes">${renderProjectLanes(project,{...range,expanded:filters.expanded||new Set(),state,pixelPerDay,portfolio:true,clipRange:boundedPeriod,showNodeLabels:focused})}</div></article>`;
     }).join('');
     const legend=`<div class="tl-legend timeline-portfolio-legend" aria-label="全项目时间轴图例"><span><i class="stage-idea"></i>创意</span><span><i class="stage-design"></i>设计</span><span><i class="stage-develop"></i>开发</span><span><i class="stage-test"></i>测试</span><span><i class="stage-production"></i>量产</span><span><i class="stage-iteration"></i>应用迭代</span><span><i class="ring"></i>逾期节点</span><span><i class="cluster"></i>拥挤节点</span><span><b>✓</b> 已完成</span></div>`;
     const catalog=filters.tagCatalog||{virtual:[],tags:[]},active=filters.orderContext||{context_type:'all',tag_id:null},tagNav=[...(catalog.virtual||[]).map(tag=>({kind:tag.context_type,id:'',name:tag.name,count:tag.project_count})),...(catalog.tags||[]).map(tag=>({kind:'tag',id:tag.tag_id,name:tag.name,count:tag.project_count}))].map(tag=>`<button type="button" data-timeline-tag-context="${tag.kind}" data-tag-id="${tag.id}" class="${active.context_type===tag.kind&&(tag.kind!=='tag'||Number(active.tag_id)===Number(tag.id))?'active':''}">${esc(tag.name)} <small>${tag.count}</small></button>`).join('');
@@ -283,7 +287,7 @@
       const candidates=raw.map((candidate,index)=>{const left=clamp(candidate.left,leftBound,Math.max(leftBound,rightBound-measuredWidth)),top=clamp(candidate.top,topBound,Math.max(topBound,bottomBound-measuredHeight)),rect={left,top,right:left+measuredWidth,bottom:top+measuredHeight},collision=blockers.reduce((total,blocker)=>total+intersection(rect,blocker.rect)*(blocker.item.matches('.timeline-dashboard-node,.timeline-node-cluster')?8:1),0);return{...candidate,left,top,collision:collision+index*.01}}).sort((a,b)=>a.collision-b.collision)[0];
       tooltip.dataset.placement=candidates.placement;tooltip.style.left=Math.round(candidates.left)+'px';tooltip.style.top=Math.round(candidates.top)+'px';tooltip.style.visibility='visible';
     };
-    const show=anchor=>{const source=anchor?.querySelector('[data-node-tooltip-source]');if(!source)return;hide();active=anchor;anchor.setAttribute('aria-describedby','timelineNodeTooltip');tooltip.innerHTML=source.innerHTML;tooltip.style.left='0';tooltip.style.top='0';tooltip.style.visibility='hidden';tooltip.hidden=false;frame=requestAnimationFrame(()=>place(anchor))};
+    const show=anchor=>{if(anchor?.dataset.nodeFlagVisible==='true'){hide();return}const source=anchor?.querySelector('[data-node-tooltip-source]');if(!source)return;hide();active=anchor;anchor.setAttribute('aria-describedby','timelineNodeTooltip');tooltip.innerHTML=source.innerHTML;tooltip.style.left='0';tooltip.style.top='0';tooltip.style.visibility='hidden';tooltip.hidden=false;frame=requestAnimationFrame(()=>place(anchor))};
     root.addEventListener('pointerover',event=>{const anchor=event.target.closest('.timeline-dashboard-node,.timeline-node-cluster');if(anchor&&!anchor.contains(event.relatedTarget))show(anchor)});
     root.addEventListener('pointerout',event=>{const anchor=event.target.closest('.timeline-dashboard-node,.timeline-node-cluster');if(anchor&&active===anchor&&!anchor.contains(event.relatedTarget))hide()});
     root.addEventListener('focusin',event=>{const anchor=event.target.closest('.timeline-dashboard-node,.timeline-node-cluster');if(anchor)show(anchor)});
@@ -292,9 +296,36 @@
     const previous=window.__flowboardTimelineTooltipHide;if(previous){window.removeEventListener('scroll',previous,true);window.removeEventListener('resize',previous)}window.__flowboardTimelineTooltipHide=hide;window.addEventListener('scroll',hide,true);window.addEventListener('resize',hide);
     return hide;
   }
+  function layoutNodeFlags(root){
+    const groupingGap=5,maxOverlapRatio=.5,clamp=(value,min,max)=>Math.max(min,Math.min(max,value)),sampleIndices=(count,visible)=>{if(visible<=1)return[0];return Array.from({length:visible},(_,index)=>Math.round(index*(count-1)/(visible-1)))};
+    root.querySelectorAll('.timeline-stage-lane').forEach(lane=>{
+      const plot=lane.querySelector('.timeline-stage-plot'),flags=[...lane.querySelectorAll('.timeline-node-flag')];if(!plot||!flags.length)return;
+      const leaders=new Map([...lane.querySelectorAll('.timeline-node-flag-leader')].map(item=>[item.dataset.nodeFlagKey,item])),hits=new Map([...lane.querySelectorAll('.timeline-node-flag-hit')].map(item=>[item.dataset.nodeFlagKey,item]));
+      flags.forEach(flag=>{flag.style.setProperty('--timeline-node-flag-shift','0px');flag.style.setProperty('--timeline-node-flag-order','0');flag.classList.remove('is-shifted','is-collision-saturated','is-density-hidden','is-probed');const leader=leaders.get(flag.dataset.nodeFlagKey),hit=hits.get(flag.dataset.nodeFlagKey);if(leader){leader.classList.remove('is-density-hidden','is-probed');leader.style.setProperty('--timeline-node-flag-leader-left','0px');leader.style.setProperty('--timeline-node-flag-leader-width','7px')}if(hit){hit.classList.remove('is-active','is-density-hidden','is-probed');hit.style.setProperty('--timeline-node-flag-shift','0px');hit.style.setProperty('--timeline-node-flag-hit-width','0px')}});
+      const plotRect=plot.getBoundingClientRect(),items=flags.map(flag=>({flag,rect:flag.getBoundingClientRect()})).sort((a,b)=>a.rect.left-b.rect.left),groups=[];let current=[],right=-Infinity;
+      for(const item of items){if(current.length&&item.rect.left>=right+groupingGap){groups.push(current);current=[];right=-Infinity}current.push(item);right=Math.max(right,item.rect.right)}if(current.length)groups.push(current);
+      groups.forEach((group,groupIndex)=>{if(group.length<2)return;const next=groups[groupIndex+1]?.[0],rightLimit=Math.min(plotRect.right-4,next?next.rect.left-groupingGap:Infinity),maxShift=Math.max(...group.map(item=>item.rect.width))+groupingGap;
+        const fit=indices=>{let previousRight=-Infinity;const placed=[];for(const index of indices){const item=group[index],targetLeft=Math.max(item.rect.left,previousRight-item.rect.width*maxOverlapRatio);if(targetLeft-item.rect.left>maxShift+.5||targetLeft+item.rect.width>rightLimit+.5)return null;placed.push({item,targetLeft});previousRight=targetLeft+item.rect.width}return placed};
+        let placed=null;for(let visible=group.length;visible>=1&&!placed;visible--)placed=fit(sampleIndices(group.length,visible));
+        if(!placed){const item=group[0];placed=[{item,targetLeft:clamp(item.rect.left,plotRect.left+4,plotRect.right-4-item.rect.width)}]}
+        const visibleItems=new Set(placed.map(entry=>entry.item)),positions=new Map(placed.map(entry=>[entry.item,entry.targetLeft])),probeWidths=new Map(placed.map((entry,index)=>[entry.item,placed[index+1]?Math.max(8,placed[index+1].targetLeft-entry.targetLeft):entry.item.rect.width])),condensed=placed.length<group.length,overlapping=placed.some((entry,index)=>placed[index+1]&&entry.targetLeft+entry.item.rect.width>placed[index+1].targetLeft+1);
+        group.forEach((item,index)=>{const hidden=!visibleItems.has(item),targetLeft=positions.get(item)??clamp(item.rect.left,plotRect.left+4,plotRect.right-4-item.rect.width),shift=targetLeft-item.rect.left,anchor=7+shift,key=item.flag.dataset.nodeFlagKey,leader=leaders.get(key),hit=hits.get(key);item.flag.style.setProperty('--timeline-node-flag-shift',`${shift}px`);item.flag.style.setProperty('--timeline-node-flag-order',String(Math.min(index,20)));item.flag.classList.toggle('is-shifted',Math.abs(shift)>1);item.flag.classList.toggle('is-collision-saturated',condensed);item.flag.classList.toggle('is-density-hidden',hidden);if(leader){leader.classList.toggle('is-density-hidden',hidden);leader.style.setProperty('--timeline-node-flag-leader-left',`${Math.min(0,anchor)}px`);leader.style.setProperty('--timeline-node-flag-leader-width',`${Math.max(1,Math.abs(anchor))}px`)}if(hit){hit.classList.toggle('is-density-hidden',hidden);hit.classList.toggle('is-active',overlapping&&!hidden);hit.style.setProperty('--timeline-node-flag-shift',`${shift}px`);hit.style.setProperty('--timeline-node-flag-hit-width',`${probeWidths.get(item)||0}px`)}});
+      }
+      );
+    });
+  }
+  function bindNodeFlagProbe(root){
+    const flags=new Map([...root.querySelectorAll('.timeline-node-flag')].map(flag=>[flag.dataset.nodeFlagKey,flag])),leaders=new Map([...root.querySelectorAll('.timeline-node-flag-leader')].map(leader=>[leader.dataset.nodeFlagKey,leader])),clear=()=>{flags.forEach(flag=>flag.classList.remove('is-probed'));leaders.forEach(leader=>leader.classList.remove('is-probed'))},probe=(key,active)=>{if(active)clear();flags.get(key)?.classList.toggle('is-probed',active);leaders.get(key)?.classList.toggle('is-probed',active)};
+    root.querySelectorAll('[data-node-flag-key]').forEach(target=>{
+      const key=target.dataset.nodeFlagKey,flag=flags.get(key);if(!flag)return;
+      const enter=()=>probe(key,true),leave=event=>{const related=event.relatedTarget?.closest?.('[data-node-flag-key]');if(related?.dataset.nodeFlagKey===key)return;probe(key,false)};
+      target.addEventListener('pointerenter',enter);target.addEventListener('pointerleave',leave);target.addEventListener('focusin',enter);target.addEventListener('focusout',leave);
+    });
+  }
   function bindDashboard(root,{filters={},states=new Map(),render,onSubmit,onDiscard,onUndo,onOpenSingle,onViewportChange,editable=()=>true}={}){
     let drag=null;
     const hideNodeTooltip=bindDashboardTooltip(root);
+    bindNodeFlagProbe(root);requestAnimationFrame(()=>layoutNodeFlags(root));window.addEventListener('resize',()=>layoutNodeFlags(root),{signal:root.__timelineAbort?.signal});
     const getState=projectId=>states.get(Number(projectId));
     const labels={single:'拖拽（仅当前节点）',cascade:'拖拽（顺延）',done:'已完成',undone:'未完成'};
     const portfolio=root.querySelector('.timeline-portfolio-card'),portfolioScroll=root.querySelector('[data-portfolio-scroll]'),portfolioChart=portfolioScroll?.querySelector('.timeline-portfolio-chart');
@@ -311,7 +342,7 @@
       const sync=(persist=false)=>{const ratio=Math.max(0,Math.min(1,(portfolioScroll.scrollLeft+available/2)/plotWidth)),centerMs=startTime+ratio*(endTime-startTime),center=new Date(centerMs).toISOString().slice(0,10),viewStart=addDays(center,-Math.floor(days/2)),viewEnd=addDays(viewStart,days);filters.viewport={center,centerMs,days,scrollTop:Math.max(0,Math.round(portfolioScroll.scrollTop))};if(rangeLabel)rangeLabel.textContent=`${viewStart} → ${viewEnd} · ${Math.round(days)} 天`;if(persist)onViewportChange?.(filters.viewport)};
       portfolioApi={scroll:portfolioScroll,chart:portfolioChart,start,end,fullDays,days,plotWidth,available,sync};sync(false);
       let pan=null,scrollTimer=0;
-      const excluded=target=>{if(target.closest('.timeline-dashboard-node,.timeline-node-cluster,.timeline-portfolio-meta,.timeline-portfolio-axis-label,input,select,a,[data-timeline-context]'))return true;const control=target.closest('button');return Boolean(control&&!control.classList.contains('timeline-stage'))};
+      const excluded=target=>{if(target.closest('.timeline-dashboard-node,.timeline-node-cluster,.timeline-node-flag,.timeline-node-flag-hit,.timeline-portfolio-meta,.timeline-portfolio-axis-label,input,select,a,[data-timeline-context]'))return true;const control=target.closest('button');return Boolean(control&&!control.classList.contains('timeline-stage'))};
       portfolioScroll.addEventListener('pointerdown',event=>{if(weekLocked||event.button!==0||excluded(event.target))return;pan={id:event.pointerId,x:event.clientX,y:event.clientY,left:portfolioScroll.scrollLeft,top:portfolioScroll.scrollTop,moved:false};portfolioScroll.setPointerCapture?.(event.pointerId);event.preventDefault()});
       portfolioScroll.addEventListener('pointermove',event=>{if(!pan||event.pointerId!==pan.id)return;const dx=event.clientX-pan.x,dy=event.clientY-pan.y;if(!pan.moved&&Math.hypot(dx,dy)<4)return;pan.moved=true;portfolio.classList.add('is-panning');portfolioScroll.scrollLeft=pan.left-dx;portfolioScroll.scrollTop=pan.top-dy;sync(false)});
       const finishPan=event=>{if(!pan||event.pointerId!==pan.id)return;portfolioScroll.releasePointerCapture?.(event.pointerId);pan=null;portfolio.classList.remove('is-panning');sync(true)};
@@ -326,7 +357,7 @@
       cancelZoom?.addEventListener('click',()=>{clearTimeout(scrollTimer);cancelZoom.hidden=true;const centerMs=(startTime+endTime)/2;filters.viewport={center:new Date(centerMs).toISOString().slice(0,10),centerMs,days:fullDays,scrollTop:portfolioScroll.scrollTop};onViewportChange?.(filters.viewport);render?.()});
       portfolio.querySelector('[data-portfolio-fullscreen]')?.addEventListener('click',()=>{filters.fullscreen=!filters.fullscreen;render?.()});
       portfolio.querySelectorAll('[data-portfolio-focus-project]').forEach(row=>row.addEventListener('click',event=>{
-        if(event.target.closest('button,a,input,select,summary,[data-timeline-context],.timeline-node-cluster,.timeline-portfolio-risk'))return;
+        if(event.target.closest('button,a,input,select,summary,[data-timeline-context],.timeline-node-cluster,.timeline-node-flag,.timeline-node-flag-hit,.timeline-portfolio-risk'))return;
         sync(false);
         const projectId=Number(row.dataset.portfolioFocusProject);
         filters.focusedProjectId=Number(filters.focusedProjectId)===projectId?null:projectId;
@@ -381,14 +412,14 @@
       }
       closeNodeEditor();render?.();
     });
-    portfolioScroll?.addEventListener('pointermove',event=>{if(event.target.closest('.timeline-dashboard-node,.timeline-node-cluster')){hideDateGuide();return}const plot=event.target.closest('.timeline-stage-plot');if(plot&&portfolio?.contains(plot)&&!nodeEditorContext)showDateGuide(event,plot);else if(!nodeEditorContext)hideDateGuide()});
+    portfolioScroll?.addEventListener('pointermove',event=>{if(event.target.closest('.timeline-dashboard-node,.timeline-node-cluster,.timeline-node-flag,.timeline-node-flag-hit')){hideDateGuide();return}const plot=event.target.closest('.timeline-stage-plot');if(plot&&portfolio?.contains(plot)&&!nodeEditorContext)showDateGuide(event,plot);else if(!nodeEditorContext)hideDateGuide()});
     portfolioScroll?.addEventListener('pointerleave',hideDateGuide);portfolioScroll?.addEventListener('scroll',hideDateGuide,{passive:true});
     const inferStage=(state,track,date,target)=>{
       const direct=target.closest('[data-stage-interval]')?.dataset.stage;if(direct)return direct;
       const matching=(state.project.stage_intervals||[]).filter(item=>item.track===track).find(item=>{const first=item.start_date||item.start,last=item.end_date||item.end||first;return first&&last&&date>=first&&date<=last});if(matching?.stage)return matching.stage;
       const chain=state.project.nodes.filter(node=>node.track===track).slice().sort(compareNodes),before=chain.filter(node=>node.date<=date).at(-1),after=chain.find(node=>node.date>date);return (before||after)?.stage||stages[0];
     };
-    const nodeContextController=bindContextController(root,{selector:'.timeline-dashboard-node,.timeline-node-cluster[data-cluster-drag-proxy]',onOpen:(context,menu)=>{
+    const nodeContextController=bindContextController(root,{selector:'.timeline-dashboard-node,.timeline-node-cluster[data-cluster-drag-proxy],.timeline-node-flag,.timeline-node-flag-hit',onOpen:(context,menu)=>{
       hideNodeTooltip();closeInsertMenu();closeProjectUndo();hideDateGuide();
       const state=getState(context.projectId),node=state?.project?.nodes.find(item=>Number(item.id)===context.id),allowed=editable(context.projectId);
       menu.querySelectorAll('[data-draft-action]').forEach(button=>button.disabled=!allowed||(context.cluster&&!['single','cascade'].includes(button.dataset.draftAction)));
@@ -422,7 +453,7 @@
     document.addEventListener('keydown',event=>{if(event.key==='Escape'&&insertMenu&&!insertMenu.hidden)closeInsertMenu()},{signal:root.__timelineAbort?.signal});
     window.addEventListener('resize',()=>closeInsertMenu(),{signal:root.__timelineAbort?.signal});portfolioScroll?.addEventListener('scroll',()=>closeInsertMenu(),{passive:true,signal:root.__timelineAbort?.signal});
     root.querySelectorAll('.timeline-stage-plot').forEach(plot=>plot.addEventListener('contextmenu',event=>{
-      if(event.target.closest('.timeline-dashboard-node,.timeline-node-cluster'))return;
+      if(event.target.closest('.timeline-dashboard-node,.timeline-node-cluster,.timeline-node-flag,.timeline-node-flag-hit'))return;
       const projectRoot=plot.closest('[data-dashboard-project]'),projectId=Number(projectRoot?.dataset.dashboardProject),state=getState(projectId),track=plot.closest('[data-track]')?.dataset.track;
       if(!projectId||!state||!track||!editable(projectId))return;
       event.preventDefault();event.stopPropagation();hideNodeTooltip();nodeContextController.hide();closeInsertMenu();const date=showDateGuide(event,plot),stage=inferStage(state,track,date,event.target);if(date)openInsertMenu({projectId,track,stage,date,clientX:event.clientX,clientY:event.clientY});
@@ -460,7 +491,7 @@
       drag.targetDate=target;drag.previewDates=new Map(drag.snapshotDates);
       if(drag.mode==='cascade')drag.chain.slice(drag.index).forEach(node=>drag.previewDates.set(Number(node.id),addDays(drag.snapshotDates.get(Number(node.id)),delta)));
       else{drag.previewDates.set(drag.nodeId,target);let previous=target;for(const node of drag.chain.slice(drag.index+1)){const original=drag.snapshotDates.get(Number(node.id)),minimum=addDays(previous,DRAG_MIN_GAP_DAYS),date=original<minimum?minimum:original;drag.previewDates.set(Number(node.id),date);previous=date}}
-      root.querySelectorAll(`.timeline-dashboard-node[data-project-id="${drag.projectId}"],.timeline-node-cluster[data-project-id="${drag.projectId}"]`).forEach(node=>{const date=drag.previewDates.get(Number(node.dataset.nodeId));if(date){node.style.left=position(date,drag.range.start,drag.range.end)+'%';node.classList.toggle('is-dragging',Number(node.dataset.nodeId)===drag.nodeId);}});
+      root.querySelectorAll(`.timeline-dashboard-node[data-project-id="${drag.projectId}"],.timeline-node-cluster[data-project-id="${drag.projectId}"]`).forEach(node=>{const nodeId=Number(node.dataset.nodeId),date=drag.previewDates.get(nodeId);if(date){const left=position(date,drag.range.start,drag.range.end)+'%';node.style.left=left;node.classList.toggle('is-dragging',nodeId===drag.nodeId);root.querySelectorAll(`.timeline-node-flag[data-project-id="${drag.projectId}"][data-node-id="${nodeId}"],.timeline-node-flag-leader[data-node-flag-key="${drag.projectId}:${nodeId}"],.timeline-node-flag-hit[data-node-flag-key="${drag.projectId}:${nodeId}"]`).forEach(item=>item.style.left=left);}});
       drag.projectRoot.querySelectorAll('[data-stage-interval]').forEach(bar=>{const first=drag.previewDates.get(Number(bar.dataset.startNodeId)),last=drag.previewDates.get(Number(bar.dataset.endNodeId));if(!first||!last)return;const left=position(first,drag.range.start,drag.range.end),right=position(last,drag.range.start,drag.range.end),width=right-left;bar.style.left=left+'%';bar.style.width=Math.max(0,width)+'%';bar.hidden=width<=0;});
       const committed=drag.committedDate,diff=Math.round((iso(target)-iso(committed))/DAY);
       if(drag.guides){const origin=position(drag.startDate,drag.range.start,drag.range.end),destination=position(target,drag.range.start,drag.range.end),guide=drag.guides;guide.hidden=false;guide.querySelector('.origin').style.left=origin+'%';guide.querySelector('.target').style.left=destination+'%';const corridor=guide.querySelector('.corridor');corridor.style.left=Math.min(origin,destination)+'%';corridor.style.width=Math.abs(destination-origin)+'%';const label=guide.querySelector('.target-label'),deltaLabel=document.createElement('span');label.style.left=destination+'%';deltaLabel.className='target-delta';deltaLabel.textContent=`${diff>=0?'+':''}${diff}天`;label.replaceChildren(`${target} | `,deltaLabel);drag.surface.querySelectorAll('.timeline-e-month').forEach(cell=>cell.classList.toggle('is-target',cell.dataset.axisMonth===target.slice(0,7)));const dayLayer=drag.surface.querySelector('.timeline-e-days');dayLayer?.querySelectorAll('.is-target').forEach(tick=>{if(tick.dataset.dynamic==='1')tick.remove();else tick.classList.remove('is-target')});let tick=dayLayer?.querySelector(`[data-axis-date="${target}"]`);if(!tick&&dayLayer){dayLayer.insertAdjacentHTML('beforeend',`<i class="timeline-e-day-tick is-target" data-dynamic="1" data-axis-date="${target}" style="left:${destination}%"></i>`)}else tick?.classList.add('is-target')}
