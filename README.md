@@ -1,5 +1,7 @@
 # Flowboard
 
+> 当前状态（2026-09-04）：已在公司局域网正式运行，当前 schema v19；feature01 已完成人工验收和部署，现处于第 8 阶段的生产运行、反馈维护与文档收口。正式入口是 `start-flowboard.cmd`，开发调试使用隔离的 `local-test.cmd`。
+
 ## I10 图表与跨看板仪表盘
 
 schema v11 将保存视图扩展为 `chart`，并新增 `dashboards`、`dashboard_sources`、`dashboard_widgets` 与独立的 `dashboard_activity`。数据库只保存版本化配置、显式来源映射和 12 列有界布局，不保存聚合结果或复制任务数据。柱状、折线、饼图、堆叠柱状图以及数字/图表/进度/日历/表格组件全部调用同一个 `flowboard.aggregation` typed aggregation 核；单看板入口是 `POST /api/boards/:id/aggregate`，组件入口是 `POST /api/dashboards/:id/widgets/:widget_id/data`。
@@ -16,7 +18,7 @@ schema v10 为任务增加固定排期 `start_date`，并让保存视图支持 `
 
 桌面端支持日/周/月粒度、今天定位、横向滚动和拖移排期；移动端保留浏览、打开任务及显式“编辑”日期表单，粗指针上禁用易误触的条形拖动。保存视图中的来源与粒度可持久化，URL/default/copy/update 沿用统一视图状态机。
 
-Flowboard 是面向小团队局域网部署的协作看板原型。安全身份、迁移底座、核心生命周期、动态/高级字段、跨看板关系、镜像与计算字段、统一查询/保存视图及表格/Kanban/日历共享视图已经实现。
+Flowboard 是面向公司内部小团队、局域网部署的协作看板。安全身份、迁移底座、核心生命周期、动态/高级字段、跨看板关系、镜像与计算字段、统一查询/保存视图及表格/Kanban/日历共享视图已经实现。
 
 ## I8 模板与 CSV/XLSX 导入导出
 
@@ -30,7 +32,7 @@ schema v9 增加工作区级看板/项目模板和导入预览批次。模板保
 
 schema v8 扩展 `timeline/rating/file/email/phone/relation/mirror/formula`。时间线保存经过校验的起止日期；评分上限为 1–10；邮件和电话有长度/格式边界；file 在 I7 只保存安全的名称、大小和媒体类型元数据，不接受路径、二进制或附件 ID，真实上传统一留到 I11。
 
-feature01 时间管理使用 schema v16 新增的五张专表：`timeline_projects`、`timeline_nodes`、`timeline_change_batches`、`timeline_node_changes` 与 `timeline_import_batches`。项目与看板保持零外键，节点间隔与派生指标不落库；所有读写均由服务端派生和授权。接口提供项目新建、读取与软删除、批量编辑、undo、initial correction、轻量复盘、Excel 导出与两段式导入。导入复用安全 XLSX/CSV 解析器，拒绝公式、宏、外链与超限文件，并在 commit 事务内重验同名项目。
+feature01 时间管理使用 schema v16 新增的五张专表：`timeline_projects`、`timeline_nodes`、`timeline_change_batches`、`timeline_node_changes` 与 `timeline_import_batches`。v17 增加共享标签和用户个人顺序，v18 增加手工归档，v19 将活跃项目名称唯一性升级为大小写不敏感。项目与看板保持零外键，节点间隔与派生指标不落库；所有读写均由服务端派生和授权。接口提供项目新建、读取、重命名、软删除、归档/取消归档、批量编辑、undo、initial correction、轻量复盘、Excel 导出与两段式导入。导入复用安全 XLSX/CSV 解析器，拒绝公式、宏、外链与超限文件，并在 commit 事务内重验同名项目。
 
 跨看板关系用 `task_relation_values` 的单条 canonical 软删除边保存，关系字段声明目标看板与是否展示反向关系。新增关系要求源任务写权限和目标任务当前可见，携带 source task、source board 与 target task version；目标失权、归档或删除后，字段配置会被裁剪，关系、反向关系和镜像统一返回不可用诊断，不泄露目标 ID、标题、数量或活动详情。任务单独复制不复制外部关系；看板复制只重映副本集合内部关系、字段 ID 和公式引用，跨板关系字段复制为停用且未绑定，避免副本意外连回原看板。
 
@@ -80,7 +82,7 @@ schema v7 为普通任务增加同看板父子关系与兄弟顺序，并用独�
 
 schema v13 将评论升级为两级线程，编辑使用 version 乐观并发并保留 `comment_versions` 历史；删除为软删除，正文不再通过普通任务详情返回，已有回复仍保留。提及只接受当前工作区有效用户或最小 `all` 目标。每个任务/用户只有一条订阅记录：创建者、评论者和直接被提及者仅在无记录时自动关注；用户手动取消后保持 `opted_out`，评论或再次提及不会偷偷恢复，只有显式订阅才能恢复。所有评论、提及、订阅和附件变更同时写入现有活动流和 `collaboration_events` 事务 outbox，事件载荷只含必要标识，不在本迭代发送通知。
 
-schema v15 增加任务长描述、工作区回收站保留期与删除时间索引。批量更新、分配、移动、归档和删除使用逐项乐观版本校验和单一事务，任何一项 ACL、版本或结构校验失败都不会产生部分变更或事件。到期永久清理使用预览哈希、精确确认和 pre-purge 校验备份，且保留审计记录。完整 Windows 部署、备份、保留与离线恢复步骤见 [WINDOWS_OPERATIONS.md](WINDOWS_OPERATIONS.md)。
+schema v15 增加任务长描述、工作区回收站保留期与删除时间索引。批量更新、分配、移动、归档和删除使用逐项乐观版本校验和单一事务，任何一项 ACL、版本或结构校验失败都不会产生部分变更或事件。到期永久清理使用预览哈希、精确确认和 pre-purge 校验备份，且保留审计记录。完整 Windows 部署、备份、保留与离线恢复步骤见 [WINDOWS_OPERATIONS.md](feature-00-build-up/WINDOWS_OPERATIONS.md)。
 
 附件使用严格有界的 JSON/base64 上传（单文件 1 MB、每任务 20 个），仅允许内容签名、扩展名与声明 MIME 一致的 PNG/JPEG/GIF/TXT/PDF；SVG、HTML 和不匹配内容会被拒绝。二进制存入 `FLOWBOARD_ATTACHMENT_DIR` 指定的私有目录（默认数据库同目录的 `flowboard-attachments`），不进入静态文件路由；下载和安全预览都会重新执行任务 ACL，并返回 `private, no-store`、`nosniff` 与沙箱 CSP。TXT 和安全图片可内联预览，PDF 只下载。元数据软删除，blob 保留以支持恢复/取证，管理员可在备份完成后按已删除元数据做离线清理。
 
@@ -114,17 +116,17 @@ python server.py
 - `FLOWBOARD_BACKUP_DIR`：校验备份包目录，必须与附件源目录分离。
 - `FLOWBOARD_SECURE_COOKIE=1`：HTTPS 部署时启用 Secure Cookie。
 
-局域网正式使用前，应在反向代理上配置 HTTPS，不要让密码和会话通过不受信任的明文网络传输。
+当前部署边界是公司可信局域网内的本机服务；HTTPS 反向代理不是默认上线条件。若未来服务跨越不受信任网络或用户明确要求 HTTPS，再增加反向代理并启用 `FLOWBOARD_SECURE_COOKIE=1`。
 
 HTTP 静态服务的 GET 与 HEAD 均采用同一份默认拒绝清单：只公开入口 HTML、明确列入 `server.py::PUBLIC_PATHS` 的 CSS/JS 资源（含 dashboard、schedule、I12、I13 资源）和 `/api/health` 的最小 JSON。数据库、备份、源码、测试、点文件及其他仓库文件不会被 Web 路由下载或枚举；新增前端资源时必须显式加入公开清单并补测试。
 
 ## 迁移、备份与恢复
 
-首次启动或升级会先运行 SQLite `integrity_check`，再使用 SQLite backup API 在 `backups/` 生成对应目标版本的迁移前备份，然后执行版本化迁移。schema v3 增加字段系统，v4 增加保存视图，v5 增加 presentation，v6 增加 Kanban board order，v7 增加任务邻接层级与依赖边，v8 增加高级字段类型和跨看板关系边，v9 增加模板快照和导入预览批次，v12 增加评论协作与私有附件元数据，v13 将订阅归一为每任务/用户一条 sticky 状态记录，v14 增加通知、实时游标和安全审计，v15 增加任务描述及回收站保留策略，v16 以单事务纯增量新增 feature01 的五张 timeline 专表。v16 DDL 使用逐条执行，避免 `executescript` 隐式提交破坏失败回滚；迁移失败必须保持完整 v15，不得残留半表或 v16 migration row。运行库使用 WAL；服务运行时不要用文件复制替代一致性备份；恢复时数据库与附件目录必须取同一备份时间点。
+首次启动或升级会先运行 SQLite `integrity_check`，再使用 SQLite backup API 在 `backups/` 生成对应目标版本的迁移前备份，然后执行版本化迁移。schema v3 增加字段系统，v4 增加保存视图，v5 增加 presentation，v6 增加 Kanban board order，v7 增加任务邻接层级与依赖边，v8 增加高级字段类型和跨看板关系边，v9 增加模板快照和导入预览批次，v12 增加评论协作与私有附件元数据，v13 将订阅归一为每任务/用户一条 sticky 状态记录，v14 增加通知、实时游标和安全审计，v15 增加任务描述及回收站保留策略，v16 增加 feature01 五张 timeline 专表，v17 增加标签/个人顺序，v18 增加手工归档，v19 增加活跃项目名称大小写不敏感唯一约束。v16 DDL 使用逐条执行，避免 `executescript` 隐式提交破坏失败回滚；运行库使用 WAL；服务运行时不要用文件复制替代一致性备份；恢复时数据库与附件目录必须取同一备份时间点。
 
-门 4 已在全新临时目录验证真实 v15 形状的代表存量、自动 `pre-v16` 备份、v15→v16、二次幂等、计数/FK/integrity、故障注入回滚，以及 `flowboard_ops.py backup → verify → restore → 再迁移`。仓库中的真实 `flowboard.db` 仍为 v15 且 `integrity_check=ok`，本轮没有对它执行迁移、恢复或重建；真实库正式迁移必须在门 5 由用户另行拍板。
+门 4 已在隔离目录验证 v15→v16 迁移、幂等、故障回滚和备份恢复；其后真实库经授权于 2026-08-25 迁移至 v18、2026-08-28 迁移至 v19。2026-09-04 只读复核：`user_version=19`、`integrity_check=ok`、外键违规 0；当前业务数据快照为 5 active / 1 archived / 2 soft-deleted 时间项目和 107 个节点。该计数会随生产使用变化，不是固定验收常量。
 
-恢复演练应在停止服务后进行：先把备份通过 SQLite backup API 恢复到独立路径，运行 `PRAGMA integrity_check` 并核对任务数和关键字段，确认无误后再替换运行库。架构与分迭代说明见 `PHASE1_ARCHITECTURE.md`。
+恢复演练应在停止服务后进行：先把备份通过 SQLite backup API 恢复到独立路径，运行 `PRAGMA integrity_check` 并核对任务数和关键字段，确认无误后再替换运行库。架构与分迭代说明见 [PHASE1_ARCHITECTURE.md](feature-00-build-up/PHASE1_ARCHITECTURE.md)。
 
 ## 测试
 
@@ -146,18 +148,15 @@ feature01 门 4 终值测试矩阵（2026-08-20）：
 - v15→v16 隔离迁移/备份/恢复验证器 exit 0；修改迁移事务后，timeline service 29/29 回归通过。
 - Python 语法检查和字面全仓 `git diff --check` 均 exit 0。
 
-## feature01 门 4 自动终态：WAIT_GATE5_HUMAN
+## feature01 生产运行状态
 
-门 4 自动施工、回归和隔离迁移验证已经收口；当前交付状态只表示 `WAIT_GATE5_HUMAN`，不表示门 5、真实部署或上线已经完成。以下事项保留给人工门：
+feature01 的原 `WAIT_GATE5_HUMAN`、`TAG_INCREMENT_WAIT_HUMAN`、`PORTFOLIO_CANVAS_WAIT_HUMAN` 和 `ARCHIVE_VIEW_WAIT_HUMAN` 均为上线前历史状态。真实数据人工验收、正式启动入口、真实库部署和局域网使用已经完成，当前阶段为 `PRODUCTION_RUNNING / STAGE8_CLOSEOUT`。
 
-1. 使用真实 2–3 个项目试用编辑器、单项目仪表盘和全项目仪表盘。
-2. 按真实使用感受裁定六阶段精确色值、强磁吸参数、条形/节点/字号/行高/留白及响应式像素微调。
-3. 完成约 15 分钟手工冒烟：开板拖卡与刷新、甘特切视图、widgets 出数、普通成员登录与权限。
-4. 在目标浏览器、真机和实际部署环境验收 HTTPS、进程、备份目录与附件目录。
-5. 先做可恢复备份，再由用户显式决定是否对真实 `flowboard.db` 执行 v15→v16 迁移和恢复演练。
-6. 门 4 阶段收尾 commit 已于 2026-08-21 获用户授权；push、发布、部署和对外交付仍等待用户单独授权。
+- 正式服务自 2026-08-31 起运行；PR #1/#2 已合入，2026-09-04 本地 `main` 与 `origin/main` 同步在 `6e66f7f`。
+- 9 月 3 日完成聚焦节点旗标升级，9 月 4 日完成旗标直拖与拖拽选中反馈升级；本次文档重基线复跑 `node tests/timeline_ui.test.js` PASS，关联 Chromium 2/2 PASS。
+- `AUD-03` 窄屏导航和纯键盘打开项目右键菜单仍是可选体验/可访问性改进，不阻断当前桌面端生产。新功能或范围升级仍须用户另行拍板。
 
-## 核心生命周期手工验收
+## 核心生命周期运维复查清单
 
 1. 使用 `u1` 登录，创建看板并验证名称、描述、颜色和访问类型编辑；刷新确认颜色持久化，再验证复制、归档、恢复和软删除。
 2. 在看板中新增分组，验证重命名、复制、上下排序、归档和删除菜单。
@@ -168,4 +167,4 @@ feature01 门 4 终值测试矩阵（2026-08-20）：
 
 ## 当前边界
 
-第一阶段功能主线已经进入生产收口。统一查询 AST 支持 AND/OR、按字段类型限定的筛选、多字段真类型排序、稳定兜底排序及严格 422；保存视图支持个人/共享、默认优先级、复制、更新和软删除，无效保存配置会阻止执行而不会扩大结果。前端筛选、排序和视图调用同一服务端查询入口，I12 全局搜索覆盖五类实体。旧 `status/priority/owner/due` 仍作为事务内同步的回滚投影。表格、Kanban、月历、SSE 实时同步及轮询降级已实现；I13 已加入原子批量操作、保留期清理与可校验的数据库加附件备份/离线恢复工具。
+Flowboard 已进入局域网生产运行和反馈维护。统一查询 AST 支持 AND/OR、按字段类型限定的筛选、多字段真类型排序、稳定兜底排序及严格 422；保存视图支持个人/共享、默认优先级、复制、更新和软删除，无效保存配置会阻止执行而不会扩大结果。前端筛选、排序和视图调用同一服务端查询入口，I12 全局搜索覆盖五类实体。旧 `status/priority/owner/due` 仍作为事务内同步的回滚投影。表格、Kanban、月历、SSE 实时同步及轮询降级已实现；I13 已加入原子批量操作、保留期清理与可校验的数据库加附件备份/离线恢复工具。当前默认工作不是扩产品范围，而是根据真实使用反馈做小批次修复并维持数据可恢复性。
