@@ -216,8 +216,8 @@
           return `<span class="timeline-node-cluster" role="img" tabindex="0" data-cluster-drag-proxy="earliest" data-node-id="${proxy.id}" data-project-id="${project.project_id}" data-node-date="${proxy.date}" aria-label="${group.length} 个拥挤节点：${esc(description)}；右键可拖拽最早节点" style="left:${position(middle,range.start,range.end)}%;z-index:${1000-nodeOrder}"><span data-node-tooltip-source aria-hidden="true"><b>${group.length} 个拥挤节点</b><small>${esc(preview+more)}</small></span></span>`;
         }
          const node=group[0],action=state?.dashboardContext?.nodeId===Number(node.id)?state.dashboardContext.action:'',draft=state?.draft?.has(Number(node.id)),overdue=!node.done_at&&node.date<range.today,left=position(node.date,range.start,range.end),flagKey=`${project.project_id}:${node.id}`;
-         const flag=showNodeLabels?`<i class="timeline-node-flag-leader" data-node-flag-key="${flagKey}" aria-hidden="true" style="left:${left}%"></i><span class="timeline-node-flag" data-node-flag-key="${flagKey}" data-node-id="${node.id}" data-project-id="${project.project_id}" data-node-track="${track}" aria-hidden="true" style="left:${left}%"><b>${esc(node.name)}</b><small>${esc(node.date)}</small></span><i class="timeline-node-flag-hit" data-node-flag-key="${flagKey}" data-node-id="${node.id}" data-project-id="${project.project_id}" aria-hidden="true" style="left:${left}%"></i>`:'';
-         return `<button type="button" class="timeline-dashboard-node ${stageClass(node.stage)} ${node.done_at?'is-done':''} ${overdue?'is-overdue':''} ${draft?'is-draft':''} ${state?.armed?.nodeId===Number(node.id)?'is-armed':''} ${action?'is-context-target':''}" data-dashboard-hit-target="node" data-node-id="${node.id}" data-project-id="${project.project_id}" data-node-date="${node.date}" ${showNodeLabels?`data-node-flag-key="${flagKey}" data-node-flag-visible="true"`:''} ${action?`data-dashboard-action="${esc(action)}"`:''} aria-label="节点 ${esc(node.name)}，${esc(node.stage)}，${esc(node.date)}；右键操作" style="left:${left}%;z-index:${1000-nodeOrder}"><i></i><span data-node-tooltip-source aria-hidden="true"><b>${esc(node.name)}</b><small>${esc(node.stage)} · ${esc(node.date)}</small></span></button>${flag}`;
+         const armed=state?.armed?.nodeId===Number(node.id),dragPending=draft&&['single','cascade'].includes(action),emphasized=armed||dragPending,stateClasses=`${emphasized?' is-emphasized':''}${armed?' is-armed':''}${dragPending?' is-drag-pending':''}`,flag=showNodeLabels?`<i class="timeline-node-flag-leader${stateClasses}" data-node-flag-key="${flagKey}" aria-hidden="true" style="left:${left}%"></i><span class="timeline-node-flag${stateClasses}" data-node-flag-key="${flagKey}" data-node-id="${node.id}" data-project-id="${project.project_id}" data-node-track="${track}" aria-hidden="true" style="left:${left}%"><b>${esc(node.name)}</b><small>${esc(node.date)}</small></span><i class="timeline-node-flag-hit${stateClasses}" data-node-flag-key="${flagKey}" data-node-id="${node.id}" data-project-id="${project.project_id}" aria-hidden="true" style="left:${left}%"></i>`:'';
+         return `<button type="button" class="timeline-dashboard-node ${stageClass(node.stage)} ${node.done_at?'is-done':''} ${overdue?'is-overdue':''} ${draft?'is-draft':''}${stateClasses} ${action?'is-context-target':''}" data-dashboard-hit-target="node" data-node-id="${node.id}" data-project-id="${project.project_id}" data-node-date="${node.date}" ${showNodeLabels?`data-node-flag-key="${flagKey}" data-node-flag-visible="true"`:''} ${action?`data-dashboard-action="${esc(action)}"`:''} aria-label="节点 ${esc(node.name)}，${esc(node.stage)}，${esc(node.date)}；右键操作" style="left:${left}%;z-index:${1000-nodeOrder}"><i></i><span data-node-tooltip-source aria-hidden="true"><b>${esc(node.name)}</b><small>${esc(node.stage)} · ${esc(node.date)}</small></span></button>${flag}`;
       }).join('');
       return `<div class="timeline-stage-lane ${open?'is-expanded':''}" data-track="${track}" data-overlap-rows="${maxRow+1}"><div class="timeline-track-label ${portfolio?'is-portfolio-label':''}">${portfolio?'':`<strong>${track==='main'?'主线':'并行'}</strong>`}${maxRow?`<button type="button" data-timeline-expand="${key}" aria-expanded="${open}">${open?'收起重叠':'展开重叠'}</button>`:''}</div><div class="timeline-stage-plot" style="--overlap-rows:${open?maxRow+1:1}">${bars}${origins}${buttons}${pastMask}</div></div>`;
     }).join('');
@@ -433,8 +433,9 @@
       if(action==='remark'){state.armed=null;openNodeEditor('remark',{projectId:context.projectId,nodeId:context.id});return}
       if(action==='remove'){state.armed=null;removeNode(state,context.id);render?.();return}
       state.armed={nodeId:context.id,mode:action};
-      root.querySelectorAll('.timeline-dashboard-node.is-armed,.timeline-node-cluster.is-armed').forEach(node=>node.classList.remove('is-armed'));
-      context.element.classList.add('is-armed','is-context-target');context.element.dataset.dashboardAction=action;
+      root.querySelectorAll('.is-armed,.is-emphasized').forEach(node=>node.classList.remove('is-armed','is-emphasized'));
+      context.element.classList.add('is-armed','is-emphasized','is-context-target');context.element.dataset.dashboardAction=action;
+      const flagKey=`${context.projectId}:${context.id}`;root.querySelectorAll(`[data-node-flag-key="${flagKey}"]`).forEach(item=>item.classList.add('is-armed','is-emphasized'));
       const projectRoot=context.element.closest('[data-dashboard-project]');
       let hint=projectRoot?.querySelector('[data-dashboard-hint]');
       if(!hint&&projectRoot?.classList.contains('timeline-project-card')){
@@ -505,8 +506,10 @@
       if(commit&&target!==active.startDate)moveNode(state,active.nodeId,target,active.mode);
       state.dashboardContext={nodeId:active.nodeId,action:active.mode};state.armed=null;drag=null;render?.();
     };
-    root.querySelectorAll('.timeline-dashboard-node,.timeline-node-cluster[data-cluster-drag-proxy]').forEach(node=>node.addEventListener('mousedown',event=>{
+    root.querySelectorAll('.timeline-dashboard-node,.timeline-node-cluster[data-cluster-drag-proxy],.timeline-node-flag,.timeline-node-flag-hit').forEach(trigger=>trigger.addEventListener('mousedown',event=>{
       if(event.button!==0)return;
+      const node=trigger.matches('.timeline-node-flag,.timeline-node-flag-hit')?[...root.querySelectorAll('.timeline-dashboard-node')].find(candidate=>Number(candidate.dataset.nodeId)===Number(trigger.dataset.nodeId)&&Number(candidate.dataset.projectId)===Number(trigger.dataset.projectId)):trigger;
+      if(!node)return;
       const projectId=Number(node.dataset.projectId),state=getState(projectId);
       if(!state?.armed||state.armed.nodeId!==Number(node.dataset.nodeId)||!editable(projectId))return;
       event.preventDefault();

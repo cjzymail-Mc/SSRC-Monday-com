@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Flowboard｜节点拖拽高亮效果对照</title>
+  <style>
+    *{box-sizing:border-box}
+    :root{color-scheme:light;font-family:"Microsoft YaHei UI","Segoe UI",sans-serif;color:#253047;background:#f5f7fa}
+    body{margin:0;padding:34px 24px 48px}
+    main{width:min(1100px,100%);margin:auto}
+    header{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:22px}
+    h1{margin:0 0 7px;font-size:24px;letter-spacing:-.02em}
+    p{margin:0;color:#738096;font-size:13px;line-height:1.65}
+    button{border:1px solid #cbd4e1;border-radius:8px;background:#fff;padding:9px 14px;color:#33405a;font:inherit;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 7px rgba(31,48,76,.06)}
+    button:hover{border-color:#9eabba}
+    button[aria-pressed="true"]{border-color:#d74655;background:#d74655;color:#fff}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .option{overflow:hidden;border:1px solid #dfe5ee;border-radius:13px;background:#fff;box-shadow:0 5px 18px rgba(31,48,76,.06)}
+    .copy{display:flex;align-items:start;justify-content:space-between;gap:18px;padding:16px 17px 11px}
+    .copy h2{margin:0 0 4px;font-size:15px}.copy p{font-size:11px}
+    .tag{flex:none;border-radius:99px;background:#eef2f7;padding:4px 7px;color:#6d788b;font-size:9px;font-weight:800}
+    .stage{position:relative;height:150px;margin:0 10px 10px;border-radius:9px;background:linear-gradient(90deg,transparent 24.8%,#e9edf3 25%,transparent 25.2%,transparent 49.8%,#e9edf3 50%,transparent 50.2%,transparent 74.8%,#e9edf3 75%,transparent 75.2%),#fafbfd}
+    .track{position:absolute;left:12%;right:10%;top:92px;height:8px;border-radius:8px;background:#dbe3ee}
+    .unit{position:absolute;z-index:2;left:47%;top:22px;width:0;height:90px;transition:transform .18s ease;filter:none}
+    .flag{position:absolute;left:7px;top:0;width:max-content;min-width:112px;max-width:160px;border-left:3px solid #8b96a8;border-radius:0 4px 4px 0;background:rgba(255,255,255,.98);padding:6px 9px 6px 8px;color:#32405a;font-size:10px;line-height:1.25;box-shadow:0 3px 11px rgba(31,48,76,.12);transform:rotate(-8deg);transform-origin:left bottom}
+    .flag b{display:block;white-space:nowrap}.flag small{display:block;margin-top:2px;color:#7c8799;font-size:8px}
+    .leader{position:absolute;left:0;top:55px;width:13px;border-top:1px dashed #9aa5b6;transform:rotate(-8deg);transform-origin:left center}
+    .node{position:absolute;left:-8px;top:62px;width:16px;height:16px;border:3px solid #fff;border-radius:50%;background:#2457c5;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+    .stage::after{content:"拖拽状态预览";position:absolute;right:10px;bottom:8px;color:#a0a9b8;font-size:9px}
+    body:not(.active) .stage::after{content:"普通状态"}
+    body:not(.active) .unit{filter:none!important;transform:none!important}
+    body:not(.active) .unit::before,body:not(.active) .unit::after{display:none!important}
+    body:not(.active) .flag{border-color:#8b96a8!important;background:#fff!important;color:#32405a!important;box-shadow:0 3px 11px rgba(31,48,76,.12)!important}
+    body:not(.active) .node{border-color:#fff!important;background:#2457c5!important;box-shadow:0 1px 4px rgba(0,0,0,.2)!important}
+
+    /* A：克制红边光 */
+    .a .unit:not(.comparison){z-index:20;filter:drop-shadow(0 0 5px rgba(228,55,72,.48))}
+    .a .unit:not(.comparison) .flag{min-width:134px;max-width:190px;padding:8px 11px 8px 10px;border-color:#e43849;font-size:12px;box-shadow:0 0 0 1px rgba(228,56,73,.26),0 0 12px rgba(228,56,73,.32),0 7px 18px rgba(31,48,76,.13)}
+    .a .unit:not(.comparison) .flag small{margin-top:3px;font-size:10px}
+    .a .unit:not(.comparison) .node{width:16px;height:16px;left:-8px;top:62px;border-color:#fff;background:#d92f43;box-shadow:0 0 0 2px #e43849,0 0 11px 4px rgba(228,56,73,.42)}
+    .a .comparison{z-index:3;left:43%;top:30px;filter:none}
+    .a .comparison .flag{min-width:112px;border-color:#8b96a8;background:#fff;color:#32405a;font-size:10px;box-shadow:0 3px 11px rgba(31,48,76,.12)}
+    .a .comparison .flag small{font-size:8px}
+    .a .comparison .node{border-color:#fff;background:#2457c5;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+    .state-label{position:absolute;z-index:30;border-radius:99px;padding:3px 6px;font-size:8px;font-style:normal;font-weight:800}
+    .a .comparison .state-label{left:-15px;top:84px;background:#e9edf4;color:#6f7b8e}
+    .a .unit:not(.comparison) .state-label{left:-16px;top:88px;background:#fff0f2;color:#d92f43;box-shadow:0 0 0 1px rgba(228,56,73,.18)}
+
+    /* B：双层霓虹 */
+    .b .unit:not(.comparison){z-index:20;filter:drop-shadow(0 0 3px rgba(255,44,70,.72)) drop-shadow(0 0 9px rgba(255,44,70,.38))}
+    .b .unit:not(.comparison) .flag{min-width:134px;max-width:190px;padding:8px 11px 8px 10px;border-color:#ff2c46;background:#fff9fa;font-size:12px;box-shadow:inset 0 0 0 1px rgba(255,44,70,.35),0 0 0 2px rgba(255,255,255,.85),0 0 0 4px rgba(255,44,70,.17)}
+    .b .unit:not(.comparison) .flag small{margin-top:3px;font-size:10px}
+    .b .unit:not(.comparison) .node{width:16px;height:16px;left:-8px;top:62px;background:#ff2945;box-shadow:0 0 0 2px #fff,0 0 0 4px #ff2945,0 0 15px 6px rgba(255,41,69,.48)}
+    .b .comparison{z-index:3;left:43%;top:30px;filter:none}
+    .b .comparison .flag{min-width:112px;border-color:#8b96a8;background:#fff;color:#32405a;font-size:10px;box-shadow:0 3px 11px rgba(31,48,76,.12)}
+    .b .comparison .flag small{font-size:8px}
+    .b .comparison .node{border-color:#fff;background:#2457c5;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+    .b .comparison .state-label{left:-15px;top:84px;background:#e9edf4;color:#6f7b8e}
+    .b .unit:not(.comparison) .state-label{left:-16px;top:88px;background:#fff0f2;color:#e11f39;box-shadow:0 0 0 1px rgba(255,44,70,.2)}
+
+    /* C：红色呼吸晕染 */
+    .c .unit{z-index:20;filter:drop-shadow(0 0 7px rgba(218,38,57,.46))}
+    .c .unit::before{content:"";position:absolute;z-index:-1;left:-24px;top:-15px;width:176px;height:104px;border-radius:50%;background:radial-gradient(ellipse,rgba(239,62,80,.23),rgba(239,62,80,.08) 48%,transparent 72%)}
+    .c .flag{border-color:#d82439;background:linear-gradient(100deg,#fff1f3,#fff 45%);box-shadow:0 8px 22px rgba(181,28,47,.18)}
+    .c .node{background:#d82439;box-shadow:0 0 0 3px rgba(216,36,57,.2),0 0 16px 5px rgba(216,36,57,.38)}
+
+    /* D：蓝紫电光 */
+    .d .unit{z-index:20;filter:drop-shadow(0 0 5px rgba(92,71,255,.52))}
+    .d .flag{border-color:#664cff;background:linear-gradient(110deg,#f2efff,#fff 58%);color:#372b7e;box-shadow:0 0 0 1px rgba(102,76,255,.25),0 0 17px rgba(102,76,255,.34),0 9px 20px rgba(31,48,76,.12)}
+    .d .node{background:#654cff;box-shadow:0 0 0 2px #fff,0 0 0 4px #6a50ff,0 0 15px 5px rgba(106,80,255,.44)}
+
+    /* E：金色聚光 */
+    .e .unit{z-index:20;filter:drop-shadow(0 7px 8px rgba(134,87,0,.22));transform:translateY(-2px)}
+    .e .unit::before{content:"";position:absolute;z-index:-1;left:-32px;top:-20px;width:190px;height:112px;background:radial-gradient(ellipse,rgba(255,190,44,.26),transparent 69%)}
+    .e .flag{border-color:#e2a20d;background:linear-gradient(105deg,#fff6d8,#fff 62%);color:#65480a;box-shadow:0 0 0 1px rgba(226,162,13,.34),0 8px 21px rgba(135,91,0,.18)}
+    .e .node{background:#f2ad0a;box-shadow:0 0 0 2px #fff,0 0 0 5px rgba(242,173,10,.38),0 0 14px 6px rgba(255,191,42,.35)}
+
+    /* F：暗色高对比 */
+    .f .unit{z-index:20;filter:drop-shadow(0 9px 10px rgba(13,20,34,.28));transform:translateY(-2px) scale(1.025)}
+    .f .flag{border-color:#ff4b5f;background:#263147;color:#fff;box-shadow:0 0 0 1px #ff4b5f,0 0 0 4px rgba(255,75,95,.16),0 11px 24px rgba(20,28,43,.28)}
+    .f .flag small{color:#c8d0de}
+    .f .node{background:#ff4258;box-shadow:0 0 0 2px #fff,0 0 0 4px #ff4258,0 0 13px 5px rgba(255,66,88,.38)}
+    @media(max-width:720px){body{padding:22px 14px}header{align-items:start;flex-direction:column}.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body class="active">
+<main>
+  <header>
+    <div><h1>节点拖拽高亮｜六种效果对照</h1><p>只比较节点圆圈、引线与旗标。所有方案进入拖拽状态后均整体置顶；点击右侧按钮可对比普通状态。</p></div>
+    <button id="toggle" type="button" aria-pressed="true">当前：拖拽选中</button>
+  </header>
+  <section class="grid">
+    <article class="option a"><div class="copy"><div><h2>A｜克制红边光（重叠对照）</h2><p>两个节点圆圈尺寸相同；红色选中旗标的盒体、名称和日期整体放大两级并置顶。</p></div><span class="tag">已选方向</span></div><div class="stage"><i class="track"></i><div class="unit comparison"><span class="flag"><b>鞋楦评审</b><small>09/11 · 主线</small></span><i class="leader"></i><i class="node"></i><em class="state-label">选中前</em></div><div class="unit"><span class="flag"><b>结构设计确认</b><small>09/12 · 主线</small></span><i class="leader"></i><i class="node"></i><em class="state-label">选中后</em></div></div></article>
+    <article class="option b"><div class="copy"><div><h2>B｜双层霓虹红（重叠对照）</h2><p>节点圆圈同样保持原尺寸，仅以双层霓虹强化并放大选中旗标。</p></div><span class="tag">最醒目</span></div><div class="stage"><i class="track"></i><div class="unit comparison"><span class="flag"><b>鞋楦评审</b><small>09/11 · 主线</small></span><i class="leader"></i><i class="node"></i><em class="state-label">选中前</em></div><div class="unit"><span class="flag"><b>结构设计确认</b><small>09/12 · 主线</small></span><i class="leader"></i><i class="node"></i><em class="state-label">选中后</em></div></div></article>
+    <article class="option c"><div class="copy"><div><h2>C｜柔和红晕</h2><p>用大范围柔光包住整体，视觉更温和。</p></div><span class="tag">柔和</span></div><div class="stage"><i class="track"></i><div class="unit"><span class="flag"><b>结构设计确认</b><small>09/12 · 主线</small></span><i class="leader"></i><i class="node"></i></div></div></article>
+    <article class="option d"><div class="copy"><div><h2>D｜蓝紫电光</h2><p>避开错误/逾期语义，与红色风险提示区分。</p></div><span class="tag">无风险歧义</span></div><div class="stage"><i class="track"></i><div class="unit"><span class="flag"><b>结构设计确认</b><small>09/12 · 主线</small></span><i class="leader"></i><i class="node"></i></div></div></article>
+    <article class="option e"><div class="copy"><div><h2>E｜金色聚光</h2><p>像“已抓取”的聚光提示，温暖且突出。</p></div><span class="tag">轻盈</span></div><div class="stage"><i class="track"></i><div class="unit"><span class="flag"><b>结构设计确认</b><small>09/12 · 主线</small></span><i class="leader"></i><i class="node"></i></div></div></article>
+    <article class="option f"><div class="copy"><div><h2>F｜暗色高对比</h2><p>旗标反色并轻微抬升，选中感最强。</p></div><span class="tag">强选中</span></div><div class="stage"><i class="track"></i><div class="unit"><span class="flag"><b>结构设计确认</b><small>09/12 · 主线</small></span><i class="leader"></i><i class="node"></i></div></div></article>
+  </section>
+</main>
+<script>
+  const button=document.getElementById('toggle');
+  button.addEventListener('click',()=>{const active=document.body.classList.toggle('active');button.setAttribute('aria-pressed',String(active));button.textContent=active?'当前：拖拽选中':'当前：普通状态'});
+</script>
+</body>
+</html>

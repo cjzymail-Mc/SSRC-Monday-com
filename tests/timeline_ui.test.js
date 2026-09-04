@@ -58,6 +58,12 @@ ok(/timeline-portfolio-project is-focused[^>]+data-dashboard-project="2"/.test(f
 ok(!all.includes('timeline-node-flag')&&!all.includes('data-node-flag-visible'),'unfocused portfolio rows keep the existing node tooltip path without rendering flags');
 ok(focusedAll.includes('is-focused has-node-flags')&&focusedAll.includes('data-node-flag-visible="true"')&&focusedAll.includes('class="timeline-node-flag"')&&focusedAll.includes('class="timeline-node-flag-leader"')&&/class="timeline-node-flag-hit"[^>]*data-node-id="[^"]+"[^>]*data-project-id="[^"]+"/.test(focusedAll),'focused portfolio row renders the approved flag, short leader and node-addressable dense probe surface for each node');
 ok(!/data-dashboard-project="1"[^]*?class="timeline-node-flag"[^]*?data-dashboard-project="2"/.test(focusedAll),'unfocused sibling project does not inherit the selected row flags');
+const armedState=Timeline.editorState(projectB);armedState.armed={nodeId:2,mode:'single'};
+const armedAll=Timeline.renderAll([projectB],{today:'2026-08-04',focusedProjectId:2,states:new Map([[2,armedState]])});
+ok(/timeline-dashboard-node[^>]*is-emphasized is-armed/.test(armedAll)&&/timeline-node-flag[^>]*is-emphasized is-armed/.test(armedAll)&&/timeline-node-flag-leader[^>]*is-emphasized is-armed/.test(armedAll)&&/timeline-node-flag-hit[^>]*is-emphasized is-armed/.test(armedAll),'armed dashboard rendering highlights the original node and its complete flag group');
+const pendingState=Timeline.editorState(projectB);Timeline.moveNode(pendingState,2,'2026-08-06','single');pendingState.dashboardContext={nodeId:2,action:'single'};
+const pendingAll=Timeline.renderAll([projectB],{today:'2026-08-04',focusedProjectId:2,states:new Map([[2,pendingState]])});
+ok(/timeline-dashboard-node[^>]*is-emphasized is-drag-pending/.test(pendingAll)&&/timeline-node-flag[^>]*is-emphasized is-drag-pending/.test(pendingAll)&&!/timeline-dashboard-node[^>]*is-armed/.test(pendingAll),'a dragged node and its flag stay emphasized while the draft awaits discard or submit without remaining armed');
 ok(!all.includes('data-dashboard-submit')&&!all.includes('timeline-portfolio-actions'),'all dashboard omits row actions before any local draft');
 ok(all.includes('data-portfolio-undo-menu hidden')&&all.includes('data-portfolio-undo-action disabled>撤销'),'editable all dashboard keeps an explicit disabled project-column right-click menu before a current-session submission');
 const allDraftState=Timeline.editorState(project);allDraftState.lastBatchId=90;Timeline.moveNode(allDraftState,2,'2026-08-06','single');

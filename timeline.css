@@ -182,7 +182,9 @@
 .timeline-dashboard-node i{position:relative;width:12px;height:12px;box-sizing:border-box}
 .timeline-dashboard-node.is-overdue i{width:14px;height:14px;border:2.5px solid var(--timeline-today)}
 .timeline-dashboard-node.is-done i::after{content:"✓";position:absolute;inset:50% auto auto 50%;margin:0;transform:translate(-50%,-53%);color:#fff;font-size:8px;font-weight:800}
-.timeline-dashboard-node.is-armed i{outline:2px solid #6db2ff;outline-offset:3px}
+.timeline-dashboard-node.is-emphasized{z-index:1300!important;filter:drop-shadow(0 0 5px rgba(228,56,73,.48))}
+.timeline-dashboard-node.is-emphasized i{outline:2px solid #e43849;outline-offset:3px;box-shadow:0 0 11px 4px rgba(228,56,73,.42)}
+.timeline-dashboard-node.is-armed{cursor:grab}
 .timeline-dashboard-node.is-dragging{cursor:grabbing}
 .timeline-dashboard-node.is-dragging i{outline:2px solid #6db2ff;outline-offset:5px;box-shadow:0 0 0 7px rgba(109,178,255,.13)}
 .timeline-dashboard-node.is-draft i{box-shadow:0 0 0 4px rgba(23,70,176,.13)}
@@ -357,6 +359,11 @@ body.timeline-dragging{cursor:grabbing;user-select:none}
 .timeline-portfolio-card[data-canvas-profile="multi"] .timeline-portfolio-project.is-focused .timeline-stage-lane[data-track="main"] .timeline-node-flag-hit{bottom:29px}.timeline-portfolio-card[data-canvas-profile="multi"] .timeline-portfolio-project.is-focused .timeline-stage-lane[data-track="parallel"] .timeline-node-flag-hit{top:37px}
 .timeline-portfolio-card.is-single-profile .timeline-stage-lane[data-track="main"] .timeline-node-flag-hit{bottom:46px}.timeline-portfolio-card.is-single-profile .timeline-stage-lane[data-track="parallel"] .timeline-node-flag-hit{top:55px}
 .timeline-node-flag.is-probed{z-index:1190;background:#fff;box-shadow:0 9px 24px rgba(31,48,76,.24),0 0 0 1px rgba(139,150,168,.18)}
+.timeline-node-flag.is-emphasized{z-index:1301;min-width:94px;max-width:198px;border-left-color:#e43849;padding:6px 9px 6px 8px;font-size:10.5px;box-shadow:0 0 0 1px rgba(228,56,73,.26),0 0 12px rgba(228,56,73,.32),0 7px 18px rgba(31,48,76,.13);filter:drop-shadow(0 0 5px rgba(228,56,73,.32))}
+.timeline-node-flag.is-emphasized b{max-width:181px;font-size:10.5px}.timeline-node-flag.is-emphasized small{margin-top:2px;font-size:8.5px}
+.timeline-node-flag.is-armed{cursor:grab}
+.timeline-stage-lane[data-track="main"] .timeline-node-flag.is-emphasized{transform:translateX(var(--timeline-node-flag-shift,0px)) translateY(7px) rotate(-8deg)}.timeline-stage-lane[data-track="parallel"] .timeline-node-flag.is-emphasized{transform:translateX(var(--timeline-node-flag-shift,0px)) translateY(-7px) rotate(-8deg)}
+.timeline-node-flag-leader.is-emphasized{z-index:1299;border-top-color:#e43849}.timeline-node-flag-hit.is-emphasized{z-index:1302}.timeline-node-flag-hit.is-armed{cursor:grab}
 
 /* 单项目默认展开态：行高更舒展，双轨压缩并在纵向居中。 */
 .timeline-portfolio-card.is-single-profile .timeline-portfolio-project,.timeline-portfolio-card.is-single-profile .timeline-portfolio-meta,.timeline-portfolio-card.is-single-profile .timeline-portfolio-lanes,.timeline-portfolio-card.is-single-profile .timeline-portfolio-lanes .timeline-stage-lanes{height:190px;min-height:190px}
