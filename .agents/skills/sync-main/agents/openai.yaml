@@ -1,6 +1,6 @@
 interface:
   display_name: "sync-main 同步主线"
-  short_description: "安全切回并同步最新的 origin/main"
-  default_prompt: "Use $sync-main to safely return this checkout to a clean, current origin/main before new work."
+  short_description: "快速同步远端主线、保留本地修复，有冲突时主动合并并按影响验证"
+  default_prompt: "Use $sync-main to synchronize main, preserve unfinished work, take the fast path when possible, and resolve conflicts with only the necessary checks."
 policy:
   allow_implicit_invocation: false

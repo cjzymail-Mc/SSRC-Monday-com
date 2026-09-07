@@ -82,6 +82,36 @@ function Get-RootEnvironmentSnapshot {
     return Get-TextSha256 -Text ($records -join "`n")
 }
 
+function Get-TrackedSourcePaths {
+    # Read Git's NUL-delimited UTF-8 output directly; line-based native output
+    # handling and core.quotepath would otherwise damage unusual file names.
+    $start = [System.Diagnostics.ProcessStartInfo]::new()
+    $start.FileName = "git"
+    $start.UseShellExecute = $false
+    $start.RedirectStandardOutput = $true
+    $start.RedirectStandardError = $true
+    $start.StandardOutputEncoding = [System.Text.UTF8Encoding]::new($false)
+    $start.ArgumentList.Add("ls-files")
+    $start.ArgumentList.Add("-z")
+    $start.ArgumentList.Add("--cached")
+    $process = [System.Diagnostics.Process]::Start($start)
+    try {
+        $errorRead = $process.StandardError.ReadToEndAsync()
+        $output = $process.StandardOutput.ReadToEnd()
+        $process.WaitForExit()
+        $errorText = $errorRead.GetAwaiter().GetResult()
+        if ($process.ExitCode -ne 0) {
+            throw "Unable to enumerate tracked source files: $errorText"
+        }
+        foreach ($path in $output.Split([char]0, [System.StringSplitOptions]::RemoveEmptyEntries)) {
+            if ($path -match '^(?:\.agents/|tests/skill_checks/)') { continue }
+            if ($path -match '\.(?:py|js)$') { $path }
+        }
+    } finally {
+        $process.Dispose()
+    }
+}
+
 $rootOutput = & git rev-parse --show-toplevel 2>&1
 if ($LASTEXITCODE -ne 0) {
     throw "Not inside a Git repository: $rootOutput"
@@ -96,8 +126,8 @@ if (-not $CollectAllFailures) {
 $plan = @(
     $pythonPlan,
     "node --test <all tests/*.test.js>",
-    "python -m py_compile <all repository *.py>",
-    "node --check <all repository *.js>",
+    "python <single-process syntax check of Git-tracked *.py, excluding .agents/ and tests/skill_checks/>",
+    "node --check <Git-tracked *.js, excluding .agents/ and tests/skill_checks/>",
     "git diff --check origin/main...HEAD plus index/worktree cleanliness"
 )
 if ($PlanOnly) {
@@ -137,17 +167,28 @@ try {
         & node --test @nodeTests
     }
 
-    $pythonFiles = @(Get-ChildItem -LiteralPath $root -Recurse -Filter "*.py" -File | Where-Object { $_.FullName -notmatch "[\\/]\.git[\\/]" })
-    foreach ($file in $pythonFiles) {
-        Invoke-Checked -Label "Python compile: $($file.FullName)" -Command {
-            & python -m py_compile $file.FullName
+    $sourcePaths = @(Get-TrackedSourcePaths)
+    $pythonFiles = @($sourcePaths | Where-Object { $_ -match '\.py$' })
+    if ($pythonFiles.Count -gt 0) {
+        Invoke-Checked -Label "Python syntax batch ($($pythonFiles.Count) tracked files)" -Command {
+            # stdin avoids Windows command-line length limits. compile(bytes)
+            # respects source encoding and does not create __pycache__ artifacts.
+            $syntaxCheck = @'
+import json
+from pathlib import Path
+import sys
+
+for name in json.load(sys.stdin):
+    compile(Path(name).read_bytes(), name, "exec")
+'@
+            ConvertTo-Json -InputObject $pythonFiles -Compress | & python -c $syntaxCheck
         }
     }
 
-    $javascriptFiles = @(Get-ChildItem -LiteralPath $root -Recurse -Filter "*.js" -File | Where-Object { $_.FullName -notmatch "[\\/]\.git[\\/]" })
+    $javascriptFiles = @($sourcePaths | Where-Object { $_ -match '\.js$' })
     foreach ($file in $javascriptFiles) {
-        Invoke-Checked -Label "JavaScript syntax: $($file.FullName)" -Command {
-            & node --check $file.FullName
+        Invoke-Checked -Label "JavaScript syntax: $file" -Command {
+            & node --check (Join-Path $root $file)
         }
     }
 
