@@ -130,15 +130,25 @@ HTTP 静态服务的 GET 与 HEAD 均采用同一份默认拒绝清单：只公�
 
 ## 测试
 
+日常修复先运行与改动相关的专项测试；已有可信 PASS 且相关内容未变化时，提交阶段复用结果。以下是产品全量回归入口，按风险或明确要求运行，不是每次同步/提交的默认步骤。
+
 ```powershell
 python -m unittest discover -s tests -p 'test_*.py' -v
 node --test (Get-ChildItem tests -Filter *.test.js | ForEach-Object FullName)
-Get-ChildItem -Recurse -Filter *.py | ForEach-Object { python -m py_compile $_.FullName }
-Get-ChildItem -Recurse -Filter *.js | ForEach-Object { node --check $_.FullName }
 git diff --check
 ```
 
 测试在临时数据库副本和临时端口上运行，不修改仓库中的运行库。Windows sandbox 若禁止 Chromium/Node 子进程，应在受控的沙箱外运行相同完整套件，不能跳过断言。最终验收索引见 `GLOBAL_ACCEPTANCE.md`。
+
+提交阶段若需要包含语法和运行数据核验的完整检查，可在修复已提交到本地分支、工作区干净时使用 `.agents/skills/commit-push-pr/scripts/run-flowboard-checks.ps1`；它只枚举 Git 跟踪源码，Python 在单个进程中检查且不写入源码目录。上面的产品套件可直接用于尚未提交的修复。单个 Python 专项可用 `python -m unittest discover -s tests -p 'test_name.py' -v -f`，前端专项可用 `node --test tests/timeline_ui.test.js` 等对应文件。
+
+Git 协作工具的隔离测试单独运行；仅在修改相关 skill/脚本或明确要求时使用，不随上面的产品测试自动执行：
+
+```powershell
+python -m unittest discover -s tests/skill_checks -p 'test_*.py' -v -f
+```
+
+`tests/skill_checks/` 不作为 Python package（不添加 `__init__.py`），以保持两个 unittest discovery 入口独立。Git 工具测试只使用临时本地仓库。
 
 feature01 门 4 终值测试矩阵（2026-08-20）：
 

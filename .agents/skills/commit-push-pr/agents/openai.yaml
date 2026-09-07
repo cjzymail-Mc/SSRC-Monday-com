@@ -1,6 +1,6 @@
 interface:
   display_name: "commit-push-pr 提交并推送 PR"
-  short_description: "通过贡献者 fork 提交修复 PR 并安全归位"
-  default_prompt: "Use $commit-push-pr to move my completed local fixes into a fresh fix branch, verify them, push through my public fork, open an upstream GitHub pull request, then safely return to main."
+  short_description: "复用已通过的测试、按需解决主线冲突，经贡献者 fork 提交修复 PR"
+  default_prompt: "Use $commit-push-pr to package my completed fixes, reuse valid test evidence, resolve upstream conflicts with focused checks, submit through my fork, and safely return to main."
 policy:
   allow_implicit_invocation: false
