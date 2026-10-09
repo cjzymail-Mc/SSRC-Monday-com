@@ -8,6 +8,8 @@
 >
 > **2026-08-26 Gate 5 体验覆盖**：归档操作入口仅保留在【单项目仪表盘】项目菜单；【全项目仪表盘】行菜单与【时间表编辑器】均不渲染归档入口。单双仪表盘的【撤销/放弃/更新】操作条只有形成当前本地草稿或存在当前会话可撤销提交后才生成；全项目提交后的撤销态默认收起，仅项目列 hover/focus 时显示红色【撤销】。仅撤销态项目列须提供条件化键盘入口，下一次 Tab 可到达撤销按钮。
 >
+> **2026-09-24 用户覆盖删除规则**：workspace admin 或项目创建者均可软删除项目；已归档项目可在【已归档】列表直接删除，不必先取消归档。删除审计保留操作者、版本与原归档状态；归档、节点和先前审计记录不被清除。
+>
 > 适用范围：手工归档、一次性初始化归档、全项目密集节点显示、今日蒙版、全项目全屏入口恢复，以及单项目时间轴横向缩放/拖拽。本文只覆盖这些增量；其余仍分别沿用 `9-GATE3_TECH_FREEZE.md`、`13-TAG_ORDER_TECH_FREEZE.md` 和 `14-PORTFOLIO_CANVAS_TECH_FREEZE.md`。
 
 ## 0. 不可变业务基线
@@ -16,7 +18,7 @@
 2. workspace admin 或项目 `created_by` 可归档；两者也可取消归档。权限必须由服务端执行。
 3. 归档是高优先级系统状态，以虚拟系统标签【已归档项目】呈现；它不是删除、软删除、回收站或普通标签。
 4. 归档项目从“全部 / 未分类 / 普通标签 / 我的项目 / 项目分组”等活跃入口剔除，只在【全项目仪表盘 → 已归档项目】和首页【已归档】页出现。
-5. 首页【已归档】页只列项目名称和【取消归档】动作，不承载时间画布、编辑器、标签修改或删除入口。
+5. 首页【已归档】页列项目名称，并向 admin 或项目创建者提供【取消归档】和【删除项目】；不承载时间画布、编辑器或标签修改。
 6. 归档期间项目内容只读；必须先取消归档才能编辑。
 7. 归档不删除普通标签关系或个人顺序；取消归档后恢复原有标签与个人位置。
 8. 归档入口仅位于单项目仪表盘的项目菜单；全项目行与时间表编辑器不得出现该入口。执行前只出现一次确认弹窗。
@@ -55,7 +57,7 @@ WHERE deleted_at IS NULL AND archived_at IS NOT NULL;
 - `archived`：`deleted_at IS NULL AND archived_at IS NOT NULL`。
 - `mine / all / uncategorized / tag` 在 `13-` 原定义上追加 `archived_at IS NULL`，标签计数也只统计 active。
 - 虚拟 `archived` 上下文不接受 `tag_id`，不参与普通标签 CRUD，也不提供个人自定义排序；服务端固定按归档时间倒序。
-- 软删除与归档是互斥的用户旅程：归档项目若需进入回收站，必须先取消归档，再按既有 admin 软删除合同执行。
+- 2026-09-24 用户覆盖：workspace admin 或项目创建者可从【已归档】列表直接软删除归档项目，无需先取消归档；项目与节点、归档历史及审计仍保留在库中。
 
 ### 2.2 遮蔽而非改写
 
@@ -91,7 +93,7 @@ POST /api/workspaces/{workspace_id}/timeline/projects/{project_id}/unarchive
 
 - 项目详情 GET 允许 workspace 成员读取归档项目，并返回 `archived_at/archived_by/read_only=true`；普通项目列表默认只返回 active，显式 `archive_state=archived` 才返回归档集合。
 - 所有项目内容写路径在服务层统一要求 `archived_at IS NULL`：节点增删改、日期/状态批次、撤销、历史日期更正、标签归属变更及其他会修改既有项目内容的路径均不得只靠前端隐藏。
-- admin 和创建者在归档期间也不能编辑；命中时返回 409 `PROJECT_ARCHIVED`。允许的状态写只有取消归档。
+- admin 和创建者在归档期间也不能编辑；命中时返回 409 `PROJECT_ARCHIVED`。允许的状态写为取消归档，以及按 2026-09-24 用户覆盖执行的项目软删除。
 - 全项目【已归档项目】可查看只读时间画布；行内不出现节点拖拽、完成状态、编辑、标签、归档或删除动作。项目页若从归档上下文进入，同样只读并只提供【取消归档】。
 
 ### 3.3 审计
@@ -101,10 +103,11 @@ POST /api/workspaces/{workspace_id}/timeline/projects/{project_id}/unarchive
 ```text
 timeline.project_archived
 timeline.project_unarchived
+timeline.project_deleted
 timeline.archive_bootstrap_completed
 ```
 
-单项目事件记录 workspace、project、actor、前后 version、`archived_at`；一次性初始化的每个项目仍各有 `timeline.project_archived`，完成事件另记候选数、快照摘要和操作者。归档历史不得因取消归档而删除。
+单项目事件记录 workspace、project、actor、前后 version、`archived_at`；删除事件另记 `deleted_at`。一次性初始化的每个项目仍各有 `timeline.project_archived`，完成事件另记候选数、快照摘要和操作者。归档历史不得因取消归档或删除而清除。
 
 ## 4. 一次性初始化归档（Q6=B）
 
@@ -132,7 +135,7 @@ timeline.archive_bootstrap_completed
 
 - 仅单项目仪表盘的 active 项目菜单显示【归档项目】；全项目 active 行和时间表编辑器均不渲染该动作，归档项目也不显示该动作。
 - 点击后出现一次确认弹窗，明确“不是删除、将从普通入口隐藏、归档期间只读”；取消零写入，确认后才调用 archive API。
-- 全项目标签导航末尾固定显示虚拟【已归档项目】；首页侧边栏【已归档】进入轻量列表，只显示名称与有权限时的【取消归档】。
+- 全项目标签导航末尾固定显示虚拟【已归档项目】；首页侧边栏【已归档】进入轻量列表，显示名称及有权限时的【取消归档】【删除项目】。
 - 前端根据服务端 `can_archive/can_unarchive` 控制入口可见性，但这只是反馈，不能替代 3.1 的服务端鉴权。
 
 ### 5.2 独立范围与视角记忆（Q8=A）
