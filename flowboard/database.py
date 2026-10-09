@@ -7,7 +7,7 @@ from pathlib import Path
 from .security import hash_password
 
 
-SCHEMA_VERSION = 19
+SCHEMA_VERSION = 20
 
 
 def utc_now():
@@ -121,6 +121,8 @@ def migrate(path, initial_password=None):
             _migration_v18(conn)
         if version < 19:
             _migration_v19(conn)
+        if version < 20:
+            _migration_v20(conn)
         conn.execute("PRAGMA journal_mode = WAL")
         conn.execute("PRAGMA foreign_keys = ON")
         return backup
@@ -1154,6 +1156,31 @@ def _migration_v19(conn):
         raise RuntimeError("foreign key check failed after v19 migration")
     if conn.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
         raise RuntimeError("database integrity check failed after v19 migration")
+
+
+def _migration_v20(conn):
+    """Store each user's order of workspace member cards."""
+    with transaction(conn):
+        conn.execute(
+            """CREATE TABLE timeline_member_orders(
+                workspace_id INTEGER NOT NULL REFERENCES workspaces(id),
+                user_id TEXT NOT NULL REFERENCES users(id),
+                version INTEGER NOT NULL DEFAULT 1,
+                member_ids_json TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY(workspace_id,user_id)
+            )"""
+        )
+        conn.execute(
+            "INSERT INTO schema_migrations VALUES (20,?,?,?)",
+            ("personal timeline team member card ordering", "flowboard-schema-v20", utc_now()),
+        )
+        conn.execute("PRAGMA user_version = 20")
+    if conn.execute("PRAGMA foreign_key_check").fetchall():
+        raise RuntimeError("foreign key check failed after v20 migration")
+    if conn.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+        raise RuntimeError("database integrity check failed after v20 migration")
 
 
 def copy_database(source, target):
