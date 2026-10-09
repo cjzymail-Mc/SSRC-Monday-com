@@ -1,0 +1,232 @@
+{
+  "created": [
+    {
+      "id": 10,
+      "name": "晨曦休闲鞋 · 概念款（演示）",
+      "stage": "创意",
+      "progress": 0,
+      "creator": "dev"
+    },
+    {
+      "id": 11,
+      "name": "晨曦休闲鞋 · 轻量款（演示）",
+      "stage": "创意",
+      "progress": 25,
+      "creator": "u2"
+    },
+    {
+      "id": 12,
+      "name": "晨曦休闲鞋 · 竞赛款（演示）",
+      "stage": "创意",
+      "progress": 50,
+      "creator": "dev"
+    },
+    {
+      "id": 13,
+      "name": "晨曦休闲鞋 · 耐磨款（演示）",
+      "stage": "创意",
+      "progress": 75,
+      "creator": "u2"
+    },
+    {
+      "id": 14,
+      "name": "晨曦休闲鞋 · 联名款（演示）",
+      "stage": "创意",
+      "progress": 100,
+      "creator": "dev"
+    },
+    {
+      "id": 15,
+      "name": "凌云竞速跑鞋 · 概念款（演示）",
+      "stage": "设计",
+      "progress": 0,
+      "creator": "u2"
+    },
+    {
+      "id": 16,
+      "name": "凌云竞速跑鞋 · 轻量款（演示）",
+      "stage": "设计",
+      "progress": 25,
+      "creator": "dev"
+    },
+    {
+      "id": 17,
+      "name": "凌云竞速跑鞋 · 竞赛款（演示）",
+      "stage": "设计",
+      "progress": 50,
+      "creator": "u2"
+    },
+    {
+      "id": 18,
+      "name": "凌云竞速跑鞋 · 耐磨款（演示）",
+      "stage": "设计",
+      "progress": 75,
+      "creator": "dev"
+    },
+    {
+      "id": 19,
+      "name": "凌云竞速跑鞋 · 联名款（演示）",
+      "stage": "设计",
+      "progress": 100,
+      "creator": "u2"
+    },
+    {
+      "id": 20,
+      "name": "跃影篮球鞋 · 概念款（演示）",
+      "stage": "开发",
+      "progress": 0,
+      "creator": "dev"
+    },
+    {
+      "id": 21,
+      "name": "跃影篮球鞋 · 轻量款（演示）",
+      "stage": "开发",
+      "progress": 25,
+      "creator": "u2"
+    },
+    {
+      "id": 22,
+      "name": "跃影篮球鞋 · 竞赛款（演示）",
+      "stage": "开发",
+      "progress": 50,
+      "creator": "dev"
+    },
+    {
+      "id": 23,
+      "name": "跃影篮球鞋 · 耐磨款（演示）",
+      "stage": "开发",
+      "progress": 75,
+      "creator": "u2"
+    },
+    {
+      "id": 24,
+      "name": "跃影篮球鞋 · 联名款（演示）",
+      "stage": "开发",
+      "progress": 100,
+      "creator": "dev"
+    },
+    {
+      "id": 25,
+      "name": "霜羽羽毛球鞋 · 概念款（演示）",
+      "stage": "测试",
+      "progress": 0,
+      "creator": "u2"
+    },
+    {
+      "id": 26,
+      "name": "霜羽羽毛球鞋 · 轻量款（演示）",
+      "stage": "测试",
+      "progress": 25,
+      "creator": "dev"
+    },
+    {
+      "id": 27,
+      "name": "霜羽羽毛球鞋 · 竞赛款（演示）",
+      "stage": "测试",
+      "progress": 50,
+      "creator": "u2"
+    },
+    {
+      "id": 28,
+      "name": "霜羽羽毛球鞋 · 耐磨款（演示）",
+      "stage": "测试",
+      "progress": 75,
+      "creator": "dev"
+    },
+    {
+      "id": 29,
+      "name": "霜羽羽毛球鞋 · 联名款（演示）",
+      "stage": "测试",
+      "progress": 100,
+      "creator": "u2"
+    },
+    {
+      "id": 30,
+      "name": "拓野徒步鞋 · 概念款（演示）",
+      "stage": "量产",
+      "progress": 0,
+      "creator": "dev"
+    },
+    {
+      "id": 31,
+      "name": "拓野徒步鞋 · 轻量款（演示）",
+      "stage": "量产",
+      "progress": 25,
+      "creator": "u2"
+    },
+    {
+      "id": 32,
+      "name": "拓野徒步鞋 · 竞赛款（演示）",
+      "stage": "量产",
+      "progress": 50,
+      "creator": "dev"
+    },
+    {
+      "id": 33,
+      "name": "拓野徒步鞋 · 耐磨款（演示）",
+      "stage": "量产",
+      "progress": 75,
+      "creator": "u2"
+    },
+    {
+      "id": 34,
+      "name": "拓野徒步鞋 · 联名款（演示）",
+      "stage": "量产",
+      "progress": 100,
+      "creator": "dev"
+    },
+    {
+      "id": 35,
+      "name": "轻风训练鞋 · 概念款（演示）",
+      "stage": "应用迭代",
+      "progress": 0,
+      "creator": "u2"
+    },
+    {
+      "id": 36,
+      "name": "轻风训练鞋 · 轻量款（演示）",
+      "stage": "应用迭代",
+      "progress": 25,
+      "creator": "dev"
+    },
+    {
+      "id": 37,
+      "name": "轻风训练鞋 · 竞赛款（演示）",
+      "stage": "应用迭代",
+      "progress": 50,
+      "creator": "u2"
+    },
+    {
+      "id": 38,
+      "name": "轻风训练鞋 · 耐磨款（演示）",
+      "stage": "应用迭代",
+      "progress": 75,
+      "creator": "dev"
+    },
+    {
+      "id": 39,
+      "name": "轻风训练鞋 · 联名款（演示）",
+      "stage": "应用迭代",
+      "progress": 100,
+      "creator": "u2"
+    }
+  ],
+  "skipped": [],
+  "backup": "D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\local-test-data\\feature02-preview\\backups\\preview-before-more-projects-20261008-132131.db",
+  "database": "D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\local-test-data\\feature02-preview\\flowboard.db",
+  "server_today": "2026-10-08",
+  "sample_projects": 30,
+  "sample_nodes": 240,
+  "active_projects": 37,
+  "sample_groups": {
+    "attention": 12,
+    "recent": 18
+  },
+  "progress_distribution": {
+    "0": 6,
+    "25": 6,
+    "50": 6,
+    "75": 6,
+    "100": 6
+  }
+}

@@ -1,0 +1,309 @@
+{
+  "date": "2026-10-08",
+  "status": "DEVELOPMENT_READY",
+  "human_acceptance": "PENDING",
+  "deployment": "NOT_DEPLOYED",
+  "tests": {
+    "backend": "7/7 PASS",
+    "browser": "19/19 PASS",
+    "overview_node": "6/6 PASS",
+    "timeline_node": "PASS"
+  },
+  "diff_note": "UX-round saved baselines only; README/timeline E2E current hashes included. Preexisting dirty changes retained.",
+  "excluded_mutable_logs": [
+    "preview-stdout.log",
+    "preview-stderr.log"
+  ],
+  "files": [
+    {
+      "path": "app.js",
+      "bytes": 151637,
+      "sha256": "cce19b6f16c356d73af4fbd53413296be6864f85ccaa434d78c3b47f2abe2f4f"
+    },
+    {
+      "path": "feature-02-进阶仪表盘/01-PROJECT_OVERVIEW_CONTRACT.md",
+      "bytes": 5481,
+      "sha256": "71b2593b27fc222c5190d28ed76e16b11866b8bd46ae36f92831186dd64dda28"
+    },
+    {
+      "path": "feature-02-进阶仪表盘/02-DELIVERY.md",
+      "bytes": 10092,
+      "sha256": "7914981e59145e6f250f62e2e7856a73853e7005a90f2a3402351d58e581c5e2"
+    },
+    {
+      "path": "feature-02-进阶仪表盘/03-UX_OPTIMIZATION_CONTRACT.md",
+      "bytes": 5548,
+      "sha256": "5502db84ec66784e7ebde58cc72a606a12b03d2941696d26e6375d1e83de2dc8"
+    },
+    {
+      "path": "feature-02-进阶仪表盘/04-UX_DELIVERY.md",
+      "bytes": 6825,
+      "sha256": "8585a7a753487929781aade66e23c5bf3d29c4dbb2cfd0fcf4d9d5bd83f013d0"
+    },
+    {
+      "path": "flowboard/overview.py",
+      "bytes": 8655,
+      "sha256": "6bb8448a0cc6f394a0558c85fa1a6edc48a3d03a95618f66982576c8096828c6"
+    },
+    {
+      "path": "index.html",
+      "bytes": 7509,
+      "sha256": "3e4f06187e6101c74c6c09b5c1dd6cc7b5d741288ee4d0de41fc5068c92b0d24"
+    },
+    {
+      "path": "overview-ui.js",
+      "bytes": 13568,
+      "sha256": "48ede05c8f79fc45467b65dd4cb663dc692df9ff5692c3b972f00b2cd044e48b"
+    },
+    {
+      "path": "overview.css",
+      "bytes": 9930,
+      "sha256": "088f1105fc74d8a0cb6ad4b31a8698eaad3b97186a972af8955d988ca0eb7e65"
+    },
+    {
+      "path": "README.md",
+      "bytes": 25469,
+      "sha256": "4b2dad8c0b05162882c2fab1e40f4ccd92532456e0a1f3d0e2fd846631b3df91"
+    },
+    {
+      "path": "STATE.md",
+      "bytes": 8285,
+      "sha256": "c15b98482b6c57fdecc3afda061a8fc35ecdcce0b63750db4f67f3ede5c8f3b9"
+    },
+    {
+      "path": "team-progress/20261008-feature02-ux-optimization.md",
+      "bytes": 2726,
+      "sha256": "06d6541e227595931d9fe2185c792433369f9aab0344b52b4addcf7910679a46"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/backend.log",
+      "bytes": 2909,
+      "sha256": "2c8cc043d92e6d39267440b6a2ac6da40c625ca575984d26071211216e9a39a1"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/baseline/app.js",
+      "bytes": 148421,
+      "sha256": "bc68b878d95034cfeba690a9e6be0f8828167f73917dab9640bf18c1e1658704"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/baseline/feature-02-进阶仪表盘_01-PROJECT_OVERVIEW_CONTRACT.md",
+      "bytes": 5217,
+      "sha256": "ead334657a797545eecd54d8b43f98b2ad252de7aa59a3bcb0db8c41fc0fc3cf"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/baseline/feature-02-进阶仪表盘_02-DELIVERY.md",
+      "bytes": 9773,
+      "sha256": "8f5125c2b575d4d6fddef9f133d14be87761616a842fdb6c888a24306bd82a98"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/baseline/flowboard_overview.py",
+      "bytes": 6351,
+      "sha256": "0b9eaf38f6efadafc51c22bf2da54f95ad03d0ebf3f19e1216bd490b9b353127"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/baseline/git-status.txt",
+      "bytes": 3057,
+      "sha256": "12a6cb70d64d657175af7bf6befa68a3c006836b96167532bf384e00ae76b414"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/baseline/index.html",
+      "bytes": 7553,
+      "sha256": "6f476b33cd4daaac20839d42d2480b5c8202cb3340588414eefba9335eb849d0"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/baseline/overview-ui.js",
+      "bytes": 10493,
+      "sha256": "abd48ddac470f8b0c2e0ec4d8061d8fc190bcd0f51c2a4a350d4c532f3368ce2"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/baseline/overview.css",
+      "bytes": 6965,
+      "sha256": "a7a475d69c6144f7678f98d35318a78c2f47c939afe11119e5204b1fa76aec1c"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/baseline/STATE.md",
+      "bytes": 7237,
+      "sha256": "0ef19e26b0fc43a963548b2dc5f61ae0be9d3ebff10c6a5cc1d20865ef2946aa"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/baseline/tests_overview_ui.test.js",
+      "bytes": 2905,
+      "sha256": "b9ab09f2f3ace76365da418a88a96f532530dcaf13788731fee145fb1714337e"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/baseline/tests_test_overview.py",
+      "bytes": 7083,
+      "sha256": "2271f42b36049339c0a966d0c46bfb4612522d95d58988d2d3f0a8b9ef4c33b0"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/baseline/tests_test_overview_e2e.py",
+      "bytes": 14447,
+      "sha256": "6775bcb452229e69f48e746dbf706b1e9dab06df8ebfd529424fc801339c9f34"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/baseline/tests_timeline_ui.test.js",
+      "bytes": 49504,
+      "sha256": "094646be1255061b5ed48daa55eb697f648c1211f1127cc310fc98692302f84f"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/baseline/timeline-ui.js",
+      "bytes": 134116,
+      "sha256": "340490fe6b8d4dfc6ca6acfc8907ea2e1bc4ea8b843f725ce57557bf55796e70"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/browser.log",
+      "bytes": 40616,
+      "sha256": "199db3e35fe79d85cfdd6e74234ba454860514740b3b8683c4b73b1a6a7d650c"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/canvas-regression.log",
+      "bytes": 12376,
+      "sha256": "136e8cbe02e68e47cd27968ef1cd07abab837f321e1ce3b5903b91d99f120b55"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/canvas-scopes.jpg",
+      "bytes": 77511,
+      "sha256": "b994805b17b1017093db179d76d46ffadc363d1dcbe53b1fbc3c93bee826ff3c"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/category-filter.jpg",
+      "bytes": 85153,
+      "sha256": "cb7dbb630c6069a3681f1242689f6d8f7b6ba6d402232e121b2fe1e5a659c378"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/demo-tags.json",
+      "bytes": 611,
+      "sha256": "02c5ca2a59d7c176c4d0f7afef80a3a6a97b663753165588fd259261dc8e2992"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/dense-detail.jpg",
+      "bytes": 87541,
+      "sha256": "12c00520bd7283e19796108019d210463f9a4650c872b852ce7ee884ab811a67"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/final-browser.log",
+      "bytes": 58708,
+      "sha256": "d4c5e9956684a470968f0c68c9ac7a56e952123c8b1ca21823d6bebeb6aa5cb1"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/finalize_evidence.py",
+      "bytes": 5704,
+      "sha256": "560b9def7ab0e696b100f847c630fc631d38b44ebfbb3f6e133826f4f2c8002c"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/live-walkthrough.json",
+      "bytes": 2248,
+      "sha256": "d9eb8677d03f54bbc13dd6307277a81255e64535ea7994cc0932aa4abd184592"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/native-draft-guard.log",
+      "bytes": 2511,
+      "sha256": "982fec7b3468ad74aee77984daf02e6b8a2b36165c51b3b09148b41d6f5b143f"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/node.log",
+      "bytes": 645,
+      "sha256": "c9a40d8db0de10a4b8f47c4575e97f0d74f60f61c3b1651935799fef842f9e21"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/overview-content.png",
+      "bytes": 686947,
+      "sha256": "288c64661c2f59aa0534539af1db461e147ff077ed6e6900ccc0de78071eee53"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/overview-desktop.png",
+      "bytes": 313820,
+      "sha256": "4dc65a745fe65f71fbdab5d3c23b366cdc90ed2442c3e4e3e0af046a00cad705"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/overview-initial.jpg",
+      "bytes": 85830,
+      "sha256": "9fce7614f823f0a0406039fda51fccd2a3bdeb353b9f333a624f814e86dbe19a"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/overview-narrow.png",
+      "bytes": 145767,
+      "sha256": "b9896456990c4a2d48206ef701db6214f474fc99e55adbf39f80c7379777ba35"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/overview-ready.jpg",
+      "bytes": 85394,
+      "sha256": "6213471f3aca869c84e471358d959fca0111942152b2a1f5f3d7fce17c7d5c47"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/run_canvas_regression.py",
+      "bytes": 674,
+      "sha256": "4eb2216a57c864f10705605df6b1d751396dc3ba1cef135117faf85ea8b2465b"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/run_final_browser.py",
+      "bytes": 881,
+      "sha256": "2a82a4f339e0f7d39cbc5ac3b6082426fc5f941c0c4eb4fccee8cb10e3d54477"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/seed_demo_tags.py",
+      "bytes": 2300,
+      "sha256": "7df5a646ea8c8ab129578444a786a88b366551c74f097a036e8edaa1b9f069bb"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/static-checks.log",
+      "bytes": 688,
+      "sha256": "759eea02dbf860a36c366a2f47f60eb388e238af0631b807fb56ba64d596b70b"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/tag-catalog-race.log",
+      "bytes": 2620,
+      "sha256": "51f07cd26c24e7a45d09f33c20c19be7a74c8d34fbba5a0233752ba773533f98"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/timeline-node.log",
+      "bytes": 11200,
+      "sha256": "cf5b5cf557b3dceda699c0b56476f79fcf74f498efa0558bf5c326902470ccd2"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/ux-final-browser.log",
+      "bytes": 16635,
+      "sha256": "aa3dbffc42c45a491eae0f10547c57bbeaeabfb68e88c5f2577b6c4e4d3d0231"
+    },
+    {
+      "path": "team-progress/verification/20261008-feature02-ux/ux-source.diff",
+      "bytes": 128358,
+      "sha256": "1f1ea56d46e1fdf3cfd25b381cd8cd44ef351bb0a179293e8c07565895697fb9"
+    },
+    {
+      "path": "tests/overview_ui.test.js",
+      "bytes": 3834,
+      "sha256": "2c38f7d4e54e094763a13caeb9a22a6eb582eb9678ac14c7adb80bf9db0d4bf4"
+    },
+    {
+      "path": "tests/test_overview.py",
+      "bytes": 9905,
+      "sha256": "f9e5f9c7b811a0e799f791ef13753fc80d7ff987358c3655109e33a79bb5cb14"
+    },
+    {
+      "path": "tests/test_overview_e2e.py",
+      "bytes": 15144,
+      "sha256": "66066e5623c3f648cc8e0133e7f3a61667403af8173c211d13a5f8615bce195b"
+    },
+    {
+      "path": "tests/test_overview_ux_e2e.py",
+      "bytes": 10844,
+      "sha256": "9210541b85c0cfb4d11972a4149549cbf83b6676f92ea9f7692d6fe17dc74672"
+    },
+    {
+      "path": "tests/test_timeline_e2e.py",
+      "bytes": 215852,
+      "sha256": "3e7f251a6d0197f4744a8fed8a4a18b5040c61475f683d7883505cc07ae29c3d"
+    },
+    {
+      "path": "tests/timeline_ui.test.js",
+      "bytes": 49556,
+      "sha256": "ffca9a7bbe3cf973d5711f0cd3180484714b09336f788513ce291bfb687fcc20"
+    },
+    {
+      "path": "timeline-ui.js",
+      "bytes": 134248,
+      "sha256": "bf3d5d25c6d06f6e08a2de384bd5e0c4b8f333c7ef46f6372b918482f4deb513"
+    }
+  ]
+}

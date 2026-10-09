@@ -1,0 +1,20 @@
+Final static verification
+Python compilation PASS
+JS syntax PASS: app.js
+JS syntax PASS: timeline-ui.js
+JS syntax PASS: overview-ui.js
+warning: in the working copy of 'STATE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'feature-01-项目时间管理-仪表盘/15-MANUAL_ARCHIVE_AND_TIMELINE_VIEW_TECH_FREEZE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'feature-01-项目时间管理-仪表盘/STATE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'feature-01-项目时间管理-仪表盘/mainline-feature01.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'flowboard/database.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'flowboard/timeline.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'flowboard/transfer.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_timeline.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_timeline_archive.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_timeline_e2e.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_timeline_http.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/timeline_ui.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'timeline.css', LF will be replaced by CRLF the next time Git touches it
+git diff --check PASS
+Artifact whitespace, baseline timeline.css and temp=0 PASS

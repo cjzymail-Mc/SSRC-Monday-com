@@ -1,0 +1,160 @@
+{
+  "date": "2026-10-09",
+  "scope": "project width and creator surname",
+  "tests": {
+    "node": 9,
+    "browser": 5
+  },
+  "files": [
+    {
+      "path": "feature-02-进阶仪表盘/03-UX_OPTIMIZATION_CONTRACT.md",
+      "bytes": 7230,
+      "sha256": "ba83c033a19237233a5bdb39601cac15615e7bdbab33e77864162a334389ea65"
+    },
+    {
+      "path": "feature-02-进阶仪表盘/04-UX_DELIVERY.md",
+      "bytes": 9151,
+      "sha256": "6e0619a0483427b808b84fe6f8ad6081387666104045a1b3c95e1120acb52e29"
+    },
+    {
+      "path": "index.html",
+      "bytes": 7669,
+      "sha256": "5296fbbce5a46cfe35b8bd96429b68ab75d06cb37afd229fc21b975bc1eed05b"
+    },
+    {
+      "path": "overview-ui.js",
+      "bytes": 14643,
+      "sha256": "a028a25c1b6454ce3403b5e4632b6274101bf5d1c39f9ae003ed961309e24c70"
+    },
+    {
+      "path": "overview.css",
+      "bytes": 9663,
+      "sha256": "6e5e992394082145abe92f1bb610d1a1e195e4b22b078fc3ab22d99245106eb1"
+    },
+    {
+      "path": "STATE.md",
+      "bytes": 11812,
+      "sha256": "1d58cabb7d9c822ac20235ec216b06c00113633c1e36257fb7db5e6486157d65"
+    },
+    {
+      "path": "team-progress/20261009-overview-owner-column.md",
+      "bytes": 1668,
+      "sha256": "6a1bbf226f8f44178bcf0090e5cfdc789942e3b1d770f3a50d2b81918a72c231"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/apply_owner_column.py",
+      "bytes": 2537,
+      "sha256": "b41585979e1045455c2ab3ecac03f635628aff2b92a4d9692d0fcc13f4844731"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/baseline/feature-02-进阶仪表盘_03-UX_OPTIMIZATION_CONTRACT.md",
+      "bytes": 6955,
+      "sha256": "56fcbe2c25e8d1e4fe6e1583894b59b1a465cc1e72147d3918ed0e771698d30b"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/baseline/feature-02-进阶仪表盘_04-UX_DELIVERY.md",
+      "bytes": 8768,
+      "sha256": "8ca982d2d2b55a4743497776ce39e2c28b5ed7ba645b63b6e1ccb4493674e172"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/baseline/index.html",
+      "bytes": 7681,
+      "sha256": "292fd8a0d0e7b187b56935e4678278cb0f0739f81767f14725bd94f51afa2f25"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/baseline/overview-ui.js",
+      "bytes": 14277,
+      "sha256": "69d53a1f6d6629c0e98c513df80eec10d9dc85fe9cd84519222eeff19bb62e57"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/baseline/overview.css",
+      "bytes": 9555,
+      "sha256": "19464368675cd1e3367e654d31f2b8f820f3afd83d1d96dc8abd38bc81475ffd"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/baseline/STATE.md",
+      "bytes": 11192,
+      "sha256": "7121df78989ab0f80bbb5bd9caf28363eb5e7cd7f6529b60af0dc25c40742af8"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/baseline/tests_overview_ui.test.js",
+      "bytes": 5668,
+      "sha256": "ac8c8a922bb03bd337b4fd7caf4be4c4999b6c44f1e902c03ede772168e1b60e"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/baseline/tests_test_overview_ux_e2e.py",
+      "bytes": 15083,
+      "sha256": "9b99d0de324ac44b402f46e9780845f8b4fb5e1c7c9dfce4120390d17348aa57"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/browser.log",
+      "bytes": 15195,
+      "sha256": "3de5a15b6ab254374f63bd0ba68a7d989048b8a8f3f5caa538c9394109578fc0"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/creator-data-profile.json",
+      "bytes": 92,
+      "sha256": "578c4e27b610226babd7e75b24a556f76fe618d841ef1019c4433c10c7ebb578"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/finalize_evidence.py",
+      "bytes": 3296,
+      "sha256": "5bc021da7e197636ffb83aa2582ef04297bf9ba18fd9d8d6876bc1808a1a1656"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/http-proof.json",
+      "bytes": 277,
+      "sha256": "93950594f286d4f6b4ce70791bd68bf831c10bf150a1b58aab7d260f5bd9897f"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/narrow_project_column.py",
+      "bytes": 254,
+      "sha256": "4a06a5734561ea9129d2eacef9e8d112cf569aeb94e1c8b2ece27e05b2c663b1"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/node.log",
+      "bytes": 936,
+      "sha256": "0a88e0f5edc15c812abd36a60985b4136362488e4e3f842888aa1f00ce3ea387"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/overview-content.png",
+      "bytes": 688890,
+      "sha256": "d839a1635dcc2d31dc66e86ecc9ae801538bb7c85a1006bbb6e153644e7758ee"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/overview-desktop.png",
+      "bytes": 320070,
+      "sha256": "b29310c5866e2d248ea225c721ba26dc9fac3fd69161fa2eb5ae9d1a812fabde"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/overview-narrow.png",
+      "bytes": 150744,
+      "sha256": "87dfc26f9230c30a63292598b3c9faa20274d813b06049d9a7fcfadc21061ef3"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/run_regression.py",
+      "bytes": 865,
+      "sha256": "8c07aa78fc5be819dfe03c9403e7a3a277064ffc8a788369dc9e8b4fee1d019a"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/source.diff",
+      "bytes": 29747,
+      "sha256": "a960576410e2914267bcd9203cd97bac5d7eff9abb87c6e24f5b7f796a713c18"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-owner/static-checks.log",
+      "bytes": 264,
+      "sha256": "fd6bb0acc451c34a3e756aaaf0d46c5c2e0e71fb520a292fc492f00d5e2ebc67"
+    },
+    {
+      "path": "tests/overview_ui.test.js",
+      "bytes": 5668,
+      "sha256": "d79a64fffa77849981e5be9ac126f9e6f6c37784f07022947c75194ffc5282da"
+    },
+    {
+      "path": "tests/test_overview_ux_e2e.py",
+      "bytes": 15383,
+      "sha256": "9c0f4f6070c8e9034646357c1aa4945f5443f3042b9aaf77acbc60315c6749ae"
+    }
+  ]
+}

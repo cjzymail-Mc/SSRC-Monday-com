@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-08",
+  "url": "http://127.0.0.1:8083/",
+  "method": "Cua in-app browser actual user interactions; final read-only DOM snapshot",
+  "final": {
+    "advancedVisible": false,
+    "assetVersions": [
+      "http://127.0.0.1:8083/timeline-ui.js?v=20261008-f02-ux-ready",
+      "http://127.0.0.1:8083/overview-ui.js?v=20261008-f02-ux-ready",
+      "http://127.0.0.1:8083/app.js?v=20261008-f02-ux-ready"
+    ],
+    "columns": [
+      "项目",
+      "关注状态",
+      "当前阶段",
+      "下一未完成节点",
+      "项目进度"
+    ],
+    "heading": "项目概览",
+    "modules": [
+      "◈我的工作",
+      "▤项目概览",
+      "↔时间画布",
+      "♢标签",
+      "▣已归档"
+    ],
+    "projectRows": 37,
+    "search": "",
+    "stats": "37 个项目 · 314 个节点全部 · 全部日期",
+    "viewport": {
+      "height": 676,
+      "width": 1480
+    }
+  },
+  "observedJourneys": [
+    {
+      "scenario": "球类运动标签",
+      "projects": 10,
+      "nodes": 109,
+      "evidence": "category-filter.jpg"
+    },
+    {
+      "scenario": "球类运动+已完成事项",
+      "projects": 10,
+      "nodes": 79,
+      "fullProjectProgress": [
+        "9/12",
+        "7/12",
+        "6/12"
+      ],
+      "verified": "row progress remains full-project despite filtered detail"
+    },
+    {
+      "scenario": "晨曦休闲鞋 · 概念款（演示）",
+      "projects": 1,
+      "nodes": 21,
+      "detailNodes": 21,
+      "fullProjectProgress": "21/21",
+      "tracks": [
+        "主线",
+        "并行"
+      ],
+      "evidence": "dense-detail.jpg"
+    },
+    {
+      "scenario": "时间画布本月",
+      "projectRows": 12,
+      "rangeButtons": 3,
+      "evidence": "canvas-scopes.jpg",
+      "verified": "leave and return retains month; original chart still renders"
+    },
+    {
+      "scenario": "清除条件",
+      "projects": 37,
+      "nodes": 314,
+      "evidence": "overview-ready.jpg",
+      "verified": "all project/date/node defaults restored; search empty; advanced collapsed"
+    }
+  ],
+  "automatedEvidence": "final-browser.log (19 PASS)",
+  "notes": "Current preview snapshot; production not used; screenshots paired with real interactions and automated regression."
+}

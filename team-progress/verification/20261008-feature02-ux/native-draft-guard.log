@@ -1,0 +1,37 @@
+test_browser_reload_cancel_keeps_unsaved_editor_draft (test_overview_ux_e2e.OverviewUXE2E.test_browser_reload_cancel_keeps_unsaved_editor_draft) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 5.692s
+
+OK
+[08/Oct/2026 15:51:08] "GET / HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /styles.css?v=20260831-a HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /auth.css HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /lifecycle.css HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /dashboard.css HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /dashboard-mobile.css HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /i12.css HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /i13.css HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /timeline.css?v=20261008-week-flags HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /overview.css?v=20261008-f02-ux-ready HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /view-state.js HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /view-ui.js HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /schedule-ui.js HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /dashboard-ui.js HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /timeline-ui.js?v=20261008-f02-ux-ready HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /overview-ui.js?v=20261008-f02-ux-ready HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /i12-ui.js HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /app.js?v=20261008-f02-ux-ready HTTP/1.1" 200 -
+[08/Oct/2026 15:51:08] "GET /api/session HTTP/1.1" 401 -
+[08/Oct/2026 15:51:09] "POST /api/auth/login HTTP/1.1" 200 -
+[08/Oct/2026 15:51:09] "GET /api/bootstrap HTTP/1.1" 200 -
+[08/Oct/2026 15:51:09] "POST /api/boards/1/query HTTP/1.1" 200 -
+[08/Oct/2026 15:51:09] "GET /api/workspaces/1/events/stream?cursor=0 HTTP/1.1" 200 -
+[08/Oct/2026 15:51:09] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[08/Oct/2026 15:51:09] "GET /api/workspaces/1/timeline/member-order HTTP/1.1" 200 -
+[08/Oct/2026 15:51:09] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[08/Oct/2026 15:51:09] "GET /api/workspaces/1/timeline/tags HTTP/1.1" 200 -
+[08/Oct/2026 15:51:09] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[08/Oct/2026 15:51:09] "GET /api/workspaces/1/timeline/review HTTP/1.1" 200 -
+[08/Oct/2026 15:51:09] "GET /api/workspaces/1/timeline/overview?period=all&scope=all&q=&stage=all&track=all&completion=all&focus=all&search_in=all&tag_id=all HTTP/1.1" 200 -
+[08/Oct/2026 15:51:09] "GET /api/timeline/projects/1 HTTP/1.1" 200 -

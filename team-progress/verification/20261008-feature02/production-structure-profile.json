@@ -1,0 +1,25 @@
+{
+  "production_read_mode": "mode=ro; PRAGMA query_only=ON",
+  "active_projects": 25,
+  "active_nodes": 230,
+  "node_count_distribution": {
+    "0": 2,
+    "2": 1,
+    "6": 5,
+    "7": 1,
+    "10": 2,
+    "11": 7,
+    "12": 5,
+    "13": 1,
+    "21": 1
+  },
+  "median_nodes": 11,
+  "max_nodes": 21,
+  "date_span_days_min": 7,
+  "date_span_days_max": 590,
+  "track_distribution": {
+    "main": 219,
+    "parallel": 11
+  },
+  "archived_projects": 1
+}

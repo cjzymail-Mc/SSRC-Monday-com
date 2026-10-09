@@ -1,0 +1,284 @@
+{
+  "time": "2026-10-09T15:10:25.722384+08:00",
+  "http": {
+    "127.0.0.1": {
+      "/api/health": {
+        "status": 200,
+        "body": {
+          "status": "ok",
+          "schema_version": 20
+        }
+      },
+      "/": {
+        "status": 200,
+        "source_sha256": "7302d7ee9fc28a3dc5e7c5d0db24658c105b1eee324d80440333ae28892e0d84"
+      },
+      "/timeline-ui.js?v=20261009-period-mask": {
+        "status": 200,
+        "source_sha256": "fc6c68b72ba58bf21c9c598b332242f6a0b86c46d4f6ec9c70dc29c3bf32a283"
+      },
+      "/app.js?v=20261009-f02-team-cards": {
+        "status": 200,
+        "source_sha256": "d7a815560f957123cf3fda3611c3fb4239f45f8fe76ca603f2e9074be43abc6c"
+      },
+      "/overview-ui.js?v=20261009-f02-team-cards": {
+        "status": 200,
+        "source_sha256": "18e3d6880a1a96f384ac96e3b508a1cdd4e654e543e50cddd6e5ce1a02e369c1"
+      },
+      "/api/bootstrap": {
+        "status": 401,
+        "code": "AUTH_REQUIRED"
+      },
+      "/api/workspaces/1/timeline/overview?scope=all&period=all": {
+        "status": 401,
+        "code": "AUTH_REQUIRED"
+      }
+    },
+    "192.168.3.39": {
+      "/api/health": {
+        "status": 200,
+        "body": {
+          "status": "ok",
+          "schema_version": 20
+        }
+      },
+      "/": {
+        "status": 200,
+        "source_sha256": "7302d7ee9fc28a3dc5e7c5d0db24658c105b1eee324d80440333ae28892e0d84"
+      },
+      "/timeline-ui.js?v=20261009-period-mask": {
+        "status": 200,
+        "source_sha256": "fc6c68b72ba58bf21c9c598b332242f6a0b86c46d4f6ec9c70dc29c3bf32a283"
+      },
+      "/app.js?v=20261009-f02-team-cards": {
+        "status": 200,
+        "source_sha256": "d7a815560f957123cf3fda3611c3fb4239f45f8fe76ca603f2e9074be43abc6c"
+      },
+      "/overview-ui.js?v=20261009-f02-team-cards": {
+        "status": 200,
+        "source_sha256": "18e3d6880a1a96f384ac96e3b508a1cdd4e654e543e50cddd6e5ce1a02e369c1"
+      },
+      "/api/bootstrap": {
+        "status": 401,
+        "code": "AUTH_REQUIRED"
+      },
+      "/api/workspaces/1/timeline/overview?scope=all&period=all": {
+        "status": 401,
+        "code": "AUTH_REQUIRED"
+      }
+    }
+  },
+  "profile": {
+    "version": 20,
+    "schema_sha256": "5476055933ecafed0b348579da50a977ad4a4fb22e11a7aa3f9df7bc98fc7392",
+    "integrity": "ok",
+    "foreign_keys": 0,
+    "tables": {
+      "activity": {
+        "count": 4,
+        "sha256": "a6383949ef532ffe2a95ab6b7f62de2b40b698176337e0af6718b47d35db786e"
+      },
+      "attachments": {
+        "count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "audit_log": {
+        "count": 263,
+        "sha256": "89fae2b334c27f0e76f46d8f4a739dbf7c3f8bd4e2daed08b60796082b10c5d8"
+      },
+      "board_memberships": {
+        "count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "board_templates": {
+        "count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "boards": {
+        "count": 2,
+        "sha256": "3ab1e9ec82cdbfc30d57581e04bf0864c787ccb985331513b868a4ef5648b6c8"
+      },
+      "collaboration_events": {
+        "count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "comment_mentions": {
+        "count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "comment_versions": {
+        "count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "comments": {
+        "count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dashboard_activity": {
+        "count": 2,
+        "sha256": "12b25bf9da3befde2c81d2c265489899203d8be467d8ed5527a9acdf7bf6175f"
+      },
+      "dashboard_sources": {
+        "count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dashboard_widgets": {
+        "count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dashboards": {
+        "count": 2,
+        "sha256": "198b0b9e95ce0be9107be3a46b12292e5b805ca6cb11f86c2867244d75edb8cb"
+      },
+      "event_consumers": {
+        "count": 2,
+        "sha256": "bb80df23617596534a451acb365d8b7f712e8e81290466f54e4b829a2107c439"
+      },
+      "field_definitions": {
+        "count": 8,
+        "sha256": "d71ddbea1edf8f26f95650be8eab2058ba8865d9c0740c75c0fca82d75cfbc27"
+      },
+      "field_options": {
+        "count": 14,
+        "sha256": "82143087b7fafaf8aaad1b1e87e38df286842027aa6dc8c2c148def5005e7116"
+      },
+      "groups_": {
+        "count": 2,
+        "sha256": "26e130e23992c239b9e9b0d712345a62e77ff4bb2a42c514487e0473ac52872b"
+      },
+      "import_batches": {
+        "count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "legacy_task_field_values": {
+        "count": 5,
+        "sha256": "eb8f7f42e67d9a575c996458371d559294d1d89809ea947f0a2c87a289d381c6"
+      },
+      "members": {
+        "count": 1,
+        "sha256": "482d0926b466d45da571b8627d0c21cb2184dfd694edb85cbe1c2096fc6547e4"
+      },
+      "notifications": {
+        "count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "realtime_events": {
+        "count": 4,
+        "sha256": "dc77a7788cc8cf10bfdfb8f9af65c4864d3982c09a77c5d655b3eb7d593688e9"
+      },
+      "saved_views": {
+        "count": 1,
+        "sha256": "c4d60087622cd1f298678fe54db7ea546c7c1a543b7f24d312b389ff02665cbe"
+      },
+      "schema_migrations": {
+        "count": 20,
+        "sha256": "db052c96c95079fa1828853c5eddfc5514e8902b56f9d2bf68f0581736958a1c"
+      },
+      "sessions": {
+        "count": 4,
+        "sha256": "0232ecbc19be1393f402325fdfc5ec199170f9b83a06374384ed3a02b9e3fcb4"
+      },
+      "task_dependencies": {
+        "count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "task_field_tag_values": {
+        "count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "task_field_values": {
+        "count": 18,
+        "sha256": "c92ddfd6de076586e84f26f9b7b058aebb5c4861e8238ab5aec3fc700ee4872d"
+      },
+      "task_relation_values": {
+        "count": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "task_subscriptions": {
+        "count": 1,
+        "sha256": "eda97e4c0d181fee254e5e0b7d858843c396755edebfc46d1382814ad8f57add"
+      },
+      "tasks": {
+        "count": 6,
+        "sha256": "88a2fda2af0f87eb62ca60933b6e8cee65501bff2af6266c656b726bac41c130"
+      },
+      "timeline_change_batches": {
+        "count": 133,
+        "sha256": "71f6a35a7a2d11fa3b38b3201d8c75aa6d32443708cd434d61585fee1091fd33"
+      },
+      "timeline_import_batches": {
+        "count": 10,
+        "sha256": "423728e88e069f07f64b1ba87b08c4ce2f1be7eee3f371d46ec2360b4da974a1"
+      },
+      "timeline_member_orders": {
+        "count": 1,
+        "sha256": "90aa4a09eec4fb1e4930659d91ce73a9242831dba8f03b8d9e2a82fe155bb99d"
+      },
+      "timeline_node_changes": {
+        "count": 575,
+        "sha256": "914da88540392df06c70fb74561b3db8b3f4cb9e604e35cd7d4d9a5afe769ff3"
+      },
+      "timeline_nodes": {
+        "count": 348,
+        "sha256": "a15088ccea92f707efce718b7ea61fa20bb6be05831dfd947323733cccb8fadf"
+      },
+      "timeline_order_contexts": {
+        "count": 2,
+        "sha256": "c3d9ef4d4c7249379c0c9b7a0ba82851274041e999668d504ef03fdd9783a5c2"
+      },
+      "timeline_order_items": {
+        "count": 11,
+        "sha256": "afe6d58b1475435df37e80998f5df17f296ea22850eb36b9f5cc037534e7fcf9"
+      },
+      "timeline_project_tags": {
+        "count": 2,
+        "sha256": "a3576df44f0a90ae65620bcf999e8e0356d3c688a4a42a79880ea175bc564a3d"
+      },
+      "timeline_projects": {
+        "count": 35,
+        "sha256": "6bfa4a2659ffaf09758e18213ce94b0396c2da29cbb162383627859923315315"
+      },
+      "timeline_tags": {
+        "count": 2,
+        "sha256": "0af0adf92e98533511886a1d190e5c38706e287a3f5e840f9f088c859be147da"
+      },
+      "users": {
+        "count": 7,
+        "sha256": "186b6a96757ccc966bf8c28630f4bf6e0d9da9b8415bf4eb6a9fc937d036ed77"
+      },
+      "workspace_memberships": {
+        "count": 7,
+        "sha256": "ea992238718907cf7308f966ef8a1a4addcfe25576dda862be2c547945a58a93"
+      },
+      "workspaces": {
+        "count": 1,
+        "sha256": "192cf811ca5dfcf7fe888eb8b00c068c9c0231cefb1636683fe3e630ec39a7db"
+      }
+    }
+  },
+  "changed_tables_since_backup": [],
+  "readonly_latest_projection": {
+    "member_roles": {
+      "member": 6,
+      "admin": 1
+    },
+    "project_count": 25,
+    "node_count": 230,
+    "unique_projects": true,
+    "earliest_incomplete_verified": true
+  },
+  "sources": {
+    "server.py": "a6e1e8863ec27b1cb437b062a7d973d7a0b3baadae71fd6ea5c28abd4c13a00a",
+    "flowboard/service.py": "54f6c1e5a94724de21277d374cef97711dc67e1a4696db00f97c090a24ccccc9",
+    "flowboard/overview.py": "bdff7765caee30f69f3493a11f25876c91fe5749c2baa803ff3a2abc878b13e2",
+    "flowboard/timeline.py": "775ef390928e598a4397fd25fad107a62e62f1c734b027f7af54d5ba0f757456",
+    "flowboard/database.py": "11effc4726075ff4f1154a2184da0ecae4be6be4e94ccdb6cf7be4c88ecf5d40",
+    "timeline-ui.js": "fc6c68b72ba58bf21c9c598b332242f6a0b86c46d4f6ec9c70dc29c3bf32a283",
+    "app.js": "d7a815560f957123cf3fda3611c3fb4239f45f8fe76ca603f2e9074be43abc6c",
+    "index.html": "7302d7ee9fc28a3dc5e7c5d0db24658c105b1eee324d80440333ae28892e0d84",
+    "overview-ui.js": "18e3d6880a1a96f384ac96e3b508a1cdd4e654e543e50cddd6e5ce1a02e369c1",
+    "overview.css": "cdf01a132ed9822bd1e57a85b8543b7feaf5e020fdde0b6bc145e4640be605cc",
+    "timeline.css": "839a4b07fa155013f7097f7a1707d6de45d4c2a1c61a84b65e449eac0c17c397",
+    "start-flowboard.cmd": "0afbd9e14b6e8993ada79aec309db4c8d80d421ec5495153d73e0b1227d1ba87"
+  }
+}

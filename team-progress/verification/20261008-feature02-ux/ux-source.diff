@@ -1,0 +1,860 @@
+--- before/app.js
++++ after/app.js
+@@ -38,13 +38,18 @@
+ function resetViewState(){const clean=FlowboardViewState.reset();activeQuery=clean.activeQuery;activeViewId=clean.activeViewId;activePresentation=clean.activePresentation;adHocQuery=clean.adHocQuery;urlViewExplicit=clean.urlViewExplicit;blockedLatch=clean.blockedLatch;viewType=clean.viewType;localPresentation=clean.localPresentation;const url=new URL(location.href);url.searchParams.delete('view');history.replaceState(null,'',url)}
+ function viewTransition(event,payload={}){const next=FlowboardViewState.transition({activeQuery,activeViewId,activePresentation,adHocQuery,urlViewExplicit,blockedLatch,viewType,localPresentation},event,payload);activeQuery=next.activeQuery;activeViewId=next.activeViewId;activePresentation=next.activePresentation;adHocQuery=next.adHocQuery;urlViewExplicit=next.urlViewExplicit;blockedLatch=next.blockedLatch;viewType=next.viewType||viewType;localPresentation=next.localPresentation||localPresentation}
+ function setViewState(next){activeQuery=next.activeQuery;activeViewId=next.activeViewId;activePresentation=next.activePresentation;adHocQuery=next.adHocQuery;urlViewExplicit=next.urlViewExplicit;blockedLatch=next.blockedLatch;viewType=next.viewType||viewType;localPresentation=next.localPresentation||localPresentation}
+-async function login(event){event.preventDefault();try{resetViewState();timelineLandingDone=false;const result=await api('/api/auth/login','POST',{username:$('#loginUser').value.trim(),password:$('#loginPassword').value});overviewState.request++;overviewState=FlowboardOverview.createState();timelineState.mode='home';csrfToken=result.csrf_token;state.current_user=result.user;hideLogin();await refresh();toast('登录成功');await landTimelineHome()}catch(error){showLogin(error.message)}}
++async function login(event){event.preventDefault();try{resetViewState();timelineLandingDone=false;const result=await api('/api/auth/login','POST',{username:$('#loginUser').value.trim(),password:$('#loginPassword').value});overviewState.request++;overviewState=FlowboardOverview.createState();timelineState.mode='home';timelineNavigationChosen=false;uxPreferencesReady=false;timelineCanvasScope='all';timelineHomeScope='mine';csrfToken=result.csrf_token;state.current_user=result.user;hideLogin();await refresh();toast('登录成功');await landTimelineHome()}catch(error){showLogin(error.message)}}
+ async function logout(){if(!allowTimelineLeave())return;overviewState.request++;overviewState=FlowboardOverview.createState();if(realtimeSource)realtimeSource.close();realtimeSource=null;try{await api('/api/auth/logout','POST',{})}catch(error){}csrfToken='';state.current_user=null;timelineLandingDone=false;timelineState={projects:[],archivedProjects:[],mode:'home',selectedId:null,editor:null,review:null,projectReturnMode:'home'};timelineTags={catalog:null,selectedId:null,membership:null,undo:null};timelineOrders={mine:null,current:null,members:null,context:{context_type:'mine',tag_id:null}};timelineDraftStates=new Map();if(!$('#timelineView')?.hidden)hideTimelineView();resetViewState();showLogin('已退出登录')}
+ 
+ let timelineFilters={project_ids:[],sort_key:'custom',expanded:new Set(),focusedProjectId:null,viewport:null,viewportWidth:760,fullscreen:false},timelineState={projects:[],archivedProjects:[],mode:'home',selectedId:null,editor:null,review:null,projectReturnMode:'home'},timelineDraftStates=new Map();
+ const timelinePortfolioModes=new Set(['all','week','month']);
+ let overviewState=FlowboardOverview.createState();
++let timelineHomeScope='mine',timelineCanvasScope='all',timelineNavigationChosen=false,uxPreferencesReady=false;
++function uxPreferenceKey(kind){return `flowboard:ux:${kind}:${state.workspace_id}:${state.current_user?.id||''}`}
++function saveUxPreferences(){if(!state.current_user||(!uxPreferencesReady&&!timelineNavigationChosen))return;try{sessionStorage.setItem(uxPreferenceKey('view'),JSON.stringify({mode:['single','editor'].includes(timelineState.mode)?timelineState.projectReturnMode:timelineState.mode,homeScope:timelineHomeScope,canvasScope:timelineCanvasScope}));sessionStorage.setItem(uxPreferenceKey('overview'),JSON.stringify(FlowboardOverview.preferences(overviewState.filters)))}catch(_){}}
++function restoreUxPreferences(){try{const saved=JSON.parse(sessionStorage.getItem(uxPreferenceKey('view'))||'null');if(['home','overview','all','week','month','tags','archived'].includes(saved?.mode))timelineState.mode=saved.mode;if(['all','week','month'].includes(saved?.canvasScope))timelineCanvasScope=saved.canvasScope;if(['mine','team'].includes(saved?.homeScope))timelineHomeScope=saved.homeScope;overviewState.filters=FlowboardOverview.preferences(JSON.parse(sessionStorage.getItem(uxPreferenceKey('overview'))||'null'));if(!['all','uncategorized'].includes(overviewState.filters.tag_id)&&!timelineTags.catalog?.tags.some(tag=>String(tag.tag_id)===overviewState.filters.tag_id))overviewState.filters.tag_id='all'}catch(_){}uxPreferencesReady=true;}
+ async function loadOverview(){
++  overviewState.tags=timelineTags.catalog?.tags||[];saveUxPreferences();
+   const snapshot=overviewState,request=++overviewState.request,userId=state.current_user?.id,query=new URLSearchParams(overviewState.filters).toString();
+   clearTimeout(overviewState.searchTimer);overviewState.searchTimer=null;
+   overviewState.status='loading';overviewState.error='';
+@@ -62,13 +67,14 @@
+   if(timelineState.mode==='overview')renderTimeline();
+ }
+ function renderOverview(){
+-  const body=$('#timelineBody'),active=document.activeElement,searchFocused=active?.matches('[data-overview-search]'),selection=searchFocused?[active.selectionStart,active.selectionEnd]:null,scrollY=window.scrollY;
++  overviewState.tags=timelineTags.catalog?.tags||[];
++  const body=$('#timelineBody'),active=document.activeElement,focusAttr=['data-overview-filter','data-overview-focus','data-overview-scope','data-overview-expand','data-overview-collapse','data-overview-advanced'].find(attr=>active?.hasAttribute(attr)),focusValue=focusAttr?active.getAttribute(focusAttr):null,searchFocused=active?.matches('[data-overview-search]'),selection=searchFocused?[active.selectionStart,active.selectionEnd]:null,scrollY=window.scrollY;
+   body.__timelineAbort?.abort();body.__timelineAbort=new AbortController();
+   body.innerHTML=FlowboardOverview.render(overviewState);
+   const boundState=overviewState,reload=()=>{if(overviewState===boundState&&timelineState.mode==='overview')loadOverview()};
+   FlowboardOverview.bind(body,boundState,{onChange:reload,onReload:reload,onRender:renderOverview});
+   if(searchFocused){const search=body.querySelector('[data-overview-search]');search?.focus({preventScroll:true});if(search&&selection)search.setSelectionRange(...selection)}
+-  window.scrollTo(0,scrollY);renderTimelineChrome();
++  if(!searchFocused&&focusAttr)body.querySelector(`[${focusAttr}="${CSS.escape(focusValue)}"]`)?.focus({preventScroll:true});window.scrollTo({top:scrollY,behavior:'instant'});renderTimelineChrome();
+ }
+ let timelineTags={catalog:null,selectedId:null,membership:null,undo:null},timelineOrders={mine:null,current:null,members:null,context:{context_type:'mine',tag_id:null}},timelineDrag=null;
+ let timelineTransfer={busy:false,filename:'',preview:null,error:null,committed:null,exportReady:null};
+@@ -102,10 +108,11 @@
+     timelineOrders.context=loadTimelineContextPreference();
+     await loadTimeline();
+     if($('#loginModal').classList.contains('open'))return;
++    if(!timelineNavigationChosen){restoreUxPreferences();if(timelineState.mode==='overview')await loadOverview();else if(timelineState.mode==='archived')await loadArchivedTimeline();else if(timelineState.mode==='tags')await loadTagMembership()}
+     if(timelineState.mode==='home')timelineState.projectReturnMode='home';renderTimeline();showTimelineView();
+   }catch(error){showError(error)}
+ }
+-function setHomeTab(scope){const root=$('#timelineBody');if(!root)return;root.querySelectorAll('[data-timeline-tab]').forEach(button=>button.classList.toggle('on',button.dataset.timelineTab===scope));root.querySelectorAll('[data-timeline-section]').forEach(section=>section.toggleAttribute('hidden',section.dataset.timelineSection!==scope));root.querySelectorAll('[data-timeline-feed]').forEach(list=>list.toggleAttribute('hidden',list.dataset.timelineFeed!==scope));const label=root.querySelector('[data-timeline-feed-scope]');if(label)label.textContent=scope==='mine'?'我 · 最近 6 条 · 新在上':'团队 · 最近 20 条 · 新在上';const note=root.querySelector('[data-timeline-home-note]');if(note)note.textContent=scope==='mine'?'整行点击进入项目页（单项目仪表盘 / 时间表编辑器）；日期、间隔、阶段、轨道、节点状态和备注均可在时间表中维护。':'拖动成员卡片左侧把手，只调整你自己的显示顺序；项目药丸可进入项目页，他人项目的时间表保持只读。'}
++function setHomeTab(scope){timelineHomeScope=scope;saveUxPreferences();const root=$('#timelineBody');if(!root)return;root.querySelectorAll('[data-timeline-tab]').forEach(button=>button.classList.toggle('on',button.dataset.timelineTab===scope));root.querySelectorAll('[data-timeline-section]').forEach(section=>section.toggleAttribute('hidden',section.dataset.timelineSection!==scope));root.querySelectorAll('[data-timeline-feed]').forEach(list=>list.toggleAttribute('hidden',list.dataset.timelineFeed!==scope));const label=root.querySelector('[data-timeline-feed-scope]');if(label)label.textContent=scope==='mine'?'我 · 最近 6 条 · 新在上':'团队 · 最近 20 条 · 新在上';const note=root.querySelector('[data-timeline-home-note]');if(note)note.textContent=scope==='mine'?'整行点击进入项目页（单项目仪表盘 / 时间表编辑器）；日期、间隔、阶段、轨道、节点状态和备注均可在时间表中维护。':'拖动成员卡片左侧把手，只调整你自己的显示顺序；项目药丸可进入项目页，他人项目的时间表保持只读。'}
+ function renderTimeline(){
+   if(timelineState.mode==='overview'){renderOverview();return}
+   if($('#timelineBody')?.__timelineRemark?.editing)return;
+@@ -121,8 +128,9 @@
+   const allFilters=Object.assign(timelineFilters,{tagCatalog:timelineTags.catalog,orderContext:timelineOrders.context,archived:archivedContext,timeScope:portfolioMode?timelineState.mode:'all',canReorder:!archivedContext&&timelineFilters.sort_key==='custom'&&!timelineFilters.project_ids.length,canArchive:timelineArchiveManageable});
+   body.innerHTML=FlowboardTimeline.renderWorkspace(renderProjects,{mode:timelineState.mode,selectedId:timelineState.selectedId,admin:Boolean(state.capabilities?.admin),write:Boolean(state.capabilities?.write),editor:timelineState.editor,dashboardStates:timelineDraftStates,filters:allFilters,transfer:timelineTransfer,members:state.members||[],currentUser:state.current_user||null,review:timelineState.review||null,tagsState:timelineTags,mineOrder:timelineOrders.mine,memberOrder:timelineOrders.members,backMode:timelineState.projectReturnMode});
+   if(timelineState.mode==='editor'&&timelineState.editor)FlowboardTimeline.bindEditor(body,timelineState.editor,{render:renderTimeline,onSubmit:submitTimelineDraft,onAdd:addTimelineNode,onUndo:undoTimelineBatch,onCorrect:correctTimelineInitialDate,onReview:showTimelineReview,editable:timelineProjectEditable(timelineState.selectedId)});
+-  else if(timelineState.mode==='single'||timelinePortfolioModes.has(timelineState.mode))FlowboardTimeline.bindDashboard(body,{filters:timelineFilters,states:timelineDraftStates,render:renderTimeline,onSubmit:submitTimelineDashboardDraft,onDiscard:discardTimelineDashboardDraft,onUndo:undoTimelineDashboardBatch,onOpenSingle:projectId=>openTimelineMode('single',projectId,{origin:'all'}),onViewportChange:saveTimelineViewport,onRemarkDraft:()=>toast('备注已加入草稿，点击项目“更新”提交'),editable:timelineProjectEditable});
++  else if(timelineState.mode==='single'||timelinePortfolioModes.has(timelineState.mode))FlowboardTimeline.bindDashboard(body,{filters:timelineFilters,states:timelineDraftStates,render:renderTimeline,onSubmit:submitTimelineDashboardDraft,onDiscard:discardTimelineDashboardDraft,onUndo:undoTimelineDashboardBatch,onOpenSingle:projectId=>openTimelineMode('single',projectId,{origin:timelineState.mode}),onViewportChange:saveTimelineViewport,onRemarkDraft:()=>toast('备注已加入草稿，点击项目“更新”提交'),editable:timelineProjectEditable});
+   renderTimelineChrome();
++  if(timelineState.mode==='home')setHomeTab(timelineHomeScope);
+ }
+ function renderTimelineChrome(){const view=$('#timelineView'),crumb=$('#breadcrumbBoard');if(view&&!view.hidden&&crumb)crumb.textContent=timelineCrumb()}
+ let timelineLoadInFlight=null;
+@@ -131,21 +139,22 @@
+ async function loadArchivedTimeline(){const payload=await api(`/api/workspaces/${state.workspace_id}/timeline?archive_state=archived`);timelineState.archivedProjects=payload.projects||[];return payload}
+ async function loadTagMembership(){if(!timelineTags.selectedId){timelineTags.membership=null;return}timelineTags.membership=await api(`/api/workspaces/${state.workspace_id}/timeline/tags/${timelineTags.selectedId}/projects`)}
+ async function loadTimeline(){if(timelineLoadInFlight)return timelineLoadInFlight;timelineLoadInFlight=(async()=>{const payload=await api(`/api/workspaces/${state.workspace_id}/timeline`),[catalog,mineOrder,memberOrder]=await Promise.all([api(`/api/workspaces/${state.workspace_id}/timeline/tags`),loadTimelineOrder({context_type:'mine',tag_id:null}),api(`/api/workspaces/${state.workspace_id}/timeline/member-order`)]);timelineState.projects=payload.projects;timelineTags.catalog=catalog;if(timelineTags.selectedId&&!catalog.tags.some(tag=>Number(tag.tag_id)===Number(timelineTags.selectedId)))timelineTags.selectedId=null;if(!timelineTags.selectedId)timelineTags.selectedId=catalog.tags[0]?.tag_id||null;if(timelineOrders.context.context_type==='tag'&&!catalog.tags.some(tag=>Number(tag.tag_id)===Number(timelineOrders.context.tag_id))){timelineOrders.context={context_type:'mine',tag_id:null};saveTimelineContextPreference()}timelineOrders.mine=mineOrder;timelineOrders.members=memberOrder;timelineOrders.current=timelineOrders.context.context_type==='archived'?null:await loadTimelineOrder(timelineOrders.context);const selectedExists=timelineState.projects.some(project=>project.project_id===timelineState.selectedId)||timelineState.archivedProjects.some(project=>project.project_id===timelineState.selectedId);if(!selectedExists)timelineState.selectedId=timelineState.projects[0]?.project_id||null;await Promise.all([loadTimelineReview(),timelineState.mode==='tags'?loadTagMembership():Promise.resolve(),['archived'].includes(timelineState.mode)||timelineOrders.context.context_type==='archived'?loadArchivedTimeline():Promise.resolve()]);renderTimeline()})().finally(()=>{timelineLoadInFlight=null});return timelineLoadInFlight}
+-async function openTimeline(){try{if(!allowTimelineLeave())return;const view=$('#timelineView');if(view&&!view.hidden&&timelineState.mode==='home')return;timelineState.mode='home';timelineState.projectReturnMode='home';await loadTimeline();showTimelineView()}catch(error){showError(error)}}
++async function openTimeline(){try{if(!allowTimelineLeave())return;timelineNavigationChosen=true;const view=$('#timelineView');if(view&&!view.hidden&&timelineState.mode==='home')return;timelineState.mode='home';timelineState.projectReturnMode='home';await loadTimeline();showTimelineView()}catch(error){showError(error)}}
+ function clearTimelineDragSelection(){for(const draft of timelineDraftStates.values()){if(!draft?.armed)continue;const nodeId=Number(draft.armed.nodeId);draft.armed=null;if(Number(draft.dashboardContext?.nodeId)===nodeId&&['single','cascade'].includes(draft.dashboardContext?.action))draft.dashboardContext=null}}
+ async function openTimelineMode(mode,projectId,{origin=null}={}){
+   if($('#timelineBody')?.__timelineRemark?.requestClose()===false)return;
+   try{
+     const previousMode=timelineState.mode,nextId=projectId?Number(projectId):timelineState.selectedId,sameProjectTabs=['single','editor'].includes(previousMode)&&['single','editor'].includes(mode)&&Number(nextId)===Number(timelineState.selectedId),leavingDirtyEditor=previousMode==='editor'&&timelineState.editor?.dirty&&!sameProjectTabs,leavingDraftContext=timelineHasDraft()&&!sameProjectTabs;
+     if(leavingDraftContext&&!allowTimelineLeave())return;
++    timelineNavigationChosen=true;
+     if(mode!==previousMode||Number(nextId)!==Number(timelineState.selectedId))clearTimelineDragSelection();
+     if(leavingDirtyEditor){timelineDraftStates.delete(Number(timelineState.editor.project.project_id));timelineState.editor=null}
+     if(projectId)timelineState.selectedId=nextId;
+-    if(['single','editor'].includes(mode)&&!sameProjectTabs)timelineState.projectReturnMode=origin==='overview'||previousMode==='overview'?'overview':origin==='all'||previousMode==='all'?'all':'home';
++    if(['single','editor'].includes(mode)&&!sameProjectTabs)timelineState.projectReturnMode=['overview','all','week','month','archived'].includes(origin)?origin:['overview','all','week','month','archived'].includes(previousMode)?previousMode:'home';
+     if(previousMode==='overview'&&mode!=='overview')overviewState.scrollTop=window.scrollY;
+     if(mode==='overview'){
+       timelineState.mode=mode;timelineState.editor=null;showTimelineView();
+-      await loadOverview();window.scrollTo(0,overviewState.scrollTop);return;
++      await loadOverview();window.scrollTo({top:overviewState.scrollTop,behavior:'instant'});return;
+     }
+     if(['editor','single'].includes(mode)){
+       if(!timelineState.selectedId)return;
+@@ -158,6 +167,7 @@
+     if(mode==='archived')await loadArchivedTimeline();
+     resetTimelineViewports();
+     if(timelinePortfolioModes.has(mode)){if(timelineOrders.context.context_type==='archived')await loadArchivedTimeline();else if(!timelineOrders.current)timelineOrders.current=await loadTimelineOrder(timelineOrders.context);timelineFilters.fullscreen=false;timelineFilters.focusedProjectId=null;timelineFilters.viewport=mode==='all'?loadTimelineViewport():null}
++    if(timelinePortfolioModes.has(mode))timelineCanvasScope=mode;
+     else if(mode==='single'){timelineFilters.fullscreen=false;timelineFilters.focusedProjectId=null;timelineFilters.viewport=null}
+     if(mode==='home')timelineState.projectReturnMode='home';
+     if(mode!=='editor')timelineState.editor=null;
+@@ -283,9 +293,9 @@
+ async function correctTimelineInitialDate(){const editor=timelineState.editor,node=editor?.project.nodes.find(item=>item.id>0);if(!node)return;const initialDate=prompt(`纠正「${node.name}」初始日期`,node.initial_date||node.date);if(!initialDate)return;try{const result=await api(`/api/workspaces/${state.workspace_id}/timeline/batches/initial-correction`,'POST',{project_id:editor.project.project_id,base_version:editor.original.version,corrections:[{node_id:node.id,initial_date:initialDate}]});acceptTimelineView(result.results[0].view,null);toast('初始日期已纠正')}catch(error){showError(error)}}
+ async function showTimelineReview(){const editor=timelineState.editor;if(!editor)return;try{const review=await api(`/api/workspaces/${state.workspace_id}/timeline/review?project_ids=${editor.project.project_id}`),project=review.projects[0],panel=$('[data-timeline-review-panel]');panel.innerHTML=(project?.batches||[]).slice(0,5).map(batch=>`<article><strong>${esc(batch.actor?.name||batch.actor?.id||'系统')}</strong><span>${esc(batch.change_kind)} · ${batch.change_rows?.length||0} 项变更</span></article>`).join('')||'<p>暂无变更记录</p>';panel.hidden=false}catch(error){showError(error)}}
+ function closeTimeline(){if(!allowTimelineLeave())return;timelineDraftStates=new Map();timelineState.editor=null;openTimeline()}
+-function timelineCrumb(){if(timelineState.mode==='overview')return '项目总览';if(timelineState.mode==='all')return '全项目仪表盘';if(timelineState.mode==='week')return '本周工作';if(timelineState.mode==='month')return '本月工作';if(timelineState.mode==='tags')return '标签';if(timelineState.mode==='archived')return '已归档';if(['single','editor'].includes(timelineState.mode)){const project=timelineProjectById(timelineState.selectedId);return project?project.name:'项目'}return '我的工作'}
++function timelineCrumb(){if(timelineState.mode==='overview')return '项目概览';if(timelineState.mode==='all')return '全项目仪表盘';if(timelineState.mode==='week')return '本周工作';if(timelineState.mode==='month')return '本月工作';if(timelineState.mode==='tags')return '标签';if(timelineState.mode==='archived')return '已归档';if(['single','editor'].includes(timelineState.mode)){const project=timelineProjectById(timelineState.selectedId);return project?project.name:'项目'}return '我的工作'}
+ function removeLegacyTimelineBackRows(){document.querySelectorAll('#timelineView>.timeline-shell>header,#timelineClose').forEach(node=>node.remove())}
+-function showTimelineView(){const workspace=$('#boardWorkspace'),view=$('#timelineView');if(!view)return;removeLegacyTimelineBackRows();if(workspace)workspace.hidden=true;view.hidden=false;[['timelineBtn','home'],['timelineAllBtn','all'],['timelineOverviewBtn','overview'],['timelineWeekBtn','week'],['timelineMonthBtn','month'],['timelineTagsBtn','tags'],['archivedBtn','archived']].forEach(([id,mode])=>$('#'+id)?.classList.toggle('active',timelineState.mode===mode));renderTimelineChrome()}
++function showTimelineView(){const workspace=$('#boardWorkspace'),view=$('#timelineView');if(!view)return;removeLegacyTimelineBackRows();if(workspace)workspace.hidden=true;view.hidden=false;const mode=timelineState.mode,navMode=['single','editor'].includes(mode)?timelineState.projectReturnMode:mode;[['timelineBtn','home'],['timelineAllBtn','all'],['timelineOverviewBtn','overview'],['timelineTagsBtn','tags'],['archivedBtn','archived']].forEach(([id,target])=>$('#'+id)?.classList.toggle('active',target==='all'?timelinePortfolioModes.has(navMode):navMode===target));const canvasNav=$('#timelineCanvasNav');if(canvasNav)canvasNav.hidden=!timelinePortfolioModes.has(mode);[['timelineCanvasAllBtn','all'],['timelineWeekBtn','week'],['timelineMonthBtn','month']].forEach(([id,target])=>{const button=$('#'+id);if(button){button.classList.toggle('on',mode===target);button.setAttribute('aria-pressed',String(mode===target))}});saveUxPreferences();renderTimelineChrome()}
+ function hideTimelineView(){$('#timelineBody')?.__timelineAbort?.abort();const workspace=$('#boardWorkspace'),view=$('#timelineView');if(!view)return;view.hidden=true;if(workspace){workspace.hidden=true;workspace.setAttribute('aria-hidden','true')}['timelineBtn','timelineOverviewBtn','timelineAllBtn','timelineWeekBtn','timelineMonthBtn','timelineTagsBtn','archivedBtn'].forEach(id=>$('#'+id)?.classList.remove('active'));const crumb=$('#breadcrumbBoard');if(crumb)crumb.textContent='项目时间管理'}
+ 
+ async function refresh(silent=false){
+@@ -494,7 +504,7 @@
+ function bindDashboardLayout(dashboard){if(matchMedia('(pointer:coarse)').matches)return;const grid=document.querySelector('.dashboard-grid'),cell=()=>Math.max(1,grid.getBoundingClientRect().width/12);document.querySelectorAll('[data-widget]').forEach(card=>{const widget=dashboard.widgets.find(item=>item.id===+card.dataset.widget);card.onpointerdown=event=>{if(event.target.closest('button,.widget-resize-handle,.widget-data'))return;const x=event.clientX,y=event.clientY;event.preventDefault();document.onpointerup=end=>{document.onpointerup=null;const dx=Math.round((end.clientX-x)/cell()),dy=Math.round((end.clientY-y)/70);if(dx||dy)saveWidgetLayout(dashboard,widget,{...widget,x:widget.x+dx,y:widget.y+dy})}}});document.querySelectorAll('[data-widget-resize-handle]').forEach(handle=>handle.onpointerdown=event=>{const widget=dashboard.widgets.find(item=>item.id===+handle.dataset.widgetResizeHandle),x=event.clientX,y=event.clientY;event.preventDefault();event.stopPropagation();document.onpointerup=end=>{document.onpointerup=null;const dw=Math.round((end.clientX-x)/cell()),dh=Math.round((end.clientY-y)/70);if(dw||dh)saveWidgetLayout(dashboard,widget,{...widget,width:widget.width+dw,height:widget.height+dh})}})}
+ async function loadWidgetData(dashboard,widget){const target=document.querySelector(`[data-widget-data="${widget.id}"]`);if(!target)return;try{const result=await api(`/api/dashboards/${dashboard.id}/widgets/${widget.id}/data`,'POST',{}),data=result.data;if(widget.widget_type==='chart')target.innerHTML=FlowboardDashboard.chart(data,widget.config.spec.chart_type);else if(widget.widget_type==='number')target.innerHTML=data.empty?'<div class="empty-state compact">无数据</div>':`<strong class="dashboard-number">${esc(data.value)}</strong>`;else if(widget.widget_type==='progress')target.innerHTML=data.empty?'<div class="empty-state compact">无数据</div>':`<progress max="1" value="${data.ratio}"></progress><b>${Math.round(data.ratio*100)}%</b><small>${data.complete}/${data.total}</small>`;else target.innerHTML=data.rows.length?`<table class="widget-table"><tbody>${data.rows.map(row=>`<tr><td>${esc(row.date||'')}</td><td>${esc(row.title)}</td><td>${esc(row.status)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty-state compact">无数据</div>'}catch(error){target.innerHTML=`<div class="widget-error">${esc(error.code==='WIDGET_SOURCE_UNAVAILABLE'?'来源不可访问':error.message)}</div>`}}
+ 
+-$('#searchInput').oninput=()=>{clearTimeout(searchTimer);searchTimer=setTimeout(applySearch,300)};$('#filterBtn').onclick=configureFilter;$('#sortBtn').onclick=configureSort;$('#viewSelect').onchange=selectView;$('#addBoardBtn').onclick=addBoard;$('#editBoardBtn').onclick=editBoard;$('#copyBoardBtn').onclick=copyBoard;$('#archiveBoardBtn').onclick=archiveBoard;$('#deleteBoardBtn').onclick=deleteBoard;$('#addGroupBtn').onclick=addGroup;$('#addTaskTop').onclick=()=>state.groups[0]?addTask(state.groups[0].id):toast('请先创建分组');$('#mobileDashboardBtn').onclick=manageDashboards;$('#timelineBtn').onclick=openTimeline;$('#timelineOverviewBtn').onclick=()=>openTimelineMode('overview');$('#timelineAllBtn').onclick=()=>openTimelineMode('all');$('#timelineWeekBtn').onclick=()=>openTimelineMode('week');$('#timelineMonthBtn').onclick=()=>openTimelineMode('month');$('#timelineTagsBtn').onclick=()=>openTimelineMode('tags');$('#archivedBtn').onclick=()=>openTimelineMode('archived');$('#archivedItemsBtn').onclick=showArchivedItems;$('#trashBtn').onclick=showTrash;$('#logoutBtn').onclick=logout;$('#loginForm').onsubmit=login;
++$('#searchInput').oninput=()=>{clearTimeout(searchTimer);searchTimer=setTimeout(applySearch,300)};$('#filterBtn').onclick=configureFilter;$('#sortBtn').onclick=configureSort;$('#viewSelect').onchange=selectView;$('#addBoardBtn').onclick=addBoard;$('#editBoardBtn').onclick=editBoard;$('#copyBoardBtn').onclick=copyBoard;$('#archiveBoardBtn').onclick=archiveBoard;$('#deleteBoardBtn').onclick=deleteBoard;$('#addGroupBtn').onclick=addGroup;$('#addTaskTop').onclick=()=>state.groups[0]?addTask(state.groups[0].id):toast('请先创建分组');$('#mobileDashboardBtn').onclick=manageDashboards;$('#timelineBtn').onclick=openTimeline;$('#timelineOverviewBtn').onclick=()=>openTimelineMode('overview');$('#timelineAllBtn').onclick=()=>openTimelineMode(timelineCanvasScope);$('#timelineCanvasAllBtn').onclick=()=>openTimelineMode('all');$('#timelineWeekBtn').onclick=()=>openTimelineMode('week');$('#timelineMonthBtn').onclick=()=>openTimelineMode('month');$('#timelineTagsBtn').onclick=()=>openTimelineMode('tags');$('#archivedBtn').onclick=()=>openTimelineMode('archived');$('#archivedItemsBtn').onclick=showArchivedItems;$('#trashBtn').onclick=showTrash;$('#logoutBtn').onclick=logout;$('#loginForm').onsubmit=login;
+ $('#sidebarToggle').onclick=()=>setSidebarCollapsed(!$('#appSidebar').classList.contains('is-collapsed'));
+ document.querySelectorAll('[data-batch]').forEach(button=>button.onclick=()=>runBatch(button.dataset.batch));
+ async function manageViewsProduction(){const current={activeQuery,activeViewId,activePresentation,adHocQuery,urlViewExplicit,blockedLatch,viewType,localPresentation},view=(state.saved_views||[]).find(item=>item.id===activeViewId);const outcome=await FlowboardViewState.runManage({current,view,viewType,localPresentation,role:state.board?.role||(canWrite()?'member':'viewer'),boardId:state.board?.id,fields:state.fields||[],query:activeQuery,prompt:(...args)=>window.prompt(...args),api});if(outcome.denied)return toast('没有权限执行该视图操作');if(outcome.error)return showError(outcome.error);if(outcome.cancelled)return;setViewState(outcome.state);syncUrl();await refresh();toast('视图操作完成')}
+--- before/index.html
++++ after/index.html
+@@ -12,14 +12,14 @@
+   <link rel="stylesheet" href="i12.css" />
+   <link rel="stylesheet" href="i13.css" />
+   <link rel="stylesheet" href="timeline.css?v=20261008-week-flags" />
+-  <link rel="stylesheet" href="overview.css?v=20261008-f02-scroll" />
++  <link rel="stylesheet" href="overview.css?v=20261008-f02-ux-ready" />
+ </head>
+ <body>
+   <div class="app-shell">
+     <aside class="sidebar" id="appSidebar">
+       <button type="button" class="sidebar-collapse" id="sidebarToggle" aria-label="收起侧边栏" aria-expanded="true" title="收起侧边栏">&lt;</button>
+       <div class="brand"><span class="brand-mark">F</span><span class="brand-label">flowboard</span></div>
+-      <nav class="main-nav"><button class="nav-item nav-button" id="timelineBtn" title="我的工作"><span class="nav-icon">◈</span><span class="nav-label">我的工作</span></button><button class="nav-item nav-button nav-child" id="timelineOverviewBtn" title="项目总览"><span class="nav-icon">▤</span><span class="nav-label">项目总览</span></button><button class="nav-item nav-button nav-child" id="timelineWeekBtn" title="本周工作"><span class="nav-icon">├</span><span class="nav-label">本周工作</span></button><button class="nav-item nav-button nav-child" id="timelineMonthBtn" title="本月工作"><span class="nav-icon">└</span><span class="nav-label">本月工作</span></button><button class="nav-item nav-button" id="timelineAllBtn" title="全项目仪表盘"><span class="nav-icon">▤</span><span class="nav-label">全项目仪表盘</span></button><button class="nav-item nav-button" id="timelineTagsBtn" title="标签"><span class="nav-icon">♢</span><span class="nav-label">标签</span></button><button class="nav-item nav-button" id="archivedBtn" title="已归档"><span class="nav-icon">▣</span><span class="nav-label">已归档</span></button><button class="nav-item nav-button" id="trashBtn" title="回收站" hidden><span class="nav-icon">♲</span><span class="nav-label">回收站</span></button></nav>
++      <nav class="main-nav"><button class="nav-item nav-button" id="timelineBtn" title="我的工作"><span class="nav-icon">◈</span><span class="nav-label">我的工作</span></button><button class="nav-item nav-button" id="timelineOverviewBtn" title="项目概览"><span class="nav-icon">▤</span><span class="nav-label">项目概览</span></button><button class="nav-item nav-button" id="timelineAllBtn" title="时间画布"><span class="nav-icon">↔</span><span class="nav-label">时间画布</span></button><button class="nav-item nav-button" id="timelineTagsBtn" title="标签"><span class="nav-icon">♢</span><span class="nav-label">标签</span></button><button class="nav-item nav-button" id="archivedBtn" title="已归档"><span class="nav-icon">▣</span><span class="nav-label">已归档</span></button><button class="nav-item nav-button" id="trashBtn" title="回收站" hidden><span class="nav-icon">♲</span><span class="nav-label">回收站</span></button></nav>
+       <div class="side-section legacy-hidden"><div class="side-heading"><span>看板</span><button id="addBoardBtn" class="write-only" title="新建看板">＋</button></div><div id="boardList" class="board-list"><div class="side-empty">加载中…</div></div></div>
+       <div class="sidebar-bottom"><div class="top-actions" aria-label="账户与同步状态"><div class="sidebar-sync"><span class="realtime-state" id="realtimeState">连接中</span><span class="updated" id="loadState">自动同步</span></div><div class="current-user" id="currentUser"></div><button class="tool-btn" id="logoutBtn">退出</button></div></div>
+     </aside>
+@@ -33,7 +33,7 @@
+       <section class="board" id="board"><div class="empty-state">加载中…</div></section>
+       <div class="board-footer"><button class="add-group-btn write-only" id="addGroupBtn">＋ 添加新分组</button><span>共 <strong id="taskCount">0</strong> 个任务</span></div>
+       </div>
+-      <section class="timeline-view" id="timelineView" hidden><div class="timeline-shell"><div id="timelineBody"></div></div></section>
++      <section class="timeline-view" id="timelineView" hidden><div class="timeline-shell"><nav id="timelineCanvasNav" class="ux-canvas-nav" aria-label="时间画布范围" hidden><strong>时间画布</strong><button type="button" id="timelineCanvasAllBtn">全部日期</button><button type="button" id="timelineWeekBtn">本周</button><button type="button" id="timelineMonthBtn">本月</button></nav><div id="timelineBody"></div></div></section>
+     </main>
+   </div>
+   <div class="toast" id="toast"></div>
+@@ -41,6 +41,6 @@
+   <div class="modal-backdrop" id="taskModal"><div class="task-modal"><button class="modal-close" data-close="taskModal">×</button><div id="modalBody"></div></div></div>
+   <div class="modal-backdrop" id="listModal"><div class="task-modal list-modal"><button class="modal-close" data-close="listModal">×</button><div id="listModalBody"></div></div></div>
+   <div class="modal-backdrop login-backdrop" id="loginModal"><form class="login-card" id="loginForm"><div class="brand login-brand"><span class="brand-mark">F</span><span>flowboard</span></div><h2>登录工作空间</h2><p>使用管理员提供的账号登录。</p><label>用户名<input id="loginUser" name="username" autocomplete="username" required /></label><label>密码<input id="loginPassword" name="password" type="password" autocomplete="current-password" required /></label><div class="login-error" id="loginError"></div><button class="primary-btn" type="submit">登录</button></form></div>
+-  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js?v=20261008-f02"></script><script src="overview-ui.js?v=20261008-f02-search"></script><script src="i12-ui.js"></script><script src="app.js?v=20261008-f02-search"></script>
++  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js?v=20261008-f02-ux-ready"></script><script src="overview-ui.js?v=20261008-f02-ux-ready"></script><script src="i12-ui.js"></script><script src="app.js?v=20261008-f02-ux-ready"></script>
+ </body>
+ </html>
+--- before/overview-ui.js
++++ after/overview-ui.js
+@@ -3,14 +3,49 @@
+   const stages=['创意','设计','开发','测试','量产','应用迭代'];
+   const stageClasses=['idea','design','develop','test','production','iteration'];
+   const stageClass=stage=>stageClasses[stages.indexOf(stage)]||'empty';
+-  function createState(){return {filters:{period:'week',scope:'all',q:'',stage:'all',track:'all',completion:'open'},payload:null,status:'loading',error:'',expanded:new Set(),collapsed:new Set(),scrollTop:0,scrollLeft:0,request:0}}
+-  function select(key,label,choices,filters){return `<label class="ov-filter"><span>${label}</span><select data-overview-filter="${key}" aria-label="${label}">${choices.map(([value,text])=>`<option value="${esc(value)}"${filters[key]===value?' selected':''}>${esc(text)}</option>`).join('')}</select></label>`}
+-  function status(project){return project.overdue_count?['late',`逾期 ${project.overdue_count}`]:project.today_count?['today',`今日 ${project.today_count}`]:!project.total_node_count?['empty','待录入节点']:project.total_done_count===project.total_node_count?['done','全部完成']:project.done_count===project.node_count&&project.node_count?['done','近期已完成']:['upcoming','近期推进']}
+-  function nextLabel(project){if(project.next_nodes.length)return project.next_nodes.map(n=>`${n.name} · ${n.date} · ${n.track==='main'?'主线':'并行'}`).join('\n');return project.total_node_count?'暂无未完成节点':'尚未录入节点'}
+-  function detail(project){return `<tr class="ov-detail" id="ov-detail-${project.project_id}"><td colspan="7"><div class="ov-detail-head"><strong>${esc(project.name)}</strong><span>筛选命中 ${project.node_count} 个节点</span><button type="button" data-timeline-open="editor" data-project-id="${project.project_id}">${project.can_edit?'编辑时间表':'查看时间表 · 只读'}</button></div>${project.matched_nodes.length?`<table class="ov-nodes"><thead><tr><th>节点</th><th>轨道</th><th>节点阶段</th><th>节点日期</th><th>状态</th><th>备注</th></tr></thead><tbody>${project.matched_nodes.map(n=>`<tr><td>${esc(n.name)}</td><td>${n.track==='main'?'主线':'并行'}</td><td><span class="ov-tag ov-${stageClass(n.stage)}">${esc(n.stage)}</span></td><td class="ov-date">${esc(n.date)}</td><td><span class="ov-node-status ${n.done_at?'done':n.overdue?'late':n.is_today?'today':'upcoming'}">${n.done_at?'已完成':n.overdue?'逾期未完成':n.is_today?'今日到期':esc(n.status)}</span></td><td class="ov-node-remark">${esc(n.remark||'暂无备注')}</td></tr>`).join('')}</tbody></table>`:'<p class="ov-empty-nodes">尚未录入节点，可进入时间表维护。</p>'}</td></tr>`}
+-  function row(project,state){const expanded=state.expanded.has(project.project_id),[kind,label]=status(project),next=project.next_nodes[0],remarks=[...new Set(project.matched_nodes.map(n=>n.remark).filter(Boolean))].join('；');return `<tr class="ov-project" data-overview-project="${project.project_id}"><td><div class="ov-project-name"><button type="button" class="ov-expand" data-overview-expand="${project.project_id}" aria-expanded="${expanded}" aria-controls="ov-detail-${project.project_id}" aria-label="${expanded?'收起':'展开'} ${esc(project.name)}">${expanded?'⌄':'›'}</button><button type="button" class="ov-open" data-timeline-open="single" data-project-id="${project.project_id}" title="${esc(project.name)}">${esc(project.name)}</button><span class="ov-node-count" title="筛选命中的节点数">${project.node_count}</span></div></td><td class="ov-creator"><span class="ov-avatar ${esc(/^avatar-[a-z]+$/.test(project.creator_avatar_class||'')?project.creator_avatar_class:'avatar-purple')}" title="创建者：${esc(project.creator_name)}" aria-label="创建者：${esc(project.creator_name)}">${esc(project.creator_name.slice(0,1))}</span></td><td class="ov-status ${kind}">${label}</td><td class="ov-stage ov-${stageClass(project.current_stage)}">${esc(project.current_stage)}</td><td class="ov-next"><span title="${esc(nextLabel(project))}">${next?`${esc(next.name)}${project.next_nodes.length>1?` <b>+${project.next_nodes.length-1}</b>`:''}`:esc(nextLabel(project))}</span>${next?`<small class="ov-date">${esc(next.date)} · ${next.track==='main'?'主线':'并行'}</small>`:''}</td><td><div class="ov-progress"><span class="ov-progress-track" role="progressbar" aria-label="筛选后有效节点完成比例" aria-valuemin="0" aria-valuemax="100"${project.progress===null?'':` aria-valuenow="${project.progress}"`}><i style="width:${project.progress||0}%"></i></span><small>${project.progress===null?'—':`${project.done_count}/${project.node_count}`}</small></div></td><td class="ov-remark" title="${esc(remarks||'暂无备注')}"><span>${esc(remarks||'暂无备注')}</span></td></tr>${expanded?detail(project):''}`}
+-  function group(key,title,projects,state){const collapsed=state.collapsed.has(key);return `<section class="ov-group ov-group-${key}"><h2><button type="button" data-overview-collapse="${key}" aria-expanded="${!collapsed}"><span>${collapsed?'›':'⌄'}</span>${title}<small>${projects.length} 个项目</small></button></h2>${collapsed?'':`<div class="ov-table-scroll" data-overview-scroll tabindex="0" aria-label="${title}项目表，可横向滚动"><table class="ov-table"><colgroup><col style="width:280px"><col style="width:72px"><col style="width:110px"><col style="width:108px"><col style="width:230px"><col style="width:154px"><col></colgroup><thead><tr><th>项目名称</th><th>创建者</th><th>关注状态</th><th>当前阶段</th><th>下一未完成节点</th><th title="筛选命中的节点中，已完成节点数 / 有效节点数">有效节点完成</th><th>节点备注</th></tr></thead><tbody>${projects.map(p=>row(p,state)).join('')}</tbody></table></div>`}</section>`}
+-  function render(state){const f=state.filters,payload=state.payload,counts=payload?.counts;let content='';if(state.status==='loading')content='<div class="ov-message" role="status">正在加载项目和近期节点…</div>';else if(state.status==='error')content=`<div class="ov-message" role="alert"><strong>项目总览加载失败</strong><p>${esc(state.error)}</p><button type="button" data-overview-reload>重新加载</button></div>`;else if(!payload?.projects.length)content='<div class="ov-message"><strong>当前筛选下没有项目</strong><p>可切换全部日期、包含已完成节点，或清除搜索及阶段筛选。</p><button type="button" data-overview-reset>重置筛选</button></div>';else content=['attention','recent'].map(key=>{const projects=payload.projects.filter(p=>p.group===key);return projects.length?group(key,key==='attention'?'需要关注':'近期推进',projects,state):''}).join('');return `<section class="ov-board" data-timeline-page="overview" aria-busy="${state.status==='loading'}"><header class="ov-header"><h1>项目总览</h1><span>${payload?`今天 ${esc(payload.server_today)}`:''}</span></header><nav class="ov-tabs" aria-label="工作视图"><button type="button" class="on" aria-current="page">▤ 项目总览</button><button type="button" data-timeline-mode-target="home">我的工作</button><button type="button" data-timeline-mode-target="all">全项目仪表盘</button></nav><div class="ov-toolbar"><label class="ov-search"><span aria-hidden="true">⌕</span><input data-overview-search type="search" aria-label="搜索项目、创建者、节点或备注" placeholder="搜索项目、节点或备注" maxlength="100" value="${esc(f.q)}"></label>${select('period','近期范围',[['week','本周'],['month','本月'],['next30','未来30天'],['all','全部日期']],f)}${select('scope','项目范围',[['all','全部项目'],['mine','我的项目']],f)}${select('completion','节点状态',[['open','未完成'],['all','含已完成']],f)}${select('stage','节点阶段',[['all','全部阶段'],...stages.map(s=>[s,s])],f)}${select('track','节点轨道',[['all','双轨'],['main','主线'],['parallel','并行']],f)}<button type="button" class="ov-refresh" data-overview-reload>刷新</button></div><div class="ov-result" role="status">${state.status==='ready'&&counts?`${counts.projects} 个项目 · ${counts.nodes} 个节点 · 已完成 ${counts.done} · 逾期未完成 ${counts.overdue}`:'读取实时项目数据'}<span>${payload?.range_start?`${esc(payload.range_start)} — ${esc(payload.range_end)} · 同时纳入更早逾期节点`:'按节点筛选；项目名称可进入仪表盘'}</span></div><div class="ov-content">${content}</div><footer class="ov-note">创建者表示项目创建关系。进度按当前筛选的有效节点计算；展开查看节点所属阶段、双轨及备注。下一未完成节点取全项目最早未完成日期。</footer></section>`}
+-  function bind(root,state,{onChange,onReload,onRender}){const signal=root.__timelineAbort.signal;root.addEventListener('change',event=>{const el=event.target.closest('[data-overview-filter]');if(!el)return;state.filters[el.dataset.overviewFilter]=el.value;state.scrollLeft=0;onChange()},{signal});root.addEventListener('input',event=>{if(!event.target.matches('[data-overview-search]'))return;state.filters.q=event.target.value;clearTimeout(state.searchTimer);state.searchTimer=setTimeout(()=>{state.searchTimer=null;onChange()},260)},{signal});root.addEventListener('click',event=>{const expand=event.target.closest('[data-overview-expand]'),collapse=event.target.closest('[data-overview-collapse]');if(expand){const id=Number(expand.dataset.overviewExpand);state.expanded.has(id)?state.expanded.delete(id):state.expanded.add(id);onRender()}else if(collapse){const key=collapse.dataset.overviewCollapse;state.collapsed.has(key)?state.collapsed.delete(key):state.collapsed.add(key);onRender()}else if(event.target.closest('[data-overview-reload]'))onReload();else if(event.target.closest('[data-overview-reset]')){state.filters=createState().filters;onChange()}},{signal});root.querySelectorAll('[data-overview-scroll]').forEach(el=>{el.scrollLeft=state.scrollLeft;el.addEventListener('scroll',()=>{state.scrollLeft=el.scrollLeft},{signal,passive:true})})}
+-  return {createState,render,bind,status,nextLabel};
++  const choices={period:[['all','全部日期'],['week','本周'],['month','本月'],['next30','未来30天']],scope:[['all','全部项目'],['mine','我的项目']],completion:[['all','全部节点'],['open','未完成'],['done','已完成']],stage:[['all','全部阶段'],...stages.map(s=>[s,s])],track:[['all','双轨'],['main','主线'],['parallel','并行']],focus:[['all','全部'],['attention','需关注'],['overdue','逾期'],['today','今日'],['done','已完成']],search_in:[['all','项目与事项'],['project','仅项目'],['node','仅事项']]};
++  const defaults=()=>({period:'all',scope:'all',q:'',stage:'all',track:'all',completion:'all',focus:'all',search_in:'all',tag_id:'all'});
++  function createState(){return {filters:defaults(),payload:null,status:'loading',error:'',expanded:new Set(),collapsed:new Set(),scrollTop:0,scrollLeft:0,request:0,advanced:false,tags:[]}}
++  function preferences(filters){const result=defaults();for(const key of Object.keys(choices)){if(choices[key].some(([value])=>value===filters?.[key]))result[key]=filters[key]}const tag=String(filters?.tag_id||'all');if(tag==='all'||tag==='uncategorized'||(tag.length<=18&&/^[1-9]\d*$/.test(tag)))result.tag_id=tag;return result}
++  function applyFocus(state,value){state.filters.focus=value;state.filters.completion=value==='all'?'all':value==='done'?'done':'open'}
++  function select(key,label,items,filters){return `<label class="ov-filter"><span>${label}</span><select data-overview-filter="${key}" aria-label="${label}">${items.map(([value,text])=>`<option value="${esc(value)}"${filters[key]===value?' selected':''}>${esc(text)}</option>`).join('')}</select></label>`}
++  function status(p){return p.overdue_count?['late',`逾期 ${p.overdue_count}`]:p.today_count?['today',`今日 ${p.today_count}`]:!p.total_node_count?['empty','待录入节点']:p.total_done_count===p.total_node_count?['done','全部完成']:p.done_count===p.node_count&&p.node_count?['done','已完成事项']:['upcoming','推进中']}
++  function nextLabel(p){return p.next_nodes.length?p.next_nodes.map(n=>`${n.name} · ${n.date} · ${n.track==='main'?'主线':'并行'}`).join('\n'):p.total_node_count?'暂无未完成节点':'尚未录入节点'}
++  function detail(p){
++    return `<tr class="ov-detail" id="ov-detail-${p.project_id}"><td colspan="5"><div class="ov-detail-head"><strong>${esc(p.name)}</strong><button type="button" data-timeline-open="editor" data-project-id="${p.project_id}">${p.can_edit?'编辑时间表':'查看时间表 · 只读'}</button></div><div class="ov-detail-meta"><span>创建者：${esc(p.creator_name)}</span><span>显示 ${p.node_count} / ${p.total_node_count} 个节点</span><span>项目已完成 ${p.total_done_count} / ${p.total_node_count}</span></div>${p.next_nodes.length?`<details class="ov-next-list"><summary>下一未完成节点${p.next_nodes.length>1?`（同日 ${p.next_nodes.length} 项）`:''}</summary><ul>${p.next_nodes.map(n=>`<li>${esc(n.name)} <span class="ov-date">${esc(n.date)} · ${n.track==='main'?'主线':'并行'}</span></li>`).join('')}</ul></details>`:''}${p.matched_nodes.length?`<table class="ov-nodes"><thead><tr><th>节点</th><th>轨道</th><th>节点阶段</th><th>节点日期</th><th>状态</th><th>备注</th></tr></thead><tbody>${p.matched_nodes.map(n=>`<tr><td>${esc(n.name)}</td><td>${n.track==='main'?'主线':'并行'}</td><td><span class="ov-tag ov-${stageClass(n.stage)}">${esc(n.stage)}</span></td><td class="ov-date">${esc(n.date)}</td><td><span class="ov-node-status ${n.done_at?'done':n.overdue?'late':n.is_today?'today':'upcoming'}">${n.done_at?'已完成':n.overdue?'逾期未完成':n.is_today?'今日到期':esc(n.status)}</span></td><td class="ov-node-remark">${esc(n.remark||'—')}</td></tr>`).join('')}</tbody></table>`:'<p class="ov-empty-nodes">尚未录入节点，可进入时间表维护。</p>'}</td></tr>`;
++  }
++  function row(p,state){
++    const expanded=state.expanded.has(p.project_id),[kind,label]=status(p),next=p.next_nodes[0],progress=p.total_progress;
++    return `<tr class="ov-project" data-overview-project="${p.project_id}"><td><div class="ov-project-name"><button type="button" class="ov-expand" data-overview-expand="${p.project_id}" aria-expanded="${expanded}"${expanded?` aria-controls="ov-detail-${p.project_id}"`:''} aria-label="${expanded?'收起':'展开'} ${esc(p.name)}">${expanded?'⌄':'›'}</button><button type="button" class="ov-open" data-timeline-open="single" data-project-id="${p.project_id}" title="${esc(p.name)}">${esc(p.name)}</button><span class="ov-node-count">${p.total_node_count} 节点</span></div></td><td class="ov-status ${kind}">${label}</td><td class="ov-stage ov-${stageClass(p.current_stage)}">${esc(p.current_stage)}</td><td class="ov-next"><span title="${esc(nextLabel(p))}">${next?`${esc(next.name)}${p.next_nodes.length>1?` <b>+${p.next_nodes.length-1}</b>`:''}`:esc(nextLabel(p))}</span>${next?`<small class="ov-date">${esc(next.date)} · ${next.track==='main'?'主线':'并行'}</small>`:''}</td><td><div class="ov-progress"><span class="ov-progress-track" role="progressbar" aria-label="全项目有效节点完成比例" aria-valuemin="0" aria-valuemax="100"${progress==null?'':` aria-valuenow="${progress}"`}><i style="width:${progress||0}%"></i></span><small>${p.total_node_count?`${p.total_done_count}/${p.total_node_count}`:'—'}</small></div></td></tr>${expanded?detail(p):''}`;
++  }
++  function group(key,title,projects,state){const collapsed=state.collapsed.has(key);return `<section class="ov-group ov-group-${key}"><h2><button type="button" data-overview-collapse="${key}" aria-expanded="${!collapsed}"><span>${collapsed?'›':'⌄'}</span>${title}<small>${projects.length}</small></button></h2>${collapsed?'':`<div class="ov-table-scroll" data-overview-scroll tabindex="0" aria-label="${title}项目表，可横向滚动；左右方向键查看"><table class="ov-table"><colgroup><col style="width:32%"><col style="width:105px"><col style="width:105px"><col style="width:28%"><col></colgroup><thead><tr><th>项目</th><th>关注状态</th><th>当前阶段</th><th>下一未完成节点</th><th>项目进度</th></tr></thead><tbody>${projects.map(p=>row(p,state)).join('')}</tbody></table></div>`}</section>`}
++  function render(state){
++    const f=state.filters,payload=state.payload,counts=payload?.counts,tags=[['all','全部标签'],['uncategorized','未分类'],...(state.tags||[]).map(tag=>[String(tag.tag_id),tag.name])];
++    let content='';
++    if(state.status==='loading'&&!payload)content='<div class="ov-message" role="status">正在加载项目…</div>';
++    else if(state.status==='error')content=`<div class="ov-message" role="alert"><strong>项目概览加载失败</strong><p>${esc(state.error)}</p><button type="button" data-overview-reload>重新加载</button></div>`;
++    else if(!payload?.projects.length)content='<div class="ov-message"><strong>当前筛选下没有项目</strong><p>清除条件后可查看全部项目。</p><button type="button" data-overview-reset>查看全部项目</button></div>';
++    else content=['attention','recent'].map(key=>{const projects=payload.projects.filter(p=>p.group===key);return projects.length?group(key,key==='attention'?'需要关注':'项目进展',projects,state):''}).join('');
++    const hasConditions=Object.entries(defaults()).some(([key,value])=>f[key]!==value);
++    const extras=[f.stage!=='all'?f.stage:'',f.track!=='all'?(f.track==='main'?'主线':'并行'):'',f.tag_id!=='all'?(tags.find(([id])=>id===f.tag_id)?.[1]||'标签'):'',f.search_in!=='all'?(f.search_in==='project'?'仅项目搜索':'仅事项搜索'):'',f.focus==='all'&&f.completion!=='all'?(f.completion==='done'?'已完成节点':'未完成节点'):''].filter(Boolean);
++    return `<section class="ov-board" data-timeline-page="overview" aria-busy="${state.status==='loading'}"><header class="ov-header"><h1>项目概览</h1><span>${payload?esc(payload.server_today):''}</span></header><div class="ov-toolbar"><div class="ov-scope" aria-label="项目归属">${choices.scope.map(([value,text])=>`<button type="button" data-overview-scope="${value}" aria-pressed="${f.scope===value}" class="${f.scope===value?'on':''}">${text}</button>`).join('')}</div><label class="ov-search"><span aria-hidden="true">⌕</span><input data-overview-search type="search" aria-label="搜索项目、创建者、节点或备注" placeholder="搜索项目或事项" maxlength="100" value="${esc(f.q)}"></label>${select('period','日期范围',choices.period,f)}<button type="button" class="ov-filter-toggle" data-overview-advanced aria-expanded="${state.advanced}" aria-controls="ov-advanced">筛选${extras.length?` <b>${extras.length}</b>`:''}</button><button type="button" class="ov-refresh" data-overview-reload aria-label="刷新项目概览">↻</button></div><div class="ov-quick" role="group" aria-label="事项快捷筛选"><span class="ov-quick-label">节点</span>${choices.focus.map(([value,text])=>`<button type="button" data-overview-focus="${value}" aria-pressed="${f.focus===value}" class="${f.focus===value?'on':''}">${text}</button>`).join('')}<button type="button" class="ov-clear" data-overview-reset${hasConditions?'':' hidden'}>清除条件</button></div><div class="ov-advanced" id="ov-advanced"${state.advanced?'':' hidden'}>${select('stage','节点阶段',choices.stage,f)}${select('track','节点轨道',choices.track,f)}${select('completion','节点状态',choices.completion,f)}${select('tag_id','项目标签',tags,f)}${select('search_in','搜索对象',choices.search_in,f)}<button type="button" data-overview-advanced>收起</button></div><div class="ov-result" role="status"><span>${state.status==='loading'?'更新中…':counts?`${counts.projects} 个项目 · ${counts.nodes} 个节点`:''}</span><span>${choices.focus.find(([value])=>value===f.focus)?.[1]} · ${choices.period.find(([value])=>value===f.period)?.[1]}${extras.length?` · ${esc(extras.join(' · '))}`:''}${f.q?` · 搜索「${esc(f.q)}」`:''}</span></div><div class="ov-content">${content}</div><details class="ov-explain"><summary>进度与筛选说明</summary><p>项目进度按项目全部有效节点计算。展开只显示当前条件命中的节点；下一未完成节点取全项目最早未完成日期。近期范围同时纳入更早逾期节点。</p></details></section>`;
++  }
++  function bind(root,state,{onChange,onReload,onRender}){
++    const signal=root.__timelineAbort.signal;
++    root.addEventListener('change',event=>{const el=event.target.closest('[data-overview-filter]');if(!el)return;state.filters[el.dataset.overviewFilter]=el.value;if(el.dataset.overviewFilter==='completion')state.filters.focus='all';state.scrollLeft=0;onChange()},{signal});
++    root.addEventListener('input',event=>{if(!event.target.matches('[data-overview-search]'))return;state.filters.q=event.target.value;clearTimeout(state.searchTimer);state.searchTimer=setTimeout(()=>{state.searchTimer=null;onChange()},260)},{signal});
++    root.addEventListener('keydown',event=>{if(event.target.matches('[data-overview-search]')&&event.key==='Enter'){event.preventDefault();clearTimeout(state.searchTimer);onChange()}},{signal});
++    root.addEventListener('click',event=>{
++      const expand=event.target.closest('[data-overview-expand]'),collapse=event.target.closest('[data-overview-collapse]'),scope=event.target.closest('[data-overview-scope]'),focus=event.target.closest('[data-overview-focus]');
++      if(expand){const id=Number(expand.dataset.overviewExpand);state.expanded.has(id)?state.expanded.delete(id):state.expanded.add(id);onRender()}
++      else if(collapse){const key=collapse.dataset.overviewCollapse;state.collapsed.has(key)?state.collapsed.delete(key):state.collapsed.add(key);onRender()}
++      else if(scope){state.filters.scope=scope.dataset.overviewScope;onChange()}
++      else if(focus){applyFocus(state,focus.dataset.overviewFocus);onChange()}
++      else if(event.target.closest('[data-overview-advanced]')){state.advanced=!state.advanced;onRender();root.querySelector(state.advanced?'#ov-advanced select':'[data-overview-advanced]')?.focus({preventScroll:true})}
++      else if(event.target.closest('[data-overview-reload]'))onReload();
++      else if(event.target.closest('[data-overview-reset]')){state.filters=defaults();state.advanced=false;state.scrollLeft=0;state.expanded.clear();state.collapsed.clear();onChange();root.querySelector('[data-overview-focus=all]')?.focus({preventScroll:true})}
++    },{signal});
++    root.querySelectorAll('[data-overview-scroll]').forEach(el=>{el.scrollLeft=state.scrollLeft;el.addEventListener('scroll',()=>{state.scrollLeft=el.scrollLeft},{signal,passive:true});el.addEventListener('keydown',event=>{if(event.target!==el||!['ArrowLeft','ArrowRight'].includes(event.key))return;event.preventDefault();el.scrollLeft+=(event.key==='ArrowRight'?1:-1)*120},{signal})});
++  }
++  return {createState,preferences,applyFocus,render,bind,status,nextLabel};
+ });
+--- before/overview.css
++++ after/overview.css
+@@ -11,3 +11,9 @@
+ @media(max-width:800px){.timeline-shell:has(.ov-board){padding:12px}.ov-board{padding:22px 18px}.ov-header h1{font-size:28px}.ov-toolbar{gap:8px}.ov-search input{width:180px}.ov-result{margin-bottom:18px}.ov-header{flex-wrap:wrap}.ov-note{font-size:11px}}
+ 
+ .ov-table-scroll::-webkit-scrollbar{display:none}
++.ov-table{min-width:850px}.ov-header{margin-bottom:24px}.ov-toolbar{gap:12px;margin-bottom:12px}.ov-scope{display:flex;border-bottom:1px solid #ded6eb;flex:none}.ov-scope button{border:0;border-bottom:2px solid transparent;background:none;padding:9px 11px;cursor:pointer;font-size:13px;color:#8b8298}.ov-scope button.on{border-bottom-color:#538be3;color:#302743}.ov-search{flex:1;min-width:180px;max-width:300px}.ov-search input{width:100%;min-width:0}.ov-filter-toggle,.ov-advanced>button{border:1px solid #ddd7e8;border-radius:4px;background:#ffffffa8;padding:7px 12px;cursor:pointer;font-size:12px}.ov-filter-toggle b{background:#eae3fb;border-radius:10px;padding:1px 5px;color:#7863d9;font-weight:400}.ov-refresh{margin-left:0;font-size:18px!important;line-height:18px;padding:6px 10px}.ov-quick{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:0 0 12px}.ov-quick button{border:0;border-radius:4px;background:none;padding:6px 12px;color:#908598;cursor:pointer;font-size:12px}.ov-quick button.on{background:#eae4fb;color:#6c54be}.ov-quick button:hover,.ov-scope button:hover{background:#f0eafb}.ov-quick .ov-clear{margin-left:auto;color:#a397b0;padding-right:0}.ov-advanced{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border:1px solid #e6dfee;background:#ffffff7a;border-radius:5px;padding:12px;margin-bottom:12px}.ov-advanced[hidden]{display:none}.ov-result{margin:12px 0 22px}.ov-node-count{font-size:10px;white-space:nowrap}.ov-detail-meta{display:flex;gap:20px;font-size:11px;color:#9b8ba8;margin-bottom:12px}.ov-detail-head{margin-bottom:8px}.ov-next-list{font-size:12px;margin-bottom:12px;color:#79628c}.ov-next-list summary{cursor:pointer}.ov-next-list ul{margin:7px 0;padding-left:20px;line-height:1.8}.ov-next-list li .ov-date{color:#9a88a7;margin-left:12px}.ov-explain{font-size:11px;color:#a295ad;line-height:1.7;margin-top:8px}.ov-explain summary{cursor:pointer;list-style:none;display:inline}.ov-explain p{max-width:650px;margin:6px 0}.ux-canvas-nav{display:flex;align-items:center;gap:8px;max-width:1180px;margin:0 auto 16px;padding:0 2px;font-size:13px}.ux-canvas-nav[hidden]{display:none}.ux-canvas-nav strong{font-size:15px;font-weight:500;margin-right:16px;color:#494052}.ux-canvas-nav button{border:0;border-bottom:2px solid transparent;background:none;color:#8d819b;padding:8px 12px;cursor:pointer;font:inherit}.ux-canvas-nav button.on{border-bottom-color:#538be3;color:#493661}
++@media(max-width:800px){.ov-board{padding:22px 16px}.ov-toolbar{gap:10px}.ov-scope{order:0}.ov-search{order:1;max-width:none;min-width:180px}.ov-detail-meta{gap:10px;flex-wrap:wrap}.ov-quick button{padding:6px 9px}.ux-canvas-nav{flex-wrap:wrap}.ov-advanced{gap:10px}}
++
++.tl-archive-open{border:0;background:none;padding:0;text-align:left;color:inherit;font:inherit;font-weight:600;cursor:pointer;overflow-wrap:anywhere}.tl-archive-open:hover{text-decoration:underline}
++
++.ov-quick-label{font-size:11px;color:#9a8ca6;margin-right:5px}
+--- before/flowboard/overview.py
++++ after/flowboard/overview.py
+@@ -11,12 +11,14 @@
+     "scope": ("all", "mine"),
+     "stage": ("all", *STAGES),
+     "track": ("all", "main", "parallel"),
+-    "completion": ("open", "all"),
++    "completion": ("open", "all", "done"),
++    "focus": ("all", "attention", "overdue", "today", "done"),
++    "search_in": ("all", "project", "node"),
+ }
+ 
+ 
+ def project_overview(service, user, workspace_id, query):
+-    if set(query) - {*CHOICES, "q"}:
++    if set(query) - {*CHOICES, "q", "tag_id"}:
+         raise ApiError(422, "VALIDATION_ERROR", "未知项目总览筛选参数")
+     filters = {}
+     for key, choices in CHOICES.items():
+@@ -28,10 +30,18 @@
+     if len(searches) != 1 or not isinstance(searches[0], str) or len(searches[0]) > 100:
+         raise ApiError(422, "VALIDATION_ERROR", "搜索限100个字符")
+     filters["q"] = searches[0].strip()
++    tags = query.get("tag_id", ["all"])
++    if len(tags) != 1 or not (tags[0] in ("all", "uncategorized") or (len(tags[0]) <= 18 and tags[0].isascii() and tags[0].isdigit() and int(tags[0]) > 0)):
++        raise ApiError(422, "VALIDATION_ERROR", "无效的项目标签")
++    filters["tag_id"] = tags[0]
+     conn = service._db()
+     try:
+         conn.execute("BEGIN")  # ACL, projects and nodes share one read snapshot.
+         role = service._workspace_access(conn, user["id"], workspace_id)
++        if filters["tag_id"] not in ("all", "uncategorized"):
++            tag = conn.execute("SELECT id FROM timeline_tags WHERE workspace_id=? AND id=? AND deleted_at IS NULL", (workspace_id, int(filters["tag_id"]))).fetchone()
++            if tag is None:
++                raise ApiError(422, "VALIDATION_ERROR", "项目标签已不可用")
+         today = service._server_today()
+         start, end = None, None
+         if filters["period"] == "week":
+@@ -46,8 +56,15 @@
+             """SELECT p.*,u.name creator_name,u.avatar_class creator_avatar_class
+                FROM timeline_projects p LEFT JOIN users u ON u.id=p.created_by
+                WHERE p.workspace_id=? AND p.deleted_at IS NULL AND p.archived_at IS NULL
++               AND (?='all' OR (?='uncategorized' AND NOT EXISTS(
++                   SELECT 1 FROM timeline_project_tags pt JOIN timeline_tags t ON t.id=pt.tag_id
++                   WHERE pt.project_id=p.id AND pt.workspace_id=p.workspace_id AND t.workspace_id=p.workspace_id AND pt.deleted_at IS NULL AND t.deleted_at IS NULL
++               )) OR EXISTS(
++                   SELECT 1 FROM timeline_project_tags pt JOIN timeline_tags t ON t.id=pt.tag_id
++                   WHERE pt.project_id=p.id AND pt.workspace_id=p.workspace_id AND t.workspace_id=p.workspace_id AND pt.tag_id=? AND pt.deleted_at IS NULL AND t.deleted_at IS NULL
++               ))
+                AND (?='all' OR p.created_by=?) ORDER BY p.id""",
+-            (workspace_id, filters["scope"], user["id"]),
++            (workspace_id, filters["tag_id"], filters["tag_id"], filters["tag_id"], filters["scope"], user["id"]),
+         ).fetchall()
+         grouped = defaultdict(list)
+         # Join constrains the node query before projection; no cross-workspace fetch.
+@@ -63,12 +80,23 @@
+         for project in projects:
+             nodes = sorted(grouped[project["id"]], key=lambda n: (n["date"], _natural_key(n["name"]), n["id"]))
+             view = service._view(conn, project, user_id=user["id"], role=role, nodes=nodes, today=today)
+-            project_match = not search or search in (project["name"] + " " + (project["creator_name"] or "")).casefold()
++            project_match = not search or (filters["search_in"] != "node" and search in (project["name"] + " " + (project["creator_name"] or "")).casefold())
+             matched = []
+             for node in view["nodes"]:
+                 date = service._date(node["date"])
+                 overdue = not node["done_at"] and date < today
+                 if filters["completion"] == "open" and node["done_at"]:
++                    continue
++                if filters["completion"] == "done" and not node["done_at"]:
++                    continue
++                focus = filters["focus"]
++                if focus == "attention" and not (overdue or (not node["done_at"] and date == today)):
++                    continue
++                if focus == "overdue" and not overdue:
++                    continue
++                if focus == "today" and not (not node["done_at"] and date == today):
++                    continue
++                if focus == "done" and not node["done_at"]:
+                     continue
+                 if start is not None and not (start <= date <= end or overdue):
+                     continue
+@@ -76,10 +104,10 @@
+                     continue
+                 if filters["track"] != "all" and node["track"] != filters["track"]:
+                     continue
+-                if not project_match and search not in (node["name"] + " " + node["remark"]).casefold():
++                if not project_match and (filters["search_in"] == "project" or search not in (node["name"] + " " + node["remark"]).casefold()):
+                     continue
+                 matched.append({**node, "overdue": overdue, "is_today": date == today})
+-            empty_match = not nodes and filters["period"] == "all" and filters["stage"] == "all" and filters["track"] == "all" and project_match
++            empty_match = not nodes and filters["period"] == "all" and filters["stage"] == "all" and filters["track"] == "all" and filters["focus"] == "all" and filters["completion"] != "done" and project_match
+             if not matched and not empty_match:
+                 continue
+             incomplete = sorted((n for n in view["nodes"] if not n["done_at"]), key=lambda n: (n["date"], STAGES.index(n["stage"]), n["track"] != "main", _natural_key(n["name"]), n["id"]))
+@@ -99,6 +127,7 @@
+                 "progress": round(done * 100 / len(matched)) if matched else None,
+                 "overdue_count": overdue_count, "today_count": today_count,
+                 "total_node_count": len(nodes), "total_done_count": sum(n["done_at"] for n in view["nodes"]),
++                "total_progress": round(sum(n["done_at"] for n in view["nodes"]) * 100 / len(nodes)) if nodes else None,
+             })
+         result.sort(key=lambda p: (p["group"] != "attention", p["next_nodes"][0]["date"] if p["next_nodes"] else "9999", p["project_id"]))
+         return {
+--- before/timeline-ui.js
++++ after/timeline-ui.js
+@@ -83,7 +83,7 @@
+     const archiveAction=mode==='single'&&canArchive?`<button type="button" class="danger" data-timeline-archive="${project.project_id}">归档项目</button>`:canUnarchive?`<button type="button" data-timeline-unarchive="${project.project_id}">取消归档</button>`:'';
+     const deleteAction=mode==='single'&&canDelete&&!project?.archived_at?`<button type="button" class="danger" data-timeline-delete="${project.project_id}" data-project-version="${project.version}">删除项目</button>`:'';
+     const menu=archiveAction||deleteAction?`<details class="tl-project-menu"><summary aria-label="项目操作">•••</summary><div>${archiveAction}${deleteAction}</div></details>`:'';
+-    const target=backMode==='overview'?'overview':backMode==='all'?'all':'home',label=target==='overview'?'返回项目总览':target==='all'?'返回':'我的工作';
++    const target=['overview','all','week','month','archived'].includes(backMode)?backMode:'home',label=target==='overview'?'返回项目概览':target==='archived'?'返回已归档':['week','month'].includes(target)?'返回时间画布':target==='all'?'返回':'我的工作';
+     return `<div class="timeline-project-tabs"><nav aria-label="项目页签"><button type="button" class="back" data-timeline-mode-target="${target}"><span class="timeline-back-arrow" aria-hidden="true">←</span><span class="timeline-back-label">${label}</span></button><button type="button" class="${mode==='single'?'on':''}" data-timeline-mode-target="single" aria-pressed="${mode==='single'}">单项目仪表盘</button><button type="button" class="${mode==='editor'?'on':''}" data-timeline-mode-target="editor" aria-pressed="${mode==='editor'}">时间表编辑器</button></nav><div class="timeline-project-tab-actions">${write&&!project?.archived_at?'<button type="button" data-timeline-export>导出 Excel</button>':''}${menu}</div></div>`;
+   }
+   function editorIntervals(project){const result=new Map();for(const track of ['main','parallel']){const chain=(project.nodes||[]).filter(node=>node.track===track).slice().sort(compareNodes);chain.forEach((node,index)=>result.set(Number(node.id),index?Math.round((iso(node.date)-iso(chain[index-1].date))/DAY):null))}return result}
+@@ -578,12 +578,12 @@
+     const membersById=new Map(members.map(member=>[member.id,member])),orderedMembers=memberOrder?.member_ids?[...memberOrder.member_ids.map(id=>membersById.get(id)).filter(Boolean),...members.filter(member=>!memberOrder.member_ids.includes(member.id))]:members;
+     const row=project=>{const metrics=project.metrics||{},count=(project.nodes||[]).length,stage=count?metrics.current_stage||project.nodes[0]?.stage:'',upcoming=metrics.upcoming?.[0]?.date,overdue=Number(metrics.overdue_count)||0,status=count?`${esc(stage||'未开始')}${overdue?` · <b class="tl-red">逾期 ${overdue}</b>`:''}${upcoming?` · 临近 ${esc(upcoming.slice(5).replace('-','/'))}`:''}`:'未开始 · 待录入首个节点',canManage=admin||(write&&ownedBy(project,currentUser));return `<article class="tl-prow" data-project-choice="${project.project_id}" data-order-project="${project.project_id}" data-project-rename-host><button type="button" class="tl-order-grip" draggable="true" aria-label="拖拽调整我的顺序" tabindex="-1">⋮⋮</button><button type="button" class="tl-prow-main" data-timeline-open="single" data-project-id="${project.project_id}"><i class="tl-prow-dot ${count?stageClass(stage):'is-empty'}"></i><strong>${esc(project.name)}</strong><span class="tl-prow-meta">${status}</span>${overdue?`<span class="tl-risk-chip">逾期 ${overdue}</span>`:''}<span class="tl-prow-go" aria-hidden="true">›</span></button><span class="tl-prow-actions"><button type="button" data-timeline-open="editor" data-project-id="${project.project_id}">编辑</button>${canManage?`<button type="button" data-timeline-rename-start="${project.project_id}">重命名</button>`:''}${canManage?`<button type="button" class="timeline-delete" data-timeline-delete="${project.project_id}" data-project-version="${project.version}">删除</button>`:''}</span>${canManage?projectRenameForm(project,'home'):''}</article>`};
+     const strip=member=>{const owned=projects.filter(project=>ownedBy(project,member)),isMe=Boolean(currentUser&&member.id===currentUser.id),pills=owned.map((project,index)=>{const metrics=project.metrics||{},overdue=Number(metrics.overdue_count)||0,upcoming=metrics.upcoming?.[0]?.date,locked=!admin&&!ownedBy(project,currentUser);return `<button type="button" class="tl-pill ${stageClass(metrics.current_stage)}" data-timeline-member-open="${project.project_id}"${index>=10?' data-member-extra hidden':''}><i class="dot"></i><b>${esc(project.name)}</b><small>${overdue?`逾期 ${overdue}`:esc(metrics.current_stage||'未开始')}${upcoming?` · 临近 ${esc(upcoming.slice(5).replace('-','/'))}`:''}</small>${locked?'<span class="tl-lock">🔒 只读</span>':''}</button>`}).join(''),more=owned.length>10?`<button type="button" class="tl-member-more" data-timeline-member-toggle="${esc(member.id)}" aria-expanded="false">显示全部（剩余 ${owned.length-10} 个）</button>`:'';return `<div class="tl-mrow" data-order-member="${esc(member.id)}"><button type="button" class="tl-order-grip" draggable="true" aria-label="拖拽调整团队成员卡片顺序" tabindex="-1">⋮⋮</button><div class="tl-member-head"><span class="tl-mavatar" aria-hidden="true">${esc(String(member.name||'?').slice(0,1))}</span><span><b>${esc(member.name||'')}${isMe?'（我）':''}</b><small>${isMe&&admin?'admin':'member'} · ${owned.length} 个项目</small></span></div><span class="tl-mpills">${owned.length?`${pills}${more}`:'<span class="tl-mnone">暂无负责项目</span>'}</span></div>`};
+-    const actions=write?`<div class="tl-home-actions"><button type="button" data-timeline-mode-target="overview">▤ 项目总览</button><button type="button" class="tl-home-import" data-timeline-import-open>⇪ 导入 Excel</button><button type="button" class="tl-home-export" data-timeline-export>导出 Excel</button><button type="button" data-timeline-create-open>＋ 新建项目</button></div>`:'';
++    const actions=write?`<div class="tl-home-actions"><button type="button" class="tl-home-import" data-timeline-import-open>⇪ 导入 Excel</button><button type="button" class="tl-home-export" data-timeline-export>导出 Excel</button><button type="button" data-timeline-create-open>＋ 新建项目</button></div>`:'';
+     return `<div class="tl-home"><header class="tl-home-head"><div><h1>我的工作</h1><small>今天 ${shanghaiToday()}</small></div>${actions}</header><div class="tl-kpis"><button type="button" class="tl-kpi" data-timeline-kpi="mine"><small>我的项目</small><span><b>${stats.mine}</b>${stats.myOverdue?`<em class="r">逾期 ${stats.myOverdue}</em>`:''}</span></button><button type="button" class="tl-kpi" data-timeline-kpi="team"><small>团队项目</small><span><b>${stats.team}</b>${stats.overdue?`<em class="r">逾期 ${stats.overdue}</em>`:''}</span></button><button type="button" class="tl-kpi" data-timeline-kpi="members"><small>团队成员</small><span><b>${stats.members}</b></span></button><button type="button" class="tl-kpi" data-timeline-kpi="feed"><small>今日团队动态</small><span><b>${stats.todayFeed}</b>${stats.yesterdayFeed?`<em class="g">昨日 ${stats.yesterdayFeed}</em>`:''}</span></button></div><div class="tl-cols"><div class="tl-maincol"><div class="tl-tabs" role="tablist"><button type="button" class="on" data-timeline-tab="mine">我的项目（${stats.mine}）</button><button type="button" data-timeline-tab="team">团队项目（${stats.team}）</button></div><section class="tl-section" data-timeline-section="mine" data-order-list="mine">${mine.length?mine.map(row).join(''):'<div class="tl-empty">暂无负责项目，可通过上方“新建项目”创建。</div>'}</section><section class="tl-section team" data-timeline-section="team" data-order-list="team" hidden>${orderedMembers.length?orderedMembers.map(strip).join(''):'<div class="tl-empty">暂无成员</div>'}</section><p class="tl-home-note" data-timeline-home-note="mine">整行点击进入项目页（单项目仪表盘 / 时间表编辑器）；日期、间隔、阶段、轨道、节点状态和备注均可在时间表中维护。</p></div><aside class="tl-feed"><h4>最新动态 <small data-timeline-feed-scope>我 · 最近 6 条 · 新在上</small></h4><p class="tl-feed-note">随左侧标签联动：我的项目显示当前用户最近 6 条，团队项目显示全员最近 20 条；最新记录在上。</p><div data-timeline-feed="mine">${feedRows(review,currentUser?.name,'mine')}</div><div data-timeline-feed="team" hidden>${feedRows(review,currentUser?.name,'team')}</div></aside></div></div>`;
+   }
+ 
+   function renderArchived(projects){
+-    const rows=projects.map(project=>`<article class="tl-archive-row"><strong>${esc(project.name)}</strong>${project.can_unarchive?`<span class="tl-archive-row-actions"><button type="button" data-timeline-unarchive="${project.project_id}">取消归档</button><button type="button" class="timeline-delete" data-timeline-delete="${project.project_id}" data-project-version="${project.version}">删除项目</button></span>`:''}</article>`).join('');
++    const rows=projects.map(project=>`<article class="tl-archive-row"><button type="button" class="tl-archive-open" data-timeline-open="single" data-project-id="${project.project_id}">${esc(project.name)}</button>${project.can_unarchive?`<span class="tl-archive-row-actions"><button type="button" data-timeline-unarchive="${project.project_id}">取消归档</button><button type="button" class="timeline-delete" data-timeline-delete="${project.project_id}" data-project-version="${project.version}">删除项目</button></span>`:''}</article>`).join('');
+     return `<section class="tl-archive-page"><header><div><p>SYSTEM LABEL · 高优先级归档状态</p><h1>已归档</h1><small>归档项目已从普通入口隐藏；取消归档后恢复原标签与个人顺序。</small></div></header><div class="tl-archive-list">${rows||'<div class="tl-empty">暂无已归档项目。</div>'}</div></section>`;
+   }
+ 
+--- before/tests/overview_ui.test.js
++++ after/tests/overview_ui.test.js
+@@ -1,8 +1,10 @@
+ const test=require('node:test');
+ const assert=require('node:assert/strict');
+ const overview=require('../overview-ui.js');
+-function fixture(){return {project_id:7,name:'真实项目',creator_name:'成员',creator_avatar_class:'avatar-green',current_stage:'开发',group:'attention',can_edit:false,node_count:2,done_count:1,progress:50,overdue_count:1,today_count:0,total_node_count:3,total_done_count:1,next_nodes:[{name:'最早节点',date:'2026-10-01',track:'main'},{name:'同日并行',date:'2026-10-01',track:'parallel'}],matched_nodes:[{id:1,name:'主线节点',track:'main',stage:'开发',date:'2026-10-01',done_at:false,overdue:true,is_today:false,status:'进行中',remark:'真实备注'},{id:2,name:'完成节点',track:'parallel',stage:'测试',date:'2026-10-08',done_at:true,remark:''}]}}
+-test('overview preserves project stage and exposes every same-day next node',()=>{const p=fixture();assert.equal(overview.status(p)[1],'逾期 1');assert.match(overview.nextLabel(p),/同日并行.*并行/);const s=overview.createState();s.status='ready';s.payload={projects:[p],counts:{projects:1,nodes:2,done:1,overdue:1},server_today:'2026-10-08'};s.expanded.add(7);const html=overview.render(s);assert.match(html,/ov-stage ov-develop/);assert.match(html,/返回|查看时间表 · 只读/);assert.match(html,/aria-valuenow="50"/);assert.match(html,/逾期未完成/);assert.match(html,/已完成/);assert.match(html,/同日并行/)});
++function fixture(){return {project_id:7,name:'真实项目',creator_name:'成员',creator_avatar_class:'avatar-green',current_stage:'开发',group:'attention',can_edit:false,node_count:2,done_count:1,progress:50,overdue_count:1,today_count:0,total_node_count:3,total_done_count:1,total_progress:33,next_nodes:[{name:'最早节点',date:'2026-10-01',track:'main'},{name:'同日并行',date:'2026-10-01',track:'parallel'}],matched_nodes:[{id:1,name:'主线节点',track:'main',stage:'开发',date:'2026-10-01',done_at:false,overdue:true,is_today:false,status:'进行中',remark:'真实备注'},{id:2,name:'完成节点',track:'parallel',stage:'测试',date:'2026-10-08',done_at:true,remark:''}]}}
++test('overview preserves project stage and exposes every same-day next node',()=>{const p=fixture();assert.equal(overview.status(p)[1],'逾期 1');assert.match(overview.nextLabel(p),/同日并行.*并行/);const s=overview.createState();s.status='ready';s.payload={projects:[p],counts:{projects:1,nodes:2,done:1,overdue:1},server_today:'2026-10-08'};s.expanded.add(7);const html=overview.render(s);assert.match(html,/ov-stage ov-develop/);assert.match(html,/返回|查看时间表 · 只读/);assert.match(html,/aria-valuenow="33"/);assert.match(html,/逾期未完成/);assert.match(html,/已完成/);assert.match(html,/同日并行/)});
+ test('project names node remarks and creator attributes cannot inject HTML',()=>{const p=fixture();p.name='<img src=x onerror=alert(1)>';p.creator_name='" autofocus onfocus=alert(1)';p.creator_avatar_class='avatar-green" onclick="bad';p.matched_nodes[0].remark='<script>bad()</script>';const s=overview.createState();s.status='ready';s.payload={projects:[p],counts:{},server_today:'2026-10-08'};s.expanded.add(7);const html=overview.render(s);assert.ok(!html.includes('<img'));assert.ok(!html.includes('<script>'));assert.ok(!html.includes('onclick="bad'));assert.match(html,/&lt;script&gt;/);assert.match(html,/&quot; autofocus/)});
+ test('missing nodes and completed projects have accurate no-next copy',()=>{const p=fixture();p.next_nodes=[];p.total_node_count=0;assert.equal(overview.nextLabel(p),'尚未录入节点');assert.equal(overview.status({...p,overdue_count:0,today_count:0})[1],'待录入节点');p.total_node_count=2;p.total_done_count=2;assert.equal(overview.nextLabel(p),'暂无未完成节点');assert.equal(overview.status({...p,overdue_count:0,today_count:0})[1],'全部完成')});
+ test('error and empty-result rendering provide an actionable recovery control',()=>{const s=overview.createState();s.status='error';s.error='<故障>';assert.match(overview.render(s),/data-overview-reload/);assert.match(overview.render(s),/&lt;故障&gt;/);s.status='ready';s.payload={projects:[],counts:{}};assert.match(overview.render(s),/data-overview-reset/)});
++test('first overview is complete and stored preferences exclude transient search',()=>{const s=overview.createState();assert.equal(s.filters.period,'all');assert.equal(s.filters.completion,'all');const saved=overview.preferences({...s.filters,scope:'mine',q:'私有临时搜索',stage:'伪造阶段',tag_id:'9'.repeat(40)});assert.equal(saved.scope,'mine');assert.equal(saved.q,'');assert.equal(saved.stage,'all');assert.equal(saved.tag_id,'all')});
++test('quick focus chooses compatible completion and advanced controls stay collapsed',()=>{const s=overview.createState();overview.applyFocus(s,'done');assert.equal(s.filters.completion,'done');overview.applyFocus(s,'overdue');assert.equal(s.filters.completion,'open');overview.applyFocus(s,'all');assert.equal(s.filters.completion,'all');assert.match(overview.render(s),/id="ov-advanced" hidden/);assert.doesNotMatch(overview.render(s),/ov-tabs/)});
+--- before/tests/test_overview.py
++++ after/tests/test_overview.py
+@@ -111,5 +111,40 @@
+         self.assertEqual(self.overview(period='month')['range_end'],'2028-02-29')
+         self.assertEqual(self.overview(period='next30')['range_end'],'2028-03-29')
+ 
++    def test_focus_search_target_and_complete_project_progress(self):
++        self.seed()
++        for focus,expected in [('attention',3),('overdue',1),('today',2),('done',3)]:
++            result=self.overview(period='all',completion='all',focus=focus)
++            self.assertEqual(result['counts']['nodes'],expected,focus)
++        risk=next(p for p in self.overview(period='all',completion='done',focus='done')['projects'] if p['project_id']==self.ids['risk'])
++        self.assertEqual((risk['node_count'],risk['progress'],risk['total_progress']),(1,100,20))
++        self.assertEqual(self.overview(period='all',q='鞋面材料',search_in='project')['counts']['projects'],0)
++        self.assertEqual(self.overview(period='all',q='鞋面材料',search_in='node')['counts']['nodes'],1)
++        self.assertEqual(self.overview(period='all',q='疾风',search_in='project')['counts']['nodes'],4)
++        self.assertEqual(self.overview(period='all',q='疾风',search_in='node')['counts']['nodes'],0)
++
++    def test_tag_filter_is_shared_active_and_workspace_scoped(self):
++        self.seed();user={'id':'u1'}
++        tag=self.service.create_tag(user,1,{'name':'材料验证'})
++        self.service.set_tag_project(user,1,tag['tag_id'],self.ids['risk'],{'base_tag_version':tag['version']},included=True)
++        result=self.overview(period='all',tag_id=str(tag['tag_id']))
++        self.assertEqual([p['project_id'] for p in result['projects']],[self.ids['risk']])
++        self.assertNotIn(self.ids['risk'],[p['project_id'] for p in self.overview(period='all',tag_id='uncategorized')['projects']])
++        conn=connect(self.db_path)
++        conn.execute('UPDATE timeline_tags SET deleted_at=? WHERE id=?',('2026-10-08',tag['tag_id']))
++        conn.commit();conn.close()
++        self.assertIn(self.ids['risk'],[p['project_id'] for p in self.overview(period='all',tag_id='uncategorized')['projects']])
++        with self.assertRaises(ApiError) as caught:self.overview(tag_id=str(tag['tag_id']))
++        self.assertEqual(caught.exception.status,422)
++        conn=connect(self.db_path)
++        conn.execute("INSERT INTO workspaces(id,name,created_at) VALUES (2,'其他空间','2026-10-08')")
++        foreign=conn.execute("INSERT INTO timeline_tags(workspace_id,name,created_by,created_at,updated_at) VALUES (2,'不可透露的其他空间标签','u1','2026-10-08','2026-10-08')").lastrowid
++        conn.commit();conn.close()
++        with self.assertRaises(ApiError) as caught:self.overview(tag_id=str(foreign))
++        self.assertEqual(caught.exception.status,422)
++        self.assertNotIn('不可透露',caught.exception.message)
++        for key,value in [('tag_id','0'),('tag_id','9'*40),('tag_id','-1'),('tag_id','999999'),('focus','bad'),('search_in','bad')]:
++            with self.assertRaises(ApiError):self.overview(**{key:value})
++
+ 
+ if __name__=='__main__':unittest.main()
+--- before/tests/test_overview_e2e.py
++++ after/tests/test_overview_e2e.py
+@@ -1,5 +1,6 @@
+ import json
+ import unittest
++from urllib.parse import parse_qs, urlparse
+ from datetime import datetime, timedelta, timezone
+ from pathlib import Path
+ 
+@@ -7,7 +8,7 @@
+ from overview_fixtures import seed_overview
+ from flowboard.database import connect
+ 
+-EVIDENCE = Path(__file__).resolve().parents[1] / 'team-progress/verification/20261008-feature02'
++EVIDENCE = Path(__file__).resolve().parents[1] / 'team-progress/verification/20261008-feature02-ux'
+ 
+ 
+ class OverviewE2E(unittest.TestCase):
+@@ -27,23 +28,27 @@
+         page.locator('.ov-project').first.wait_for()
+ 
+     def select(self, page, key, value):
+-        with page.expect_response(lambda r:'/timeline/overview?' in r.url and f'{key}={value}' in r.url and r.status==200):
+-            page.locator(f'[data-overview-filter="{key}"]').select_option(value)
++        if key not in ('period','scope') and not page.locator('#ov-advanced').is_visible():
++            page.locator('[data-overview-advanced][aria-controls]').click()
++        if key!='scope':page.locator(f'[data-overview-filter="{key}"]').focus()
++        with page.expect_response(lambda r:'/timeline/overview?' in r.url and parse_qs(urlparse(r.url).query).get(key)==[value] and r.status==200):
++            if key=='scope':page.locator(f'[data-overview-scope="{value}"]').click()
++            else:page.locator(f'[data-overview-filter="{key}"]').select_option(value)
+         page.locator('[data-timeline-page="overview"][aria-busy="false"]').wait_for()
+ 
+     def test_filters_expansion_counts_search_and_real_navigation(self):
+         ids=self.seed();context,page=self.login('u1')
+         page.set_viewport_size({'width':1600,'height':1000})
+         self.open_overview(page)
+-        self.assertEqual(page.locator('.ov-project').count(),3)
++        self.assertEqual(page.locator('.ov-project').count(),6)
+         for secret in ['归档项目机密','删除项目机密','删除节点机密']:
+             self.assertNotIn(secret,page.locator('.ov-board').inner_text())
+         self.select(page,'completion','all')
+         risk=page.locator(f'[data-overview-project="{ids["risk"]}"]')
+-        self.assertIn('1/4',risk.inner_text())
+-        self.assertIn('25%',risk.locator('[role="progressbar"]').get_attribute('aria-valuenow')+'%')
++        self.assertIn('1/5',risk.inner_text())
++        self.assertIn('20%',risk.locator('[role="progressbar"]').get_attribute('aria-valuenow')+'%')
+         page.locator(f'[data-overview-expand="{ids["risk"]}"]').click()
+-        self.assertEqual(page.locator(f'#ov-detail-{ids["risk"]} .ov-nodes tbody tr').count(),4)
++        self.assertEqual(page.locator(f'#ov-detail-{ids["risk"]} .ov-nodes tbody tr').count(),5)
+         self.assertIn('主线',page.locator(f'#ov-detail-{ids["risk"]}').inner_text())
+         self.assertIn('并行',page.locator(f'#ov-detail-{ids["risk"]}').inner_text())
+         self.select(page,'track','parallel')
+@@ -57,11 +62,11 @@
+         self.assertEqual(page.locator('.ov-nodes tbody tr').count(),1)
+         page.locator(f'[data-timeline-open="single"][data-project-id="{ids["risk"]}"]').click()
+         page.locator('[data-timeline-page="single"]').wait_for()
+-        self.assertIn('返回项目总览',page.locator('[data-timeline-mode-target="overview"]').inner_text())
++        self.assertIn('返回项目概览',page.locator('[data-timeline-mode-target="overview"]').inner_text())
+         page.locator('[data-timeline-mode-target="overview"]').click()
+         page.locator('.ov-project').first.wait_for()
+         self.assertEqual(page.locator('[data-overview-search]').input_value(),'材料')
+-        self.assertEqual(page.locator('[data-overview-filter="scope"]').input_value(),'mine')
++        self.assertEqual(page.locator('[data-overview-scope="mine"]').get_attribute('aria-pressed'),'true')
+         self.assertTrue(page.locator(f'#ov-detail-{ids["risk"]}').is_visible())
+         self.assert_clean_browser(page);context.close()
+ 
+@@ -103,7 +108,7 @@
+         page.locator('#loginForm button[type=submit]').click()
+         page.locator('[data-timeline-page="home"]').wait_for()
+         self.open_overview(page)
+-        self.assertEqual(page.locator('[data-overview-filter="scope"]').input_value(),'all')
++        self.assertEqual(page.locator('[data-overview-scope="mine"]').get_attribute('aria-pressed'),'false')
+         self.assertEqual(page.locator('.ov-detail').count(),0)
+         self.assert_clean_browser(page);context.close()
+ 
+@@ -122,7 +127,7 @@
+         page.locator('.ov-project').first.wait_for()
+         pending.clear();page.route('**/timeline/overview?*',lambda route:pending.append(route))
+         page.locator('[data-overview-filter="period"]').select_option('all')
+-        page.locator('[data-overview-filter="scope"]').select_option('mine')
++        page.locator('[data-overview-scope="mine"]').click()
+         page.wait_for_timeout(100)
+         self.assertEqual(len(pending),2)
+         newer=pending[1].fetch();pending[1].fulfill(response=newer)
+@@ -134,9 +139,9 @@
+         with page.expect_response(lambda r:'/timeline/overview?' in r.url and r.status==200):
+             page.locator('[data-overview-search]').fill('没有这个项目')
+         page.locator('.ov-message',has_text='没有项目').wait_for()
+-        page.locator('[data-overview-reset]').click()
+-        page.locator('.ov-project').first.wait_for()
+-        self.assertEqual(page.locator('[data-overview-filter="period"]').input_value(),'week')
++        page.locator('.ov-message [data-overview-reset]').click()
++        page.locator('.ov-project').first.wait_for()
++        self.assertEqual(page.locator('[data-overview-filter="period"]').input_value(),'all')
+         self.assertEqual(page.flowboard_page_errors,[])
+         self.assertTrue(all('500' in error for error in page.flowboard_console_errors))
+         context.close()
+@@ -192,7 +197,7 @@
+         page.locator('#logoutBtn').click()
+         page.locator('#loginUser').fill('u1');page.locator('#loginPassword').fill('test-password')
+         page.locator('#loginForm button[type=submit]').click()
+-        page.locator('[data-timeline-page="home"]').wait_for()
++        page.locator('[data-timeline-page="overview"]').wait_for()
+         self.open_overview(page)
+         pending[0].fulfill(status=200,content_type='application/json',body=json.dumps(old_payload))
+         page.wait_for_timeout(100)
+@@ -217,7 +222,7 @@
+         self.assertTrue(scroller.evaluate('el=>el.scrollWidth>el.clientWidth'))
+         scroller.evaluate('el=>el.scrollLeft=el.scrollWidth')
+         self.assertTrue(scroller.evaluate('el=>el.scrollLeft>0'))
+-        self.assertTrue(page.locator('.ov-remark').first.is_visible())
++        self.assertTrue(scroller.evaluate('el=>getComputedStyle(el).scrollbarWidth==="none"'))
+         self.assertTrue(page.locator('.ov-date').first.evaluate('el=>getComputedStyle(el).whiteSpace==="nowrap"'))
+         page.screenshot(path=str(EVIDENCE/'overview-narrow.png'))
+         self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'),762)
+--- before/tests/timeline_ui.test.js
++++ after/tests/timeline_ui.test.js
+@@ -181,7 +181,7 @@
+ ok((tagsHtml.match(/data-tag-project=/g)||[]).length===2&&tagsHtml.includes('data-tag-create-open')&&tagsHtml.includes('data-tag-rename-open="9"')&&tagsHtml.includes('data-tag-delete-open="9"')&&tagsHtml.includes('data-tag-delete="9"')&&tagsHtml.includes('data-tag-undo'),'tag directory exposes modal create, inline rename/delete, drag membership and immediate undo');
+ const archived={...project,project_id:9,name:'归档项目',archived_at:'2026-08-25T09:30:00',read_only:true,can_archive:false,can_unarchive:true};
+ const archivedPage=Timeline.renderWorkspace([archived],{mode:'archived',write:true,currentUser:{id:'u1',name:'林晓'}});
+-ok(archivedPage.includes('<h1>已归档</h1>')&&archivedPage.includes('<strong>归档项目</strong>')&&archivedPage.includes('data-timeline-unarchive="9"')&&archivedPage.includes('data-timeline-delete="9" data-project-version="1"')&&!archivedPage.includes('timeline-portfolio-chart'),'archived list offers unarchive and soft delete to its manager');
++ok(archivedPage.includes('<h1>已归档</h1>')&&archivedPage.includes('data-timeline-open="single" data-project-id="9">归档项目</button>')&&archivedPage.includes('data-timeline-unarchive="9"')&&archivedPage.includes('data-timeline-delete="9" data-project-version="1"')&&!archivedPage.includes('timeline-portfolio-chart'),'archived list offers unarchive and soft delete to its manager');
+ const readonlyArchivedPage=Timeline.renderWorkspace([{...archived,can_unarchive:false}],{mode:'archived',write:true,currentUser:{id:'u2',name:'其他成员'}});
+ ok(!readonlyArchivedPage.includes('data-timeline-delete')&&!readonlyArchivedPage.includes('data-timeline-unarchive'),'archived list hides both actions from another member');
+ const archivedAll=Timeline.renderAll([archived],{archived:true,today:'2026-08-04',editable:()=>true,tagCatalog:{virtual:[{context_type:'archived',name:'已归档项目',project_count:1}],tags:[]},orderContext:{context_type:'archived',tag_id:null}});
+--- before/STATE.md
++++ after/STATE.md
+@@ -2,6 +2,8 @@
+ 
+ > 跨会话当前快照；完整历史：`team-progress/STATE-archive-20260904-pre-production-rebaseline.md`。
+ > 更新：2026-10-08
++
++> 2026-10-08 feature02 最新UX目标：`DEVELOPMENT_READY / HUMAN_ACCEPTANCE_PENDING / NOT_DEPLOYED`。侧栏合为我的工作、项目概览、时间画布、标签、已归档五模块，本周/月收进画布范围；概览首次全部项目/日期/节点，归属与事项快捷切换，高级条件按需展开。常态五列、完整项目进度，创建者/备注进入详情；账户/工作区会话记忆、下钻返回与画布范围保留。最终Chromium19/19、后端7/7、概览Node6/6及原timeline Node PASS；8083实际走查37项目/314节点、标签10项目与21节点详情，证据 `team-progress/verification/20261008-feature02-ux/`。该条替代下方历史默认/菜单描述；当前交互契约03，交付入口 `feature-02-进阶仪表盘/04-UX_DELIVERY.md`。未写正式库、未重启正式服务、未commit/push/部署；整体体验待用户确认。
+ 
+ > feature02 浏览器反馈：访问8083后默认本周＋未完成仅显示18项目/25节点；全量37/314，完整演示筛选30/300。已恢复内置浏览器全部日期＋含已完成＋搜索（演示）。排查并修复旧筛选响应取消延迟搜索的竞态，JS版本20261008-f02-search；总览Chromium8/8、Node4/4 PASS，证据 `team-progress/verification/20261008-feature02/search-race-regression.log` 和 `preview-full-filter-proof.jpg`。未改业务筛选默认值，未提交或部署。
+ 
+@@ -25,7 +27,7 @@
+ 
+ ## 可续接路线
+ 
+-- **feature02 项目总览** — 开发交付就绪，人工验收待确认，未上线；范围契约 `feature-02-进阶仪表盘/01-PROJECT_OVERVIEW_CONTRACT.md`，体验与证据索引 `feature-02-进阶仪表盘/02-DELIVERY.md`。下次可运行该目录 `local-preview.cmd` 启动8083隔离体验；后续提交/部署仍须明确授权。
++- **feature02 项目概览** — 开发交付就绪，整体体验待确认，未上线；基础范围01、当前交互契约 `feature-02-进阶仪表盘/03-UX_OPTIMIZATION_CONTRACT.md`，体验与证据索引 `feature-02-进阶仪表盘/04-UX_DELIVERY.md`，实施记录 `team-progress/20261008-feature02-ux-optimization.md`。下次可运行该目录 `local-preview.cmd` 启动8083隔离体验（test/test），不要按下方历史默认或旧菜单续接；后续提交/部署仍须明确授权。
+ 
+ - **生产运行** — 2026-09-30 按用户明确授权将根 `flowboard.db` 从 v19 升级至 v20，`start-flowboard.cmd --check` 返回 PASS，integrity `ok`、外键违规 0；升级前备份包及恢复实测记录见 `team-progress/20260930-v20-production-migration.json`。本次未启动 8080 服务，可重新运行正式启动器。下一步是按真实反馈做小批次维护；入口：`README.md`。
+ - **feature01** — 原 `WAIT_GATE5_HUMAN` 等四个等待态已被人工验收、正式上线及持续使用事实取代；9 月 3 日旗标升级和 9 月 4 日拖拽升级已在 `origin/main` 的 `6e66f7f`。当前只保留用户选中的体验迭代；`AUD-03` 窄屏导航是待拍板可选项，不阻断现有桌面生产。入口：`feature-01-项目时间管理-仪表盘/STATE.md`。
+--- before/feature-02-进阶仪表盘/01-PROJECT_OVERVIEW_CONTRACT.md
++++ after/feature-02-进阶仪表盘/01-PROJECT_OVERVIEW_CONTRACT.md
+@@ -1,6 +1,8 @@
+ # feature02 · 项目总览范围与技术契约
+ 
+ > 2026-10-08 用户通过根 temp.md 授权设计、实现、整合、验证与开发交付准备。开发就绪不等于人工验收通过或上线。无需恢复旧问卷或 double-workflow。
++
++> 当前交互覆盖：用户另行授权的菜单融合、快捷/高级筛选、默认入口与完整项目进度见 `03-UX_OPTIMIZATION_CONTRACT.md`，交付入口见 `04-UX_DELIVERY.md`。本文原导航/默认筛选/行信息选择保留为第一轮历史。
+ 
+ ## 目标与范围
+ 
+--- before/feature-02-进阶仪表盘/02-DELIVERY.md
++++ after/feature-02-进阶仪表盘/02-DELIVERY.md
+@@ -1,6 +1,8 @@
+ # feature02 · 项目总览开发交付
+ 
+ > 2026-10-08：**开发交付就绪；人工视觉/手感验收待确认；未上线。**
++
++> 最新体验版本：`03-UX_OPTIMIZATION_CONTRACT.md` / `04-UX_DELIVERY.md`。名称统一为项目概览，首次完整显示；五模块菜单、节点快捷情境及按需高级筛选已交付，进度改为完整项目进度。以下第一轮布局与默认筛选说明是历史，不覆盖最新交互契约。
+ 
+ ## 体验入口
+ 
+--- /dev/null
++++ after/tests/test_overview_ux_e2e.py
+@@ -0,0 +1,145 @@
++import unittest
++import test_overview_e2e as overview_harness
++from flowboard.timeline import TimelineService
++from playwright.sync_api import Error as PlaywrightError
++from flowboard.database import connect
++
++
++class OverviewUXE2E(unittest.TestCase):
++    setUpClass=classmethod(overview_harness.OverviewE2E.setUpClass.__func__)
++    tearDownClass=classmethod(overview_harness.OverviewE2E.tearDownClass.__func__)
++    setUp=overview_harness.OverviewE2E.setUp
++    tearDown=overview_harness.OverviewE2E.tearDown
++    login=overview_harness.OverviewE2E.login
++    assert_clean_browser=overview_harness.OverviewE2E.assert_clean_browser
++    seed=overview_harness.OverviewE2E.seed
++    open_overview=overview_harness.OverviewE2E.open_overview
++    select=overview_harness.OverviewE2E.select
++
++    def ready(self,page):page.locator('[data-timeline-page="overview"][aria-busy="false"]').wait_for()
++
++    def focus(self,page,key):
++        with page.expect_response(lambda r:'/timeline/overview?' in r.url and f'focus={key}' in r.url and r.status==200):
++            page.locator(f'[data-overview-focus="{key}"]').click()
++        self.ready(page)
++
++    def test_menu_five_modules_and_focus_progress_never_resets_to_zero(self):
++        ids=self.seed();context,page=self.login('u1');self.open_overview(page)
++        self.assertEqual(page.locator('.main-nav > button:not([hidden]) .nav-label').all_inner_texts(),['我的工作','项目概览','时间画布','标签','已归档'])
++        self.assertFalse(page.locator('#timelineCanvasNav').is_visible())
++        self.assertEqual(page.locator('.ov-tabs').count(),0)
++        self.assertEqual(page.locator('.ov-table').first.locator('thead th').all_inner_texts(),['项目','关注状态','当前阶段','下一未完成节点','项目进度'])
++        self.assertEqual(page.locator('.ov-project').count(),6)
++        risk=page.locator(f'[data-overview-project="{ids["risk"]}"]')
++        self.assertEqual(risk.locator('[role=progressbar]').get_attribute('aria-valuenow'),'20')
++        for key,projects,nodes in [('attention',1,3),('overdue',1,1),('today',1,2),('done',3,3),('all',6,10)]:
++            self.focus(page,key)
++            self.assertIn(f'{projects} 个项目 · {nodes} 个节点',page.locator('.ov-result').inner_text())
++            self.assertEqual(risk.locator('[role=progressbar]').get_attribute('aria-valuenow'),'20')
++        self.assert_clean_browser(page);context.close()
++
++    def test_early_overview_navigation_receives_late_tag_catalog(self):
++        ids=self.seed();service=TimelineService(self.db_path);user={'id':'u1'}
++        tag=service.create_tag(user,1,{'name':'竞速类'})
++        service.set_tag_project(user,1,tag['tag_id'],ids['risk'],{'base_tag_version':tag['version']},included=True)
++        pending=[];context=self.browser.new_context();page=context.new_page()
++        page.route('**/timeline/tags',lambda route:pending.append(route))
++        page.goto(self.base);page.locator('#loginUser').fill('u1');page.locator('#loginPassword').fill('test-password');page.locator('#loginForm button[type=submit]').click()
++        page.locator('#loadState',has_text='刚刚同步').wait_for();self.open_overview(page)
++        page.locator('[data-overview-advanced][aria-controls]').click()
++        self.assertEqual(len(pending),1)
++        pending[0].fulfill(response=pending[0].fetch())
++        page.locator('[data-overview-filter=tag_id] option',has_text='竞速类').wait_for(state='attached')
++        self.select(page,'tag_id',str(tag['tag_id']))
++        self.assertEqual(page.locator('.ov-project').count(),1)
++        self.assertEqual(page.locator('.ov-project').get_attribute('data-overview-project'),str(ids['risk']))
++        context.close()
++
++    def test_browser_reload_cancel_keeps_unsaved_editor_draft(self):
++        ids=self.seed();context,page=self.login('u1');self.open_overview(page)
++        page.locator(f'[data-overview-expand="{ids["risk"]}"]').click()
++        page.locator(f'#ov-detail-{ids["risk"]} [data-timeline-open=editor]').click()
++        page.locator('[data-timeline-page=editor]').wait_for()
++        field=page.locator(f'[data-editor-field=remark][data-node-id="{ids["today_node"]}"]')
++        original=field.input_value();field.fill('取消刷新后保留的草稿');field.press('Tab')
++        dialogs=[]
++        def cancel(dialog):dialogs.append(dialog.type);dialog.dismiss()
++        page.once('dialog',cancel)
++        try:page.reload(timeout=1500)
++        except PlaywrightError:
++            # Chromium may keep waiting for load after a dismissed beforeunload.
++            # Cancellation is proven by the dialog, unchanged editor and database below.
++            self.assertEqual(dialogs,['beforeunload'])
++        self.assertEqual(dialogs,['beforeunload'])
++        self.assertTrue(page.locator('[data-timeline-page=editor]').is_visible())
++        self.assertEqual(field.input_value(),'取消刷新后保留的草稿')
++        conn=connect(self.db_path)
++        self.assertEqual(conn.execute('SELECT remark FROM timeline_nodes WHERE id=?',(ids['today_node'],)).fetchone()[0],original)
++        conn.close();context.close()
++
++    def test_account_preferences_refresh_and_clear_without_persisting_search(self):
++        self.seed();context,page=self.login('u1');self.open_overview(page)
++        self.select(page,'scope','mine');self.focus(page,'overdue');self.select(page,'stage','创意');self.select(page,'track','main')
++        with page.expect_response(lambda r:'/timeline/overview?' in r.url and 'q=' in r.url and r.status==200):
++            page.locator('[data-overview-search]').fill('鞋面材料')
++        self.ready(page);page.reload();self.ready(page)
++        self.assertEqual(page.locator('[data-overview-search]').input_value(),'')
++        self.assertEqual(page.locator('[data-overview-scope=mine]').get_attribute('aria-pressed'),'true')
++        self.assertEqual(page.locator('[data-overview-focus=overdue]').get_attribute('aria-pressed'),'true')
++        self.assertIn('创意',page.locator('.ov-result').inner_text());self.assertIn('主线',page.locator('.ov-result').inner_text())
++        self.assertTrue(page.locator('#timelineOverviewBtn').evaluate('el=>el.classList.contains("active")'))
++        page.locator('[data-overview-reset]').first.click();self.ready(page)
++        self.assertEqual(page.locator('.ov-project').count(),6)
++        # Save a restrictive state again, then verify another account starts clean.
++        self.select(page,'scope','mine');self.focus(page,'overdue')
++        page.locator('#logoutBtn').click();page.locator('#loginUser').fill('u2');page.locator('#loginPassword').fill('test-password');page.locator('#loginForm button[type=submit]').click()
++        page.locator('[data-timeline-page="home"]').wait_for();self.open_overview(page)
++        self.assertEqual(page.locator('[data-overview-scope=all]').get_attribute('aria-pressed'),'true')
++        self.assertEqual(page.locator('[data-overview-focus=all]').get_attribute('aria-pressed'),'true')
++        self.assertEqual(page.locator('.ov-project').count(),6)
++        self.assert_clean_browser(page);context.close()
++
++    def test_canvas_ranges_workbench_team_tab_and_archive_return(self):
++        ids=self.seed();context,page=self.login('u1')
++        self.assertEqual(page.locator('.tl-home-actions [data-timeline-mode-target=overview]').count(),0)
++        page.locator('#timelineAllBtn').click();page.locator('#timelineCanvasNav').wait_for()
++        for key,mode in [('timelineWeekBtn','week'),('timelineMonthBtn','month')]:
++            page.locator('#'+key).click();page.locator(f'[data-timeline-page="{mode}"]').wait_for()
++            self.assertEqual(page.locator('#'+key).get_attribute('aria-pressed'),'true')
++            self.assertTrue(page.locator('#timelineAllBtn').evaluate('el=>el.classList.contains("active")'))
++        page.locator('#timelineBtn').click();page.locator('[data-timeline-page=home]').wait_for()
++        page.locator('#timelineAllBtn').click();page.locator('[data-timeline-page=month]').wait_for()
++        page.locator('#timelineCanvasAllBtn').click();page.locator('[data-timeline-page=all]').wait_for()
++        page.reload();page.locator('[data-timeline-page="all"]').wait_for()
++        page.locator('#timelineBtn').click();page.locator('[data-timeline-tab=team]').click()
++        page.locator(f'[data-timeline-member-open="{ids["team"]}"]').click();page.locator('[data-timeline-page=single]').wait_for()
++        page.locator('[data-timeline-mode-target=home]').click();page.locator('[data-timeline-section=team]').wait_for()
++        self.assertEqual(page.locator('[data-timeline-tab=team]').get_attribute('class'),'on')
++        page.locator('#archivedBtn').click();page.locator('[data-timeline-page=archived]').wait_for()
++        page.locator(f'[data-timeline-open=single][data-project-id="{ids["archived"]}"]').click();page.locator('[data-timeline-page=single]').wait_for()
++        self.assertIn('返回已归档',page.locator('[data-timeline-mode-target=archived]').inner_text())
++        page.locator('[data-timeline-mode-target=archived]').click();page.locator('[data-timeline-page=archived]').wait_for()
++        self.assert_clean_browser(page);context.close()
++
++    def test_advanced_search_object_and_keyboard_horizontal_access(self):
++        ids=self.seed(long_list=True);context,page=self.login('u1');page.set_viewport_size({'width':760,'height':850});self.open_overview(page)
++        self.select(page,'search_in','project')
++        with page.expect_response(lambda r:'/timeline/overview?' in r.url and r.status==200):
++            page.locator('[data-overview-search]').fill('鞋面材料')
++        self.ready(page);self.assertEqual(page.locator('.ov-project').count(),0)
++        self.select(page,'search_in','node');self.assertEqual(page.locator('.ov-project').count(),1)
++        self.assertEqual(page.locator('[data-overview-filter=search_in]').evaluate('el=>document.activeElement===el'),True)
++        page.locator('[data-overview-reset]').first.click();self.ready(page)
++        scroller=page.locator('.ov-table-scroll').first;scroller.focus();scroller.press('ArrowRight')
++        self.assertGreater(scroller.evaluate('el=>el.scrollLeft'),0)
++        self.assertEqual(scroller.evaluate('el=>getComputedStyle(el).scrollbarWidth'),'none')
++        page.locator('#sidebarToggle').click()
++        self.assertTrue(page.locator('#appSidebar').evaluate('el=>el.classList.contains("is-collapsed")'))
++        self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'),762)
++        page.locator(f'[data-overview-expand="{ids["long"]}"]').click()
++        self.assertIn('复杂工艺说明与材料沟通记录',page.locator(f'#ov-detail-{ids["long"]}').inner_text())
++        self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'),762)
++        self.assert_clean_browser(page);context.close()
++
++
++if __name__=='__main__':unittest.main()
+--- /dev/null
++++ after/feature-02-进阶仪表盘/03-UX_OPTIMIZATION_CONTRACT.md
+@@ -0,0 +1,41 @@
++# feature02 · 菜单融合与筛选体验增量契约
++
++> 2026-10-08 用户通过根 temp.md 明确授权本轮交互优化。当前视觉基本认可；本契约覆盖01中导航、默认筛选、筛选布局及信息展示选择，业务与权限不变。冻结/归档 feature01 历史不改写。
++
++> 收口：`DEVELOPMENT_READY / HUMAN_ACCEPTANCE_PENDING / NOT_DEPLOYED`。本契约实现与必要开发验证已完成，最终浏览器19/19、后端7/7、概览Node6/6及原timeline Node PASS；实际8083走查与证据见 `04-UX_DELIVERY.md`。整体体验人工确认和正式上线独立保留。
++
++## 菜单与视图
++
++侧栏保留五个模块入口：「我的工作」（原个人/团队工作台、创建/导入/排序/动态）、「项目概览」（原总览）、「时间画布」（原全项目仪表盘）、「标签」、「已归档」。概览由我的工作子项调整为独立项目模块，术语统一为项目概览。概览页不再重复我的工作/全项目仪表盘页签；工作台去掉重复的概览快捷入口，所有模块由固定侧栏直达。
++
++本周/月是时间画布范围，不再作为独立侧栏模块。进入时间画布后显示全部日期/本周/本月三项范围切换，原共享标尺、标签、个人顺序、旗标、拖拽、全屏等能力保留。项目下钻返回保留来源（概览、画布范围、工作台或已归档）；单项目与编辑器间切换不重置来源，草稿离页仍确认。
++
++首次登录保留我的工作工作台。当前账户/工作区的模块与概览非搜索筛选在浏览器会话中记忆，刷新恢复；搜索不作为跨刷新/登录的默认过滤，账户间隔离。工作台当前我的/团队页签在页内下钻返回时保留，登录更换账户恢复该账户入口。无节点项目和已完成项目在首次概览可见。
++
++## 快捷与高级筛选
++
++首次项目概览默认全部项目、全部日期、包含已完成，展示完整项目。顶部只保留我的/全部项目切换、搜索、日期范围、筛选入口和刷新。常用事项捷径为全部、需关注、逾期、今日、已完成，分别限定命中节点；“需关注”=逾期或今日未完成，“已完成”=已完成节点，项目不重复计数。日期仍为上海自然日，近期范围保留更早逾期规则。
++
++阶段、轨道、节点状态、共享标签及搜索对象放入高级筛选。搜索对象区分项目（含创建者）、事项（节点名称/备注）及综合搜索；不新增待办、项目类型或负责人模型。标签复用活跃共享关系，未知/停用/跨工作区标签拒绝，未分类为无活跃标签项目。当前情境、时间范围和额外条件可见，并可一键清除/恢复全部；空结果提供清晰恢复入口。
++
++快捷情境切换设定相容的节点状态；手工改节点状态时退出旧事项捷径，避免“已完成+未完成”等冲突。全部/我的切换保留其他当前条件。高级面板位置与键盘焦点稳定；组合筛选、新旧响应、延迟搜索和账户切换不得产生输入与结果不一致。
++
++## 信息层级
++
++概览常态表格五列：项目、关注状态、当前阶段、下一未完成节点、项目进度。项目进度按全项目有效节点计算，由服务端返回，不能因为“未完成”筛选显示为零进度；命中数量与展开明细基于筛选集，项目行和展开处分别清楚表达总节点与显示节点。
++
++创建者、完整名称、同日下一节点和备注进入直接展开区；名称点击进入单项目，箭头展开详情。无备注使用简洁空值，不重复堆“暂无备注”。常态删除长篇底部规则说明与重复计数，仅在按需“说明”中解释有助判断的口径。状态与六阶段色、浅紫白底、紫/粉组头及紧凑行高保留。
++
++缩减横向密度，使桌面关键列易读；隐藏两组可见横向滚动条，支持触控/横向滚动及明确键盘横向访问。窄屏日期不截断，长名称、备注和21节点明细可展开全文。加载时不清空已有结果导致闪烁，错误重试仍明确，初次加载正常反馈。
++
++## 数据与工程
++
++不迁移schema。overview只读投影新增严格枚举情境、搜索对象、标签过滤和完整项目进度；复用现有鉴权、状态/阶段/日期、归档和软删除过滤。所有派生保持服务端统一，不保存第二份业务数据。新增筛选不能扩大读取工作区或授予写权限。
++
++基线：`team-progress/verification/20261008-feature02-ux/baseline/`。演示固定8083隔离库，30样本300节点；保留当前用户与其他任务成果。后端变更后只重启本轮隔离服务，不触碰正式服务/库；不commit/push/部署或改变机器配置。
++
++## 验收
++
++真实浏览器走完登录、菜单5模块、画布3范围、我的/全部、5情境、搜索对象与高级组合/清除、11–21节点展开、单项目/编辑保存撤销、草稿取消、返回、刷新/重登/换账户、加载错误/旧响应/搜索竞态、长列表/窄屏/键盘。保留服务端权限/跨空间/标签失效/归档删除负例与统计断言。
++
++以前后入口数量、常态筛选数量及常用任务真实操作步骤说明取舍；检查原工作台排序、标签、归档和原时间画布能力仍可达。保存代表性截图、交互证据和相称回归，更新02交付索引及根STATE，交付8083整体体验入口。状态为开发交付就绪时仍分别保留人工整体体验确认和未上线事实。
+--- /dev/null
++++ after/feature-02-进阶仪表盘/04-UX_DELIVERY.md
+@@ -0,0 +1,57 @@
++# feature02 · 菜单融合与快速筛选体验交付
++
++> 2026-10-08：开发交付就绪，整体体验待用户确认，未上线。当前交互以 `03-UX_OPTIMIZATION_CONTRACT.md` 为准。
++
++## 直接体验
++
++[8083 隔离体验页](http://127.0.0.1:8083/)，管理员 `test / test`，普通成员 `u2 / localtest`。侧栏进入「项目概览」即可查看完整项目。首次概览为全部项目、全部日期、全部节点，当前37项目/314节点；其中30个真实结构演示样本为300节点。统计是动态快照。
++
++简短体验路线：
++
++1. 在项目概览点「需关注 / 逾期 / 今日 / 已完成」，再切「我的项目」。项目进度保持按完整项目计算，展开显示当前命中节点。
++2. 点「筛选」选择项目标签（跑步与训练、球类运动、休闲与户外，每类10个演示项目），可组合节点阶段、轨道、状态和搜索对象。切换后条件摘要保留，一键清除回到完整项目。
++3. 搜索「晨曦休闲鞋 · 概念款」，展开查看21个节点、主线/并行、完整名称和备注；进入单项目或时间表，返回保留当前上下文。保存/撤销与草稿离页确认沿用原有路径。
++4. 进入「时间画布」切本周/本月，离开再回来保留范围；回工作台仍可查看我的/团队项目及排序、导入导出和动态。标签管理与已归档仍独立可达，归档项目名称可直接进入只读单项目页并返回。
++
++不必逐项人工找bug；本轮已自动走查主要旅程，用户最后确认整体菜单、切换和信息密度是否顺手即可。重新启动用本目录 `local-preview.cmd`，固定使用 `local-test-data/feature02-preview/flowboard.db`；正式库与8080未用于本轮验证。
++
++## 用户现在能更顺畅完成什么
++
++| 场景 | 之前 | 现在 |
++| --- | --- | --- |
++| 找到入口 | 7个侧栏业务/范围入口混排，概览再重复3个页签 | 5个模块；本周/月收进时间画布范围，概览重复导航移除 |
++| 看完整项目 | 默认本周＋未完成，需要改日期与状态；21节点全完成项目被隐藏 | 首次概览直接完整显示，无额外筛选操作 |
++| 切我的/全部项目 | 下拉选择，通常打开再选两步 | 两个归属按钮，一次点击 |
++| 看逾期或完成事项 | 没有独立逾期/完成事项快捷条件；含已完成还混入未完成 | 节点快捷情境一次点击，命中口径与明细一致 |
++| 按类型与低频条件筛选 | 常态5个下拉同时摊开，缺少类型/搜索对象区分 | 常态仅日期下拉；标签、阶段、轨道、节点状态、搜索对象按需展开 |
++| 阅读主要信息 | 7列，头像/备注及长规则说明常驻 | 5列；创建者与备注进入展开，规则说明按需查看 |
++| 判断进度 | 未完成筛选时进度常为0，容易误以为项目没进展 | 服务端完整项目进度稳定；展开另标显示节点数 / 总节点数 |
++| 刷新与返回 | 刷新恢复默认，工作台团队页签及部分来源容易丢失 | 账户/工作区隔离的会话记忆；搜索不固化，画布范围和返回来源保留 |
++
++取舍：低频高级条件多一步展开；从其他模块进入本周/月画布首次需“时间画布→范围”两步，之后保留所选范围。这样日期范围不再被误认成独立业务模块。原画布能力与权限不删减，不把表格的节点筛选等同于画布日期范围。
++
++## 数据口径与授权边界
++
++“我的项目”仍是创建关系。项目阶段、节点阶段不同；快捷筛选作用于节点，类型优先复用已有共享标签。完整项目进度由服务端计算，原筛选进度字段为兼容保留但不作为概览行进度。下一未完成仍取全项目最早未完成日期，同日节点在展开处完整可查。
++
++无schema迁移、无新任务实体、无框架/外部服务。新增筛选参数严格校验，继续在查询前鉴权，排除归档/软删项目及软删节点；未知/停用/跨工作区标签拒绝，不泄露名称。未分类只认当前工作区活跃标签关系。查看不授予编辑权限，原版本、审计和草稿链保留。
++
++演示库增加3个共享分类标签，每类10项目；新增前SQLite backup完整性ok，节点表全量哈希前后相同，详见 `demo-tags.json`。只重启经进程路径核验的8083隔离服务加载新只读投影。未写/迁移正式库、未重启正式服务、未commit/push/部署、未改变机器配置。
++
++## 验证与证据
++
++证据目录：`../team-progress/verification/20261008-feature02-ux/`。
++
++- 后端/HTTP 7/7 PASS：快捷情境、搜索对象、完整进度、共享标签、未分类、停用及跨工作区拒绝、权限负例、日期边界、归档/删除过滤、读零写入与固定查询检查；`backend.log`。
++- 最终浏览器19/19 PASS：原总览8项、新体验6项（包括标签目录延迟、原生刷新取消）、原画布5项；`final-browser.log`。新体验覆盖五模块、三个画布范围、归属/情境/高级组合、清除、刷新/换账户、搜索不固化、归档只读返回、键盘及侧栏收起，保留原保存、撤销、草稿、旧响应和登录竞态断言。
++- 新概览Node 6/6及原timeline UI Node PASS：`node.log`、`timeline-node.log`。语法与差异检查见 `static-checks.log`。
++- 实际8083/真实结构数据走查：`overview-initial.jpg`、`category-filter.jpg`、`dense-detail.jpg`、`canvas-scopes.jpg`、`overview-ready.jpg`，交互与尺寸摘要 `live-walkthrough.json`。球类筛选实测10项目/109节点，切已完成事项10项目/79节点，完整项目进度仍为9/12、7/12等；21节点全部展开已核对。截图不能代替操作证据，操作与测试一起判断。
++- 当前基线 `baseline/`，本轮源文件差异 `ux-source.diff` 与哈希 `artifact-manifest.json`。保护任务前已有改动，原冻结/归档资料未改写。
++
++发现并解决的实际问题：概览返回来源、工作台团队页签连续性、画布范围离开后丢失、归档项目缺少直接只读入口、延迟标签目录未更新。原生刷新取消用原有beforeunload机制，不改其实现；Chromium取消后可能等待load超时，验收以原生对话框、编辑草稿仍在及数据库未写三项证据判断。旧测试仅按新入口/默认/进度及原生交互语义调整，权限与数据断言不弱化。
++
++## 收口状态
++
++开发目标与必要验证已满足；当前无已知阻断开发交付的问题。新的菜单与整体体验需要用户最后确认，正式环境尚未验收或上线。原本月旗标偶发生产反馈不因本轮临时库回归PASS而自动关闭。
++
++本轮不再扩展功能或继续无依据的视觉打磨；后续依据整体体验反馈做有界调整。提交/上线仍须用户明确授权。
+--- /dev/null
++++ after/team-progress/20261008-feature02-ux-optimization.md
+@@ -0,0 +1,21 @@
++# feature02 菜单与筛选体验优化实施记录
++
++2026-10-08。用户根temp目标已按读取→立即清空→验空处理，并作为新goal执行。当前开发交付就绪，整体体验待用户确认，未上线。权威交互范围：`../feature-02-进阶仪表盘/03-UX_OPTIMIZATION_CONTRACT.md`；体验与证据索引：`../feature-02-进阶仪表盘/04-UX_DELIVERY.md`。
++
++侧栏统一五模块，画布管理全部/本周/本月范围；概览默认完整项目，归属按钮、节点快捷筛选与按需高级条件，复用共享标签分类。常态表格七列减为五列；完整项目进度由服务端返回，筛选明细单独标识。账户/工作区会话记忆、工作台团队页签返回、画布范围连续性、归档只读下钻和延迟标签目录已验证。既有编辑、草稿、保存撤销、权限与画布能力保留，无schema变更。
++
++## 验证
++
++- 后端/HTTP 7/7 PASS：新筛选、全项目统计、标签隔离及原权限/读零写入负例。
++- 最终真实Chromium 19/19 PASS：原概览8项、UX6项、原画布5项。测试入口随新导航和默认口径调整，原权限、数据、旗标、排序及提交/撤销断言保留。
++- 概览Node 6/6及原timeline Node PASS；语法与差异检查PASS，见证据目录日志。
++- 8083固定隔离库实际走查：37项目/314节点；球类标签10项目/109节点，完成事项79节点；21节点全完成双轨项目可展开，清除后恢复完整列表。代表截图及读取DOM证据已保存。
++- 原生刷新取消沿用既有beforeunload；Chromium取消后可能load等待超时，按已出现原生确认、草稿仍在、数据库未写验证。
++
++证据目录：`verification/20261008-feature02-ux/`。`baseline/`保留任务前源码，`ux-source.diff`仅对比本轮基线，`artifact-manifest.json`绑定源码、测试、文档及证据。日志、截图、`live-walkthrough.json`共同构成验收证据，截图不替代交互。
++
++## 数据与续接
++
++本轮只在8083隔离库增加三类共享演示标签，每类十项目；执行前SQLite backup、完整性ok，节点全量哈希前后相同，见`demo-tags.json`。真实规模样本沿用此前只读核对结构后的30项目300节点，没有访问真实业务库进行写入或迁移。仅核验并重启本轮8083进程加载新API；未重启正式服务、未commit/push/部署、未改变机器配置。任务前已有未提交成果保留，冻结/归档资料未在本轮改写。
++
++下一步用户在8083确认整体操作是否顺手；无需重新逐bug查找。正式提交或上线需要后续明确指令。旧本月旗标偶发生产反馈仍保留原有待确认状态，不能依据本轮临时库回归自动关闭。
+
+# README.md and tests/test_timeline_e2e.py lack a UX-round source baseline;
+# their current hashes are bound below. Existing Git diff includes pre-UX changes.

@@ -1,0 +1,23 @@
+{
+  "observed": "month child => parent => all dates",
+  "result": {
+    "assets": [
+      "http://127.0.0.1:8083/timeline-ui.js?v=20261008-f02-timeline-menu",
+      "http://127.0.0.1:8083/app.js?v=20261008-f02-timeline-menu"
+    ],
+    "children": [
+      {
+        "label": "⊢本周",
+        "pressed": "false"
+      },
+      {
+        "label": "⌞本月",
+        "pressed": "false"
+      }
+    ],
+    "page": "all",
+    "parentCurrent": "page",
+    "parentLabel": "项目时间轴",
+    "rangeRow": false
+  }
+}

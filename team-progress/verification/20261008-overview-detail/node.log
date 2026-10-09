@@ -1,0 +1,16 @@
+✔ overview preserves project stage and exposes every same-day next node (3.3379ms)
+✔ project names node remarks and creator attributes cannot inject HTML (0.6764ms)
+✔ missing nodes and completed projects have accurate no-next copy (0.2603ms)
+✔ error and empty-result rendering provide an actionable recovery control (0.3907ms)
+✔ first overview is complete and stored preferences exclude transient search (0.5557ms)
+✔ quick focus chooses compatible completion and advanced controls stay collapsed (0.3171ms)
+✔ detail uses server upcoming IDs without duplicate headers or next list (1.55ms)
+✔ opening a different project collapses the previous project and toggling closes it (1.417ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 47.2652

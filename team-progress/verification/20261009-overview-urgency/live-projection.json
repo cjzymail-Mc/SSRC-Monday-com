@@ -1,0 +1,225 @@
+{
+  "database": "D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\flowboard.db",
+  "access": "mode=ro",
+  "server_today": "2026-10-09",
+  "counts": {
+    "projects": 25,
+    "nodes": 230,
+    "done": 162,
+    "overdue": 10
+  },
+  "groups": {
+    "attention": 9,
+    "recent": 16
+  },
+  "unique_projects": 25,
+  "sort_check": "PASS",
+  "note_correspondence": "PASS",
+  "business_tables_unchanged": true,
+  "table_hashes": {
+    "timeline_projects": "d7c81717e824495454db250e75fbfd4961cdcc109a119f97a1fd86d6067ad657",
+    "timeline_nodes": "4600211267598d584943bb20e40343833a16db948f56ba2e8d472ff16e3b15c5"
+  },
+  "ordered_rows": [
+    {
+      "project_id": 25,
+      "group": "attention",
+      "urgency_rank": 0,
+      "next_date": "2026-03-18",
+      "next_node_id": 243,
+      "note_present": false
+    },
+    {
+      "project_id": 19,
+      "group": "attention",
+      "urgency_rank": 0,
+      "next_date": "2026-09-23",
+      "next_node_id": 173,
+      "note_present": false
+    },
+    {
+      "project_id": 8,
+      "group": "attention",
+      "urgency_rank": 0,
+      "next_date": "2026-09-26",
+      "next_node_id": 102,
+      "note_present": true
+    },
+    {
+      "project_id": 13,
+      "group": "attention",
+      "urgency_rank": 0,
+      "next_date": "2026-09-28",
+      "next_node_id": 122,
+      "note_present": true
+    },
+    {
+      "project_id": 11,
+      "group": "attention",
+      "urgency_rank": 0,
+      "next_date": "2026-09-29",
+      "next_node_id": 111,
+      "note_present": false
+    },
+    {
+      "project_id": 23,
+      "group": "attention",
+      "urgency_rank": 0,
+      "next_date": "2026-09-29",
+      "next_node_id": 217,
+      "note_present": false
+    },
+    {
+      "project_id": 22,
+      "group": "attention",
+      "urgency_rank": 0,
+      "next_date": "2026-10-08",
+      "next_node_id": 206,
+      "note_present": false
+    },
+    {
+      "project_id": 24,
+      "group": "attention",
+      "urgency_rank": 0,
+      "next_date": "2026-10-08",
+      "next_node_id": 228,
+      "note_present": false
+    },
+    {
+      "project_id": 14,
+      "group": "attention",
+      "urgency_rank": 1,
+      "next_date": "2026-10-09",
+      "next_node_id": 127,
+      "note_present": true
+    },
+    {
+      "project_id": 32,
+      "group": "recent",
+      "urgency_rank": 2,
+      "next_date": "2026-10-10",
+      "next_node_id": 313,
+      "note_present": true
+    },
+    {
+      "project_id": 20,
+      "group": "recent",
+      "urgency_rank": 2,
+      "next_date": "2026-10-11",
+      "next_node_id": 187,
+      "note_present": false
+    },
+    {
+      "project_id": 31,
+      "group": "recent",
+      "urgency_rank": 2,
+      "next_date": "2026-10-15",
+      "next_node_id": 302,
+      "note_present": true
+    },
+    {
+      "project_id": 33,
+      "group": "recent",
+      "urgency_rank": 2,
+      "next_date": "2026-10-15",
+      "next_node_id": 325,
+      "note_present": true
+    },
+    {
+      "project_id": 15,
+      "group": "recent",
+      "urgency_rank": 2,
+      "next_date": "2026-10-20",
+      "next_node_id": 132,
+      "note_present": true
+    },
+    {
+      "project_id": 12,
+      "group": "recent",
+      "urgency_rank": 2,
+      "next_date": "2026-10-22",
+      "next_node_id": 114,
+      "note_present": true
+    },
+    {
+      "project_id": 34,
+      "group": "recent",
+      "urgency_rank": 2,
+      "next_date": "2026-10-28",
+      "next_node_id": 332,
+      "note_present": true
+    },
+    {
+      "project_id": 35,
+      "group": "recent",
+      "urgency_rank": 2,
+      "next_date": "2026-10-28",
+      "next_node_id": 343,
+      "note_present": true
+    },
+    {
+      "project_id": 16,
+      "group": "recent",
+      "urgency_rank": 2,
+      "next_date": "2026-10-30",
+      "next_node_id": 138,
+      "note_present": true
+    },
+    {
+      "project_id": 21,
+      "group": "recent",
+      "urgency_rank": 2,
+      "next_date": "2027-02-05",
+      "next_node_id": 198,
+      "note_present": false
+    },
+    {
+      "project_id": 3,
+      "group": "recent",
+      "urgency_rank": 3,
+      "next_date": "9999",
+      "next_node_id": null,
+      "note_present": false
+    },
+    {
+      "project_id": 5,
+      "group": "recent",
+      "urgency_rank": 3,
+      "next_date": "9999",
+      "next_node_id": null,
+      "note_present": false
+    },
+    {
+      "project_id": 17,
+      "group": "recent",
+      "urgency_rank": 3,
+      "next_date": "9999",
+      "next_node_id": null,
+      "note_present": false
+    },
+    {
+      "project_id": 18,
+      "group": "recent",
+      "urgency_rank": 3,
+      "next_date": "9999",
+      "next_node_id": null,
+      "note_present": false
+    },
+    {
+      "project_id": 9,
+      "group": "recent",
+      "urgency_rank": 4,
+      "next_date": "9999",
+      "next_node_id": null,
+      "note_present": false
+    },
+    {
+      "project_id": 10,
+      "group": "recent",
+      "urgency_rank": 4,
+      "next_date": "9999",
+      "next_node_id": null,
+      "note_present": false
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-08",
+  "first": {
+    "detailCount": 1,
+    "detailId": "ov-detail-29",
+    "duplicates": 0,
+    "highlighted": [
+      {
+        "color": "rgb(224, 50, 88)",
+        "outline": "dashed",
+        "text": "最终验证 / 功能定版主线测试2026-10-17未开始—"
+      }
+    ]
+  },
+  "second": {
+    "detailCount": 1,
+    "detailId": "ov-detail-39",
+    "firstExpanded": "false"
+  },
+  "scenario": "open sample 29 => open sample 39 automatically closes 29 => search and reopen 29",
+  "screenshot": "detail-ready.jpg"
+}

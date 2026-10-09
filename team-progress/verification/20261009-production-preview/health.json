@@ -1,0 +1,10 @@
+{
+  "health": {
+    "status": "ok",
+    "schema_version": 20
+  },
+  "mode": "LIVE_PRODUCTION_DATABASE",
+  "pid_at_start": 17444,
+  "migration": "disabled",
+  "seed": "disabled"
+}

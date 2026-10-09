@@ -1,0 +1,30 @@
+test_batch_sql_zero_writes_and_archive_deleted_workspace_isolation (test_overview.OverviewTests.test_batch_sql_zero_writes_and_archive_deleted_workspace_isolation) ... ok
+test_filtered_counts_next_ties_and_current_stage_are_distinct (test_overview.OverviewTests.test_filtered_counts_next_ties_and_current_stage_are_distinct) ... ok
+test_http_acl_my_scope_validation_and_static_allowlist (test_overview.OverviewTests.test_http_acl_my_scope_validation_and_static_allowlist) ... ok
+test_search_stage_track_completion_and_empty_project_semantics (test_overview.OverviewTests.test_search_stage_track_completion_and_empty_project_semantics) ... ok
+test_temporal_month_week_and_next30_boundaries (test_overview.OverviewTests.test_temporal_month_week_and_next30_boundaries) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 7.671s
+
+OK
+[08/Oct/2026 11:56:59] "GET /api/workspaces/1/timeline/overview HTTP/1.1" 401 -
+[08/Oct/2026 11:57:00] "POST /api/auth/login HTTP/1.1" 200 -
+[08/Oct/2026 11:57:00] "POST /api/auth/login HTTP/1.1" 200 -
+[08/Oct/2026 11:57:00] "POST /api/auth/login HTTP/1.1" 200 -
+[08/Oct/2026 11:57:00] "GET /api/workspaces/1/timeline/overview HTTP/1.1" 403 -
+[08/Oct/2026 11:57:00] "GET /api/workspaces/999/timeline/overview HTTP/1.1" 403 -
+[08/Oct/2026 11:57:00] "GET /api/workspaces/1/timeline/overview?scope=mine&period=all HTTP/1.1" 200 -
+[08/Oct/2026 11:57:00] "GET /api/workspaces/1/timeline/overview?period=all HTTP/1.1" 200 -
+[08/Oct/2026 11:57:00] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 403 -
+[08/Oct/2026 11:57:00] "GET /api/workspaces/1/timeline/overview?period=invalid HTTP/1.1" 422 -
+[08/Oct/2026 11:57:01] "GET /api/workspaces/1/timeline/overview?period= HTTP/1.1" 422 -
+[08/Oct/2026 11:57:01] "GET /api/workspaces/1/timeline/overview?track=bad HTTP/1.1" 422 -
+[08/Oct/2026 11:57:01] "GET /api/workspaces/1/timeline/overview?scope=admin HTTP/1.1" 422 -
+[08/Oct/2026 11:57:01] "GET /api/workspaces/1/timeline/overview?period=all&period=week HTTP/1.1" 422 -
+[08/Oct/2026 11:57:01] "GET /api/workspaces/1/timeline/overview?unknown=1 HTTP/1.1" 422 -
+[08/Oct/2026 11:57:01] "GET /api/workspaces/1/timeline/overview?unknown= HTTP/1.1" 422 -
+[08/Oct/2026 11:57:01] "GET /api/workspaces/1/timeline/overview?q=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa HTTP/1.1" 422 -
+[08/Oct/2026 11:57:01] "GET /overview.css HTTP/1.1" 200 -
+[08/Oct/2026 11:57:01] "GET /overview-ui.js HTTP/1.1" 200 -
+[08/Oct/2026 11:57:01] "GET /flowboard/overview.py HTTP/1.1" 404 -

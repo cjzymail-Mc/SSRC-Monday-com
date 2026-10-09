@@ -1,0 +1,140 @@
+ok - bounds use both tracks
+ok - single project renders both tracks without the redundant axis heading
+ok - ordinary single-project entry renders the animated My Work back button
+ok - all-dashboard entry renders an animated Return button targeting the portfolio
+ok - editable single dashboard renders a hover pencil and an inline rename form
+ok - read-only single dashboard does not expose project rename or undo controls
+ok - single dashboard omits the draft action bar before any local change
+ok - editable single dashboard keeps an explicit disabled right-click menu before a current-session submission
+ok - single dashboard renders draft-only discard and update in its dedicated floating dock
+ok - shared dashboard canvas renders semantic stage intervals
+ok - stage class maps semantic token
+ok - all frozen stages map to stable semantic classes
+ok - single dashboard keeps a blank calendar spacer with the today label
+ok - single dashboard removes every user-marked redundant label and the default footer instruction
+ok - collapsed overlap uses server row_index and offers expansion
+ok - stage interval carries matching data, class and redundant label
+ok - expanded overlap splits deterministic server rows
+ok - risk markers are red-left orange-right with text
+ok - single dashboard exposes drag, status, remark, recoverable delete, project undo and the dedicated insert action
+ok - dashboard drag menu uses the approved exact wording
+ok - a zero-length final stage interval renders no trailing tail
+ok - shared dashboard renders the hover date guide and dedicated quick-insert editor
+ok - dashboard nodes expose an explicit physical hit target and redundant label
+ok - dashboard nodes avoid a duplicate native title tooltip
+ok - dashboard nodes keep escaped content in a hidden source for the body-level tooltip portal
+ok - all dashboard keeps internal project shaping on one shared chart
+ok - all-dashboard project-column menu always renders view and an explicit disabled undo state
+ok - all-dashboard project metadata renders delayed detail plus one immediate red-dot risk disclosure
+ok - all dashboard removes repeated track words while preserving the two semantic track containers
+ok - all dashboard renders at most the selected project as the visual focus
+ok - unfocused portfolio rows keep the existing node tooltip path without rendering flags
+ok - focused portfolio row renders the approved flag, short leader and node-addressable dense probe surface for each node
+ok - unfocused sibling project does not inherit the selected row flags
+ok - armed dashboard rendering highlights the original node and its complete flag group
+ok - a dragged node and its flag stay emphasized while the draft awaits discard or submit without remaining armed
+ok - all dashboard omits row actions before any local draft
+ok - editable all dashboard keeps an explicit disabled project-column right-click menu before a current-session submission
+ok - all dashboard draft actions contain only discard and update, while the project menu remains available to explain the blocked undo
+ok - all dashboard never exposes the archive row menu even when the user has archive permission
+ok - submitted all-dashboard state keeps both actions in one shared project-column context menu whose selected-row state is bound dynamically
+ok - submitted single dashboard reuses the same project-column undo menu without persistent actions
+ok - multiple submitted projects still reuse one hidden undo context menu and render no persistent undo buttons
+ok - all dashboard keeps one blank calendar spacer with one sticky today label and one today line
+ok - all dashboard legend removes the two redundant text instructions
+ok - all dashboard reuses one node context controller, one insert menu and one two-action project menu
+ok - default 100% portfolio view keeps cancel zoom hidden
+ok - portfolio calendar uses all node data bounds plus 30 days on both sides
+ok - portfolio viewport clamps to the approved 14-day minimum without relying on the removed visible-range caption
+ok - portfolio keeps the shared wheel-zoom/panning canvas while removing the circled visible-range caption
+ok - zoomed portfolio exposes red cancel zoom immediately before fullscreen
+ok - portfolio renders the simplified year, month and day hierarchy without the hidden quarter row
+ok - portfolio keeps a blank calendar spacer without caption text while retaining today-left masks
+ok - portfolio removes all three circled canvas-caption items from the DOM
+ok - portfolio renders the approved D4 transient drag reinforcement layer
+ok - dense fit keeps deterministic node hit priority
+ok - portfolio keeps the restored fullscreen action
+ok - portfolio calendar drops weekday glyphs and bounds every label cell before mid-zoom text can overlap
+ok - portfolio calendar restores weekday glyphs only when each day has enough pixels
+ok - single-project calendar reuses the same colored, collision-safe year/month/day scale
+ok - zoomed single-project dashboard exposes the shared red cancel-zoom action before fullscreen
+ok - running project masks today-left on both tracks
+ok - past-only project keeps today-left masks after its final node has passed
+ok - future-only project does not receive a today-left mask before it starts
+ok - overlapping all-dashboard nodes keep one visual cluster with an earliest-node drag proxy
+ok - dense clusters replace the uncontrolled native title with a focusable portal-tooltip source
+ok - zoom restores normal nodes once their pixels no longer overlap
+ok - focused dense row keeps individual nodes and one-to-one flags so collision avoidance can preserve exact hover ownership
+ok - single dashboard reuses the portfolio wheel-zoom and pan canvas without multi-project focus toggling
+ok - single dashboard is permanently expanded and renders node flags by default
+ok - custom all-dashboard preserves personal input order and renders one active tag
+ok - system My Projects tag is always rendered second and has no editable tag id
+ok - custom unfiltered all-dashboard makes the handle the only personal-order drag source
+ok - automatic sorting disables personal dragging without writing order
+ok - all dashboard keeps the portfolio canvas and removes the legacy page menu and create form
+ok - weekly work reuses the portfolio canvas with a fixed Monday-to-next-Monday seven-day range
+ok - weekly active-node eligibility takes priority over the current tag result
+ok - weekly canvas clips nodes outside the fixed week while retaining completed context inside an active project
+ok - weekly work keeps fullscreen but exposes no zoom path
+ok - weekly dashboard uses the shared expanded-row flag behavior
+ok - monthly work reuses the portfolio canvas with the natural month as its maximum range
+ok - monthly active-node eligibility outranks tags and clips next-month nodes
+ok - monthly work shares all-dashboard zoom controls without the weekly zoom lock
+ok - monthly dashboard uses the shared expanded-row flag behavior
+ok - monthly work can zoom inward while cancel zoom returns to the month boundary
+ok - home keeps only import/export launchers and leaves file input inside the independent dialog
+ok - my-project row adds rename beside edit/delete and uses an inline editor
+ok - home keeps project creation in its dialog while allowing the separate inline rename input
+ok - new-project dialog owns the unique-name input and inline error region
+ok - new-tag uses the same focused dialog pattern and inline validation as new-project
+ok - home hides the legacy mode toolbar and inactive transfer card
+ok - home removes the three redundant guidance texts
+ok - team member projects collapse after ten and expose a prominent remaining-count control
+ok - home feed summarizes the core change in one detail line without rendering raw JSON
+ok - home feed treats timezone-less server audit stamps as UTC and displays Beijing time
+ok - Beijing formatter handles UTC conversion and cross-day boundaries
+ok - my projects renders the current user personal order with drag hooks
+ok - team member cards use the current account order and the shared drag handle
+ok - scheme C tag page keeps the shared-warning dual-column workbench
+ok - tag directory exposes modal create, inline rename/delete, drag membership and immediate undo
+ok - archived list offers unarchive and soft delete to its manager
+ok - archived list hides both actions from another member
+ok - archived all-dashboard is an independent read-only canvas
+ok - creator sees archive and delete in the single-project menu
+ok - admin can delete another creator’s active project
+ok - another member does not see the delete action
+ok - creator retains the existing home-row delete action
+ok - table editor omits archive and delete actions from its project menu
+ok - active transfer state never inserts a persistent card above the home page
+ok - import preview is an independent dialog with the approved red submit button
+ok - import errors render actionable rows and keep commit disabled
+ok - import offers the shared blank template without redundant helper copy
+ok - template download failure is escaped and does not invalidate the import preview
+ok - export uses its own dialog and links only the verified server blob
+ok - single drag pushes a colliding successor to preserve the one-day minimum
+ok - single drag can compress a seven-day interval down to one day
+ok - single drag collision-pushes only the local preview while submitting one direct anchor
+ok - cascade shifts only the same track
+ok - cascade preview submits only the direct drag anchor
+ok - status stays direct while the server derives cascaded dates
+ok - editor renders the frozen Excel-like table and fixed business columns
+ok - editor reuses the project header shell and removes the redundant secondary heading
+ok - editor renders the approved C batch selection and three-field dock
+ok - editor does not retain the rejected timeline canvas, drag nodes, zoom band or context menu
+ok - table editor hides the draft count visually and uses the simplified draft action menu
+ok - saved editor swaps discard for undo
+ok - project-level read-only editor hides write/admin and batch actions
+ok - editor batch stage update reuses the normal draft contract
+ok - editor batch status update merges into the same node drafts
+ok - editor batch update rejects fields outside stage track and status
+ok - editor batch delete emits normal recoverable remove drafts
+ok - new node can inherit and insert immediately below the visually last selected anchor
+ok - removing an unsaved inserted node clears its positional hint
+ok - discard restores original locally
+ok - batch carries version and interaction details
+ok - batch combines date status create and remove changes
+ok - editor and dashboard batches preserve distinct audit sources
+ok - table row edits preserve date-priority mixed intent and all editable fields
+ok - changing track clears the incompatible interval intent
+ok - temporary row edits stay inside create and never emit interval_days
+ok - deleting an unsaved row cancels its create draft

@@ -1,0 +1,71 @@
+ M AGENTS.md
+ M README.md
+ M STATE.md
+ M app.js
+ M feature-01-项目时间管理-仪表盘/15-MANUAL_ARCHIVE_AND_TIMELINE_VIEW_TECH_FREEZE.md
+ M feature-01-项目时间管理-仪表盘/STATE.md
+ M feature-01-项目时间管理-仪表盘/mainline-feature01.md
+ M flowboard/database.py
+ M flowboard/timeline.py
+ M flowboard/transfer.py
+ M index.html
+ M mc-plan/Mc思考01-阶段完工-下阶段计划.md
+ M server.py
+ M tests/test_timeline.py
+ M tests/test_timeline_archive.py
+ M tests/test_timeline_e2e.py
+ M tests/test_timeline_http.py
+ M tests/timeline_ui.test.js
+ M timeline-ui.js
+ M timeline.css
+?? feature-01-项目时间管理-仪表盘/（交互样稿）节点备注悬浮三案.html
+?? feature-02-进阶仪表盘/
+?? flowboard/overview.py
+?? flowboard/timeline_excel.py
+?? overview-ui.js
+?? overview.css
+?? team-progress/20260907-node-remark-implementation.md
+?? team-progress/20260907-remark-api-regression.log
+?? team-progress/20260907-remark-compact.png
+?? team-progress/20260907-remark-confirm.png
+?? team-progress/20260907-remark-dashboard-regression.log
+?? team-progress/20260907-remark-desktop.png
+?? team-progress/20260907-remark-final-regression.log
+?? team-progress/20260907-remark-node-check.log
+?? team-progress/20260907-remark-targeted-final.log
+?? team-progress/20260907-remark-targeted-recheck.log
+?? team-progress/20260907-remark-visual-check.log
+?? team-progress/20260916-excel-backend-tests.log
+?? team-progress/20260916-excel-browser-tests.log
+?? team-progress/20260916-excel-clean-ui.log
+?? team-progress/20260916-excel-drag-tests.log
+?? team-progress/20260916-excel-entry-ui.log
+?? team-progress/20260916-excel-examples-backend.log
+?? team-progress/20260916-excel-examples-browser.log
+?? team-progress/20260916-excel-examples-render.log
+?? team-progress/20260916-excel-final-checks.log
+?? team-progress/20260916-excel-import-export-assessment.md
+?? team-progress/20260916-excel-render.log
+?? team-progress/20260916-excel-result-browser.log
+?? team-progress/20260916-excel-result-ui.log
+?? team-progress/20260916-excel-sheet-backend-recheck.log
+?? team-progress/20260916-excel-sheet-backend.log
+?? team-progress/20260916-excel-sheet-browser.log
+?? team-progress/20260916-excel-sheet-ui.log
+?? team-progress/20260916-excel-ui-tests.log
+?? team-progress/20260916-excel-unified-implementation.md
+?? team-progress/20260924-project-soft-delete.md
+?? team-progress/20260930-team-member-order.md
+?? team-progress/20260930-v20-production-migration.json
+?? team-progress/20261008-dashboard-flags-e2e.log
+?? team-progress/20261008-dashboard-flags.md
+?? team-progress/20261008-feature02-project-overview.md
+?? team-progress/verification/20260916-excel-assessment/
+?? team-progress/verification/20260916-excel-examples/
+?? team-progress/verification/20260916-excel-unified/
+?? team-progress/verification/20261008-feature02/
+?? tests/overview_fixtures.py
+?? tests/overview_ui.test.js
+?? tests/test_overview.py
+?? tests/test_overview_e2e.py
+?? tests/test_timeline_excel.py

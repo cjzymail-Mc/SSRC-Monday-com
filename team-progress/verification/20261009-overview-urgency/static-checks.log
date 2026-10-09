@@ -1,0 +1,11 @@
+PASS node --check overview-ui.js
+PASS node --check tests/overview_ui.test.js
+PASS Python AST flowboard/overview.py
+PASS Python AST tests/test_overview.py
+PASS Python AST tests/test_overview_ux_e2e.py
+PASS git diff --check
+PASS scoped whitespace
+PASS backend.log 9 tests; process exit 0
+PASS browser.log 12 tests; process exit 0
+PASS Node 9/9
+PASS live read-only projection: 25 unique, 9+16 groups, urgency/note correspondence, zero business changes

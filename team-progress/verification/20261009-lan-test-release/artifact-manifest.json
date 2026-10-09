@@ -1,0 +1,102 @@
+{
+  "server.py": {
+    "sha256": "a6e1e8863ec27b1cb437b062a7d973d7a0b3baadae71fd6ea5c28abd4c13a00a",
+    "size": 36009
+  },
+  "flowboard/service.py": {
+    "sha256": "54f6c1e5a94724de21277d374cef97711dc67e1a4696db00f97c090a24ccccc9",
+    "size": 256918
+  },
+  "flowboard/overview.py": {
+    "sha256": "bdff7765caee30f69f3493a11f25876c91fe5749c2baa803ff3a2abc878b13e2",
+    "size": 9487
+  },
+  "flowboard/timeline.py": {
+    "sha256": "775ef390928e598a4397fd25fad107a62e62f1c734b027f7af54d5ba0f757456",
+    "size": 102372
+  },
+  "flowboard/database.py": {
+    "sha256": "11effc4726075ff4f1154a2184da0ecae4be6be4e94ccdb6cf7be4c88ecf5d40",
+    "size": 67937
+  },
+  "timeline-ui.js": {
+    "sha256": "fc6c68b72ba58bf21c9c598b332242f6a0b86c46d4f6ec9c70dc29c3bf32a283",
+    "size": 136283
+  },
+  "app.js": {
+    "sha256": "d7a815560f957123cf3fda3611c3fb4239f45f8fe76ca603f2e9074be43abc6c",
+    "size": 151362
+  },
+  "index.html": {
+    "sha256": "7302d7ee9fc28a3dc5e7c5d0db24658c105b1eee324d80440333ae28892e0d84",
+    "size": 7658
+  },
+  "overview-ui.js": {
+    "sha256": "18e3d6880a1a96f384ac96e3b508a1cdd4e654e543e50cddd6e5ce1a02e369c1",
+    "size": 15497
+  },
+  "overview.css": {
+    "sha256": "cdf01a132ed9822bd1e57a85b8543b7feaf5e020fdde0b6bc145e4640be605cc",
+    "size": 9446
+  },
+  "timeline.css": {
+    "sha256": "839a4b07fa155013f7097f7a1707d6de45d4c2a1c61a84b65e449eac0c17c397",
+    "size": 102846
+  },
+  "start-flowboard.cmd": {
+    "sha256": "0afbd9e14b6e8993ada79aec309db4c8d80d421ec5495153d73e0b1227d1ba87",
+    "size": 2160
+  },
+  "README.md": {
+    "sha256": "66bcd963befd02c45412be00f2ee4763002b3d20df364297624b7166684ea316",
+    "size": 26087
+  },
+  "STATE.md": {
+    "sha256": "674cd2fe5208d776653a0e35c81586260acbf54af6fa80961f5f972e6eaed0d8",
+    "size": 14518
+  },
+  "team-progress/20261009-lan-trial-release.md": {
+    "sha256": "bb731ea6b49679e2db6c552ce47d67d8f93e4bad4561068f312d0525b2eef43e",
+    "size": 3554
+  },
+  "feature-02-进阶仪表盘/03-UX_OPTIMIZATION_CONTRACT.md": {
+    "sha256": "d67a3db726274422e6165093ef473f33bd291474cb14a2690e7a9c81db945294",
+    "size": 9441
+  },
+  "feature-02-进阶仪表盘/04-UX_DELIVERY.md": {
+    "sha256": "7676df47d6c3cce29155283d931f4bf9bd296f9ef62b877381ef0959393b16cc",
+    "size": 10842
+  },
+  "team-progress/verification/20261009-lan-test-release/after.json": {
+    "sha256": "cff17240056c4db841487d1225ccadbc38aeb5d3cdaf231ad8144b5dcb8dd1cc",
+    "size": 10366
+  },
+  "team-progress/verification/20261009-lan-test-release/before.json": {
+    "sha256": "766110c56372340259f62f813ef3c58ff9603cf34312c3e2642e403c6eab76a6",
+    "size": 15349
+  },
+  "team-progress/verification/20261009-lan-test-release/diff-check.log": {
+    "sha256": "e7f80ff63181937eaa2d76aa7a1ae346ae1e127dbbf37fd2d22a6f5bb2c8941b",
+    "size": 1509
+  },
+  "team-progress/verification/20261009-lan-test-release/new-process.json": {
+    "sha256": "24805e3625c44a37d1bb834bb043abd33d5368c3bd120ae1d9f7619295711bb2",
+    "size": 203
+  },
+  "team-progress/verification/20261009-lan-test-release/old-process.json": {
+    "sha256": "976f8bc662a9e6f0489f32fbc62b310af7a3183b3942ae8544c46790a7232e19",
+    "size": 125
+  },
+  "team-progress/verification/20261009-lan-test-release/release_check.py": {
+    "sha256": "cf5f5a0d8fc644490f1c913b1592c5a33bcbf28a79811d13dac12873ac21e7f0",
+    "size": 6696
+  },
+  "team-progress/verification/20261009-lan-test-release/runtime-stderr.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0
+  },
+  "team-progress/verification/20261009-lan-test-release/runtime-stdout.log": {
+    "sha256": "2d138522b4eaf7c0141c00487f28d169c2e585bef6987707e1adf1e6cb1e5f58",
+    "size": 4740
+  }
+}

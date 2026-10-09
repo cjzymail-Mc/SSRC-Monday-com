@@ -1,0 +1,13 @@
+{
+  "health": {
+    "status": "ok",
+    "schema_version": 20
+  },
+  "asset_version": "20261009-f02-minimal-feed",
+  "secondary_controls": false,
+  "heading": "shared tl-home-head",
+  "project_width_percent": 20.8,
+  "progress_width_percent": 16.3,
+  "summary_row": false,
+  "live_database_connection": "unchanged"
+}

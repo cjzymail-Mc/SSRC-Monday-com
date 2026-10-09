@@ -1,0 +1,181 @@
+{
+  "date": "2026-10-09",
+  "scope": "overview urgency and notes",
+  "tests": {
+    "backend": 9,
+    "node": 9,
+    "browser": 12
+  },
+  "files": [
+    {
+      "path": "feature-02-进阶仪表盘/03-UX_OPTIMIZATION_CONTRACT.md",
+      "bytes": 6955,
+      "sha256": "56fcbe2c25e8d1e4fe6e1583894b59b1a465cc1e72147d3918ed0e771698d30b"
+    },
+    {
+      "path": "feature-02-进阶仪表盘/04-UX_DELIVERY.md",
+      "bytes": 8768,
+      "sha256": "8ca982d2d2b55a4743497776ce39e2c28b5ed7ba645b63b6e1ccb4493674e172"
+    },
+    {
+      "path": "flowboard/overview.py",
+      "bytes": 9487,
+      "sha256": "bdff7765caee30f69f3493a11f25876c91fe5749c2baa803ff3a2abc878b13e2"
+    },
+    {
+      "path": "index.html",
+      "bytes": 7681,
+      "sha256": "292fd8a0d0e7b187b56935e4678278cb0f0739f81767f14725bd94f51afa2f25"
+    },
+    {
+      "path": "overview-ui.js",
+      "bytes": 14277,
+      "sha256": "69d53a1f6d6629c0e98c513df80eec10d9dc85fe9cd84519222eeff19bb62e57"
+    },
+    {
+      "path": "overview.css",
+      "bytes": 9555,
+      "sha256": "19464368675cd1e3367e654d31f2b8f820f3afd83d1d96dc8abd38bc81475ffd"
+    },
+    {
+      "path": "STATE.md",
+      "bytes": 11192,
+      "sha256": "7121df78989ab0f80bbb5bd9caf28363eb5e7cd7f6529b60af0dc25c40742af8"
+    },
+    {
+      "path": "team-progress/20261009-overview-urgency-feedback.md",
+      "bytes": 2807,
+      "sha256": "3ada42da8596812f918153c106d15777a925ad3cb47a37bbadbfdd4a1a69e8d6"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/apply_urgency_update.py",
+      "bytes": 2123,
+      "sha256": "0a3c5a3259921e91e13b779a73585329b3e7cedf4d0bf8c3eb91b86242746b0b"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/backend.log",
+      "bytes": 3250,
+      "sha256": "25913b28511643585976fcb3ed3750e4ec114e6b0d5e78aea140a8d3d015d9e2"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/baseline/feature-02-进阶仪表盘_03-UX_OPTIMIZATION_CONTRACT.md",
+      "bytes": 6291,
+      "sha256": "738f1c8aacefc5530a680c151159c4a0acb15f639662ebda762ea22f56078217"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/baseline/feature-02-进阶仪表盘_04-UX_DELIVERY.md",
+      "bytes": 8317,
+      "sha256": "bdc1e4a2c083efba78264af823fa17d37d3fe2187368da9c34366545dcac3274"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/baseline/flowboard_overview.py",
+      "bytes": 8877,
+      "sha256": "d93496cd95c4a9d1206ba08976022c6cab50c2a36d324e78ec725d158c74bdd2"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/baseline/index.html",
+      "bytes": 7669,
+      "sha256": "3d794ec04fba9d715d160e2398b5a1a12942840b04e77182d47ebdbc1187f571"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/baseline/overview-ui.js",
+      "bytes": 13830,
+      "sha256": "00e6adf60616d79890e7d0c0096675f8ca4842118527bb34921520bcfef4fe70"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/baseline/overview.css",
+      "bytes": 9355,
+      "sha256": "982e4f148fccfe8e11b5889ac49ec1385327e69ec675d374052a23b2722a46f0"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/baseline/STATE.md",
+      "bytes": 10473,
+      "sha256": "5673278109f876376b409eef770db270bebc0be15368351323555daa32d4311a"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/baseline/tests_overview_ui.test.js",
+      "bytes": 4823,
+      "sha256": "f18a8092e2b8732104d00d8a2de5597481423d2ca24fcb3361d8670647f71a4d"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/baseline/tests_test_overview.py",
+      "bytes": 11352,
+      "sha256": "15165956b2cc68d93bbe67c62d902b6439e17b12e0ee869a5dbb5157c83e6635"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/baseline/tests_test_overview_ux_e2e.py",
+      "bytes": 13495,
+      "sha256": "2a20cf90845e38898cf7a0db653b26f879d0472d0bb34319ad980a8f236490cf"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/browser.log",
+      "bytes": 36739,
+      "sha256": "f8e902172fee4f5c156a2073de355f19dd0b039c7bfee4cc318e036de39430f3"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/check_live_projection.py",
+      "bytes": 3049,
+      "sha256": "c582ef71fd245f3b0ae298045740935009c7071eda8dccf7a86a9d39efce27a6"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/finalize_evidence.py",
+      "bytes": 3142,
+      "sha256": "5b5b12c3c0fc1cadbdd6e50f576bfee258c493e5a28e080637e607bc597be149"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/live-projection.json",
+      "bytes": 5220,
+      "sha256": "c754aff32964201a842410bb9df1391e4364247f431e0277d29545a425c0c026"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/node.log",
+      "bytes": 935,
+      "sha256": "377ed333bf2282c4ab97ead0752f3c3c1ab6e9950f05bbfc07a8ae70b4debad6"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/overview-content.png",
+      "bytes": 708184,
+      "sha256": "9cd2f66cef2a386ad46918a14e153746e1036f8c858982ea0c902710324414e4"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/overview-desktop.png",
+      "bytes": 326053,
+      "sha256": "f425a95fee9adb00a5f5ed7b67a4084bf632de68848c15ab3b41a27e3c13d4bc"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/overview-narrow.png",
+      "bytes": 150144,
+      "sha256": "8b41a450385bc20f3ff618d70cac7e8b054d46d32f16e8aa56637ae4556cb67d"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/run_regression.py",
+      "bytes": 803,
+      "sha256": "7edca0006d4c144a33d9ecb9d706185a63037cb45d9cff98b53b6a87a58a092b"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/source.diff",
+      "bytes": 34424,
+      "sha256": "aabbacefadd1b2ba2261971a3769eb3e5e719201282c34668ab72fa2ae4c6bcf"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-urgency/static-checks.log",
+      "bytes": 460,
+      "sha256": "68ee84f2363a15dcb424801f51a423276526518dce11f5e85556f83a399a8b85"
+    },
+    {
+      "path": "tests/overview_ui.test.js",
+      "bytes": 5668,
+      "sha256": "ac8c8a922bb03bd337b4fd7caf4be4c4999b6c44f1e902c03ede772168e1b60e"
+    },
+    {
+      "path": "tests/test_overview.py",
+      "bytes": 13322,
+      "sha256": "9483f5f66965600a2446bceeb04fa7f209a4188f9c04fa6339eb2edca9b9f1b7"
+    },
+    {
+      "path": "tests/test_overview_ux_e2e.py",
+      "bytes": 15083,
+      "sha256": "9b99d0de324ac44b402f46e9780845f8b4fb5e1c7c9dfce4120390d17348aa57"
+    }
+  ]
+}

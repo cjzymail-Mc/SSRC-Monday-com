@@ -1,0 +1,277 @@
+{
+  "date": "2026-10-09",
+  "scope": "combined overview feedback and readable activity",
+  "tests": {
+    "node": 16,
+    "timeline_node": "PASS",
+    "browser": "19 initial + 1 repaired/rechecked",
+    "live_readonly_encodings": 19
+  },
+  "files": [
+    {
+      "path": "feature-02-进阶仪表盘/03-UX_OPTIMIZATION_CONTRACT.md",
+      "bytes": 8647,
+      "sha256": "7642b179b064f3d31bee344b4b6fbb669ab7382064e580b05363807f0fc73396"
+    },
+    {
+      "path": "feature-02-进阶仪表盘/04-UX_DELIVERY.md",
+      "bytes": 9765,
+      "sha256": "b677ee68cecac6712cddc4e355fd02cfe6f4c354d35df5cea894d4ff3b6713da"
+    },
+    {
+      "path": "index.html",
+      "bytes": 7669,
+      "sha256": "10109c870bab269f7fa28ba1ef14add60ff20e4b2251bb0101c3eb043ac47693"
+    },
+    {
+      "path": "overview-ui.js",
+      "bytes": 15497,
+      "sha256": "18e3d6880a1a96f384ac96e3b508a1cdd4e654e543e50cddd6e5ce1a02e369c1"
+    },
+    {
+      "path": "overview.css",
+      "bytes": 9446,
+      "sha256": "cdf01a132ed9822bd1e57a85b8543b7feaf5e020fdde0b6bc145e4640be605cc"
+    },
+    {
+      "path": "STATE.md",
+      "bytes": 12685,
+      "sha256": "d86c5b99a456e7bbf3c3eda2b0c583fd6caca3317204dc34511596d34f53aed7"
+    },
+    {
+      "path": "team-progress/20261009-overview-minimal-and-feed.md",
+      "bytes": 3836,
+      "sha256": "b2479ece49a43ee37654dd56c8c9fc1cd2309546eba5e620e0dd6338eaac3cd1"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-avatar/baseline/feature-02-进阶仪表盘_03-UX_OPTIMIZATION_CONTRACT.md",
+      "bytes": 7230,
+      "sha256": "ba83c033a19237233a5bdb39601cac15615e7bdbab33e77864162a334389ea65"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-avatar/baseline/feature-02-进阶仪表盘_04-UX_DELIVERY.md",
+      "bytes": 9151,
+      "sha256": "6e0619a0483427b808b84fe6f8ad6081387666104045a1b3c95e1120acb52e29"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-avatar/baseline/index.html",
+      "bytes": 7669,
+      "sha256": "5296fbbce5a46cfe35b8bd96429b68ab75d06cb37afd229fc21b975bc1eed05b"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-avatar/baseline/overview-ui.js",
+      "bytes": 14643,
+      "sha256": "a028a25c1b6454ce3403b5e4632b6274101bf5d1c39f9ae003ed961309e24c70"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-avatar/baseline/overview.css",
+      "bytes": 9663,
+      "sha256": "6e5e992394082145abe92f1bb610d1a1e195e4b22b078fc3ab22d99245106eb1"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-avatar/baseline/STATE.md",
+      "bytes": 11812,
+      "sha256": "1d58cabb7d9c822ac20235ec216b06c00113633c1e36257fb7db5e6486157d65"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-avatar/baseline/tests_overview_ui.test.js",
+      "bytes": 5668,
+      "sha256": "d79a64fffa77849981e5be9ac126f9e6f6c37784f07022947c75194ffc5282da"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-avatar/baseline/tests_test_overview_e2e.py",
+      "bytes": 15144,
+      "sha256": "66066e5623c3f648cc8e0133e7f3a61667403af8173c211d13a5f8615bce195b"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-avatar/baseline/tests_test_overview_ux_e2e.py",
+      "bytes": 15383,
+      "sha256": "9c0f4f6070c8e9034646357c1aa4945f5443f3042b9aaf77acbc60315c6749ae"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/apply_feed_update.py",
+      "bytes": 4528,
+      "sha256": "bd485776396c30e1b86729c0c9eb263a58b3b563a9f7548413d24b280304e6c0"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/apply_minimal_update.py",
+      "bytes": 1156,
+      "sha256": "6350cfc7a04ac0f39cddbf243058d0c163b4447891a6c89c99af62553bea9779"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/avatar-shortcuts-ready.png",
+      "bytes": 238854,
+      "sha256": "30c15e2deccc94a5f70478f3263169e0d7d1ace22e70bdf61da3ceba285345aa"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/baseline/index.html",
+      "bytes": 7681,
+      "sha256": "74c51fbfd1e0082f5f26a21f4f2594e557c5585059e3fc6b16ff5a9f4166ec58"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/baseline/overview-ui.js",
+      "bytes": 14968,
+      "sha256": "0567c97824fa9dcaaca31a39cec27b5027756e02d48501b3febd207e38068027"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/baseline/overview.css",
+      "bytes": 9573,
+      "sha256": "f891a90d6128e496bd4a846ae4de9ab6ef7572b6d2ff761ce87dfe1d51112a6b"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/baseline/tests_overview_ui.test.js",
+      "bytes": 6754,
+      "sha256": "d881124d8cd07a70e0048e443b28d38cd9561912e589a0c96a469021638ac561"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/baseline/tests_test_overview_e2e.py",
+      "bytes": 15457,
+      "sha256": "ff7532b88d665a3380b015a65e45a13ca8fdb8af0a1e6247aa3123e464f7a651"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/baseline/tests_test_overview_ux_e2e.py",
+      "bytes": 18693,
+      "sha256": "d6756f2679dba95f6898a6f82a68c62275b45c49ef38b5a0c03b0c9785319bf0"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/baseline/tests_timeline_ui.test.js",
+      "bytes": 49556,
+      "sha256": "ffca9a7bbe3cf973d5711f0cd3180484714b09336f788513ce291bfb687fcc20"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/baseline/timeline-ui.js",
+      "bytes": 134251,
+      "sha256": "a268bc752b867ae7c60877920b7743cd766cf6c39fa3cc0085becdd5279c0861"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/browser.log",
+      "bytes": 68543,
+      "sha256": "d73a95e9e51526f62d98f7f2d0f951b1584f6ae533688e0100f8853a419ad3a0"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/check_live_feed.js",
+      "bytes": 1146,
+      "sha256": "e889841dd8c11d78be01c0bed590dba3b0a3543c9314ff06a92e805800e3c91a"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/check_live_feed.py",
+      "bytes": 869,
+      "sha256": "3d2f528857d3657a21609538f0bc8b95e1eb0503dfd4c7d5feed10ad659ac833"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/feed-browser-recheck.log",
+      "bytes": 3134,
+      "sha256": "95ec11f7d562e4baa8e7d52cfcb822fc8fe583cda1d166c1c653ea5470bf929d"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/finalize_evidence.py",
+      "bytes": 5738,
+      "sha256": "2732aec43d346b1d7788204608567be0b82c12f852e584be177b211263fc5cf8"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/home-feed-readable.png",
+      "bytes": 72250,
+      "sha256": "e7e5e5f423d1e57d97625d5cd6a03188e2248e0bde3770545436fd1830981d8f"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/http-proof.json",
+      "bytes": 329,
+      "sha256": "7db67faa2121b2260572313643610fea0f79333157d36480dd464e937813413c"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/live-feed-encodings.json",
+      "bytes": 4580,
+      "sha256": "fc615843683e76f5a62038e328158bd1661b3f9ece2fb28fd6baa37d235b3258"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/live-feed-proof.json",
+      "bytes": 1680,
+      "sha256": "6cdbf2235823c99cb49faff19c428b94fbfb32fde7f81727a965332e906967d0"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/node.log",
+      "bytes": 1586,
+      "sha256": "e88ddc2c586afe6a1446b1061dbe1c516c24dbe489c20da2cd79b1d363708227"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/overview-content.png",
+      "bytes": 733220,
+      "sha256": "b2b8d13fcbcdcadade1311c5f533db887c44358d7c8ea89161b11f97bdd13bd6"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/overview-desktop.png",
+      "bytes": 339036,
+      "sha256": "384a1e312469b299a9269c8b6df17516e3cd72a24dff4ed40bac259f33a09d3d"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/overview-minimal-ready.png",
+      "bytes": 222399,
+      "sha256": "8b2beedbad5320120f66cf99eb1f06db06ea62b526d24c0c68bc98decc2bd515"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/overview-narrow.png",
+      "bytes": 155636,
+      "sha256": "4d84096d234c5d8719a7fcd68c73b17e7d460df9a7b41771b06a72e880cf01ed"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/run_regression.py",
+      "bytes": 692,
+      "sha256": "c09f66ef72686c8ff466ccdd92fa0530487db947eaffd75af1be1ba26bba6519"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/source.diff",
+      "bytes": 88539,
+      "sha256": "14f5492c3a4ccfcf0e284d8fca99c5536a92c45ecbefbf187579de65fc3d9b52"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/static-checks.log",
+      "bytes": 751,
+      "sha256": "1cc68ecd4d566488aa966defc59d78dab108a0f8220c53c044f70fb65a595fd5"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/timeline-node.log",
+      "bytes": 11200,
+      "sha256": "cf5b5cf557b3dceda699c0b56476f79fcf74f498efa0558bf5c326902470ccd2"
+    },
+    {
+      "path": "team-progress/verification/20261009-overview-minimal/update_delivery_docs.py",
+      "bytes": 3677,
+      "sha256": "cb8520d19c3ab090d67d06da6de87a873e55590c39fde68407b4c72b73058db8"
+    },
+    {
+      "path": "tests/overview_ui.test.js",
+      "bytes": 7288,
+      "sha256": "0335e87055721f93fbb4d8def7592f126dddc1a6142b0e19164658ad2cc83550"
+    },
+    {
+      "path": "tests/test_overview_e2e.py",
+      "bytes": 16368,
+      "sha256": "cf74b5ded60686f57d8f6baa79abaa4ef65660fa7347e22a4c34750815266c28"
+    },
+    {
+      "path": "tests/test_overview_minimal_e2e.py",
+      "bytes": 4996,
+      "sha256": "e224337c17de227a328c4cbf96e81f17eac6dee7a69babcf67639e39081be31e"
+    },
+    {
+      "path": "tests/test_overview_ux_e2e.py",
+      "bytes": 18693,
+      "sha256": "d6756f2679dba95f6898a6f82a68c62275b45c49ef38b5a0c03b0c9785319bf0"
+    },
+    {
+      "path": "tests/timeline_feed.test.js",
+      "bytes": 3470,
+      "sha256": "afc00b1a50200cf1ed7ae5fdb1a8def6af914459629e4a065ec47a9c362f65f2"
+    },
+    {
+      "path": "tests/timeline_ui.test.js",
+      "bytes": 49562,
+      "sha256": "97440132ac4cbedbf453dde88b0d8a7d44ed3c98eee49456bce5cc076d67c295"
+    },
+    {
+      "path": "timeline-ui.js",
+      "bytes": 135850,
+      "sha256": "4a08e969f5f4d957bb040365a0138da6535545afb6c5741ba8f16684dd91e9f7"
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+{
+  "date": "2026-10-08",
+  "scope": "overview detail feedback",
+  "tests": {
+    "backend": 8,
+    "node": 8,
+    "browser": 11,
+    "additional_viewport": 1
+  },
+  "files": [
+    {
+      "path": "feature-02-进阶仪表盘/03-UX_OPTIMIZATION_CONTRACT.md",
+      "bytes": 6291,
+      "sha256": "738f1c8aacefc5530a680c151159c4a0acb15f639662ebda762ea22f56078217"
+    },
+    {
+      "path": "feature-02-进阶仪表盘/04-UX_DELIVERY.md",
+      "bytes": 7891,
+      "sha256": "d63d3d87940006d55a556c404efd6e775a6a38be7e18d76b25e7dd375e8eb2ae"
+    },
+    {
+      "path": "flowboard/overview.py",
+      "bytes": 8877,
+      "sha256": "d93496cd95c4a9d1206ba08976022c6cab50c2a36d324e78ec725d158c74bdd2"
+    },
+    {
+      "path": "index.html",
+      "bytes": 7669,
+      "sha256": "3d794ec04fba9d715d160e2398b5a1a12942840b04e77182d47ebdbc1187f571"
+    },
+    {
+      "path": "overview-ui.js",
+      "bytes": 13830,
+      "sha256": "00e6adf60616d79890e7d0c0096675f8ca4842118527bb34921520bcfef4fe70"
+    },
+    {
+      "path": "overview.css",
+      "bytes": 9355,
+      "sha256": "982e4f148fccfe8e11b5889ac49ec1385327e69ec675d374052a23b2722a46f0"
+    },
+    {
+      "path": "STATE.md",
+      "bytes": 9634,
+      "sha256": "430670a5c8e034d4aed7535789bfefe29b642c562481667ad512a82c5a96ba9c"
+    },
+    {
+      "path": "team-progress/20261008-overview-detail-feedback.md",
+      "bytes": 1731,
+      "sha256": "affb4e0e5d436d6aaf853797bfde434355aeb77c5a7e628eb298c24e81659f25"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/accordion-viewport.log",
+      "bytes": 2803,
+      "sha256": "799f5166ed4cf2fab4a2baa80b383db73839c10b5f77823e0ebbec8d61794ec7"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/apply_detail_update.py",
+      "bytes": 2700,
+      "sha256": "d9d5e81f30f12cfe21d505b66a57f8848c4c76eb9e108af7bd274ba4be01b42e"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/backend.log",
+      "bytes": 3080,
+      "sha256": "f9c36676618a51403c59630e29c53e301e19d18d692a05b9c16aab486962e759"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/baseline/feature-02-进阶仪表盘_03-UX_OPTIMIZATION_CONTRACT.md",
+      "bytes": 5654,
+      "sha256": "a7570f37a75d23ec20fbde0b83c3e69bcc78dcbbd9bd0ca1fdda61b8c2bb7bc9"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/baseline/feature-02-进阶仪表盘_04-UX_DELIVERY.md",
+      "bytes": 7285,
+      "sha256": "d04016627459d2e4799f5a07b804b6d9a6bb68c691e2a21eea404d96fc7a8bd5"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/baseline/flowboard_overview.py",
+      "bytes": 8655,
+      "sha256": "6bb8448a0cc6f394a0558c85fa1a6edc48a3d03a95618f66982576c8096828c6"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/baseline/index.html",
+      "bytes": 7673,
+      "sha256": "b23c437ac8008c3b5812c47a296759581fc938a6707427b288b0d03a04bbbe99"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/baseline/overview-ui.js",
+      "bytes": 13568,
+      "sha256": "48ede05c8f79fc45467b65dd4cb663dc692df9ff5692c3b972f00b2cd044e48b"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/baseline/overview.css",
+      "bytes": 9682,
+      "sha256": "3ad1f8b473c398adf67c6b5388c427dcae9f8f3fa3ef77011c2a06e3a73061fa"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/baseline/STATE.md",
+      "bytes": 8928,
+      "sha256": "04c8c64e54e10fc7a5cbdc42adeef5fa6e37d58d5f59410b596a4c0c1a38da8b"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/baseline/tests_overview_ui.test.js",
+      "bytes": 3834,
+      "sha256": "2c38f7d4e54e094763a13caeb9a22a6eb582eb9678ac14c7adb80bf9db0d4bf4"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/baseline/tests_test_overview.py",
+      "bytes": 9905,
+      "sha256": "f9e5f9c7b811a0e799f791ef13753fc80d7ff987358c3655109e33a79bb5cb14"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/baseline/tests_test_overview_e2e.py",
+      "bytes": 15144,
+      "sha256": "66066e5623c3f648cc8e0133e7f3a61667403af8173c211d13a5f8615bce195b"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/baseline/tests_test_overview_ux_e2e.py",
+      "bytes": 11394,
+      "sha256": "251afd2ccb87d86302291cb23dfc5d5b9cffe303bd196f6b8ec443b2a2bb954c"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/browser.log",
+      "bytes": 33219,
+      "sha256": "8729e978f96fd5691f9cd7b4e77ac40e90c2d20ea51a18d4a0d12f86a6d1f1a1"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/detail-ready.jpg",
+      "bytes": 104687,
+      "sha256": "b3b53def44fa828c7c117aea345dcdc927cdd764c033611a6a776f9c075c91fc"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/finalize_evidence.py",
+      "bytes": 3163,
+      "sha256": "ef9e3946469a4b00584f947f9bb97a2214b3b819826f04f3ae329e56170fbeba"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/live-proof.json",
+      "bytes": 545,
+      "sha256": "cf01a15e3b131ace54cb4f3e60842cf80efca83584303e08abcda9e5ca27b7d3"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/node.log",
+      "bytes": 827,
+      "sha256": "7ac815daef55534e99c3c2e963d20df2eaacfc97a56cf9925d85e816cb09f6e7"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/overview-content.png",
+      "bytes": 686947,
+      "sha256": "288c64661c2f59aa0534539af1db461e147ff077ed6e6900ccc0de78071eee53"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/overview-desktop.png",
+      "bytes": 314767,
+      "sha256": "de5f43ba2697fb9ad8b68ba439a2b193203259f4bdb77fb83e4d9d841497d39c"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/overview-narrow.png",
+      "bytes": 146852,
+      "sha256": "b3b41bea6cfbda5ec78f34b783bb777aaee90c72652e4bc67505764d3605cc57"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/run_regression.py",
+      "bytes": 722,
+      "sha256": "7d51df184cfbc38a1c8d81ef8a25bf4e68ccdc51a9e65f6db0acab6d8ccbbdd7"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/source.diff",
+      "bytes": 39164,
+      "sha256": "583beefee95d619e730aa030a196b0468fbfdc1807e730bf3714fb7e54024616"
+    },
+    {
+      "path": "team-progress/verification/20261008-overview-detail/static-checks.log",
+      "bytes": 467,
+      "sha256": "257110fe0ff185389ac87a683e84d4563b9ae447186a61f3d558f28cf83dee5f"
+    },
+    {
+      "path": "tests/overview_ui.test.js",
+      "bytes": 4823,
+      "sha256": "f18a8092e2b8732104d00d8a2de5597481423d2ca24fcb3361d8670647f71a4d"
+    },
+    {
+      "path": "tests/test_overview.py",
+      "bytes": 11352,
+      "sha256": "15165956b2cc68d93bbe67c62d902b6439e17b12e0ee869a5dbb5157c83e6635"
+    },
+    {
+      "path": "tests/test_overview_e2e.py",
+      "bytes": 15144,
+      "sha256": "66066e5623c3f648cc8e0133e7f3a61667403af8173c211d13a5f8615bce195b"
+    },
+    {
+      "path": "tests/test_overview_ux_e2e.py",
+      "bytes": 13495,
+      "sha256": "2a20cf90845e38898cf7a0db653b26f879d0472d0bb34319ad980a8f236490cf"
+    }
+  ]
+}

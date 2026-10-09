@@ -1,0 +1,180 @@
+--- before-feature02/app.js
++++ after-feature02/app.js
+@@ -38,11 +38,35 @@
+ function resetViewState(){const clean=FlowboardViewState.reset();activeQuery=clean.activeQuery;activeViewId=clean.activeViewId;activePresentation=clean.activePresentation;adHocQuery=clean.adHocQuery;urlViewExplicit=clean.urlViewExplicit;blockedLatch=clean.blockedLatch;viewType=clean.viewType;localPresentation=clean.localPresentation;const url=new URL(location.href);url.searchParams.delete('view');history.replaceState(null,'',url)}
+ function viewTransition(event,payload={}){const next=FlowboardViewState.transition({activeQuery,activeViewId,activePresentation,adHocQuery,urlViewExplicit,blockedLatch,viewType,localPresentation},event,payload);activeQuery=next.activeQuery;activeViewId=next.activeViewId;activePresentation=next.activePresentation;adHocQuery=next.adHocQuery;urlViewExplicit=next.urlViewExplicit;blockedLatch=next.blockedLatch;viewType=next.viewType||viewType;localPresentation=next.localPresentation||localPresentation}
+ function setViewState(next){activeQuery=next.activeQuery;activeViewId=next.activeViewId;activePresentation=next.activePresentation;adHocQuery=next.adHocQuery;urlViewExplicit=next.urlViewExplicit;blockedLatch=next.blockedLatch;viewType=next.viewType||viewType;localPresentation=next.localPresentation||localPresentation}
+-async function login(event){event.preventDefault();try{resetViewState();timelineLandingDone=false;const result=await api('/api/auth/login','POST',{username:$('#loginUser').value.trim(),password:$('#loginPassword').value});csrfToken=result.csrf_token;state.current_user=result.user;hideLogin();await refresh();toast('登录成功');await landTimelineHome()}catch(error){showLogin(error.message)}}
+-async function logout(){if(!allowTimelineLeave())return;if(realtimeSource)realtimeSource.close();realtimeSource=null;try{await api('/api/auth/logout','POST',{})}catch(error){}csrfToken='';state.current_user=null;timelineLandingDone=false;timelineState={projects:[],archivedProjects:[],mode:'home',selectedId:null,editor:null,review:null,projectReturnMode:'home'};timelineTags={catalog:null,selectedId:null,membership:null,undo:null};timelineOrders={mine:null,current:null,members:null,context:{context_type:'mine',tag_id:null}};timelineDraftStates=new Map();if(!$('#timelineView')?.hidden)hideTimelineView();resetViewState();showLogin('已退出登录')}
++async function login(event){event.preventDefault();try{resetViewState();timelineLandingDone=false;const result=await api('/api/auth/login','POST',{username:$('#loginUser').value.trim(),password:$('#loginPassword').value});overviewState.request++;overviewState=FlowboardOverview.createState();timelineState.mode='home';csrfToken=result.csrf_token;state.current_user=result.user;hideLogin();await refresh();toast('登录成功');await landTimelineHome()}catch(error){showLogin(error.message)}}
++async function logout(){if(!allowTimelineLeave())return;overviewState.request++;overviewState=FlowboardOverview.createState();if(realtimeSource)realtimeSource.close();realtimeSource=null;try{await api('/api/auth/logout','POST',{})}catch(error){}csrfToken='';state.current_user=null;timelineLandingDone=false;timelineState={projects:[],archivedProjects:[],mode:'home',selectedId:null,editor:null,review:null,projectReturnMode:'home'};timelineTags={catalog:null,selectedId:null,membership:null,undo:null};timelineOrders={mine:null,current:null,members:null,context:{context_type:'mine',tag_id:null}};timelineDraftStates=new Map();if(!$('#timelineView')?.hidden)hideTimelineView();resetViewState();showLogin('已退出登录')}
+ 
+ let timelineFilters={project_ids:[],sort_key:'custom',expanded:new Set(),focusedProjectId:null,viewport:null,viewportWidth:760,fullscreen:false},timelineState={projects:[],archivedProjects:[],mode:'home',selectedId:null,editor:null,review:null,projectReturnMode:'home'},timelineDraftStates=new Map();
+ const timelinePortfolioModes=new Set(['all','week','month']);
++let overviewState=FlowboardOverview.createState();
++async function loadOverview(){
++  const snapshot=overviewState,request=++overviewState.request,userId=state.current_user?.id;
++  overviewState.status='loading';overviewState.error='';
++  if(timelineState.mode==='overview')renderTimeline();
++  try{
++    const payload=await api(`/api/workspaces/${state.workspace_id}/timeline/overview?${new URLSearchParams(overviewState.filters)}`);
++    if(snapshot!==overviewState||request!==overviewState.request||state.current_user?.id!==userId)return;
++    overviewState.payload=payload;overviewState.status='ready';
++  }catch(error){
++    if(snapshot!==overviewState||request!==overviewState.request||state.current_user?.id!==userId)return;
++    overviewState.status='error';overviewState.error=error.message;
++    if(error.status===401)showError(error);
++  }
++  if(timelineState.mode==='overview')renderTimeline();
++}
++function renderOverview(){
++  const body=$('#timelineBody'),active=document.activeElement,searchFocused=active?.matches('[data-overview-search]'),selection=searchFocused?[active.selectionStart,active.selectionEnd]:null,scrollY=window.scrollY;
++  body.__timelineAbort?.abort();body.__timelineAbort=new AbortController();
++  body.innerHTML=FlowboardOverview.render(overviewState);
++  FlowboardOverview.bind(body,overviewState,{onChange:loadOverview,onReload:loadOverview,onRender:renderOverview});
++  if(searchFocused){const search=body.querySelector('[data-overview-search]');search?.focus({preventScroll:true});if(search&&selection)search.setSelectionRange(...selection)}
++  window.scrollTo(0,scrollY);renderTimelineChrome();
++}
+ let timelineTags={catalog:null,selectedId:null,membership:null,undo:null},timelineOrders={mine:null,current:null,members:null,context:{context_type:'mine',tag_id:null}},timelineDrag=null;
+ let timelineTransfer={busy:false,filename:'',preview:null,error:null,committed:null,exportReady:null};
+ let timelineCreateOpener=null;
+@@ -75,11 +99,12 @@
+     timelineOrders.context=loadTimelineContextPreference();
+     await loadTimeline();
+     if($('#loginModal').classList.contains('open'))return;
+-    timelineState.mode='home';timelineState.projectReturnMode='home';renderTimeline();showTimelineView();
++    if(timelineState.mode==='home')timelineState.projectReturnMode='home';renderTimeline();showTimelineView();
+   }catch(error){showError(error)}
+ }
+ function setHomeTab(scope){const root=$('#timelineBody');if(!root)return;root.querySelectorAll('[data-timeline-tab]').forEach(button=>button.classList.toggle('on',button.dataset.timelineTab===scope));root.querySelectorAll('[data-timeline-section]').forEach(section=>section.toggleAttribute('hidden',section.dataset.timelineSection!==scope));root.querySelectorAll('[data-timeline-feed]').forEach(list=>list.toggleAttribute('hidden',list.dataset.timelineFeed!==scope));const label=root.querySelector('[data-timeline-feed-scope]');if(label)label.textContent=scope==='mine'?'我 · 最近 6 条 · 新在上':'团队 · 最近 20 条 · 新在上';const note=root.querySelector('[data-timeline-home-note]');if(note)note.textContent=scope==='mine'?'整行点击进入项目页（单项目仪表盘 / 时间表编辑器）；日期、间隔、阶段、轨道、节点状态和备注均可在时间表中维护。':'拖动成员卡片左侧把手，只调整你自己的显示顺序；项目药丸可进入项目页，他人项目的时间表保持只读。'}
+ function renderTimeline(){
++  if(timelineState.mode==='overview'){renderOverview();return}
+   if($('#timelineBody')?.__timelineRemark?.editing)return;
+   timelineState.projects.forEach(timelineDraftState);
+   const archivedContext=timelineOrders.context.context_type==='archived',portfolioMode=timelinePortfolioModes.has(timelineState.mode),projectMode=['single','editor'].includes(timelineState.mode),selectedArchived=timelineState.archivedProjects.some(project=>Number(project.project_id)===Number(timelineState.selectedId));
+@@ -113,7 +138,12 @@
+     if(mode!==previousMode||Number(nextId)!==Number(timelineState.selectedId))clearTimelineDragSelection();
+     if(leavingDirtyEditor){timelineDraftStates.delete(Number(timelineState.editor.project.project_id));timelineState.editor=null}
+     if(projectId)timelineState.selectedId=nextId;
+-    if(['single','editor'].includes(mode)&&!sameProjectTabs)timelineState.projectReturnMode=origin==='all'||previousMode==='all'?'all':'home';
++    if(['single','editor'].includes(mode)&&!sameProjectTabs)timelineState.projectReturnMode=origin==='overview'||previousMode==='overview'?'overview':origin==='all'||previousMode==='all'?'all':'home';
++    if(previousMode==='overview'&&mode!=='overview')overviewState.scrollTop=window.scrollY;
++    if(mode==='overview'){
++      timelineState.mode=mode;timelineState.editor=null;showTimelineView();
++      await loadOverview();window.scrollTo(0,overviewState.scrollTop);return;
++    }
+     if(['editor','single'].includes(mode)){
+       if(!timelineState.selectedId)return;
+       const project=await api(`/api/timeline/projects/${timelineState.selectedId}`),index=timelineState.projects.findIndex(item=>item.project_id===project.project_id);
+@@ -250,10 +280,10 @@
+ async function correctTimelineInitialDate(){const editor=timelineState.editor,node=editor?.project.nodes.find(item=>item.id>0);if(!node)return;const initialDate=prompt(`纠正「${node.name}」初始日期`,node.initial_date||node.date);if(!initialDate)return;try{const result=await api(`/api/workspaces/${state.workspace_id}/timeline/batches/initial-correction`,'POST',{project_id:editor.project.project_id,base_version:editor.original.version,corrections:[{node_id:node.id,initial_date:initialDate}]});acceptTimelineView(result.results[0].view,null);toast('初始日期已纠正')}catch(error){showError(error)}}
+ async function showTimelineReview(){const editor=timelineState.editor;if(!editor)return;try{const review=await api(`/api/workspaces/${state.workspace_id}/timeline/review?project_ids=${editor.project.project_id}`),project=review.projects[0],panel=$('[data-timeline-review-panel]');panel.innerHTML=(project?.batches||[]).slice(0,5).map(batch=>`<article><strong>${esc(batch.actor?.name||batch.actor?.id||'系统')}</strong><span>${esc(batch.change_kind)} · ${batch.change_rows?.length||0} 项变更</span></article>`).join('')||'<p>暂无变更记录</p>';panel.hidden=false}catch(error){showError(error)}}
+ function closeTimeline(){if(!allowTimelineLeave())return;timelineDraftStates=new Map();timelineState.editor=null;openTimeline()}
+-function timelineCrumb(){if(timelineState.mode==='all')return '全项目仪表盘';if(timelineState.mode==='week')return '本周工作';if(timelineState.mode==='month')return '本月工作';if(timelineState.mode==='tags')return '标签';if(timelineState.mode==='archived')return '已归档';if(['single','editor'].includes(timelineState.mode)){const project=timelineProjectById(timelineState.selectedId);return project?project.name:'项目'}return '我的工作'}
++function timelineCrumb(){if(timelineState.mode==='overview')return '项目总览';if(timelineState.mode==='all')return '全项目仪表盘';if(timelineState.mode==='week')return '本周工作';if(timelineState.mode==='month')return '本月工作';if(timelineState.mode==='tags')return '标签';if(timelineState.mode==='archived')return '已归档';if(['single','editor'].includes(timelineState.mode)){const project=timelineProjectById(timelineState.selectedId);return project?project.name:'项目'}return '我的工作'}
+ function removeLegacyTimelineBackRows(){document.querySelectorAll('#timelineView>.timeline-shell>header,#timelineClose').forEach(node=>node.remove())}
+-function showTimelineView(){const workspace=$('#boardWorkspace'),view=$('#timelineView');if(!view)return;removeLegacyTimelineBackRows();if(workspace)workspace.hidden=true;view.hidden=false;[['timelineBtn','home'],['timelineAllBtn','all'],['timelineWeekBtn','week'],['timelineMonthBtn','month'],['timelineTagsBtn','tags'],['archivedBtn','archived']].forEach(([id,mode])=>$('#'+id)?.classList.toggle('active',timelineState.mode===mode));renderTimelineChrome()}
+-function hideTimelineView(){$('#timelineBody')?.__timelineAbort?.abort();const workspace=$('#boardWorkspace'),view=$('#timelineView');if(!view)return;view.hidden=true;if(workspace){workspace.hidden=true;workspace.setAttribute('aria-hidden','true')}['timelineBtn','timelineAllBtn','timelineWeekBtn','timelineMonthBtn','timelineTagsBtn','archivedBtn'].forEach(id=>$('#'+id)?.classList.remove('active'));const crumb=$('#breadcrumbBoard');if(crumb)crumb.textContent='项目时间管理'}
++function showTimelineView(){const workspace=$('#boardWorkspace'),view=$('#timelineView');if(!view)return;removeLegacyTimelineBackRows();if(workspace)workspace.hidden=true;view.hidden=false;[['timelineBtn','home'],['timelineAllBtn','all'],['timelineOverviewBtn','overview'],['timelineWeekBtn','week'],['timelineMonthBtn','month'],['timelineTagsBtn','tags'],['archivedBtn','archived']].forEach(([id,mode])=>$('#'+id)?.classList.toggle('active',timelineState.mode===mode));renderTimelineChrome()}
++function hideTimelineView(){$('#timelineBody')?.__timelineAbort?.abort();const workspace=$('#boardWorkspace'),view=$('#timelineView');if(!view)return;view.hidden=true;if(workspace){workspace.hidden=true;workspace.setAttribute('aria-hidden','true')}['timelineBtn','timelineOverviewBtn','timelineAllBtn','timelineWeekBtn','timelineMonthBtn','timelineTagsBtn','archivedBtn'].forEach(id=>$('#'+id)?.classList.remove('active'));const crumb=$('#breadcrumbBoard');if(crumb)crumb.textContent='项目时间管理'}
+ 
+ async function refresh(silent=false){
+   $('#loadState').textContent='加载中…';
+@@ -461,7 +491,7 @@
+ function bindDashboardLayout(dashboard){if(matchMedia('(pointer:coarse)').matches)return;const grid=document.querySelector('.dashboard-grid'),cell=()=>Math.max(1,grid.getBoundingClientRect().width/12);document.querySelectorAll('[data-widget]').forEach(card=>{const widget=dashboard.widgets.find(item=>item.id===+card.dataset.widget);card.onpointerdown=event=>{if(event.target.closest('button,.widget-resize-handle,.widget-data'))return;const x=event.clientX,y=event.clientY;event.preventDefault();document.onpointerup=end=>{document.onpointerup=null;const dx=Math.round((end.clientX-x)/cell()),dy=Math.round((end.clientY-y)/70);if(dx||dy)saveWidgetLayout(dashboard,widget,{...widget,x:widget.x+dx,y:widget.y+dy})}}});document.querySelectorAll('[data-widget-resize-handle]').forEach(handle=>handle.onpointerdown=event=>{const widget=dashboard.widgets.find(item=>item.id===+handle.dataset.widgetResizeHandle),x=event.clientX,y=event.clientY;event.preventDefault();event.stopPropagation();document.onpointerup=end=>{document.onpointerup=null;const dw=Math.round((end.clientX-x)/cell()),dh=Math.round((end.clientY-y)/70);if(dw||dh)saveWidgetLayout(dashboard,widget,{...widget,width:widget.width+dw,height:widget.height+dh})}})}
+ async function loadWidgetData(dashboard,widget){const target=document.querySelector(`[data-widget-data="${widget.id}"]`);if(!target)return;try{const result=await api(`/api/dashboards/${dashboard.id}/widgets/${widget.id}/data`,'POST',{}),data=result.data;if(widget.widget_type==='chart')target.innerHTML=FlowboardDashboard.chart(data,widget.config.spec.chart_type);else if(widget.widget_type==='number')target.innerHTML=data.empty?'<div class="empty-state compact">无数据</div>':`<strong class="dashboard-number">${esc(data.value)}</strong>`;else if(widget.widget_type==='progress')target.innerHTML=data.empty?'<div class="empty-state compact">无数据</div>':`<progress max="1" value="${data.ratio}"></progress><b>${Math.round(data.ratio*100)}%</b><small>${data.complete}/${data.total}</small>`;else target.innerHTML=data.rows.length?`<table class="widget-table"><tbody>${data.rows.map(row=>`<tr><td>${esc(row.date||'')}</td><td>${esc(row.title)}</td><td>${esc(row.status)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty-state compact">无数据</div>'}catch(error){target.innerHTML=`<div class="widget-error">${esc(error.code==='WIDGET_SOURCE_UNAVAILABLE'?'来源不可访问':error.message)}</div>`}}
+ 
+-$('#searchInput').oninput=()=>{clearTimeout(searchTimer);searchTimer=setTimeout(applySearch,300)};$('#filterBtn').onclick=configureFilter;$('#sortBtn').onclick=configureSort;$('#viewSelect').onchange=selectView;$('#addBoardBtn').onclick=addBoard;$('#editBoardBtn').onclick=editBoard;$('#copyBoardBtn').onclick=copyBoard;$('#archiveBoardBtn').onclick=archiveBoard;$('#deleteBoardBtn').onclick=deleteBoard;$('#addGroupBtn').onclick=addGroup;$('#addTaskTop').onclick=()=>state.groups[0]?addTask(state.groups[0].id):toast('请先创建分组');$('#mobileDashboardBtn').onclick=manageDashboards;$('#timelineBtn').onclick=openTimeline;$('#timelineAllBtn').onclick=()=>openTimelineMode('all');$('#timelineWeekBtn').onclick=()=>openTimelineMode('week');$('#timelineMonthBtn').onclick=()=>openTimelineMode('month');$('#timelineTagsBtn').onclick=()=>openTimelineMode('tags');$('#archivedBtn').onclick=()=>openTimelineMode('archived');$('#archivedItemsBtn').onclick=showArchivedItems;$('#trashBtn').onclick=showTrash;$('#logoutBtn').onclick=logout;$('#loginForm').onsubmit=login;
++$('#searchInput').oninput=()=>{clearTimeout(searchTimer);searchTimer=setTimeout(applySearch,300)};$('#filterBtn').onclick=configureFilter;$('#sortBtn').onclick=configureSort;$('#viewSelect').onchange=selectView;$('#addBoardBtn').onclick=addBoard;$('#editBoardBtn').onclick=editBoard;$('#copyBoardBtn').onclick=copyBoard;$('#archiveBoardBtn').onclick=archiveBoard;$('#deleteBoardBtn').onclick=deleteBoard;$('#addGroupBtn').onclick=addGroup;$('#addTaskTop').onclick=()=>state.groups[0]?addTask(state.groups[0].id):toast('请先创建分组');$('#mobileDashboardBtn').onclick=manageDashboards;$('#timelineBtn').onclick=openTimeline;$('#timelineOverviewBtn').onclick=()=>openTimelineMode('overview');$('#timelineAllBtn').onclick=()=>openTimelineMode('all');$('#timelineWeekBtn').onclick=()=>openTimelineMode('week');$('#timelineMonthBtn').onclick=()=>openTimelineMode('month');$('#timelineTagsBtn').onclick=()=>openTimelineMode('tags');$('#archivedBtn').onclick=()=>openTimelineMode('archived');$('#archivedItemsBtn').onclick=showArchivedItems;$('#trashBtn').onclick=showTrash;$('#logoutBtn').onclick=logout;$('#loginForm').onsubmit=login;
+ $('#sidebarToggle').onclick=()=>setSidebarCollapsed(!$('#appSidebar').classList.contains('is-collapsed'));
+ document.querySelectorAll('[data-batch]').forEach(button=>button.onclick=()=>runBatch(button.dataset.batch));
+ async function manageViewsProduction(){const current={activeQuery,activeViewId,activePresentation,adHocQuery,urlViewExplicit,blockedLatch,viewType,localPresentation},view=(state.saved_views||[]).find(item=>item.id===activeViewId);const outcome=await FlowboardViewState.runManage({current,view,viewType,localPresentation,role:state.board?.role||(canWrite()?'member':'viewer'),boardId:state.board?.id,fields:state.fields||[],query:activeQuery,prompt:(...args)=>window.prompt(...args),api});if(outcome.denied)return toast('没有权限执行该视图操作');if(outcome.error)return showError(outcome.error);if(outcome.cancelled)return;setViewState(outcome.state);syncUrl();await refresh();toast('视图操作完成')}
+--- before-feature02/index.html
++++ after-feature02/index.html
+@@ -12,13 +12,14 @@
+   <link rel="stylesheet" href="i12.css" />
+   <link rel="stylesheet" href="i13.css" />
+   <link rel="stylesheet" href="timeline.css?v=20261008-week-flags" />
++  <link rel="stylesheet" href="overview.css?v=20261008-f02" />
+ </head>
+ <body>
+   <div class="app-shell">
+     <aside class="sidebar" id="appSidebar">
+       <button type="button" class="sidebar-collapse" id="sidebarToggle" aria-label="收起侧边栏" aria-expanded="true" title="收起侧边栏">&lt;</button>
+       <div class="brand"><span class="brand-mark">F</span><span class="brand-label">flowboard</span></div>
+-      <nav class="main-nav"><button class="nav-item nav-button" id="timelineBtn" title="我的工作"><span class="nav-icon">◈</span><span class="nav-label">我的工作</span></button><button class="nav-item nav-button nav-child" id="timelineWeekBtn" title="本周工作"><span class="nav-icon">├</span><span class="nav-label">本周工作</span></button><button class="nav-item nav-button nav-child" id="timelineMonthBtn" title="本月工作"><span class="nav-icon">└</span><span class="nav-label">本月工作</span></button><button class="nav-item nav-button" id="timelineAllBtn" title="全项目仪表盘"><span class="nav-icon">▤</span><span class="nav-label">全项目仪表盘</span></button><button class="nav-item nav-button" id="timelineTagsBtn" title="标签"><span class="nav-icon">♢</span><span class="nav-label">标签</span></button><button class="nav-item nav-button" id="archivedBtn" title="已归档"><span class="nav-icon">▣</span><span class="nav-label">已归档</span></button><button class="nav-item nav-button" id="trashBtn" title="回收站" hidden><span class="nav-icon">♲</span><span class="nav-label">回收站</span></button></nav>
++      <nav class="main-nav"><button class="nav-item nav-button" id="timelineBtn" title="我的工作"><span class="nav-icon">◈</span><span class="nav-label">我的工作</span></button><button class="nav-item nav-button nav-child" id="timelineOverviewBtn" title="项目总览"><span class="nav-icon">▤</span><span class="nav-label">项目总览</span></button><button class="nav-item nav-button nav-child" id="timelineWeekBtn" title="本周工作"><span class="nav-icon">├</span><span class="nav-label">本周工作</span></button><button class="nav-item nav-button nav-child" id="timelineMonthBtn" title="本月工作"><span class="nav-icon">└</span><span class="nav-label">本月工作</span></button><button class="nav-item nav-button" id="timelineAllBtn" title="全项目仪表盘"><span class="nav-icon">▤</span><span class="nav-label">全项目仪表盘</span></button><button class="nav-item nav-button" id="timelineTagsBtn" title="标签"><span class="nav-icon">♢</span><span class="nav-label">标签</span></button><button class="nav-item nav-button" id="archivedBtn" title="已归档"><span class="nav-icon">▣</span><span class="nav-label">已归档</span></button><button class="nav-item nav-button" id="trashBtn" title="回收站" hidden><span class="nav-icon">♲</span><span class="nav-label">回收站</span></button></nav>
+       <div class="side-section legacy-hidden"><div class="side-heading"><span>看板</span><button id="addBoardBtn" class="write-only" title="新建看板">＋</button></div><div id="boardList" class="board-list"><div class="side-empty">加载中…</div></div></div>
+       <div class="sidebar-bottom"><div class="top-actions" aria-label="账户与同步状态"><div class="sidebar-sync"><span class="realtime-state" id="realtimeState">连接中</span><span class="updated" id="loadState">自动同步</span></div><div class="current-user" id="currentUser"></div><button class="tool-btn" id="logoutBtn">退出</button></div></div>
+     </aside>
+@@ -40,6 +41,6 @@
+   <div class="modal-backdrop" id="taskModal"><div class="task-modal"><button class="modal-close" data-close="taskModal">×</button><div id="modalBody"></div></div></div>
+   <div class="modal-backdrop" id="listModal"><div class="task-modal list-modal"><button class="modal-close" data-close="listModal">×</button><div id="listModalBody"></div></div></div>
+   <div class="modal-backdrop login-backdrop" id="loginModal"><form class="login-card" id="loginForm"><div class="brand login-brand"><span class="brand-mark">F</span><span>flowboard</span></div><h2>登录工作空间</h2><p>使用管理员提供的账号登录。</p><label>用户名<input id="loginUser" name="username" autocomplete="username" required /></label><label>密码<input id="loginPassword" name="password" type="password" autocomplete="current-password" required /></label><div class="login-error" id="loginError"></div><button class="primary-btn" type="submit">登录</button></form></div>
+-  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js?v=20260930-team-order"></script><script src="i12-ui.js"></script><script src="app.js?v=20260930-team-order"></script>
++  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js?v=20261008-f02"></script><script src="overview-ui.js?v=20261008-f02"></script><script src="i12-ui.js"></script><script src="app.js?v=20261008-f02"></script>
+ </body>
+ </html>
+--- before-feature02/server.py
++++ after-feature02/server.py
+@@ -14,6 +14,7 @@
+ from flowboard.database import SCHEMA_VERSION, migrate
+ from flowboard.service import ApiError, FlowboardService, reject_unknown, require_object, require_text
+ from flowboard.timeline import TimelineService
++from flowboard.overview import project_overview
+ 
+ 
+ ROOT = Path(__file__).resolve().parent
+@@ -21,7 +22,7 @@
+ PORT = int(os.getenv("FLOWBOARD_PORT", "8080"))
+ DB = os.getenv("FLOWBOARD_DB", str(ROOT / "flowboard.db"))
+ SESSION_COOKIE = "flowboard_session"
+-PUBLIC_PATHS = {"/", "/index.html", "/styles.css", "/auth.css", "/lifecycle.css", "/dashboard.css", "/dashboard-mobile.css", "/timeline.css", "/i12.css", "/i13.css", "/view-state.js", "/view-ui.js", "/schedule-ui.js", "/dashboard-ui.js", "/timeline-ui.js", "/i12-ui.js", "/app.js"}
++PUBLIC_PATHS = {"/", "/index.html", "/styles.css", "/auth.css", "/lifecycle.css", "/dashboard.css", "/dashboard-mobile.css", "/timeline.css", "/overview.css", "/overview-ui.js", "/i12.css", "/i13.css", "/view-state.js", "/view-ui.js", "/schedule-ui.js", "/dashboard-ui.js", "/timeline-ui.js", "/i12-ui.js", "/app.js"}
+ 
+ 
+ class PresenceRegistry:
+@@ -191,6 +192,8 @@
+         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","member-order"]:
+             if method=="GET":return 200,self.timeline.get_member_order(user,int(parts[2])),None
+             if method=="PUT":return 200,self.timeline.put_member_order(user,int(parts[2]),data),None
++        if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","overview"] and method=="GET":
++            return 200,project_overview(self.timeline,user,int(parts[2]),parse_qs(parsed.query,keep_blank_values=True)),None
+         if len(parts)==4 and parts[:2]==["api","workspaces"] and parts[3]=="timeline" and method=="GET":
+             return 200,self.timeline.list_projects(user,int(parts[2]),query.get("archive_state",["active"])[0]),None
+         if len(parts)==4 and parts[:3]==["api","timeline","projects"] and method=="GET":
+--- before-feature02/flowboard/timeline.py
++++ after-feature02/flowboard/timeline.py
+@@ -97,9 +97,9 @@
+     def _date(value):
+         return datetime.strptime(value, "%Y-%m-%d").date()
+ 
+-    def _view(self, conn, project, *, user_id=None, role=None):
+-        nodes = self._nodes(conn, project["id"])
+-        today = self._server_today()
++    def _view(self, conn, project, *, user_id=None, role=None, nodes=None, today=None):
++        nodes = self._nodes(conn, project["id"]) if nodes is None else nodes
++        today = self._server_today() if today is None else today
+         payloads = []
+         intervals = {}
+         segments = []
+--- before-feature02/timeline-ui.js
++++ after-feature02/timeline-ui.js
+@@ -83,7 +83,7 @@
+     const archiveAction=mode==='single'&&canArchive?`<button type="button" class="danger" data-timeline-archive="${project.project_id}">归档项目</button>`:canUnarchive?`<button type="button" data-timeline-unarchive="${project.project_id}">取消归档</button>`:'';
+     const deleteAction=mode==='single'&&canDelete&&!project?.archived_at?`<button type="button" class="danger" data-timeline-delete="${project.project_id}" data-project-version="${project.version}">删除项目</button>`:'';
+     const menu=archiveAction||deleteAction?`<details class="tl-project-menu"><summary aria-label="项目操作">•••</summary><div>${archiveAction}${deleteAction}</div></details>`:'';
+-    const target=backMode==='all'?'all':'home',label=target==='all'?'返回':'我的工作';
++    const target=backMode==='overview'?'overview':backMode==='all'?'all':'home',label=target==='overview'?'返回项目总览':target==='all'?'返回':'我的工作';
+     return `<div class="timeline-project-tabs"><nav aria-label="项目页签"><button type="button" class="back" data-timeline-mode-target="${target}"><span class="timeline-back-arrow" aria-hidden="true">←</span><span class="timeline-back-label">${label}</span></button><button type="button" class="${mode==='single'?'on':''}" data-timeline-mode-target="single" aria-pressed="${mode==='single'}">单项目仪表盘</button><button type="button" class="${mode==='editor'?'on':''}" data-timeline-mode-target="editor" aria-pressed="${mode==='editor'}">时间表编辑器</button></nav><div class="timeline-project-tab-actions">${write&&!project?.archived_at?'<button type="button" data-timeline-export>导出 Excel</button>':''}${menu}</div></div>`;
+   }
+   function editorIntervals(project){const result=new Map();for(const track of ['main','parallel']){const chain=(project.nodes||[]).filter(node=>node.track===track).slice().sort(compareNodes);chain.forEach((node,index)=>result.set(Number(node.id),index?Math.round((iso(node.date)-iso(chain[index-1].date))/DAY):null))}return result}
+@@ -578,7 +578,7 @@
+     const membersById=new Map(members.map(member=>[member.id,member])),orderedMembers=memberOrder?.member_ids?[...memberOrder.member_ids.map(id=>membersById.get(id)).filter(Boolean),...members.filter(member=>!memberOrder.member_ids.includes(member.id))]:members;
+     const row=project=>{const metrics=project.metrics||{},count=(project.nodes||[]).length,stage=count?metrics.current_stage||project.nodes[0]?.stage:'',upcoming=metrics.upcoming?.[0]?.date,overdue=Number(metrics.overdue_count)||0,status=count?`${esc(stage||'未开始')}${overdue?` · <b class="tl-red">逾期 ${overdue}</b>`:''}${upcoming?` · 临近 ${esc(upcoming.slice(5).replace('-','/'))}`:''}`:'未开始 · 待录入首个节点',canManage=admin||(write&&ownedBy(project,currentUser));return `<article class="tl-prow" data-project-choice="${project.project_id}" data-order-project="${project.project_id}" data-project-rename-host><button type="button" class="tl-order-grip" draggable="true" aria-label="拖拽调整我的顺序" tabindex="-1">⋮⋮</button><button type="button" class="tl-prow-main" data-timeline-open="single" data-project-id="${project.project_id}"><i class="tl-prow-dot ${count?stageClass(stage):'is-empty'}"></i><strong>${esc(project.name)}</strong><span class="tl-prow-meta">${status}</span>${overdue?`<span class="tl-risk-chip">逾期 ${overdue}</span>`:''}<span class="tl-prow-go" aria-hidden="true">›</span></button><span class="tl-prow-actions"><button type="button" data-timeline-open="editor" data-project-id="${project.project_id}">编辑</button>${canManage?`<button type="button" data-timeline-rename-start="${project.project_id}">重命名</button>`:''}${canManage?`<button type="button" class="timeline-delete" data-timeline-delete="${project.project_id}" data-project-version="${project.version}">删除</button>`:''}</span>${canManage?projectRenameForm(project,'home'):''}</article>`};
+     const strip=member=>{const owned=projects.filter(project=>ownedBy(project,member)),isMe=Boolean(currentUser&&member.id===currentUser.id),pills=owned.map((project,index)=>{const metrics=project.metrics||{},overdue=Number(metrics.overdue_count)||0,upcoming=metrics.upcoming?.[0]?.date,locked=!admin&&!ownedBy(project,currentUser);return `<button type="button" class="tl-pill ${stageClass(metrics.current_stage)}" data-timeline-member-open="${project.project_id}"${index>=10?' data-member-extra hidden':''}><i class="dot"></i><b>${esc(project.name)}</b><small>${overdue?`逾期 ${overdue}`:esc(metrics.current_stage||'未开始')}${upcoming?` · 临近 ${esc(upcoming.slice(5).replace('-','/'))}`:''}</small>${locked?'<span class="tl-lock">🔒 只读</span>':''}</button>`}).join(''),more=owned.length>10?`<button type="button" class="tl-member-more" data-timeline-member-toggle="${esc(member.id)}" aria-expanded="false">显示全部（剩余 ${owned.length-10} 个）</button>`:'';return `<div class="tl-mrow" data-order-member="${esc(member.id)}"><button type="button" class="tl-order-grip" draggable="true" aria-label="拖拽调整团队成员卡片顺序" tabindex="-1">⋮⋮</button><div class="tl-member-head"><span class="tl-mavatar" aria-hidden="true">${esc(String(member.name||'?').slice(0,1))}</span><span><b>${esc(member.name||'')}${isMe?'（我）':''}</b><small>${isMe&&admin?'admin':'member'} · ${owned.length} 个项目</small></span></div><span class="tl-mpills">${owned.length?`${pills}${more}`:'<span class="tl-mnone">暂无负责项目</span>'}</span></div>`};
+-    const actions=write?`<div class="tl-home-actions"><button type="button" class="tl-home-import" data-timeline-import-open>⇪ 导入 Excel</button><button type="button" class="tl-home-export" data-timeline-export>导出 Excel</button><button type="button" data-timeline-create-open>＋ 新建项目</button></div>`:'';
++    const actions=write?`<div class="tl-home-actions"><button type="button" data-timeline-mode-target="overview">▤ 项目总览</button><button type="button" class="tl-home-import" data-timeline-import-open>⇪ 导入 Excel</button><button type="button" class="tl-home-export" data-timeline-export>导出 Excel</button><button type="button" data-timeline-create-open>＋ 新建项目</button></div>`:'';
+     return `<div class="tl-home"><header class="tl-home-head"><div><h1>我的工作</h1><small>今天 ${shanghaiToday()}</small></div>${actions}</header><div class="tl-kpis"><button type="button" class="tl-kpi" data-timeline-kpi="mine"><small>我的项目</small><span><b>${stats.mine}</b>${stats.myOverdue?`<em class="r">逾期 ${stats.myOverdue}</em>`:''}</span></button><button type="button" class="tl-kpi" data-timeline-kpi="team"><small>团队项目</small><span><b>${stats.team}</b>${stats.overdue?`<em class="r">逾期 ${stats.overdue}</em>`:''}</span></button><button type="button" class="tl-kpi" data-timeline-kpi="members"><small>团队成员</small><span><b>${stats.members}</b></span></button><button type="button" class="tl-kpi" data-timeline-kpi="feed"><small>今日团队动态</small><span><b>${stats.todayFeed}</b>${stats.yesterdayFeed?`<em class="g">昨日 ${stats.yesterdayFeed}</em>`:''}</span></button></div><div class="tl-cols"><div class="tl-maincol"><div class="tl-tabs" role="tablist"><button type="button" class="on" data-timeline-tab="mine">我的项目（${stats.mine}）</button><button type="button" data-timeline-tab="team">团队项目（${stats.team}）</button></div><section class="tl-section" data-timeline-section="mine" data-order-list="mine">${mine.length?mine.map(row).join(''):'<div class="tl-empty">暂无负责项目，可通过上方“新建项目”创建。</div>'}</section><section class="tl-section team" data-timeline-section="team" data-order-list="team" hidden>${orderedMembers.length?orderedMembers.map(strip).join(''):'<div class="tl-empty">暂无成员</div>'}</section><p class="tl-home-note" data-timeline-home-note="mine">整行点击进入项目页（单项目仪表盘 / 时间表编辑器）；日期、间隔、阶段、轨道、节点状态和备注均可在时间表中维护。</p></div><aside class="tl-feed"><h4>最新动态 <small data-timeline-feed-scope>我 · 最近 6 条 · 新在上</small></h4><p class="tl-feed-note">随左侧标签联动：我的项目显示当前用户最近 6 条，团队项目显示全员最近 20 条；最新记录在上。</p><div data-timeline-feed="mine">${feedRows(review,currentUser?.name,'mine')}</div><div data-timeline-feed="team" hidden>${feedRows(review,currentUser?.name,'team')}</div></aside></div></div>`;
+   }
+ 

@@ -1,0 +1,34 @@
+test_batch_sql_zero_writes_and_archive_deleted_workspace_isolation (test_overview.OverviewTests.test_batch_sql_zero_writes_and_archive_deleted_workspace_isolation) ... ok
+test_filtered_counts_next_ties_and_current_stage_are_distinct (test_overview.OverviewTests.test_filtered_counts_next_ties_and_current_stage_are_distinct) ... ok
+test_focus_search_target_and_complete_project_progress (test_overview.OverviewTests.test_focus_search_target_and_complete_project_progress) ... ok
+test_http_acl_my_scope_validation_and_static_allowlist (test_overview.OverviewTests.test_http_acl_my_scope_validation_and_static_allowlist) ... ok
+test_project_urgency_sort_and_groups_do_not_follow_filtered_nodes (test_overview.OverviewTests.test_project_urgency_sort_and_groups_do_not_follow_filtered_nodes) ... ok
+test_search_stage_track_completion_and_empty_project_semantics (test_overview.OverviewTests.test_search_stage_track_completion_and_empty_project_semantics) ... ok
+test_tag_filter_is_shared_active_and_workspace_scoped (test_overview.OverviewTests.test_tag_filter_is_shared_active_and_workspace_scoped) ... ok
+test_temporal_month_week_and_next30_boundaries (test_overview.OverviewTests.test_temporal_month_week_and_next30_boundaries) ... ok
+test_upcoming_progress_is_full_project_today_ties_and_not_overdue (test_overview.OverviewTests.test_upcoming_progress_is_full_project_today_ties_and_not_overdue) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 16.620s
+
+OK
+[09/Oct/2026 12:01:34] "GET /api/workspaces/1/timeline/overview HTTP/1.1" 401 -
+[09/Oct/2026 12:01:34] "POST /api/auth/login HTTP/1.1" 200 -
+[09/Oct/2026 12:01:35] "POST /api/auth/login HTTP/1.1" 200 -
+[09/Oct/2026 12:01:35] "POST /api/auth/login HTTP/1.1" 200 -
+[09/Oct/2026 12:01:35] "GET /api/workspaces/1/timeline/overview HTTP/1.1" 403 -
+[09/Oct/2026 12:01:35] "GET /api/workspaces/999/timeline/overview HTTP/1.1" 403 -
+[09/Oct/2026 12:01:35] "GET /api/workspaces/1/timeline/overview?scope=mine&period=all HTTP/1.1" 200 -
+[09/Oct/2026 12:01:35] "GET /api/workspaces/1/timeline/overview?period=all HTTP/1.1" 200 -
+[09/Oct/2026 12:01:35] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 403 -
+[09/Oct/2026 12:01:35] "GET /api/workspaces/1/timeline/overview?period=invalid HTTP/1.1" 422 -
+[09/Oct/2026 12:01:35] "GET /api/workspaces/1/timeline/overview?period= HTTP/1.1" 422 -
+[09/Oct/2026 12:01:35] "GET /api/workspaces/1/timeline/overview?track=bad HTTP/1.1" 422 -
+[09/Oct/2026 12:01:35] "GET /api/workspaces/1/timeline/overview?scope=admin HTTP/1.1" 422 -
+[09/Oct/2026 12:01:35] "GET /api/workspaces/1/timeline/overview?period=all&period=week HTTP/1.1" 422 -
+[09/Oct/2026 12:01:35] "GET /api/workspaces/1/timeline/overview?unknown=1 HTTP/1.1" 422 -
+[09/Oct/2026 12:01:35] "GET /api/workspaces/1/timeline/overview?unknown= HTTP/1.1" 422 -
+[09/Oct/2026 12:01:35] "GET /api/workspaces/1/timeline/overview?q=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa HTTP/1.1" 422 -
+[09/Oct/2026 12:01:36] "GET /overview.css HTTP/1.1" 200 -
+[09/Oct/2026 12:01:36] "GET /overview-ui.js HTTP/1.1" 200 -
+[09/Oct/2026 12:01:36] "GET /flowboard/overview.py HTTP/1.1" 404 -

@@ -1,0 +1,25 @@
+{
+  "reference_sha256": "5643a23070568dd73830a4fa8fac15497849a3ae1a88cece7f07f593c5a89714",
+  "files": {
+    "app.js": "bc68b878d95034cfeba690a9e6be0f8828167f73917dab9640bf18c1e1658704",
+    "index.html": "6f476b33cd4daaac20839d42d2480b5c8202cb3340588414eefba9335eb849d0",
+    "server.py": "a6e1e8863ec27b1cb437b062a7d973d7a0b3baadae71fd6ea5c28abd4c13a00a",
+    "flowboard/timeline.py": "775ef390928e598a4397fd25fad107a62e62f1c734b027f7af54d5ba0f757456",
+    "timeline-ui.js": "340490fe6b8d4dfc6ca6acfc8907ea2e1bc4ea8b843f725ce57557bf55796e70",
+    "overview-ui.js": "abd48ddac470f8b0c2e0ec4d8061d8fc190bcd0f51c2a4a350d4c532f3368ce2",
+    "overview.css": "a7a475d69c6144f7678f98d35318a78c2f47c939afe11119e5204b1fa76aec1c",
+    "flowboard/overview.py": "0b9eaf38f6efadafc51c22bf2da54f95ad03d0ebf3f19e1216bd490b9b353127",
+    "tests/test_overview.py": "2271f42b36049339c0a966d0c46bfb4612522d95d58988d2d3f0a8b9ef4c33b0",
+    "tests/test_overview_e2e.py": "6775bcb452229e69f48e746dbf706b1e9dab06df8ebfd529424fc801339c9f34",
+    "tests/overview_fixtures.py": "0155579ba3ab5c6e6cb8d4e29758eac6482c4daea070f29a80a90b7af84ec557",
+    "tests/overview_ui.test.js": "b9ab09f2f3ace76365da418a88a96f532530dcaf13788731fee145fb1714337e",
+    "feature-02-进阶仪表盘/01-PROJECT_OVERVIEW_CONTRACT.md": "ead334657a797545eecd54d8b43f98b2ad252de7aa59a3bcb0db8c41fc0fc3cf",
+    "feature-02-进阶仪表盘/02-DELIVERY.md": "8f5125c2b575d4d6fddef9f133d14be87761616a842fdb6c888a24306bd82a98",
+    "feature-02-进阶仪表盘/preview.py": "ff1d1c935733aeaeaee231357d9d420ca2231c7b39cc2c8f2a904fd847991c10",
+    "feature-02-进阶仪表盘/local-preview.cmd": "73ac0dc4b2193f8b3ec43f9eff9c2bfa42b3f0f6d1ea3b5b92454505a02165fc",
+    "feature-02-进阶仪表盘/add-preview-projects.py": "6340f18f09118b8a8c478185704f80703ad8c0d50a4aeff097cb412348166ea1",
+    "feature-02-进阶仪表盘/refine-preview-projects.py": "02b31926b2de01a634d01e44b4a25b7fa35bff87abac7c17826aac91e00dcede"
+  },
+  "status": "DEVELOPMENT_READY / HUMAN_ACCEPTANCE_PENDING / NOT_DEPLOYED",
+  "preview_feedback": "default week/open explained; full sample view restored; pending-search/filter-response race fixed; Chromium 8/8 PASS"
+}

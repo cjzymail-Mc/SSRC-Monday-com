@@ -1,0 +1,784 @@
+diff --git a/STATE.md b/STATE.md
+index c5e7c7d..1443282 100644
+--- a/STATE.md
++++ b/STATE.md
+@@ -1,7 +1,17 @@
+ # STATE.md — Flowboard 当前状态
+ 
+ > 跨会话当前快照；完整历史：`team-progress/STATE-archive-20260904-pre-production-rebaseline.md`。
+-> 更新：2026-09-04
++> 更新：2026-10-08
++
++> 2026-10-08 在途改动：登录框移除写死的 `u1` 并补齐自动填充字段标识；本周仪表盘聚焦项目的节点旗标取消轨道纵向裁切，更新 CSS 版本。新增七项目双轨浏览器回归，修复前本周主线/并行裁切稳定失败，修复后本周/月切换、范围筛选及全项目画布 3/3 PASS，Node UI PASS。本月同类异常暂未复现，正式运行体验待用户确认。未写正式库，未 commit/push，未重启正式服务。证据见 `team-progress/20261008-dashboard-flags.md`。
++
++> 2026-09-30 在途改动：按用户对【团队项目】成员卡片的反馈，管理员和普通成员可拖动卡片左侧把手，自定义各自账户的成员卡片顺序。新增独立的 schema v20 个人排序记录、版本冲突与集合变更校验及审计；8081 隔离库已备份并迁移至 v20，浏览器真实拖动和刷新持久性已验证。用户随后明确授权备份并升级正式库：正式库现为 v20，备份恢复与启动检查通过，原有 44 张非迁移记录表、1,452 行数据一致；本次未启动 8080 服务，也未 commit、push 或部署；拖拽体验待用户确认。证据见 `team-progress/20260930-team-member-order.md`。
++
++> 2026-09-24 在途改动：按用户最新反馈，单项目仪表盘菜单新增【删除项目】，首页【已归档】列表可直接软删除；管理员和项目创建者有权限，其他成员由服务端拒绝。删除保留项目、节点、归档状态和历史审计，并追加含原归档状态的删除审计。隔离测试库后台 34/34、HTTP 15/15、归档 5/5、Node UI 与 8081 浏览器视觉检查 PASS；待用户实际体验，未 commit/push/部署，真实库未写入。证据见 `team-progress/20260924-project-soft-delete.md`。
++
++> 2026-09-16 在途改动：Excel 标准模板与导出已共用七列格式、原生日期、样式和填写校验；导入窗口增加“下载标准模板”（现预置 3 个示范项目 / 15 节点，附单项目/多项目说明；新增定向后台 20/20、浏览器 2/2 和排版检查 PASS），现兼容单文件拖拽与点击选择，并支持 XLSX 工作表下拉选择、切换重预览和仅选中表提交（追加浏览器回归 5/5 PASS；后台 52 项经旧提示断言更新复验全部通过），一个文件内的多项目导入保持支持。后台 56/56、浏览器 6/6、最终定向 8/8、Node UI 和工作簿/界面渲染检查 PASS；97 项目 / 857 节点完成实际文件往返。待用户体验确认，未提交或部署，真实库未写入。证据见 `team-progress/20260916-excel-unified-implementation.md`。
++
++> 2026-09-07 在途改动：节点备注 C 方案实现及自动化验收已完成，待用户实际体验确认；浏览器相关回归 9/9、后台回归 49/49、Node UI 与视觉检查 PASS。AGENTS.md 已精简并保留防循环硬停门。未提交或部署，真实库未写入。证据见 `team-progress/20260907-node-remark-implementation.md`。
+ 
+ ## 默认状态
+ 
+@@ -9,11 +19,11 @@ Flowboard 已在公司局域网正式运行；feature01 已通过真实使用验
+ 
+ ## 可续接路线
+ 
+-- **生产运行** — `start-flowboard.cmd` 的 8080 健康检查返回 schema v19；2026-09-04 对根 `flowboard.db` 只读核验为 integrity `ok`、外键违规 0，快照为 5 active / 1 archived / 2 soft-deleted 项目、107 节点，最新业务更新为 2026-09-04。下一步是按真实反馈做小批次维护；入口：`README.md`。
++- **生产运行** — 2026-09-30 按用户明确授权将根 `flowboard.db` 从 v19 升级至 v20，`start-flowboard.cmd --check` 返回 PASS，integrity `ok`、外键违规 0；升级前备份包及恢复实测记录见 `team-progress/20260930-v20-production-migration.json`。本次未启动 8080 服务，可重新运行正式启动器。下一步是按真实反馈做小批次维护；入口：`README.md`。
+ - **feature01** — 原 `WAIT_GATE5_HUMAN` 等四个等待态已被人工验收、正式上线及持续使用事实取代；9 月 3 日旗标升级和 9 月 4 日拖拽升级已在 `origin/main` 的 `6e66f7f`。当前只保留用户选中的体验迭代；`AUD-03` 窄屏导航是待拍板可选项，不阻断现有桌面生产。入口：`feature-01-项目时间管理-仪表盘/STATE.md`。
+ 
+ ## 恢复边界
+ 
+ - 真实库业务数据是动态快照；继续只读优先，迁移、恢复或 purge 仍须单独授权。开发验证使用 `local-test.cmd` 或临时库。
+-- `stash@{0}` 是 2026-09-01 同步前保护快照，未获明确指令不得清理；本轮仅更新文档，尚未 commit/push。
++- `stash@{0}` 是 2026-09-01 同步前保护快照，未获明确指令不得清理；当前节点备注、Excel 模板/导出与治理文档改动尚未 commit/push。
+ - 冻结合同和 `team-progress/` 中旧 `WAIT_*` 文案是里程碑历史，不是当前控制面；当前范围以 `feature-01-项目时间管理-仪表盘/mainline-feature01.md` 为准。
+diff --git a/app.js b/app.js
+index a70d06d..d8dfd73 100644
+--- a/app.js
++++ b/app.js
+@@ -23,7 +23,7 @@ async function api(path,method='GET',body){
+ }
+ function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2600)}
+ function showError(error){if(error.status===401){csrfToken='';resetViewState();showLogin('登录已过期，请重新登录');return}const location=error.details?.row?`（第 ${error.details.row} 行${error.details.header?` · ${error.details.header}`:''}）`:'';toast(`${error.message}${location}`);if(error.status===409)refresh()}
+-function showLogin(message=''){$('#loginError').textContent=message;$('#loginModal').classList.add('open');setTimeout(()=>$('#loginUser').focus(),0)}
++function showLogin(message=''){$('#timelineBody')?.__timelineAbort?.abort();$('#loginError').textContent=message;$('#loginModal').classList.add('open');setTimeout(()=>$('#loginUser').focus(),0)}
+ function hideLogin(){$('#loginModal').classList.remove('open')}
+ function openList(html){$('#listModalBody').innerHTML=html;$('#listModal').classList.add('open')}
+ function closeModal(id){$('#'+id).classList.remove('open')}
+@@ -39,11 +39,11 @@ function resetViewState(){const clean=FlowboardViewState.reset();activeQuery=cle
+ function viewTransition(event,payload={}){const next=FlowboardViewState.transition({activeQuery,activeViewId,activePresentation,adHocQuery,urlViewExplicit,blockedLatch,viewType,localPresentation},event,payload);activeQuery=next.activeQuery;activeViewId=next.activeViewId;activePresentation=next.activePresentation;adHocQuery=next.adHocQuery;urlViewExplicit=next.urlViewExplicit;blockedLatch=next.blockedLatch;viewType=next.viewType||viewType;localPresentation=next.localPresentation||localPresentation}
+ function setViewState(next){activeQuery=next.activeQuery;activeViewId=next.activeViewId;activePresentation=next.activePresentation;adHocQuery=next.adHocQuery;urlViewExplicit=next.urlViewExplicit;blockedLatch=next.blockedLatch;viewType=next.viewType||viewType;localPresentation=next.localPresentation||localPresentation}
+ async function login(event){event.preventDefault();try{resetViewState();timelineLandingDone=false;const result=await api('/api/auth/login','POST',{username:$('#loginUser').value.trim(),password:$('#loginPassword').value});csrfToken=result.csrf_token;state.current_user=result.user;hideLogin();await refresh();toast('登录成功');await landTimelineHome()}catch(error){showLogin(error.message)}}
+-async function logout(){if(realtimeSource)realtimeSource.close();realtimeSource=null;try{await api('/api/auth/logout','POST',{})}catch(error){}csrfToken='';state.current_user=null;timelineLandingDone=false;timelineState={projects:[],archivedProjects:[],mode:'home',selectedId:null,editor:null,review:null,projectReturnMode:'home'};timelineTags={catalog:null,selectedId:null,membership:null,undo:null};timelineOrders={mine:null,current:null,context:{context_type:'mine',tag_id:null}};timelineDraftStates=new Map();if(!$('#timelineView')?.hidden)hideTimelineView();resetViewState();showLogin('已退出登录')}
++async function logout(){if(!allowTimelineLeave())return;if(realtimeSource)realtimeSource.close();realtimeSource=null;try{await api('/api/auth/logout','POST',{})}catch(error){}csrfToken='';state.current_user=null;timelineLandingDone=false;timelineState={projects:[],archivedProjects:[],mode:'home',selectedId:null,editor:null,review:null,projectReturnMode:'home'};timelineTags={catalog:null,selectedId:null,membership:null,undo:null};timelineOrders={mine:null,current:null,members:null,context:{context_type:'mine',tag_id:null}};timelineDraftStates=new Map();if(!$('#timelineView')?.hidden)hideTimelineView();resetViewState();showLogin('已退出登录')}
+ 
+ let timelineFilters={project_ids:[],sort_key:'custom',expanded:new Set(),focusedProjectId:null,viewport:null,viewportWidth:760,fullscreen:false},timelineState={projects:[],archivedProjects:[],mode:'home',selectedId:null,editor:null,review:null,projectReturnMode:'home'},timelineDraftStates=new Map();
+ const timelinePortfolioModes=new Set(['all','week','month']);
+-let timelineTags={catalog:null,selectedId:null,membership:null,undo:null},timelineOrders={mine:null,current:null,context:{context_type:'mine',tag_id:null}},timelineDrag=null;
++let timelineTags={catalog:null,selectedId:null,membership:null,undo:null},timelineOrders={mine:null,current:null,members:null,context:{context_type:'mine',tag_id:null}},timelineDrag=null;
+ let timelineTransfer={busy:false,filename:'',preview:null,error:null,committed:null,exportReady:null};
+ let timelineCreateOpener=null;
+ let timelineModalKind=null;
+@@ -62,7 +62,7 @@ function timelineProjectEditable(value){const project=typeof value==='object'?va
+ function timelineArchiveManageable(value){const project=typeof value==='object'?value:timelineProjectById(value);return Boolean(project&&(project.can_archive||project.can_unarchive))}
+ function timelineHasDraft(){return [...timelineDraftStates.values()].some(draft=>draft.dirty)||Boolean(timelineState.editor?.dirty)}
+ function discardAllTimelineDrafts(){const editorProjectId=Number(timelineState.editor?.project?.project_id),restored=new Map();for(const [projectId,draft] of timelineDraftStates){if(!draft?.dirty){restored.set(Number(projectId),draft);continue}const fresh=FlowboardTimeline.editorState(draft.original);fresh.lastBatchId=draft.lastBatchId;restored.set(Number(projectId),fresh);if(Number(projectId)===editorProjectId)timelineState.editor=fresh}if(timelineState.editor?.dirty&&!restored.has(editorProjectId)){const fresh=FlowboardTimeline.editorState(timelineState.editor.original);fresh.lastBatchId=timelineState.editor.lastBatchId;timelineState.editor=fresh;restored.set(editorProjectId,fresh)}timelineDraftStates=restored}
+-function allowTimelineLeave(){if(!timelineHasDraft())return true;if(!confirm('有尚未提交的项目时间表草稿，确定放弃并离开？'))return false;discardAllTimelineDrafts();return true}
++function allowTimelineLeave(){if($('#timelineBody')?.__timelineRemark?.requestClose()===false)return false;if(!timelineHasDraft())return true;if(!confirm('有尚未提交的项目时间表草稿，确定放弃并离开？'))return false;discardAllTimelineDrafts();return true}
+ let timelineLandingDone=false;
+ async function loadTimelineReview(){try{const payload=await api(`/api/workspaces/${state.workspace_id}/timeline/review`);timelineState.review=payload.projects||[]}catch(_){/* 动态栏允许为空：静默降级 */}}
+ async function landTimelineHome(){
+@@ -78,8 +78,9 @@ async function landTimelineHome(){
+     timelineState.mode='home';timelineState.projectReturnMode='home';renderTimeline();showTimelineView();
+   }catch(error){showError(error)}
+ }
+-function setHomeTab(scope){const root=$('#timelineBody');if(!root)return;root.querySelectorAll('[data-timeline-tab]').forEach(button=>button.classList.toggle('on',button.dataset.timelineTab===scope));root.querySelectorAll('[data-timeline-section]').forEach(section=>section.toggleAttribute('hidden',section.dataset.timelineSection!==scope));root.querySelectorAll('[data-timeline-feed]').forEach(list=>list.toggleAttribute('hidden',list.dataset.timelineFeed!==scope));const label=root.querySelector('[data-timeline-feed-scope]');if(label)label.textContent=scope==='mine'?'我 · 最近 6 条 · 新在上':'团队 · 最近 20 条 · 新在上';const note=root.querySelector('[data-timeline-home-note]');if(note)note.textContent=scope==='mine'?'整行点击进入项目页（单项目仪表盘 / 时间表编辑器）；日期、间隔、阶段、轨道、节点状态和备注均可在时间表中维护。':'一成员一条等宽长条；项目药丸可进入项目页，他人项目的时间表保持只读。'}
++function setHomeTab(scope){const root=$('#timelineBody');if(!root)return;root.querySelectorAll('[data-timeline-tab]').forEach(button=>button.classList.toggle('on',button.dataset.timelineTab===scope));root.querySelectorAll('[data-timeline-section]').forEach(section=>section.toggleAttribute('hidden',section.dataset.timelineSection!==scope));root.querySelectorAll('[data-timeline-feed]').forEach(list=>list.toggleAttribute('hidden',list.dataset.timelineFeed!==scope));const label=root.querySelector('[data-timeline-feed-scope]');if(label)label.textContent=scope==='mine'?'我 · 最近 6 条 · 新在上':'团队 · 最近 20 条 · 新在上';const note=root.querySelector('[data-timeline-home-note]');if(note)note.textContent=scope==='mine'?'整行点击进入项目页（单项目仪表盘 / 时间表编辑器）；日期、间隔、阶段、轨道、节点状态和备注均可在时间表中维护。':'拖动成员卡片左侧把手，只调整你自己的显示顺序；项目药丸可进入项目页，他人项目的时间表保持只读。'}
+ function renderTimeline(){
++  if($('#timelineBody')?.__timelineRemark?.editing)return;
+   timelineState.projects.forEach(timelineDraftState);
+   const archivedContext=timelineOrders.context.context_type==='archived',portfolioMode=timelinePortfolioModes.has(timelineState.mode),projectMode=['single','editor'].includes(timelineState.mode),selectedArchived=timelineState.archivedProjects.some(project=>Number(project.project_id)===Number(timelineState.selectedId));
+   const sourceProjects=timelineState.mode==='archived'||(portfolioMode&&archivedContext)||(projectMode&&selectedArchived)?timelineState.archivedProjects:timelineState.projects;
+@@ -90,9 +91,9 @@ function renderTimeline(){
+   let renderProjects=sourceProjects;
+   if(portfolioMode&&!archivedContext&&timelineOrders.current){const byId=new Map(timelineState.projects.map(project=>[Number(project.project_id),project]));renderProjects=timelineOrders.current.project_ids.map(id=>byId.get(Number(id))).filter(Boolean)}
+   const allFilters=Object.assign(timelineFilters,{tagCatalog:timelineTags.catalog,orderContext:timelineOrders.context,archived:archivedContext,timeScope:portfolioMode?timelineState.mode:'all',canReorder:!archivedContext&&timelineFilters.sort_key==='custom'&&!timelineFilters.project_ids.length,canArchive:timelineArchiveManageable});
+-  body.innerHTML=FlowboardTimeline.renderWorkspace(renderProjects,{mode:timelineState.mode,selectedId:timelineState.selectedId,admin:Boolean(state.capabilities?.admin),write:Boolean(state.capabilities?.write),editor:timelineState.editor,dashboardStates:timelineDraftStates,filters:allFilters,transfer:timelineTransfer,members:state.members||[],currentUser:state.current_user||null,review:timelineState.review||null,tagsState:timelineTags,mineOrder:timelineOrders.mine,backMode:timelineState.projectReturnMode});
++  body.innerHTML=FlowboardTimeline.renderWorkspace(renderProjects,{mode:timelineState.mode,selectedId:timelineState.selectedId,admin:Boolean(state.capabilities?.admin),write:Boolean(state.capabilities?.write),editor:timelineState.editor,dashboardStates:timelineDraftStates,filters:allFilters,transfer:timelineTransfer,members:state.members||[],currentUser:state.current_user||null,review:timelineState.review||null,tagsState:timelineTags,mineOrder:timelineOrders.mine,memberOrder:timelineOrders.members,backMode:timelineState.projectReturnMode});
+   if(timelineState.mode==='editor'&&timelineState.editor)FlowboardTimeline.bindEditor(body,timelineState.editor,{render:renderTimeline,onSubmit:submitTimelineDraft,onAdd:addTimelineNode,onUndo:undoTimelineBatch,onCorrect:correctTimelineInitialDate,onReview:showTimelineReview,editable:timelineProjectEditable(timelineState.selectedId)});
+-  else if(timelineState.mode==='single'||timelinePortfolioModes.has(timelineState.mode))FlowboardTimeline.bindDashboard(body,{filters:timelineFilters,states:timelineDraftStates,render:renderTimeline,onSubmit:submitTimelineDashboardDraft,onDiscard:discardTimelineDashboardDraft,onUndo:undoTimelineDashboardBatch,onOpenSingle:projectId=>openTimelineMode('single',projectId,{origin:'all'}),onViewportChange:saveTimelineViewport,editable:timelineProjectEditable});
++  else if(timelineState.mode==='single'||timelinePortfolioModes.has(timelineState.mode))FlowboardTimeline.bindDashboard(body,{filters:timelineFilters,states:timelineDraftStates,render:renderTimeline,onSubmit:submitTimelineDashboardDraft,onDiscard:discardTimelineDashboardDraft,onUndo:undoTimelineDashboardBatch,onOpenSingle:projectId=>openTimelineMode('single',projectId,{origin:'all'}),onViewportChange:saveTimelineViewport,onRemarkDraft:()=>toast('备注已加入草稿，点击项目“更新”提交'),editable:timelineProjectEditable});
+   renderTimelineChrome();
+ }
+ function renderTimelineChrome(){const view=$('#timelineView'),crumb=$('#breadcrumbBoard');if(view&&!view.hidden&&crumb)crumb.textContent=timelineCrumb()}
+@@ -101,10 +102,11 @@ function orderQuery(context){const query=new URLSearchParams({context_type:conte
+ async function loadTimelineOrder(context){return api(`/api/workspaces/${state.workspace_id}/timeline/order?${orderQuery(context)}`)}
+ async function loadArchivedTimeline(){const payload=await api(`/api/workspaces/${state.workspace_id}/timeline?archive_state=archived`);timelineState.archivedProjects=payload.projects||[];return payload}
+ async function loadTagMembership(){if(!timelineTags.selectedId){timelineTags.membership=null;return}timelineTags.membership=await api(`/api/workspaces/${state.workspace_id}/timeline/tags/${timelineTags.selectedId}/projects`)}
+-async function loadTimeline(){if(timelineLoadInFlight)return timelineLoadInFlight;timelineLoadInFlight=(async()=>{const payload=await api(`/api/workspaces/${state.workspace_id}/timeline`),[catalog,mineOrder]=await Promise.all([api(`/api/workspaces/${state.workspace_id}/timeline/tags`),loadTimelineOrder({context_type:'mine',tag_id:null})]);timelineState.projects=payload.projects;timelineTags.catalog=catalog;if(timelineTags.selectedId&&!catalog.tags.some(tag=>Number(tag.tag_id)===Number(timelineTags.selectedId)))timelineTags.selectedId=null;if(!timelineTags.selectedId)timelineTags.selectedId=catalog.tags[0]?.tag_id||null;if(timelineOrders.context.context_type==='tag'&&!catalog.tags.some(tag=>Number(tag.tag_id)===Number(timelineOrders.context.tag_id))){timelineOrders.context={context_type:'mine',tag_id:null};saveTimelineContextPreference()}timelineOrders.mine=mineOrder;timelineOrders.current=timelineOrders.context.context_type==='archived'?null:await loadTimelineOrder(timelineOrders.context);const selectedExists=timelineState.projects.some(project=>project.project_id===timelineState.selectedId)||timelineState.archivedProjects.some(project=>project.project_id===timelineState.selectedId);if(!selectedExists)timelineState.selectedId=timelineState.projects[0]?.project_id||null;await Promise.all([loadTimelineReview(),timelineState.mode==='tags'?loadTagMembership():Promise.resolve(),['archived'].includes(timelineState.mode)||timelineOrders.context.context_type==='archived'?loadArchivedTimeline():Promise.resolve()]);renderTimeline()})().finally(()=>{timelineLoadInFlight=null});return timelineLoadInFlight}
++async function loadTimeline(){if(timelineLoadInFlight)return timelineLoadInFlight;timelineLoadInFlight=(async()=>{const payload=await api(`/api/workspaces/${state.workspace_id}/timeline`),[catalog,mineOrder,memberOrder]=await Promise.all([api(`/api/workspaces/${state.workspace_id}/timeline/tags`),loadTimelineOrder({context_type:'mine',tag_id:null}),api(`/api/workspaces/${state.workspace_id}/timeline/member-order`)]);timelineState.projects=payload.projects;timelineTags.catalog=catalog;if(timelineTags.selectedId&&!catalog.tags.some(tag=>Number(tag.tag_id)===Number(timelineTags.selectedId)))timelineTags.selectedId=null;if(!timelineTags.selectedId)timelineTags.selectedId=catalog.tags[0]?.tag_id||null;if(timelineOrders.context.context_type==='tag'&&!catalog.tags.some(tag=>Number(tag.tag_id)===Number(timelineOrders.context.tag_id))){timelineOrders.context={context_type:'mine',tag_id:null};saveTimelineContextPreference()}timelineOrders.mine=mineOrder;timelineOrders.members=memberOrder;timelineOrders.current=timelineOrders.context.context_type==='archived'?null:await loadTimelineOrder(timelineOrders.context);const selectedExists=timelineState.projects.some(project=>project.project_id===timelineState.selectedId)||timelineState.archivedProjects.some(project=>project.project_id===timelineState.selectedId);if(!selectedExists)timelineState.selectedId=timelineState.projects[0]?.project_id||null;await Promise.all([loadTimelineReview(),timelineState.mode==='tags'?loadTagMembership():Promise.resolve(),['archived'].includes(timelineState.mode)||timelineOrders.context.context_type==='archived'?loadArchivedTimeline():Promise.resolve()]);renderTimeline()})().finally(()=>{timelineLoadInFlight=null});return timelineLoadInFlight}
+ async function openTimeline(){try{if(!allowTimelineLeave())return;const view=$('#timelineView');if(view&&!view.hidden&&timelineState.mode==='home')return;timelineState.mode='home';timelineState.projectReturnMode='home';await loadTimeline();showTimelineView()}catch(error){showError(error)}}
+ function clearTimelineDragSelection(){for(const draft of timelineDraftStates.values()){if(!draft?.armed)continue;const nodeId=Number(draft.armed.nodeId);draft.armed=null;if(Number(draft.dashboardContext?.nodeId)===nodeId&&['single','cascade'].includes(draft.dashboardContext?.action))draft.dashboardContext=null}}
+ async function openTimelineMode(mode,projectId,{origin=null}={}){
++  if($('#timelineBody')?.__timelineRemark?.requestClose()===false)return;
+   try{
+     const previousMode=timelineState.mode,nextId=projectId?Number(projectId):timelineState.selectedId,sameProjectTabs=['single','editor'].includes(previousMode)&&['single','editor'].includes(mode)&&Number(nextId)===Number(timelineState.selectedId),leavingDirtyEditor=previousMode==='editor'&&timelineState.editor?.dirty&&!sameProjectTabs,leavingDraftContext=timelineHasDraft()&&!sameProjectTabs;
+     if(leavingDraftContext&&!allowTimelineLeave())return;
+@@ -169,7 +171,7 @@ async function renameTimelineProject(form){
+   catch(error){if(error.code==='NAME_CONFLICT'){setTimelineProjectRenameError(form,'项目名称已存在，请换一个名称。');input.focus();input.select()}else if(error.code==='VERSION_CONFLICT'&&error.details?.project){acceptTimelineView(error.details.project,null);toast('项目已被更新，请重新重命名')}else showError(error)}
+   finally{if(submit?.isConnected)submit.disabled=false}
+ }
+-async function deleteTimelineProject(button){if(!confirm('软删除此项目？节点与历史记录会保留。'))return;try{await api(`/api/workspaces/${state.workspace_id}/timeline/projects/${button.dataset.timelineDelete}`,'DELETE',{base_version:Number(button.dataset.projectVersion)});timelineState.mode='home';await loadTimeline();toast('项目已删除')}catch(error){showError(error)}}
++async function deleteTimelineProject(button){const projectId=Number(button.dataset.timelineDelete),project=timelineProjectById(projectId),dirty=Boolean(timelineDraftStates.get(projectId)?.dirty||(Number(timelineState.editor?.project?.project_id)===projectId&&timelineState.editor?.dirty));if($('#timelineBody')?.__timelineRemark?.requestClose()===false)return;if(!confirm(`确认软删除「${project?.name||'此项目'}」？\n\n项目将从普通和归档入口隐藏；节点与历史记录仍保留，当前没有网页恢复入口。${dirty?'\n该项目尚未提交的草稿会丢失。':''}`))return;try{await api(`/api/workspaces/${state.workspace_id}/timeline/projects/${projectId}`,'DELETE',{base_version:Number(button.dataset.projectVersion)});timelineDraftStates.delete(projectId);if(Number(timelineState.selectedId)===projectId)timelineState.selectedId=null;if(['single','editor'].includes(timelineState.mode))timelineState.mode='home';await loadTimeline();toast('项目已删除')}catch(error){showError(error)}}
+ async function archiveTimelineProject(button){const project=timelineProjectById(button.dataset.timelineArchive),name=project?.name||'此项目';if(!project||!confirm(`确认归档「${name}」？\n\n项目不会被删除；归档后将从普通项目入口隐藏，并在取消归档前保持只读。`))return;try{await api(`/api/workspaces/${state.workspace_id}/timeline/projects/${project.project_id}/archive`,'POST',{base_version:Number(project.version)});timelineDraftStates.delete(Number(project.project_id));if(['single','editor'].includes(timelineState.mode)){timelineState.mode='home';timelineState.selectedId=null}await loadArchivedTimeline();await loadTimeline();toast(`${name} 已归档`)}catch(error){await Promise.allSettled([loadTimeline(),loadArchivedTimeline()]);showError(error)}}
+ async function unarchiveTimelineProject(button){const project=timelineProjectById(button.dataset.timelineUnarchive),name=project?.name||'此项目';if(!project)return;try{await api(`/api/workspaces/${state.workspace_id}/timeline/projects/${project.project_id}/unarchive`,'POST',{base_version:Number(project.version)});if(['single','editor'].includes(timelineState.mode)){timelineState.mode='archived';timelineState.selectedId=null}await loadArchivedTimeline();await loadTimeline();toast(`${name} 已取消归档，原标签与个人顺序已恢复`)}catch(error){await Promise.allSettled([loadTimeline(),loadArchivedTimeline()]);showError(error)}}
+ async function savePersonalOrder(context,projectIds){
+@@ -177,6 +179,11 @@ async function savePersonalOrder(context,projectIds){
+   try{const saved=await api(`/api/workspaces/${state.workspace_id}/timeline/order`,'PUT',{context_type:context.context_type,tag_id:context.tag_id||null,base_order_version:current.order_version,project_ids:projectIds});if(context.context_type==='mine'){timelineOrders.mine=saved;if(timelineOrders.context.context_type==='mine')timelineOrders.current=saved}else timelineOrders.current=saved;renderTimeline();toast('你的项目顺序已保存')}
+   catch(error){const latest=error.details?.order||await loadTimelineOrder(context);if(context.context_type==='mine'){timelineOrders.mine=latest;if(timelineOrders.context.context_type==='mine')timelineOrders.current=latest}else timelineOrders.current=latest;renderTimeline();showError(error)}
+ }
++async function saveMemberOrder(memberIds){
++  const current=timelineOrders.members;if(!current)return;
++  try{const saved=await api(`/api/workspaces/${state.workspace_id}/timeline/member-order`,'PUT',{base_order_version:current.order_version,member_ids:memberIds});timelineOrders.members=saved;renderTimeline();setHomeTab('team');toast('你的团队卡片顺序已保存')}
++  catch(error){timelineOrders.members=error.details?.order||await api(`/api/workspaces/${state.workspace_id}/timeline/member-order`);renderTimeline();setHomeTab('team');showError(error)}
++}
+ async function selectTimelineContext(contextType,tagId){try{timelineOrders.context={context_type:contextType,tag_id:contextType==='tag'?Number(tagId):null};timelineFilters.project_ids=[];timelineFilters.focusedProjectId=null;if(contextType==='archived'){timelineOrders.current=null;await loadArchivedTimeline()}else timelineOrders.current=await loadTimelineOrder(timelineOrders.context);saveTimelineContextPreference();resetTimelineViewports();timelineFilters.viewport=loadTimelineViewport();renderTimeline()}catch(error){showError(error)}}
+ async function selectTimelineTag(tagId){try{timelineTags.selectedId=Number(tagId);timelineTags.undo=null;await loadTagMembership();renderTimeline()}catch(error){showError(error)}}
+ function closeTimelineTagInline({restoreFocus=false}={}){const body=$('#timelineBody');if(!body)return;body.querySelectorAll('[data-tag-rename-form],[data-tag-delete-confirm]').forEach(node=>node.hidden=true);body.querySelectorAll('[data-tag-row]').forEach(row=>row.classList.remove('is-editing'));const opener=body.__timelineTagInlineOpener;body.__timelineTagInlineOpener=null;if(restoreFocus)opener?.focus()}
+@@ -190,7 +197,47 @@ function bytesToBase64(bytes){let value='';const chunk=0x8000;for(let index=0;in
+ function base64ToBytes(value){const binary=atob(value),bytes=new Uint8Array(binary.length);for(let index=0;index<binary.length;index++)bytes[index]=binary.charCodeAt(index);return bytes}
+ async function sha256Hex(bytes){const digest=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(digest)].map(value=>value.toString(16).padStart(2,'0')).join('')}
+ function clearTimelineExport(){if(timelineTransfer.exportReady?.url)URL.revokeObjectURL(timelineTransfer.exportReady.url);timelineTransfer.exportReady=null}
+-async function previewTimelineImport(input){const file=input.files?.[0];if(!file)return;clearTimelineExport();timelineTransfer={...timelineTransfer,busy:true,filename:file.name,preview:null,error:null,committed:null};renderTimelineTransferDialog();try{const bytes=new Uint8Array(await file.arrayBuffer()),preview=await api(`/api/workspaces/${state.workspace_id}/timeline/imports/preview`,'POST',{filename:file.name,content_base64:bytesToBase64(bytes)});timelineTransfer={...timelineTransfer,busy:false,preview,error:null};renderTimelineTransferDialog()}catch(error){timelineTransfer={...timelineTransfer,busy:false,preview:null,error:{code:error.code||'IMPORT_ERROR',message:error.message,details:error.details||{}}};renderTimelineTransferDialog()}}
++async function downloadTimelineTemplate(){
++  if(timelineTransfer.templateBusy||timelineTransfer.busy)return;
++  const request=Symbol('timeline-template');
++  timelineTransfer={...timelineTransfer,templateBusy:true,templateError:null,templateRequest:request};
++  renderTimelineTransferDialog();
++  try{
++    const exported=await api(`/api/workspaces/${state.workspace_id}/timeline/template`,'POST',{}),bytes=base64ToBytes(exported.content_base64),digest=await sha256Hex(bytes);
++    if(digest.toLowerCase()!==String(exported.sha256).toLowerCase())throw new Error('模板文件校验失败，请重新下载');
++    if(timelineTransfer.templateRequest!==request||timelineModalKind!=='import')return;
++    const url=URL.createObjectURL(new Blob([bytes],{type:exported.content_type})),link=document.createElement('a');
++    link.href=url;link.download=exported.filename;document.body.appendChild(link);link.click();link.remove();
++    setTimeout(()=>URL.revokeObjectURL(url),1000);
++    toast('标准模板已开始下载');
++  }catch(error){
++    if(timelineTransfer.templateRequest===request)timelineTransfer.templateError=error.message;
++  }finally{
++    if(timelineTransfer.templateRequest===request){timelineTransfer.templateBusy=false;renderTimelineTransferDialog();$('#timelineModal [data-timeline-template]')?.focus()}
++  }
++}
++async function previewTimelineImport(files,sheetName=null){
++  if(timelineTransfer.busy||!files?.length)return;
++  clearTimelineExport();
++  if(files.length!==1){timelineTransfer={...timelineTransfer,filename:null,sourceFile:null,sheets:[],selectedSheet:null,preview:null,error:{code:'IMPORT_SINGLE_FILE',message:'一次只能导入一个 Excel / CSV 文件，请重新选择。'},committed:null};renderTimelineTransferDialog();return}
++  const file=files[0],request=Symbol('timeline-import'),switching=sheetName!==null;
++  timelineTransfer={...timelineTransfer,busy:true,filename:file.name,sourceFile:file,sheets:switching?timelineTransfer.sheets:[],selectedSheet:sheetName,preview:null,error:null,committed:null,importRequest:request};renderTimelineTransferDialog();
++  const current=()=>timelineTransfer.importRequest===request&&timelineModalKind==='import';
++  try{
++    const bytes=new Uint8Array(await file.arrayBuffer()),payload={filename:file.name,content_base64:bytesToBase64(bytes)};
++    if(!current())return;
++    if(!switching&&/\.xlsx$/i.test(file.name)){
++      const workbook=await api(`/api/workspaces/${state.workspace_id}/timeline/imports/sheets`,'POST',payload);
++      if(!current())return;
++      timelineTransfer.sheets=workbook.sheets;timelineTransfer.selectedSheet=workbook.sheet;
++      renderTimelineTransferDialog();
++    }
++    if(timelineTransfer.selectedSheet!==null)payload.sheet_name=timelineTransfer.selectedSheet;
++    const preview=await api(`/api/workspaces/${state.workspace_id}/timeline/imports/preview`,'POST',payload);
++    if(!current())return;
++    timelineTransfer={...timelineTransfer,busy:false,preview,error:null};renderTimelineTransferDialog();
++  }catch(error){if(!current())return;timelineTransfer={...timelineTransfer,busy:false,preview:null,error:{code:error.code||'IMPORT_ERROR',message:error.message,details:error.details||{}}};renderTimelineTransferDialog()}
++}
+ async function commitTimelineImport(){const preview=timelineTransfer.preview;if(!preview||timelineTransfer.error||timelineTransfer.busy)return;timelineTransfer.busy=true;renderTimelineTransferDialog();let committed;try{committed=await api(`/api/workspaces/${state.workspace_id}/timeline/imports/commit`,'POST',{batch_id:preview.batch_id})}catch(error){timelineTransfer={...timelineTransfer,busy:false,error:{code:error.code||'IMPORT_ERROR',message:error.message,details:error.details||{}}};renderTimelineTransferDialog();return}closeTimelineDialog({restoreFocus:false});await loadTimeline();toast(`导入完成：${committed.projects} 个项目、${committed.nodes} 个节点`)}
+ async function exportTimelineWorkspace(){if(timelineTransfer.busy)return;clearTimelineExport();timelineTransfer={...timelineTransfer,busy:true,error:null};renderTimelineTransferDialog();try{const exported=await api(`/api/workspaces/${state.workspace_id}/timeline/export`,'POST',{}),bytes=base64ToBytes(exported.content_base64),digest=await sha256Hex(bytes);if(digest.toLowerCase()!==String(exported.sha256).toLowerCase()){const mismatch=new Error('服务端导出文件 SHA-256 校验失败');mismatch.code='EXPORT_SHA256_MISMATCH';throw mismatch}const url=URL.createObjectURL(new Blob([bytes],{type:exported.content_type||'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));timelineTransfer={...timelineTransfer,busy:false,exportReady:{filename:exported.filename,sha256:digest,url}};renderTimelineTransferDialog()}catch(error){timelineTransfer={...timelineTransfer,busy:false,error:{code:error.code||'EXPORT_ERROR',message:error.message,details:error.details||{}}};renderTimelineTransferDialog()}}
+ function acceptTimelineView(view,batchId){const previous=timelineDraftStates.get(Number(view.project_id))||timelineState.editor,previousBatch=previous?.lastBatchId,index=timelineState.projects.findIndex(item=>item.project_id===view.project_id);if(index<0)timelineState.projects.push(view);else timelineState.projects[index]=view;const fresh=FlowboardTimeline.editorState(view);fresh.lastBatchId=batchId===undefined?previousBatch:batchId;timelineDraftStates.set(Number(view.project_id),fresh);timelineState.editor=timelineState.mode==='editor'&&Number(timelineState.selectedId)===Number(view.project_id)?fresh:null;renderTimeline()}
+@@ -206,7 +253,7 @@ function closeTimeline(){if(!allowTimelineLeave())return;timelineDraftStates=new
+ function timelineCrumb(){if(timelineState.mode==='all')return '全项目仪表盘';if(timelineState.mode==='week')return '本周工作';if(timelineState.mode==='month')return '本月工作';if(timelineState.mode==='tags')return '标签';if(timelineState.mode==='archived')return '已归档';if(['single','editor'].includes(timelineState.mode)){const project=timelineProjectById(timelineState.selectedId);return project?project.name:'项目'}return '我的工作'}
+ function removeLegacyTimelineBackRows(){document.querySelectorAll('#timelineView>.timeline-shell>header,#timelineClose').forEach(node=>node.remove())}
+ function showTimelineView(){const workspace=$('#boardWorkspace'),view=$('#timelineView');if(!view)return;removeLegacyTimelineBackRows();if(workspace)workspace.hidden=true;view.hidden=false;[['timelineBtn','home'],['timelineAllBtn','all'],['timelineWeekBtn','week'],['timelineMonthBtn','month'],['timelineTagsBtn','tags'],['archivedBtn','archived']].forEach(([id,mode])=>$('#'+id)?.classList.toggle('active',timelineState.mode===mode));renderTimelineChrome()}
+-function hideTimelineView(){const workspace=$('#boardWorkspace'),view=$('#timelineView');if(!view)return;view.hidden=true;if(workspace){workspace.hidden=true;workspace.setAttribute('aria-hidden','true')}['timelineBtn','timelineAllBtn','timelineWeekBtn','timelineMonthBtn','timelineTagsBtn','archivedBtn'].forEach(id=>$('#'+id)?.classList.remove('active'));const crumb=$('#breadcrumbBoard');if(crumb)crumb.textContent='项目时间管理'}
++function hideTimelineView(){$('#timelineBody')?.__timelineAbort?.abort();const workspace=$('#boardWorkspace'),view=$('#timelineView');if(!view)return;view.hidden=true;if(workspace){workspace.hidden=true;workspace.setAttribute('aria-hidden','true')}['timelineBtn','timelineAllBtn','timelineWeekBtn','timelineMonthBtn','timelineTagsBtn','archivedBtn'].forEach(id=>$('#'+id)?.classList.remove('active'));const crumb=$('#breadcrumbBoard');if(crumb)crumb.textContent='项目时间管理'}
+ 
+ async function refresh(silent=false){
+   $('#loadState').textContent='加载中…';
+@@ -425,20 +472,32 @@ $('#timelineBody').addEventListener('submit',event=>{const renameForm=event.targ
+ $('#timelineBody').addEventListener('pointerdown',event=>{const open=$('#timelineBody').querySelector('[data-tag-rename-form]:not([hidden]),[data-tag-delete-confirm]:not([hidden])');if(open&&!event.target.closest('[data-tag-rename-form],[data-tag-delete-confirm],[data-tag-rename-open],[data-tag-delete-open]'))closeTimelineTagInline()});
+ $('#timelineBody').addEventListener('click',event=>{const renameStart=event.target.closest('[data-timeline-rename-start]'),renameCancel=event.target.closest('[data-project-rename-cancel]');if(renameStart)return beginTimelineProjectRename(renameStart);if(renameCancel)return cancelTimelineProjectRename(renameCancel);const createOpen=event.target.closest('[data-timeline-create-open]'),importOpen=event.target.closest('[data-timeline-import-open]'),exportButton=event.target.closest('[data-timeline-export]');if(createOpen)return openTimelineCreateDialog(createOpen);if(importOpen)return openTimelineTransferDialog('import',importOpen);if(exportButton)return openTimelineTransferDialog('export',exportButton);const tagCreateOpen=event.target.closest('[data-tag-create-open]'),tagRenameOpen=event.target.closest('[data-tag-rename-open]'),tagDeleteOpen=event.target.closest('[data-tag-delete-open]'),tagInlineCancel=event.target.closest('[data-tag-inline-cancel]'),tagSelect=event.target.closest('[data-tag-select]'),tagContext=event.target.closest('[data-timeline-tag-context]'),tagDelete=event.target.closest('[data-tag-delete]'),tagUndo=event.target.closest('[data-tag-undo]');if(tagCreateOpen)return openTimelineTagCreateDialog(tagCreateOpen);if(tagRenameOpen)return openTimelineTagRowInline(tagRenameOpen,'rename');if(tagDeleteOpen)return openTimelineTagRowInline(tagDeleteOpen,'delete');if(tagInlineCancel)return closeTimelineTagInline({restoreFocus:true});if(tagSelect)return selectTimelineTag(tagSelect.dataset.tagSelect);if(tagContext)return selectTimelineContext(tagContext.dataset.timelineTagContext,tagContext.dataset.tagId);if(tagDelete)return deleteTimelineTag(tagDelete);if(tagUndo)return undoTimelineTagChange();const kpi=event.target.closest('[data-timeline-kpi]'),tab=event.target.closest('[data-timeline-tab]'),memberToggle=event.target.closest('[data-timeline-member-toggle]'),memberOpen=event.target.closest('[data-timeline-member-open]');if(kpi)return setHomeTab(kpi.dataset.timelineKpi==='mine'?'mine':'team');if(tab)return setHomeTab(tab.dataset.timelineTab);if(memberToggle){const expanded=memberToggle.getAttribute('aria-expanded')==='true',row=memberToggle.closest('.tl-mrow'),extras=row?.querySelectorAll('[data-member-extra]')||[];extras.forEach(pill=>pill.hidden=expanded);memberToggle.setAttribute('aria-expanded',String(!expanded));memberToggle.textContent=expanded?`显示全部（剩余 ${extras.length} 个）`:'收起项目';return}if(memberOpen)return openTimelineMode('single',memberOpen.dataset.timelineMemberOpen);const open=event.target.closest('[data-timeline-open]'),mode=event.target.closest('[data-timeline-mode-target]'),remove=event.target.closest('[data-timeline-delete]'),archive=event.target.closest('[data-timeline-archive]'),unarchive=event.target.closest('[data-timeline-unarchive]');if(open)return openTimelineMode(open.dataset.timelineOpen,open.dataset.projectId);if(mode)return openTimelineMode(mode.dataset.timelineModeTarget);if(remove)return deleteTimelineProject(remove);if(archive)return archiveTimelineProject(archive);if(unarchive)return unarchiveTimelineProject(unarchive)});
+ $('#timelineModal').addEventListener('submit',event=>{const tagForm=event.target.closest('[data-timeline-tag-create]');if(tagForm){event.preventDefault();return createTimelineTag(tagForm)}const form=event.target.closest('[data-timeline-create]');if(!form)return;event.preventDefault();createTimelineProject(form)});
+-$('#timelineModal').addEventListener('change',event=>{const input=event.target.closest('[data-timeline-import-file]');if(input)previewTimelineImport(input)});
+-$('#timelineModal').addEventListener('click',event=>{const modal=$('#timelineModal');if(event.target===modal||event.target.closest('[data-timeline-create-cancel],[data-timeline-tag-create-cancel],[data-timeline-transfer-close]'))return closeTimelineDialog();const commit=event.target.closest('[data-timeline-import-commit]'),runExport=event.target.closest('[data-timeline-export-run]'),download=event.target.closest('[data-timeline-download]');if(commit)return commitTimelineImport();if(runExport)return exportTimelineWorkspace();if(download){toast('Excel 已开始下载');setTimeout(()=>closeTimelineDialog({restoreFocus:false}),250)}});
++$('#timelineModal').addEventListener('change',event=>{const input=event.target.closest('[data-timeline-import-file]');if(input)return previewTimelineImport(input.files);const sheet=event.target.closest('[data-timeline-import-sheet]');if(sheet&&timelineTransfer.sourceFile)previewTimelineImport([timelineTransfer.sourceFile],sheet.value)});
++// Prevent file navigation throughout the open import overlay; only the file zone accepts drops.
++for(const type of ['dragenter','dragover','dragleave','drop']){
++  document.addEventListener(type,event=>{
++    if(timelineModalKind!=='import'||$('#timelineModal').hidden||!Array.from(event.dataTransfer?.types||[]).includes('Files'))return;
++    event.preventDefault();
++    const zone=$('#timelineModal .timeline-transfer-file'),inside=zone?.contains(event.target);
++    if(type==='drop'){zone?.classList.remove('is-drag-over');if(inside)previewTimelineImport(event.dataTransfer.files);return}
++    if(type==='dragleave'){if(!zone?.contains(event.relatedTarget))zone?.classList.remove('is-drag-over');return}
++    if(event.dataTransfer)event.dataTransfer.dropEffect=inside&&!timelineTransfer.busy?'copy':'none';
++    zone?.classList.toggle('is-drag-over',!!inside&&!timelineTransfer.busy);
++  });
++}
++$('#timelineModal').addEventListener('click',event=>{const modal=$('#timelineModal');if(event.target===modal||event.target.closest('[data-timeline-create-cancel],[data-timeline-tag-create-cancel],[data-timeline-transfer-close]'))return closeTimelineDialog();const commit=event.target.closest('[data-timeline-import-commit]'),runExport=event.target.closest('[data-timeline-export-run]'),download=event.target.closest('[data-timeline-download]');if(event.target.closest('[data-timeline-template]'))return downloadTimelineTemplate();if(commit)return commitTimelineImport();if(runExport)return exportTimelineWorkspace();if(download){toast('Excel 已开始下载');setTimeout(()=>closeTimelineDialog({restoreFocus:false}),250)}});
+ document.addEventListener('keydown',event=>{if(event.key!=='Escape')return;const renameForm=document.activeElement?.closest?.('[data-project-rename-form]');if(renameForm)return cancelTimelineProjectRename(renameForm.querySelector('[data-project-rename-cancel]'));const tagInline=$('#timelineBody')?.querySelector('[data-tag-rename-form]:not([hidden]),[data-tag-delete-confirm]:not([hidden])');if(tagInline)return closeTimelineTagInline({restoreFocus:true});if(timelineDrag?.kind==='order-pointer')finishTimelineOrderPointer(true);else if(!$('#timelineModal').hidden)closeTimelineDialog()});
+-function timelineOrderCards(list){return [...list.querySelectorAll(':scope > [data-order-project]')]}
+-function timelineOrderIds(list){return timelineOrderCards(list).map(card=>Number(card.dataset.orderProject))}
++function timelineOrderCards(list){return [...list.querySelectorAll(list.dataset.orderList==='team'?':scope > [data-order-member]':':scope > [data-order-project]')]}
++function timelineOrderIds(list){return timelineOrderCards(list).map(card=>list.dataset.orderList==='team'?card.dataset.orderMember:Number(card.dataset.orderProject))}
+ function animateTimelineOrderShift(list,before,source){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;for(const card of timelineOrderCards(list)){if(card===source)continue;const previous=before.get(card),current=card.getBoundingClientRect(),delta=previous?.top-current.top;if(previous&&Math.abs(delta)>.5&&typeof card.animate==='function')card.animate([{transform:`translateY(${delta}px)`},{transform:'translateY(0)'}],{duration:90,easing:'linear'})}}
+ function moveTimelineOrderPreview(intent,list,target,clientY){const source=intent.element;if(!source?.isConnected||source.parentElement!==list||!target||target===source||target.parentElement!==list)return false;const rect=target.getBoundingClientRect(),beforeTarget=clientY<=rect.top+rect.height/2,insertBefore=beforeTarget?target:target.nextElementSibling;if(insertBefore===source||source.nextElementSibling===insertBefore)return false;const before=new Map(timelineOrderCards(list).map(card=>[card,card.getBoundingClientRect()]));list.insertBefore(source,insertBefore);animateTimelineOrderShift(list,before,source);intent.anchorProjectId=Number(target.dataset.orderProject);intent.anchorSide=beforeTarget?'before':'after';intent.moved=true;return true}
+-function restoreTimelineOrderPreview(intent){const list=intent.list;if(!list?.isConnected||!intent.originalIds?.length)return;const before=new Map(timelineOrderCards(list).map(card=>[card,card.getBoundingClientRect()])),byId=new Map(timelineOrderCards(list).map(card=>[Number(card.dataset.orderProject),card]));for(const id of intent.originalIds){const card=byId.get(Number(id));if(card)list.appendChild(card)}animateTimelineOrderShift(list,before,intent.element)}
++function restoreTimelineOrderPreview(intent){const list=intent.list;if(!list?.isConnected||!intent.originalIds?.length)return;const before=new Map(timelineOrderCards(list).map(card=>[card,card.getBoundingClientRect()])),byId=new Map(timelineOrderCards(list).map(card=>[list.dataset.orderList==='team'?card.dataset.orderMember:Number(card.dataset.orderProject),card]));for(const id of intent.originalIds){const card=byId.get(id);if(card)list.appendChild(card)}animateTimelineOrderShift(list,before,intent.element)}
+ function composeTimelineAnchoredOrder(intent){const full=(intent.fullIds||intent.originalIds).map(Number).filter(id=>id!==intent.projectId),anchorIndex=full.indexOf(Number(intent.anchorProjectId));if(anchorIndex<0){const visible=timelineOrderIds(intent.list),newIndex=visible.indexOf(intent.projectId),neighbor=newIndex>0?visible[newIndex-1]:visible[newIndex+1],neighborIndex=full.indexOf(Number(neighbor));if(neighborIndex<0)full.push(intent.projectId);else full.splice(newIndex>0?neighborIndex+1:neighborIndex,0,intent.projectId)}else full.splice(anchorIndex+(intent.anchorSide==='after'?1:0),0,intent.projectId);return full}
+-function makeTimelineOrderFloat(row,event){const rect=row.getBoundingClientRect(),clone=row.cloneNode(true);clone.removeAttribute('data-order-project');clone.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));clone.classList.remove('is-dragging');clone.classList.add('timeline-order-drag-float');clone.setAttribute('aria-hidden','true');Object.assign(clone.style,{left:`${rect.left}px`,top:`${rect.top}px`,width:`${rect.width}px`,height:`${rect.height}px`});document.body.appendChild(clone);return {clone,offsetY:event.clientY-rect.top}}
++function makeTimelineOrderFloat(row,event){const rect=row.getBoundingClientRect(),clone=row.cloneNode(true);clone.removeAttribute('data-order-project');clone.removeAttribute('data-order-member');clone.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));clone.classList.remove('is-dragging');clone.classList.add('timeline-order-drag-float');clone.setAttribute('aria-hidden','true');Object.assign(clone.style,{left:`${rect.left}px`,top:`${rect.top}px`,width:`${rect.width}px`,height:`${rect.height}px`});document.body.appendChild(clone);return {clone,offsetY:event.clientY-rect.top}}
+ function scrollTimelineOrderPointer(intent,clientY){const host=intent.list.closest('.timeline-portfolio-scroll'),rect=host?host.getBoundingClientRect():{top:0,bottom:innerHeight};if(clientY<rect.top+36)(host||document.scrollingElement).scrollBy({top:-14});else if(clientY>rect.bottom-36)(host||document.scrollingElement).scrollBy({top:14})}
+-function updateTimelineOrderPointer(event){const intent=timelineDrag;if(intent?.kind!=='order-pointer'||event.pointerId!==intent.pointerId)return;event.preventDefault();intent.float.style.top=`${event.clientY-intent.offsetY}px`;scrollTimelineOrderPointer(intent,event.clientY);const hit=document.elementFromPoint(event.clientX,event.clientY),inside=hit?.closest(`[data-order-list="${intent.scope}"]`)===intent.list;intent.inside=inside;if(inside)moveTimelineOrderPreview(intent,intent.list,hit.closest('[data-order-project]'),event.clientY)}
+-function finishTimelineOrderPointer(cancelled=false){const intent=timelineDrag;if(intent?.kind!=='order-pointer')return;timelineDrag=null;intent.float?.remove();intent.element?.classList.remove('is-dragging');intent.list?.classList.remove('is-order-sorting');if(cancelled||!intent.inside){if(intent.moved)restoreTimelineOrderPreview(intent);return}const visible=timelineOrderIds(intent.list),changed=visible.some((id,index)=>id!==intent.originalIds[index]);if(!changed)return;const context=intent.scope==='mine'?{context_type:'mine',tag_id:null}:timelineOrders.context,ids=composeTimelineAnchoredOrder(intent);setTimeout(()=>savePersonalOrder(context,ids),0)}
+-$('#timelineBody').addEventListener('pointerdown',event=>{const grip=event.target.closest('.tl-order-grip[draggable="true"]'),orderProject=grip?.closest('[data-order-project]');if(!orderProject||(event.pointerType==='mouse'&&event.button!==0))return;const list=orderProject.closest('[data-order-list]');if(!list)return;event.preventDefault();event.stopPropagation();const scope=list.dataset.orderList,orderState=scope==='mine'?timelineOrders.mine:timelineOrders.current,{clone,offsetY}=makeTimelineOrderFloat(orderProject,event);timelineDrag={kind:'order-pointer',pointerId:event.pointerId,projectId:Number(orderProject.dataset.orderProject),scope,list,element:orderProject,float:clone,offsetY,originalIds:timelineOrderIds(list),fullIds:(orderState?.project_ids||timelineOrderIds(list)).map(Number),anchorProjectId:null,anchorSide:null,moved:false,inside:true};orderProject.classList.add('is-dragging');list.classList.add('is-order-sorting');grip.setPointerCapture?.(event.pointerId)});
++function updateTimelineOrderPointer(event){const intent=timelineDrag;if(intent?.kind!=='order-pointer'||event.pointerId!==intent.pointerId)return;event.preventDefault();intent.float.style.top=`${event.clientY-intent.offsetY}px`;scrollTimelineOrderPointer(intent,event.clientY);const hit=document.elementFromPoint(event.clientX,event.clientY),inside=hit?.closest(`[data-order-list="${intent.scope}"]`)===intent.list;intent.inside=inside;if(inside)moveTimelineOrderPreview(intent,intent.list,hit.closest(intent.scope==='team'?'[data-order-member]':'[data-order-project]'),event.clientY)}
++function finishTimelineOrderPointer(cancelled=false){const intent=timelineDrag;if(intent?.kind!=='order-pointer')return;timelineDrag=null;intent.float?.remove();intent.element?.classList.remove('is-dragging');intent.list?.classList.remove('is-order-sorting');if(cancelled||!intent.inside){if(intent.moved)restoreTimelineOrderPreview(intent);return}const visible=timelineOrderIds(intent.list),changed=visible.some((id,index)=>id!==intent.originalIds[index]);if(!changed)return;if(intent.scope==='team'){setTimeout(()=>saveMemberOrder(visible),0);return}const context=intent.scope==='mine'?{context_type:'mine',tag_id:null}:timelineOrders.context,ids=composeTimelineAnchoredOrder(intent);setTimeout(()=>savePersonalOrder(context,ids),0)}
++$('#timelineBody').addEventListener('pointerdown',event=>{const grip=event.target.closest('.tl-order-grip[draggable="true"]'),orderProject=grip?.closest('[data-order-project],[data-order-member]');if(!orderProject||(event.pointerType==='mouse'&&event.button!==0))return;const list=orderProject.closest('[data-order-list]');if(!list)return;event.preventDefault();event.stopPropagation();const scope=list.dataset.orderList,orderState=scope==='mine'?timelineOrders.mine:scope==='team'?timelineOrders.members:timelineOrders.current,{clone,offsetY}=makeTimelineOrderFloat(orderProject,event);timelineDrag={kind:'order-pointer',pointerId:event.pointerId,projectId:scope==='team'?null:Number(orderProject.dataset.orderProject),scope,list,element:orderProject,float:clone,offsetY,originalIds:timelineOrderIds(list),fullIds:scope==='team'?(orderState?.member_ids||timelineOrderIds(list)):(orderState?.project_ids||timelineOrderIds(list)).map(Number),anchorProjectId:null,anchorSide:null,moved:false,inside:true};orderProject.classList.add('is-dragging');list.classList.add('is-order-sorting');grip.setPointerCapture?.(event.pointerId)});
+ document.addEventListener('pointermove',updateTimelineOrderPointer,{passive:false});
+ document.addEventListener('pointerup',event=>{if(timelineDrag?.kind==='order-pointer'&&event.pointerId===timelineDrag.pointerId)finishTimelineOrderPointer(false)});
+ document.addEventListener('pointercancel',event=>{if(timelineDrag?.kind==='order-pointer'&&event.pointerId===timelineDrag.pointerId)finishTimelineOrderPointer(true)});
+@@ -446,7 +505,7 @@ $('#timelineBody').addEventListener('dragstart',event=>{const tagProject=event.t
+ $('#timelineBody').addEventListener('dragover',event=>{if(timelineDrag?.kind==='tag'&&event.target.closest('[data-tag-drop]')){event.preventDefault();event.dataTransfer.dropEffect='move'}});
+ $('#timelineBody').addEventListener('drop',event=>{const intent=timelineDrag;if(intent?.kind!=='tag')return;const zone=event.target.closest('[data-tag-drop]');if(!zone)return;event.preventDefault();const included=zone.dataset.tagDrop==='included';if(included!==intent.included)setTimeout(()=>changeTimelineTagProject(intent.projectId,included),0)});
+ $('#timelineBody').addEventListener('dragend',()=>{if(timelineDrag?.kind==='tag')timelineDrag=null;document.querySelectorAll('.tl-tag-project.is-dragging').forEach(node=>node.classList.remove('is-dragging'))});
+-window.addEventListener('beforeunload',event=>{if(timelineHasDraft()){event.preventDefault();event.returnValue=''}});
++window.addEventListener('beforeunload',event=>{if(timelineHasDraft()||$('#timelineBody')?.__timelineRemark?.dirty){event.preventDefault();event.returnValue=''}});
+ document.querySelectorAll('[data-close]').forEach(button=>button.onclick=()=>closeModal(button.dataset.close));document.querySelectorAll('.modal-backdrop').forEach(modal=>{if(!modal.classList.contains('login-backdrop'))modal.onclick=event=>{if(event.target===modal)modal.classList.remove('open')}});
+ document.addEventListener('dblclick',event=>{const row=event.target.closest('.task-row');const cell=event.target.closest('.task-row>div');if(!row||!cell||!canWrite())return;const index=[...row.children].indexOf(cell)-1;const fields=presentedFields();if(index>=0&&index<fields.length){event.preventDefault();event.stopPropagation();editDynamicCell(+row.dataset.task,fields[index])}});
+ document.querySelectorAll('[data-view-type]').forEach(button=>button.onclick=()=>{if(blockedLatch)return toast('当前视图已阻止，请先选择其他保存视图或修改查询');const type=button.dataset.viewType,presentation=FlowboardViewState.defaultPresentation(type,state.fields||[]);if(!presentation)return toast(type==='kanban'?'没有可用的状态或人员字段':'没有可用的日期字段');viewTransition('view-type',{viewType:type,presentation});syncUrl();renderBoard()});
+diff --git a/flowboard/timeline.py b/flowboard/timeline.py
+index 937ebeb..b115870 100644
+--- a/flowboard/timeline.py
++++ b/flowboard/timeline.py
+@@ -6,12 +6,11 @@ from datetime import datetime, timedelta, timezone
+ 
+ from .database import connect, transaction, utc_now
+ from .service import ApiError, reject_unknown, require_int, require_text, validate_choice
+-from .transfer import MAX_ROWS, XlsxNumericCell, make_xlsx, parse_upload
++from .transfer import MAX_ROWS, XlsxNumericCell, parse_upload
++from .timeline_excel import HEADERS as IMPORT_HEADERS, STAGES, make_timeline_xlsx, make_timeline_template
+ 
+ 
+ TRACKS = ("main", "parallel")
+-STAGES = ("创意", "设计", "开发", "测试", "量产", "应用迭代")
+-IMPORT_HEADERS = ["项目名称", "阶段", "主线/并行", "节点", "日期", "状态", "备注"]
+ INTERVAL_IMPORT_HEADERS = ["项目名称", "阶段", "主线/并行", "节点", "日期", "间隔", "状态", "备注"]
+ LEGACY_IMPORT_HEADERS = ["项目名称", "阶段", "轨道", "节点", "日期", "间隔", "状态", "备注"]
+ LEGACY_NO_INTERVAL_IMPORT_HEADERS = ["项目名称", "阶段", "轨道", "节点", "日期", "状态", "备注"]
+@@ -707,9 +706,7 @@ class TimelineService:
+         conn = self._db()
+         try:
+             with transaction(conn):
+-                project = self._project_access(conn, user["id"], project_id, workspace_id=workspace_id, write=True, require_active=True)
+-                if project["role"] != "admin":
+-                    raise ApiError(403, "ADMIN_REQUIRED", "仅管理员可删除项目")
++                project = self._project_access(conn, user["id"], project_id, workspace_id=workspace_id, write=True, require_active=True, allow_archived=True)
+                 if project["version"] != version:
+                     raise ApiError(409, "VERSION_CONFLICT", "项目版本冲突", {"server_version": project["version"]})
+                 stamp = utc_now()
+@@ -720,7 +717,10 @@ class TimelineService:
+                 )
+                 if cursor.rowcount != 1:
+                     raise ApiError(409, "VERSION_CONFLICT", "项目版本冲突", {"server_version": project["version"]})
+-                self._audit(conn, workspace_id, user["id"], project_id, "timeline.project_deleted", "timeline_project")
++                self._audit(
++                    conn, workspace_id, user["id"], project_id, "timeline.project_deleted", "timeline_project",
++                    {"version_before": version, "version_after": version + 1, "archived_at": project["archived_at"], "deleted_at": deleted_at},
++                )
+                 return {"project_id": project_id, "version": version + 1, "deleted_at": deleted_at}
+         finally:
+             conn.close()
+@@ -1114,16 +1114,38 @@ class TimelineService:
+             conn.close()
+ 
+     def export_timeline(self, user, workspace_id):
+-        return make_xlsx(IMPORT_HEADERS, self._timeline_rows(user, workspace_id), sheet="Timeline")
++        return make_timeline_xlsx(self._timeline_rows(user, workspace_id))
+ 
+-    def preview_import(self, user, workspace_id, filename, raw):
++    def timeline_template(self, user, workspace_id):
++        conn = self._db()
+         try:
+-            parsed = parse_upload(filename, raw)
++            self._workspace_access(conn, user["id"], workspace_id)
++            return make_timeline_template()
++        finally:
++            conn.close()
++
++    def import_sheets(self, user, workspace_id, filename, raw):
++        conn = self._db()
++        try:
++            self._workspace_access(conn, user["id"], workspace_id)
++        finally:
++            conn.close()
++        try:
++            parsed = parse_upload(filename, raw, metadata_only=True)
++            return {"format": parsed["format"], "sheet": parsed["sheet"], "sheets": parsed.get("sheets", [])}
++        except Exception as error:
++            raise ApiError(422, getattr(error, "code", "IMPORT_INVALID"), str(error), getattr(error, "details", None))
++
++    def preview_import(self, user, workspace_id, filename, raw, sheet_name=None):
++        try:
++            parsed = parse_upload(filename, raw, sheet_name)
+         except Exception as error:
+             raise ApiError(422, getattr(error, "code", "IMPORT_INVALID"), str(error), getattr(error, "details", None))
+         supported_headers = (IMPORT_HEADERS, INTERVAL_IMPORT_HEADERS, LEGACY_IMPORT_HEADERS, LEGACY_NO_INTERVAL_IMPORT_HEADERS)
+         if parsed["headers"] not in supported_headers:
+             raise ApiError(422, "IMPORT_HEADERS_MISMATCH", f"Excel 表头不匹配，标准表头：{'｜'.join(IMPORT_HEADERS)}", {"headers": IMPORT_HEADERS})
++        if not parsed["rows"]:
++            raise ApiError(422, "IMPORT_EMPTY", "没有可导入的节点，请先在 Timeline 表填写项目数据")
+         conn = self._db()
+         try:
+             with transaction(conn):
+@@ -1153,9 +1175,9 @@ class TimelineService:
+                 ).lastrowid
+                 warnings = ["状态将按日期重算，仅『已完成』保留"]
+                 if parsed["format"] == "xlsx" and len(parsed.get("sheets", [])) > 1:
+-                    warnings.append("仅导入第一个 sheet")
++                    warnings.append(f"仅导入所选工作表：{parsed['sheet']}")
+                 return {
+-                    "batch_id": batch_id, "format": parsed["format"], "row_count": len(clean),
++                    "batch_id": batch_id, "format": parsed["format"], "row_count": len(clean), "sheet": parsed["sheet"],
+                     "projects": [{"name": name, "node_count": len(group)} for name, group in self._group_import_rows(clean).items()],
+                     "warnings": warnings,
+                 }
+@@ -1619,3 +1641,70 @@ class TimelineService:
+                 return {"context_type": context_type, "tag_id": tag_id, "order_version": next_version, "project_ids": project_ids}
+         finally:
+             conn.close()
++
++    @staticmethod
++    def _member_order_view(conn, user_id, workspace_id):
++        members = [row["id"] for row in conn.execute(
++            """SELECT u.id FROM users u
++               JOIN workspace_memberships wm ON wm.user_id=u.id
++               WHERE wm.workspace_id=? AND u.is_active=1 ORDER BY u.name,u.id""",
++            (workspace_id,),
++        )]
++        row = conn.execute(
++            "SELECT version,member_ids_json FROM timeline_member_orders WHERE workspace_id=? AND user_id=?",
++            (workspace_id, user_id),
++        ).fetchone()
++        stored = json.loads(row["member_ids_json"]) if row else []
++        current = set(members)
++        ordered = [member_id for member_id in stored if member_id in current]
++        seen = set(ordered)
++        ordered.extend(member_id for member_id in members if member_id not in seen)
++        return {"order_version": row["version"] if row else 0, "member_ids": ordered}
++
++    def get_member_order(self, user, workspace_id):
++        conn = self._db()
++        try:
++            self._workspace_access(conn, user["id"], workspace_id)
++            return self._member_order_view(conn, user["id"], workspace_id)
++        finally:
++            conn.close()
++
++    def put_member_order(self, user, workspace_id, data):
++        reject_unknown(data, {"base_order_version", "member_ids"})
++        if "base_order_version" not in data:
++            raise ApiError(428, "VERSION_REQUIRED", "base_order_version is required")
++        base_version = require_int(data["base_order_version"], "base_order_version", minimum=0)
++        member_ids = data.get("member_ids")
++        if not isinstance(member_ids, list) or any(not isinstance(value, str) or not value for value in member_ids):
++            raise ApiError(422, "VALIDATION_ERROR", "member_ids must be nonempty user ids")
++        if len(member_ids) != len(set(member_ids)):
++            raise ApiError(422, "VALIDATION_ERROR", "member_ids must not contain duplicates")
++        conn = self._db()
++        try:
++            with transaction(conn):
++                self._workspace_access(conn, user["id"], workspace_id)
++                latest = self._member_order_view(conn, user["id"], workspace_id)
++                if latest["order_version"] != base_version:
++                    raise ApiError(409, "ORDER_VERSION_CONFLICT", "成员卡片排序版本冲突", {"order": latest})
++                if len(member_ids) != len(latest["member_ids"]) or set(member_ids) != set(latest["member_ids"]):
++                    raise ApiError(409, "ORDER_SCOPE_CHANGED", "成员集合已变化", {"order": latest})
++                stamp = utc_now()
++                encoded = json.dumps(member_ids, ensure_ascii=False, separators=(",", ":"))
++                if base_version:
++                    updated = conn.execute(
++                        """UPDATE timeline_member_orders SET member_ids_json=?,version=version+1,updated_at=?
++                           WHERE workspace_id=? AND user_id=? AND version=?""",
++                        (encoded, stamp, workspace_id, user["id"], base_version),
++                    )
++                    if updated.rowcount != 1:
++                        raise ApiError(409, "ORDER_VERSION_CONFLICT", "成员卡片排序版本冲突", {"order": self._member_order_view(conn, user["id"], workspace_id)})
++                else:
++                    conn.execute(
++                        """INSERT INTO timeline_member_orders(workspace_id,user_id,version,member_ids_json,created_at,updated_at)
++                           VALUES (?,?,1,?,?,?)""",
++                        (workspace_id, user["id"], encoded, stamp, stamp),
++                    )
++                self._audit(conn, workspace_id, user["id"], workspace_id, "timeline.member_order_changed", "timeline_member_order", {"version": base_version + 1, "member_count": len(member_ids)})
++                return {"order_version": base_version + 1, "member_ids": member_ids}
++        finally:
++            conn.close()
+diff --git a/index.html b/index.html
+index 8f5892f..c476a2c 100644
+--- a/index.html
++++ b/index.html
+@@ -11,7 +11,7 @@
+   <link rel="stylesheet" href="dashboard-mobile.css" />
+   <link rel="stylesheet" href="i12.css" />
+   <link rel="stylesheet" href="i13.css" />
+-  <link rel="stylesheet" href="timeline.css?v=20260904-a" />
++  <link rel="stylesheet" href="timeline.css?v=20261008-week-flags" />
+ </head>
+ <body>
+   <div class="app-shell">
+@@ -39,7 +39,7 @@
+   <div class="timeline-overlay" id="timelineModal" hidden></div>
+   <div class="modal-backdrop" id="taskModal"><div class="task-modal"><button class="modal-close" data-close="taskModal">×</button><div id="modalBody"></div></div></div>
+   <div class="modal-backdrop" id="listModal"><div class="task-modal list-modal"><button class="modal-close" data-close="listModal">×</button><div id="listModalBody"></div></div></div>
+-  <div class="modal-backdrop login-backdrop" id="loginModal"><form class="login-card" id="loginForm"><div class="brand login-brand"><span class="brand-mark">F</span><span>flowboard</span></div><h2>登录工作空间</h2><p>使用管理员提供的账号登录。</p><label>用户名<input id="loginUser" autocomplete="username" value="u1" required /></label><label>密码<input id="loginPassword" type="password" autocomplete="current-password" required /></label><div class="login-error" id="loginError"></div><button class="primary-btn" type="submit">登录</button></form></div>
+-  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js?v=20260904-a"></script><script src="i12-ui.js"></script><script src="app.js?v=20260904-a"></script>
++  <div class="modal-backdrop login-backdrop" id="loginModal"><form class="login-card" id="loginForm"><div class="brand login-brand"><span class="brand-mark">F</span><span>flowboard</span></div><h2>登录工作空间</h2><p>使用管理员提供的账号登录。</p><label>用户名<input id="loginUser" name="username" autocomplete="username" required /></label><label>密码<input id="loginPassword" name="password" type="password" autocomplete="current-password" required /></label><div class="login-error" id="loginError"></div><button class="primary-btn" type="submit">登录</button></form></div>
++  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js?v=20260930-team-order"></script><script src="i12-ui.js"></script><script src="app.js?v=20260930-team-order"></script>
+ </body>
+ </html>
+diff --git a/server.py b/server.py
+index c13b385..5244ca7 100644
+--- a/server.py
++++ b/server.py
+@@ -188,6 +188,9 @@ class Handler(SimpleHTTPRequestHandler):
+                 raw_tag=query.get("tag_id",[None])[0]
+                 return 200,self.timeline.get_personal_order(user,int(parts[2]),context_type,int(raw_tag) if raw_tag is not None else None),None
+             if method=="PUT":return 200,self.timeline.put_personal_order(user,int(parts[2]),data),None
++        if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","member-order"]:
++            if method=="GET":return 200,self.timeline.get_member_order(user,int(parts[2])),None
++            if method=="PUT":return 200,self.timeline.put_member_order(user,int(parts[2]),data),None
+         if len(parts)==4 and parts[:2]==["api","workspaces"] and parts[3]=="timeline" and method=="GET":
+             return 200,self.timeline.list_projects(user,int(parts[2]),query.get("archive_state",["active"])[0]),None
+         if len(parts)==4 and parts[:3]==["api","timeline","projects"] and method=="GET":
+@@ -210,17 +213,23 @@ class Handler(SimpleHTTPRequestHandler):
+         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","review"] and method=="GET":
+             selected=[int(value) for value in query.get("project_ids",[[]])[0].split(",") if value] if "project_ids" in query else []
+             return 200,self.timeline.review(user,int(parts[2]),selected),None
+-        if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","imports","preview"] and method=="POST":
++        if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:5]==["timeline","imports"] and parts[5] in ("preview","sheets") and method=="POST":
+             filename=require_text(data,"filename",max_length=255);content=require_text(data,"content_base64",max_length=3_000_000)
+             try:raw=base64.b64decode(content,validate=True)
+             except Exception:raise ApiError(422,"IMPORT_FILE_INVALID","文件内容不是有效 base64")
+-            return 201,self.timeline.preview_import(user,int(parts[2]),filename,raw),None
++            if parts[5]=="sheets":return 200,self.timeline.import_sheets(user,int(parts[2]),filename,raw),None
++            sheet_name=require_text(data,"sheet_name",max_length=255) if "sheet_name" in data else None
++            return 201,self.timeline.preview_import(user,int(parts[2]),filename,raw,sheet_name),None
+         if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","imports","commit"] and method=="POST":
+             return 201,self.timeline.commit_import(user,int(parts[2]),data),None
+         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","export"] and method=="POST":
+             reject_unknown(data, set())
+             raw=self.timeline.export_timeline(user,int(parts[2]))
+             return 200,{"filename":"timeline.xlsx","content_type":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","content_base64":base64.b64encode(raw).decode("ascii"),"sha256":hashlib.sha256(raw).hexdigest()},None
++        if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","template"] and method=="POST":
++            reject_unknown(data, set())
++            raw=self.timeline.timeline_template(user,int(parts[2]))
++            return 200,{"filename":"Flowboard-项目时间表填写模板.xlsx","content_type":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","content_base64":base64.b64encode(raw).decode("ascii"),"sha256":hashlib.sha256(raw).hexdigest()},None
+         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","projects"] and method=="POST":
+             return 201,self.timeline.create_project(user,int(parts[2]),data),None
+         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["events","poll"] and method=="GET":
+diff --git a/timeline-ui.js b/timeline-ui.js
+index e5930b9..bc66971 100644
+--- a/timeline-ui.js
++++ b/timeline-ui.js
+@@ -39,7 +39,7 @@
+   function position(date,start,end){const span=Math.max(1,Math.round((iso(end)-iso(start))/DAY));return Math.max(0,Math.min(100,Math.round((iso(date)-iso(start))/DAY)/span*100))}
+   function contextMenu(){return `<div class="timeline-context-menu" data-timeline-context hidden role="menu"><button type="button" role="menuitem" data-draft-action="single">拖拽（仅当前节点）</button><button type="button" role="menuitem" data-draft-action="cascade">拖拽（顺延）</button><button type="button" role="menuitem" data-draft-action="done">已完成</button><button type="button" role="menuitem" data-draft-action="undone">未完成</button><button type="button" role="menuitem" data-draft-action="remark">编辑备注</button><button type="button" class="danger" role="menuitem" data-draft-action="remove">删除节点</button></div>`}
+   function dashboardInsertMenu(){return `<div class="timeline-context-menu timeline-insert-menu" data-dashboard-insert-menu hidden role="menu" aria-label="时间轴插入操作"><button type="button" role="menuitem" data-dashboard-insert-action><i aria-hidden="true">＋</i><span><strong>插入节点</strong><small data-dashboard-insert-context></small></span></button></div>`}
+-  function dashboardNodeEditor(){return `<div class="timeline-node-editor-overlay" data-dashboard-node-editor hidden><section role="dialog" aria-modal="true" aria-labelledby="timelineNodeEditorTitle"><form data-dashboard-node-editor-form><header><h3 id="timelineNodeEditorTitle" data-dashboard-node-editor-title>编辑节点</h3><button type="button" data-dashboard-node-editor-cancel aria-label="关闭">×</button></header><p data-dashboard-node-editor-context></p><label data-dashboard-node-name-field>节点名称<input name="name" maxlength="500" required autocomplete="off"></label><label data-dashboard-node-remark-field>备注<textarea name="remark" maxlength="500" rows="7"></textarea></label><footer><button type="button" data-dashboard-node-editor-cancel>取消</button><button type="submit" class="primary">确认</button></footer></form></section></div>`}
++  function dashboardNodeEditor(){return `<div class="timeline-node-editor-overlay" data-dashboard-node-editor hidden><section role="dialog" aria-modal="true" aria-labelledby="timelineNodeEditorTitle"><form data-dashboard-node-editor-form><header><h3 id="timelineNodeEditorTitle" data-dashboard-node-editor-title>编辑节点</h3><button type="button" data-dashboard-node-editor-cancel aria-label="关闭">×</button></header><p data-dashboard-node-editor-context></p><label data-dashboard-node-name-field>节点名称<input name="name" maxlength="500" required autocomplete="off"></label><footer><button type="button" data-dashboard-node-editor-cancel>取消</button><button type="submit" class="primary">确认</button></footer></form></section></div>`}
+   function portfolioUndoMenu({viewSingle=false}={}){return `<div class="timeline-context-menu timeline-project-undo-menu" data-portfolio-undo-menu hidden role="menu" aria-label="项目操作" tabindex="-1">${viewSingle?'<button type="button" role="menuitem" data-portfolio-view-single>在单仪表盘中查看</button>':''}<button type="button" class="danger" role="menuitem" data-portfolio-undo-action disabled>撤销</button></div>`}
+   function bindContextController(root,{selector='.timeline-dashboard-node',onAction,onOpen}={}){
+     let contextNode=null;
+@@ -79,11 +79,12 @@
+     document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!menu.hidden)closeMenu()},{signal:root.__timelineAbort?.signal});
+     return {hide:closeMenu};
+   }
+-  function projectTabs(mode,{write=true,project=null,canArchive=false,canUnarchive=false,backMode='home'}={}){
++  function projectTabs(mode,{write=true,project=null,canArchive=false,canUnarchive=false,canDelete=false,backMode='home'}={}){
+     const archiveAction=mode==='single'&&canArchive?`<button type="button" class="danger" data-timeline-archive="${project.project_id}">归档项目</button>`:canUnarchive?`<button type="button" data-timeline-unarchive="${project.project_id}">取消归档</button>`:'';
+-    const menu=archiveAction?`<details class="tl-project-menu"><summary aria-label="项目操作">•••</summary><div>${archiveAction}</div></details>`:'';
++    const deleteAction=mode==='single'&&canDelete&&!project?.archived_at?`<button type="button" class="danger" data-timeline-delete="${project.project_id}" data-project-version="${project.version}">删除项目</button>`:'';
++    const menu=archiveAction||deleteAction?`<details class="tl-project-menu"><summary aria-label="项目操作">•••</summary><div>${archiveAction}${deleteAction}</div></details>`:'';
+     const target=backMode==='all'?'all':'home',label=target==='all'?'返回':'我的工作';
+-    return `<div class="timeline-project-tabs"><nav aria-label="项目页签"><button type="button" class="back" data-timeline-mode-target="${target}"><span class="timeline-back-arrow" aria-hidden="true">←</span><span class="timeline-back-label">${label}</span></button><button type="button" class="${mode==='single'?'on':''}" data-timeline-mode-target="single" aria-pressed="${mode==='single'}">单项目仪表盘</button><button type="button" class="${mode==='editor'?'on':''}" data-timeline-mode-target="editor" aria-pressed="${mode==='editor'}">时间表编辑器</button></nav><div class="timeline-project-tab-actions">${write&&!project?.archived_at?'<button type="button" data-timeline-import-open>导入 Excel</button><button type="button" data-timeline-export>导出 Excel</button>':''}${menu}</div></div>`;
++    return `<div class="timeline-project-tabs"><nav aria-label="项目页签"><button type="button" class="back" data-timeline-mode-target="${target}"><span class="timeline-back-arrow" aria-hidden="true">←</span><span class="timeline-back-label">${label}</span></button><button type="button" class="${mode==='single'?'on':''}" data-timeline-mode-target="single" aria-pressed="${mode==='single'}">单项目仪表盘</button><button type="button" class="${mode==='editor'?'on':''}" data-timeline-mode-target="editor" aria-pressed="${mode==='editor'}">时间表编辑器</button></nav><div class="timeline-project-tab-actions">${write&&!project?.archived_at?'<button type="button" data-timeline-export>导出 Excel</button>':''}${menu}</div></div>`;
+   }
+   function editorIntervals(project){const result=new Map();for(const track of ['main','parallel']){const chain=(project.nodes||[]).filter(node=>node.track===track).slice().sort(compareNodes);chain.forEach((node,index)=>result.set(Number(node.id),index?Math.round((iso(node.date)-iso(chain[index-1].date))/DAY):null))}return result}
+   function renderEditor(project,options={}){
+@@ -228,7 +229,7 @@
+   function renderProjectShell(mode,project,content,options={}){
+     const metrics=project.metrics||{},allNodes=project.nodes||[],doneCount=allNodes.filter(node=>node.done_at).length,lastNode=[...allNodes].sort((a,b)=>String(a.date).localeCompare(String(b.date))).at(-1);
+     const kpiLine=`<p class="tl-proj-kpi"><i class="dot ${stageClass(metrics.current_stage)}"></i>当前 <b>${esc(metrics.current_stage||'—')}</b> ｜ <b>${allNodes.length}</b> 节点 · <b>${doneCount}</b> 已完成${Number(metrics.overdue_count)?` ｜ <b class="tl-red">${metrics.overdue_count} 逾期</b>`:''} ｜ 临近 <b>${esc(metrics.upcoming?.[0]?`${metrics.upcoming[0].date} ${metrics.upcoming[0].name}`:'—')}</b>${lastNode?` ｜ 收尾 <b>${esc(`${lastNode.date} ${lastNode.name}`)}</b>`:''}</p>`;
+-    const tabs=options.context===false?'':projectTabs(mode,{write:options.write!==false,project,canArchive:options.canArchive,canUnarchive:options.canUnarchive,backMode:options.backMode});
++    const tabs=options.context===false?'':projectTabs(mode,{write:options.write!==false,project,canArchive:options.canArchive,canUnarchive:options.canUnarchive,canDelete:options.canDelete,backMode:options.backMode});
+     const title=mode==='single'&&options.editable!==false?`<div class="timeline-project-heading" data-project-rename-host><div class="timeline-project-title-line" data-project-title-static><h2>${esc(project.name)}</h2><button type="button" class="timeline-project-rename-pencil" data-timeline-rename-start="${project.project_id}" aria-label="重命名项目" title="重命名项目">✎</button></div>${projectRenameForm(project,'single')}${kpiLine}</div>`:`<div><h2>${esc(project.name)}</h2>${kpiLine}</div>`;
+     return `<article class="timeline-project-card timeline-project-shell${mode==='single'?' is-shared-canvas':''}" data-single-project="${project.project_id}" data-project-shell="${mode}"><header>${title}${riskMarkers(project)}</header>${tabs}<div class="timeline-project-content" data-project-content="${mode}">${content}</div></article>`;
+   }
+@@ -287,13 +288,14 @@
+       const candidates=raw.map((candidate,index)=>{const left=clamp(candidate.left,leftBound,Math.max(leftBound,rightBound-measuredWidth)),top=clamp(candidate.top,topBound,Math.max(topBound,bottomBound-measuredHeight)),rect={left,top,right:left+measuredWidth,bottom:top+measuredHeight},collision=blockers.reduce((total,blocker)=>total+intersection(rect,blocker.rect)*(blocker.item.matches('.timeline-dashboard-node,.timeline-node-cluster')?8:1),0);return{...candidate,left,top,collision:collision+index*.01}}).sort((a,b)=>a.collision-b.collision)[0];
+       tooltip.dataset.placement=candidates.placement;tooltip.style.left=Math.round(candidates.left)+'px';tooltip.style.top=Math.round(candidates.top)+'px';tooltip.style.visibility='visible';
+     };
+-    const show=anchor=>{if(anchor?.dataset.nodeFlagVisible==='true'){hide();return}const source=anchor?.querySelector('[data-node-tooltip-source]');if(!source)return;hide();active=anchor;anchor.setAttribute('aria-describedby','timelineNodeTooltip');tooltip.innerHTML=source.innerHTML;tooltip.style.left='0';tooltip.style.top='0';tooltip.style.visibility='hidden';tooltip.hidden=false;frame=requestAnimationFrame(()=>place(anchor))};
++    const show=anchor=>{if(!anchor?.matches('.timeline-node-cluster')){hide();return}const source=anchor?.querySelector('[data-node-tooltip-source]');if(!source)return;hide();active=anchor;anchor.setAttribute('aria-describedby','timelineNodeTooltip');tooltip.innerHTML=source.innerHTML;tooltip.style.left='0';tooltip.style.top='0';tooltip.style.visibility='hidden';tooltip.hidden=false;frame=requestAnimationFrame(()=>place(anchor))};
+     root.addEventListener('pointerover',event=>{const anchor=event.target.closest('.timeline-dashboard-node,.timeline-node-cluster');if(anchor&&!anchor.contains(event.relatedTarget))show(anchor)});
+     root.addEventListener('pointerout',event=>{const anchor=event.target.closest('.timeline-dashboard-node,.timeline-node-cluster');if(anchor&&active===anchor&&!anchor.contains(event.relatedTarget))hide()});
+     root.addEventListener('focusin',event=>{const anchor=event.target.closest('.timeline-dashboard-node,.timeline-node-cluster');if(anchor)show(anchor)});
+     root.addEventListener('focusout',event=>{if(active&&event.target.closest('.timeline-dashboard-node,.timeline-node-cluster')===active)hide()});
+     root.addEventListener('contextmenu',hide,true);root.addEventListener('pointerdown',hide,true);root.addEventListener('scroll',hide,true);
+     const previous=window.__flowboardTimelineTooltipHide;if(previous){window.removeEventListener('scroll',previous,true);window.removeEventListener('resize',previous)}window.__flowboardTimelineTooltipHide=hide;window.addEventListener('scroll',hide,true);window.addEventListener('resize',hide);
++    root.__timelineAbort?.signal.addEventListener('abort',()=>{hide();window.removeEventListener('scroll',hide,true);window.removeEventListener('resize',hide);if(window.__flowboardTimelineTooltipHide===hide)delete window.__flowboardTimelineTooltipHide},{once:true});
+     return hide;
+   }
+   function layoutNodeFlags(root){
+@@ -322,9 +324,43 @@
+       target.addEventListener('pointerenter',enter);target.addEventListener('pointerleave',leave);target.addEventListener('focusin',enter);target.addEventListener('focusout',leave);
+     });
+   }
+-  function bindDashboard(root,{filters={},states=new Map(),render,onSubmit,onDiscard,onUndo,onOpenSingle,onViewportChange,editable=()=>true}={}){
++  function bindDashboardRemarks(root,{states,editable,render,hideTooltip,onDraft}){
++    // A body portal clears canvas clipping/fullscreen stacking without using the browser top layer.
++    root.__timelineRemark?.destroy();
++    const panel=document.createElement('aside');panel.className='timeline-remark-popup';panel.dataset.dashboardRemark='';panel.id='timelineRemarkPopup';panel.hidden=true;panel.setAttribute('role','tooltip');
++    panel.innerHTML='<h3 id="timelineRemarkTitle" data-remark-title></h3><div data-remark-preview></div><form data-remark-form hidden><textarea name="remark" aria-label="节点备注" maxlength="500" placeholder="--暂无备注信息--"></textarea><p data-remark-confirm hidden role="alert">备注尚未保存，是否放弃修改？</p><div class="timeline-remark-actions"><button type="button" data-remark-continue hidden>继续编辑</button><button type="button" data-remark-discard hidden>放弃修改</button><button type="button" data-remark-cancel>取消</button><button type="submit" data-remark-save>确定</button></div></form>';
++    document.body.append(panel);
++    const signal=root.__timelineAbort?.signal,form=panel.querySelector('form'),input=form.elements.remark,preview=panel.querySelector('[data-remark-preview]'),selector='.timeline-dashboard-node,.timeline-node-flag,.timeline-node-flag-hit';
++    let active=null,record=null,editing=false,confirming=false,baseline='',suppressFocus=false;
++    const resolve=anchor=>{const projectId=Number(anchor?.dataset.projectId),nodeId=Number(anchor?.dataset.nodeId),state=states.get(projectId),node=state?.project.nodes.find(item=>Number(item.id)===nodeId);return node?{projectId,nodeId,state,node}:null};
++    const place=()=>{if(panel.hidden||!active?.isConnected)return;const r=active.getBoundingClientRect(),w=panel.offsetWidth,h=panel.offsetHeight,pad=12;panel.style.left=Math.max(pad,Math.min(r.left,innerWidth-w-pad))+'px';let top=r.bottom+14;if(top+h>innerHeight-pad)top=r.top-h-14;panel.style.top=Math.max(pad,Math.min(top,innerHeight-h-pad))+'px'};
++    const hide=()=>{if(editing)return;panel.hidden=true;active?.removeAttribute('aria-describedby');active=null;record=null};
++    const confirm=value=>{confirming=value;panel.classList.toggle('is-confirming',value);input.readOnly=value;panel.querySelector('[data-remark-confirm]').hidden=!value;for(const key of ['continue','discard'])panel.querySelector(`[data-remark-${key}]`).hidden=!value;for(const key of ['cancel','save'])panel.querySelector(`[data-remark-${key}]`).hidden=value;place();if(value)panel.querySelector('[data-remark-continue]').focus({preventScroll:true})};
++    const close=({restoreFocus=true}={})=>{const opener=active;editing=false;confirm(false);form.hidden=true;panel.classList.remove('is-editing');panel.setAttribute('role','tooltip');panel.removeAttribute('aria-labelledby');hide();if(restoreFocus&&opener?.isConnected){const target=opener.matches('.timeline-dashboard-node')?opener:root.querySelector(`.timeline-dashboard-node[data-project-id="${opener.dataset.projectId}"][data-node-id="${opener.dataset.nodeId}"]`);suppressFocus=true;target?.focus({preventScroll:true});suppressFocus=false}};
++    const show=anchor=>{if(editing||suppressFocus||document.body.classList.contains('timeline-dragging'))return;const next=resolve(anchor);if(!next)return;hide();hideTooltip();active=anchor;record=next;panel.querySelector('[data-remark-title]').textContent=`${next.node.name} · ${next.node.date}`;preview.textContent=next.node.remark||'--暂无备注信息--';preview.classList.toggle('is-empty',!next.node.remark);anchor.setAttribute('aria-describedby',panel.id);panel.hidden=false;place()};
++    const open=anchor=>{if(editing||!anchor)return;const next=resolve(anchor);if(!next||!editable(next.projectId)||next.state.submitting)return;show(anchor);if(!record)return;editing=true;record.state.armed=null;root.querySelectorAll('.is-armed').forEach(el=>{el.classList.remove('is-armed');if(!el.classList.contains('is-drag-pending'))el.classList.remove('is-emphasized')});baseline=String(record.node.remark||'');input.value=baseline;form.hidden=false;panel.classList.add('is-editing');panel.setAttribute('role','dialog');panel.setAttribute('aria-labelledby','timelineRemarkTitle');place();input.focus({preventScroll:true})};
++    const requestClose=()=>{if(!editing)return true;if(input.value!==baseline){confirm(true);return false}close();return true};
++    const controller={open,hide,requestClose,get editing(){return editing},get dirty(){return editing&&input.value!==baseline},destroy(){editing=false;active?.removeAttribute('aria-describedby');active=null;record=null;panel.remove();if(root.__timelineRemark===controller)delete root.__timelineRemark}};root.__timelineRemark=controller;
++    root.querySelectorAll(selector).forEach(anchor=>{
++      anchor.addEventListener('pointerenter',()=>show(anchor));anchor.addEventListener('pointerleave',hide);anchor.addEventListener('focus',()=>show(anchor));anchor.addEventListener('blur',hide);
++      anchor.addEventListener('dblclick',event=>{event.preventDefault();event.stopPropagation();open(anchor)});
++      anchor.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.isComposing){event.preventDefault();event.stopPropagation();open(anchor)}});
++    });
++    panel.querySelector('[data-remark-cancel]').addEventListener('click',()=>close());panel.querySelector('[data-remark-discard]').addEventListener('click',()=>close());panel.querySelector('[data-remark-continue]').addEventListener('click',()=>{confirm(false);input.focus({preventScroll:true})});
++    form.addEventListener('submit',event=>{event.preventDefault();if(!editing||confirming||!editable(record.projectId)||record.state.submitting||!form.reportValidity())return;const {state,nodeId}=record,value=input.value,changed=value!==baseline;if(changed){updateNode(state,nodeId,'remark',value);state.dashboardContext={nodeId,action:'remark'}}close();if(changed){render?.();onDraft?.()}});
++    // Consume editor Escape before the canvas fullscreen/drag handlers can rerender it away.
++    document.addEventListener('keydown',event=>{if(!editing||event.key!=='Escape'||event.isComposing)return;event.preventDefault();event.stopImmediatePropagation();if(!confirming)requestClose()},{capture:true,signal});
++    panel.addEventListener('keydown',event=>{if(!editing||event.key!=='Tab')return;const controls=[...form.querySelectorAll('textarea,button')].filter(el=>!el.hidden&&!el.disabled),index=controls.indexOf(document.activeElement);if(event.shiftKey&&index<=0){event.preventDefault();controls.at(-1)?.focus()}else if(!event.shiftKey&&index===controls.length-1){event.preventDefault();controls[0]?.focus()}});
++    // Keep the current editor and draft while interacting with other canvas controls.
++    for(const type of ['pointerdown','mousedown','click','dblclick','contextmenu','wheel'])root.addEventListener(type,event=>{if(!editing)return;event.preventDefault();event.stopImmediatePropagation()},{capture:true,passive:false,signal});
++    window.addEventListener('scroll',()=>editing?place():hide(),{capture:true,signal});window.addEventListener('resize',()=>editing?place():hide(),{signal});window.addEventListener('blur',hide,{signal});
++    root.addEventListener('contextmenu',hide,{capture:true,signal});root.addEventListener('pointerdown',hide,{capture:true,signal});
++    signal?.addEventListener('abort',()=>controller.destroy(),{once:true});return controller;
++  }
++  function bindDashboard(root,{filters={},states=new Map(),render,onSubmit,onDiscard,onUndo,onOpenSingle,onViewportChange,onRemarkDraft,editable=()=>true}={}){
+     let drag=null;
+     const hideNodeTooltip=bindDashboardTooltip(root);
++    const remarks=bindDashboardRemarks(root,{states,editable,render,hideTooltip:hideNodeTooltip,onDraft:onRemarkDraft});
+     bindNodeFlagProbe(root);requestAnimationFrame(()=>layoutNodeFlags(root));window.addEventListener('resize',()=>layoutNodeFlags(root),{signal:root.__timelineAbort?.signal});
+     const getState=projectId=>states.get(Number(projectId));
+     const labels={single:'拖拽（仅当前节点）',cascade:'拖拽（顺延）',done:'已完成',undone:'未完成'};
+@@ -386,17 +422,17 @@
+     const closeNodeEditor=()=>{if(!nodeEditor)return;nodeEditor.hidden=true;nodeEditor.classList.remove('is-quick-insert');nodeEditor.removeAttribute('style');nodeEditorContext=null;nodeEditorForm?.reset();hideDateGuide()};
+     const openNodeEditor=(mode,context)=>{
+       if(!nodeEditor||!nodeEditorForm)return;
+-      const state=getState(context.projectId),project=state?.project,node=context.nodeId===undefined?null:project?.nodes.find(item=>Number(item.id)===Number(context.nodeId));
+-      if(!state||!project||!editable(context.projectId)||(mode==='remark'&&!node))return;
++      const state=getState(context.projectId),project=state?.project;
++      if(!state||!project||!editable(context.projectId))return;
+       nodeEditorContext={...context,mode};
+-      const title=nodeEditor.querySelector('[data-dashboard-node-editor-title]'),summary=nodeEditor.querySelector('[data-dashboard-node-editor-context]'),nameField=nodeEditor.querySelector('[data-dashboard-node-name-field]'),remarkField=nodeEditor.querySelector('[data-dashboard-node-remark-field]'),nameInput=nodeEditorForm.elements.name,remarkInput=nodeEditorForm.elements.remark,submitButton=nodeEditorForm.querySelector('button[type="submit"]'),dialog=nodeEditor.querySelector('[role="dialog"]');
+-      if(title)title.textContent=mode==='insert'?`插入到${context.track==='parallel'?'并行':'主线'}`:'编辑备注';
+-      if(summary)summary.textContent=mode==='insert'?context.date:`${project.name} · ${node.name} · ${node.date}`;
+-      if(nameField)nameField.hidden=mode!=='insert';if(remarkField)remarkField.hidden=mode!=='remark';
+-      if(nameInput){nameInput.value='';nameInput.required=mode==='insert'}if(remarkInput)remarkInput.value=node?.remark||'';
++      const title=nodeEditor.querySelector('[data-dashboard-node-editor-title]'),summary=nodeEditor.querySelector('[data-dashboard-node-editor-context]'),nameField=nodeEditor.querySelector('[data-dashboard-node-name-field]'),nameInput=nodeEditorForm.elements.name,submitButton=nodeEditorForm.querySelector('button[type="submit"]'),dialog=nodeEditor.querySelector('[role="dialog"]');
++      if(title)title.textContent=`插入到${context.track==='parallel'?'并行':'主线'}`;
++      if(summary)summary.textContent=context.date;
++      if(nameField)nameField.hidden=mode!=='insert';
++      if(nameInput){nameInput.value='';nameInput.required=mode==='insert'}
+       if(submitButton){submitButton.textContent=mode==='insert'?'✓':'确认';submitButton.setAttribute('aria-label',mode==='insert'?'确认插入节点':'确认')};if(dialog)dialog.setAttribute('aria-modal',mode==='insert'?'false':'true');
+       nodeEditor.classList.toggle('is-quick-insert',mode==='insert');nodeEditor.hidden=false;
+-      if(mode==='insert')requestAnimationFrame(()=>{const width=nodeEditor.offsetWidth||262,height=nodeEditor.offsetHeight||101,pad=8,anchorX=Number(context.clientX)||window.innerWidth/2,anchorY=Number(context.clientY)||window.innerHeight/2,left=Math.max(pad,Math.min(window.innerWidth-width-pad,anchorX-24)),top=Math.max(pad,Math.min(window.innerHeight-height-pad,anchorY-height-8));nodeEditor.style.left=Math.round(left)+'px';nodeEditor.style.top=Math.round(top)+'px';nodeEditor.style.setProperty('--quick-arrow-x',Math.max(18,Math.min(width-24,anchorX-left))+'px');nameInput?.focus()});else requestAnimationFrame(()=>remarkInput?.focus());
++      if(mode==='insert')requestAnimationFrame(()=>{const width=nodeEditor.offsetWidth||262,height=nodeEditor.offsetHeight||101,pad=8,anchorX=Number(context.clientX)||window.innerWidth/2,anchorY=Number(context.clientY)||window.innerHeight/2,left=Math.max(pad,Math.min(window.innerWidth-width-pad,anchorX-24)),top=Math.max(pad,Math.min(window.innerHeight-height-pad,anchorY-height-8));nodeEditor.style.left=Math.round(left)+'px';nodeEditor.style.top=Math.round(top)+'px';nodeEditor.style.setProperty('--quick-arrow-x',Math.max(18,Math.min(width-24,anchorX-left))+'px');nameInput?.focus()});
+     };
+     nodeEditor?.querySelectorAll('[data-dashboard-node-editor-cancel]').forEach(button=>button.addEventListener('click',closeNodeEditor));
+     nodeEditor?.addEventListener('mousedown',event=>{if(event.target===nodeEditor)closeNodeEditor()});
+@@ -407,8 +443,6 @@
+       if(context.mode==='insert'){
+         const name=nodeEditorForm.elements.name.value.trim();if(!name){nodeEditorForm.elements.name.focus();return}
+         const node=createNode(state,{track:context.track,stage:context.stage,name,date:context.date,remark:''});state.dashboardContext={nodeId:node.id,action:'insert'};
+-      }else if(context.mode==='remark'){
+-        const node=state.project.nodes.find(item=>Number(item.id)===Number(context.nodeId)),remark=nodeEditorForm.elements.remark.value;if(node&&remark!==String(node.remark||'')){updateNode(state,Number(node.id),'remark',remark);state.dashboardContext={nodeId:Number(node.id),action:'remark'}}
+       }
+       closeNodeEditor();render?.();
+     });
+@@ -420,7 +454,7 @@
+       const chain=state.project.nodes.filter(node=>node.track===track).slice().sort(compareNodes),before=chain.filter(node=>node.date<=date).at(-1),after=chain.find(node=>node.date>date);return (before||after)?.stage||stages[0];
+     };
+     const nodeContextController=bindContextController(root,{selector:'.timeline-dashboard-node,.timeline-node-cluster[data-cluster-drag-proxy],.timeline-node-flag,.timeline-node-flag-hit',onOpen:(context,menu)=>{
+-      hideNodeTooltip();closeInsertMenu();closeProjectUndo();hideDateGuide();
++      hideNodeTooltip();remarks.hide();closeInsertMenu();closeProjectUndo();hideDateGuide();
+       const state=getState(context.projectId),node=state?.project?.nodes.find(item=>Number(item.id)===context.id),allowed=editable(context.projectId);
+       menu.querySelectorAll('[data-draft-action]').forEach(button=>button.disabled=!allowed||(context.cluster&&!['single','cascade'].includes(button.dataset.draftAction)));
+       if(node&&allowed&&!context.cluster)menu.querySelector(`[data-draft-action="${node.done_at?'done':'undone'}"]`).disabled=true;
+@@ -430,7 +464,7 @@
+       if(action==='done'||action==='undone'){
+         toggleDone(state,context.id,action==='done');state.armed=null;render?.();return;
+       }
+-      if(action==='remark'){state.armed=null;openNodeEditor('remark',{projectId:context.projectId,nodeId:context.id});return}
++      if(action==='remark'){state.armed=null;remarks.open(context.triggerElement||context.element);return}
+       if(action==='remove'){state.armed=null;removeNode(state,context.id);render?.();return}
+       state.armed={nodeId:context.id,mode:action};
+       root.querySelectorAll('.is-armed,.is-emphasized').forEach(node=>node.classList.remove('is-armed','is-emphasized'));
+@@ -503,6 +537,7 @@
+       const active=drag,state=active.state,target=active.targetDate||active.startDate;
+       stopEdgePan();active.syncViewport?.(true);
+       document.body.classList.remove('timeline-dragging');
++      if(commit&&target===active.startDate){active.guides&&(active.guides.hidden=true);active.loupe&&(active.loupe.hidden=true);root.querySelectorAll('.is-dragging').forEach(el=>el.classList.remove('is-dragging'));drag=null;return}
+       if(commit&&target!==active.startDate)moveNode(state,active.nodeId,target,active.mode);
+       state.dashboardContext={nodeId:active.nodeId,action:active.mode};state.armed=null;drag=null;render?.();
+     };
+@@ -524,7 +559,7 @@
+     root.querySelectorAll('[data-dashboard-discard]').forEach(button=>button.addEventListener('click',()=>{const projectId=Number(button.dataset.dashboardDiscard),state=getState(projectId);if(onDiscard)onDiscard(projectId);else if(state){discard(state);render?.()}}));
+     root.querySelectorAll('[data-dashboard-undo]').forEach(button=>button.addEventListener('click',()=>onUndo?.(Number(button.dataset.dashboardUndo))));
+   }
+-  function renderTransfer(transfer={},{mode='import'}={}){const importing=mode==='import',preview=transfer.preview,error=transfer.error,detailRows=error?.details?.rows,rows=Array.isArray(detailRows)?detailRows:error?.details?.row?[error.details]:[],projects=preview?.projects||[],warnings=preview?.warnings||[];return `<section class="timeline-transfer-dialog timeline-transfer" role="dialog" aria-modal="true" aria-labelledby="timelineTransferTitle" data-timeline-transfer-dialog="${mode}"><header><div><p>${importing?'IMPORT PROJECT TIMELINE':'EXPORT PROJECT TIMELINE'}</p><h2 id="timelineTransferTitle">${importing?'导入项目时间表':'导出项目时间表'}</h2><small>${importing?'严格七列表头；先预览，确认无误后提交。':'生成与标准模板一致的 Timeline 工作表。'}</small></div><button type="button" class="timeline-transfer-close" data-timeline-transfer-close aria-label="关闭">×</button></header>${importing?'<label class="timeline-transfer-file">选择 Excel / CSV 文件<input type="file" accept=".xlsx,.csv" data-timeline-import-file></label>':`<div class="timeline-transfer-export-start"><button type="button" data-timeline-export-run ${transfer.busy?'disabled':''}>${transfer.busy?'正在生成…':'生成导出文件'}</button></div>`}<div class="timeline-transfer-state" aria-live="polite">${transfer.busy?`<p class="timeline-transfer-busy">${importing?'正在校验文件…':'正在生成并校验文件…'}</p>`:''}${transfer.filename?`<p data-timeline-import-filename>已选择：${esc(transfer.filename)}</p>`:''}${preview?`<article class="timeline-import-preview" data-timeline-preview-id="${preview.batch_id}"><strong>预览通过：${preview.row_count} 行 · ${projects.length} 个项目</strong><ul class="timeline-project-summary">${projects.map(project=>`<li>${esc(project.name)}：${project.node_count} 个节点</li>`).join('')}</ul>${warnings.length?`<ul class="timeline-import-warnings">${warnings.map(warning=>`<li>提示：${esc(warning)}</li>`).join('')}</ul>`:''}</article>`:''}${error?`<article class="timeline-import-error" data-timeline-import-error="${esc(error.code||'IMPORT_ERROR')}"><strong>${esc(error.code||'IMPORT_ERROR')}：${esc(error.message)}</strong>${rows.length?`<table><thead><tr><th>行</th><th>项目/列</th><th>问题</th></tr></thead><tbody>${rows.map(row=>`<tr data-import-error-row="${esc(row.row||'')}"><td>${esc(row.row||'—')}</td><td>${esc(row.project||row.header||row.column||'—')}</td><td>${esc(row.message||error.message)}</td></tr>`).join('')}</tbody></table>`:''}</article>`:''}${transfer.exportReady?`<article class="timeline-export-ready"><strong>服务端文件校验通过</strong><span>${esc(transfer.exportReady.filename)} · SHA-256 ${esc(transfer.exportReady.sha256)}</span><a data-timeline-download href="${esc(transfer.exportReady.url)}" download="${esc(transfer.exportReady.filename)}">下载 Excel</a></article>`:''}</div><footer><button type="button" data-timeline-transfer-close>取消</button>${importing?`<button type="button" class="danger" data-timeline-import-commit ${!preview||error||transfer.busy?'disabled':''}>提交</button>`:''}</footer></section>`}
++  function renderTransfer(transfer={},{mode='import'}={}){const importing=mode==='import',preview=transfer.preview,error=transfer.error,detailRows=error?.details?.rows,rows=Array.isArray(detailRows)?detailRows:error?.details?.row?[error.details]:[],projects=preview?.projects||[],warnings=(preview?.warnings||[]).filter(warning=>warning!=='状态将按日期重算，仅『已完成』保留');return `<section class="timeline-transfer-dialog timeline-transfer" role="dialog" aria-modal="true" aria-labelledby="timelineTransferTitle" data-timeline-transfer-dialog="${mode}"><header><div><p>${importing?'IMPORT PROJECT TIMELINE':'EXPORT PROJECT TIMELINE'}</p><h2 id="timelineTransferTitle">${importing?'导入项目时间表':'导出项目时间表'}</h2>${importing?'':'<small>导出全部未归档项目，使用与标准模板相同的格式和下拉选项。</small>'}</div><button type="button" class="timeline-transfer-close" data-timeline-transfer-close aria-label="关闭">×</button></header>${importing?`<label class="timeline-transfer-file">${transfer.filename?`<span class="timeline-transfer-file-result"><strong data-timeline-import-filename>${esc(transfer.filename)}</strong><span class="timeline-transfer-file-status ${error?'is-error':preview?'is-success':'is-pending'}">${error?'-文件格式匹配失败×':preview?'-文件格式匹配成功√':'-正在校验文件…'}</span></span>`:'拖拽 Excel / CSV 文件到此处，或点击选择'}<input type="file" accept=".xlsx,.csv" data-timeline-import-file ${transfer.busy?'disabled':''}></label>${transfer.sheets?.length?`<label class="timeline-transfer-sheet">工作表（Sheet）<select data-timeline-import-sheet ${transfer.busy?'disabled':''}>${transfer.sheets.map(name=>`<option value="${esc(name)}" ${name===transfer.selectedSheet?'selected':''}>${esc(name)}</option>`).join('')}</select></label>`:''}<div class="timeline-transfer-template"><button type="button" data-timeline-template ${transfer.templateBusy||transfer.busy?'disabled':''}>${transfer.templateBusy?'正在下载…':'下载标准模板'}</button></div>${transfer.templateError?`<p class="timeline-transfer-template-error" role="alert">${esc(transfer.templateError)}</p>`:''}`:`<div class="timeline-transfer-export-start"><button type="button" data-timeline-export-run ${transfer.busy?'disabled':''}>${transfer.busy?'正在生成…':'生成导出文件'}</button></div>`}<div class="timeline-transfer-state" aria-live="polite">${transfer.busy?`<p class="timeline-transfer-busy">${importing?'正在校验文件…':'正在生成并校验文件…'}</p>`:''}${preview?`<article class="timeline-import-preview" data-timeline-preview-id="${preview.batch_id}"><strong>预览通过：${preview.row_count} 行 · ${projects.length} 个项目</strong><ul class="timeline-project-summary">${projects.map(project=>`<li>${esc(project.name)}：${project.node_count} 个节点</li>`).join('')}</ul>${warnings.length?`<ul class="timeline-import-warnings">${warnings.map(warning=>`<li>提示：${esc(warning)}</li>`).join('')}</ul>`:''}</article>`:''}${error?`<article class="timeline-import-error" data-timeline-import-error="${esc(error.code||'IMPORT_ERROR')}"><strong>${esc(error.code||'IMPORT_ERROR')}：${esc(error.message)}</strong>${rows.length?`<table><thead><tr><th>行</th><th>项目/列</th><th>问题</th></tr></thead><tbody>${rows.map(row=>`<tr data-import-error-row="${esc(row.row||'')}"><td>${esc(row.row||'—')}</td><td>${esc(row.project||row.header||row.column||'—')}</td><td>${esc(row.message||error.message)}</td></tr>`).join('')}</tbody></table>`:''}</article>`:''}${transfer.exportReady?`<article class="timeline-export-ready"><strong>服务端文件校验通过</strong><span>${esc(transfer.exportReady.filename)} · SHA-256 ${esc(transfer.exportReady.sha256)}</span><a data-timeline-download href="${esc(transfer.exportReady.url)}" download="${esc(transfer.exportReady.filename)}">下载 Excel</a></article>`:''}</div><footer><button type="button" data-timeline-transfer-close>取消</button>${importing?`<button type="button" class="danger" data-timeline-import-commit ${!preview||error||transfer.busy?'disabled':''}>提交</button>`:''}</footer></section>`}
+   function feedKind(kind,changes=[]){const fields=new Set(changes.map(row=>row.field));if(fields.has('created'))return '新增节点';if(fields.has('deleted'))return '删除节点';return ({direct_edit:'更新节点',status_toggle:'切换状态',undo:'撤销提交',initial_correction:'纠正初始日期',import:'导入项目'})[kind]||kind||'更新'}
+   function feedTime(stamp){const parts=shanghaiTimestampParts(stamp);if(!parts)return String(stamp||'');const today=shanghaiToday();if(parts.date===today)return `今天 ${parts.clock}`;if(parts.date===addDays(today,-1))return `昨天 ${parts.clock}`;return `${parts.date.slice(5)} ${parts.clock}`}
+   function feedValue(value){if(value===null||value===undefined)return '';if(typeof value==='object')return '';const text=String(value).trim();return /^[\[{]/.test(text)?'':text}
+@@ -538,16 +573,17 @@
+   function renderCreateTagDialog(){
+     return `<section class="timeline-create-dialog" role="dialog" aria-modal="true" aria-labelledby="timelineTagCreateTitle" aria-describedby="timelineTagCreateHelp"><form data-timeline-tag-create novalidate><header><div><p>NEW SHARED LABEL</p><h2 id="timelineTagCreateTitle">新建标签</h2></div><button type="button" class="timeline-create-close" data-timeline-tag-create-cancel aria-label="关闭新建标签对话框">×</button></header><label for="timelineTagCreateName">标签名称</label><input id="timelineTagCreateName" name="name" maxlength="80" required autocomplete="off" placeholder="输入唯一的标签名称" aria-describedby="timelineTagCreateHelp timelineTagCreateError"><small id="timelineTagCreateHelp">标签由全团队共同维护，名称不能与现有标签重复。</small><p class="timeline-create-error" id="timelineTagCreateError" data-timeline-tag-create-error aria-live="polite"></p><footer><button type="button" data-timeline-tag-create-cancel>取消</button><button type="submit" class="primary">创建标签</button></footer></form></section>`;
+   }
+-  function renderHomeView(projects,{admin=false,write=false,members=[],currentUser=null,review=null,mineOrder=null}={}){
++  function renderHomeView(projects,{admin=false,write=false,members=[],currentUser=null,review=null,mineOrder=null,memberOrder=null}={}){
+     const stats=homeStats(projects,members,currentUser,review),mineRaw=projects.filter(project=>ownedBy(project,currentUser)),byId=new Map(mineRaw.map(project=>[Number(project.project_id),project])),mine=mineOrder?.project_ids?[...mineOrder.project_ids.map(id=>byId.get(Number(id))).filter(Boolean),...mineRaw.filter(project=>!mineOrder.project_ids.map(Number).includes(Number(project.project_id)))]:mineRaw;
+-    const row=project=>{const metrics=project.metrics||{},count=(project.nodes||[]).length,stage=count?metrics.current_stage||project.nodes[0]?.stage:'',upcoming=metrics.upcoming?.[0]?.date,overdue=Number(metrics.overdue_count)||0,status=count?`${esc(stage||'未开始')}${overdue?` · <b class="tl-red">逾期 ${overdue}</b>`:''}${upcoming?` · 临近 ${esc(upcoming.slice(5).replace('-','/'))}`:''}`:'未开始 · 待录入首个节点',canRename=admin||(write&&ownedBy(project,currentUser));return `<article class="tl-prow" data-project-choice="${project.project_id}" data-order-project="${project.project_id}" data-project-rename-host><button type="button" class="tl-order-grip" draggable="true" aria-label="拖拽调整我的顺序" tabindex="-1">⋮⋮</button><button type="button" class="tl-prow-main" data-timeline-open="single" data-project-id="${project.project_id}"><i class="tl-prow-dot ${count?stageClass(stage):'is-empty'}"></i><strong>${esc(project.name)}</strong><span class="tl-prow-meta">${status}</span>${overdue?`<span class="tl-risk-chip">逾期 ${overdue}</span>`:''}<span class="tl-prow-go" aria-hidden="true">›</span></button><span class="tl-prow-actions"><button type="button" data-timeline-open="editor" data-project-id="${project.project_id}">编辑</button>${canRename?`<button type="button" data-timeline-rename-start="${project.project_id}">重命名</button>`:''}${admin?`<button type="button" class="timeline-delete" data-timeline-delete="${project.project_id}" data-project-version="${project.version}">删除</button>`:''}</span>${canRename?projectRenameForm(project,'home'):''}</article>`};
+-    const strip=member=>{const owned=projects.filter(project=>ownedBy(project,member)),isMe=Boolean(currentUser&&member.id===currentUser.id),pills=owned.map((project,index)=>{const metrics=project.metrics||{},overdue=Number(metrics.overdue_count)||0,upcoming=metrics.upcoming?.[0]?.date,locked=!admin&&!ownedBy(project,currentUser);return `<button type="button" class="tl-pill ${stageClass(metrics.current_stage)}" data-timeline-member-open="${project.project_id}"${index>=10?' data-member-extra hidden':''}><i class="dot"></i><b>${esc(project.name)}</b><small>${overdue?`逾期 ${overdue}`:esc(metrics.current_stage||'未开始')}${upcoming?` · 临近 ${esc(upcoming.slice(5).replace('-','/'))}`:''}</small>${locked?'<span class="tl-lock">🔒 只读</span>':''}</button>`}).join(''),more=owned.length>10?`<button type="button" class="tl-member-more" data-timeline-member-toggle="${esc(member.id)}" aria-expanded="false">显示全部（剩余 ${owned.length-10} 个）</button>`:'';return `<div class="tl-mrow"><div class="tl-member-head"><span class="tl-mavatar" aria-hidden="true">${esc(String(member.name||'?').slice(0,1))}</span><span><b>${esc(member.name||'')}${isMe?'（我）':''}</b><small>${isMe&&admin?'admin':'member'} · ${owned.length} 个项目</small></span></div><span class="tl-mpills">${owned.length?`${pills}${more}`:'<span class="tl-mnone">暂无负责项目</span>'}</span></div>`};
++    const membersById=new Map(members.map(member=>[member.id,member])),orderedMembers=memberOrder?.member_ids?[...memberOrder.member_ids.map(id=>membersById.get(id)).filter(Boolean),...members.filter(member=>!memberOrder.member_ids.includes(member.id))]:members;
++    const row=project=>{const metrics=project.metrics||{},count=(project.nodes||[]).length,stage=count?metrics.current_stage||project.nodes[0]?.stage:'',upcoming=metrics.upcoming?.[0]?.date,overdue=Number(metrics.overdue_count)||0,status=count?`${esc(stage||'未开始')}${overdue?` · <b class="tl-red">逾期 ${overdue}</b>`:''}${upcoming?` · 临近 ${esc(upcoming.slice(5).replace('-','/'))}`:''}`:'未开始 · 待录入首个节点',canManage=admin||(write&&ownedBy(project,currentUser));return `<article class="tl-prow" data-project-choice="${project.project_id}" data-order-project="${project.project_id}" data-project-rename-host><button type="button" class="tl-order-grip" draggable="true" aria-label="拖拽调整我的顺序" tabindex="-1">⋮⋮</button><button type="button" class="tl-prow-main" data-timeline-open="single" data-project-id="${project.project_id}"><i class="tl-prow-dot ${count?stageClass(stage):'is-empty'}"></i><strong>${esc(project.name)}</strong><span class="tl-prow-meta">${status}</span>${overdue?`<span class="tl-risk-chip">逾期 ${overdue}</span>`:''}<span class="tl-prow-go" aria-hidden="true">›</span></button><span class="tl-prow-actions"><button type="button" data-timeline-open="editor" data-project-id="${project.project_id}">编辑</button>${canManage?`<button type="button" data-timeline-rename-start="${project.project_id}">重命名</button>`:''}${canManage?`<button type="button" class="timeline-delete" data-timeline-delete="${project.project_id}" data-project-version="${project.version}">删除</button>`:''}</span>${canManage?projectRenameForm(project,'home'):''}</article>`};
++    const strip=member=>{const owned=projects.filter(project=>ownedBy(project,member)),isMe=Boolean(currentUser&&member.id===currentUser.id),pills=owned.map((project,index)=>{const metrics=project.metrics||{},overdue=Number(metrics.overdue_count)||0,upcoming=metrics.upcoming?.[0]?.date,locked=!admin&&!ownedBy(project,currentUser);return `<button type="button" class="tl-pill ${stageClass(metrics.current_stage)}" data-timeline-member-open="${project.project_id}"${index>=10?' data-member-extra hidden':''}><i class="dot"></i><b>${esc(project.name)}</b><small>${overdue?`逾期 ${overdue}`:esc(metrics.current_stage||'未开始')}${upcoming?` · 临近 ${esc(upcoming.slice(5).replace('-','/'))}`:''}</small>${locked?'<span class="tl-lock">🔒 只读</span>':''}</button>`}).join(''),more=owned.length>10?`<button type="button" class="tl-member-more" data-timeline-member-toggle="${esc(member.id)}" aria-expanded="false">显示全部（剩余 ${owned.length-10} 个）</button>`:'';return `<div class="tl-mrow" data-order-member="${esc(member.id)}"><button type="button" class="tl-order-grip" draggable="true" aria-label="拖拽调整团队成员卡片顺序" tabindex="-1">⋮⋮</button><div class="tl-member-head"><span class="tl-mavatar" aria-hidden="true">${esc(String(member.name||'?').slice(0,1))}</span><span><b>${esc(member.name||'')}${isMe?'（我）':''}</b><small>${isMe&&admin?'admin':'member'} · ${owned.length} 个项目</small></span></div><span class="tl-mpills">${owned.length?`${pills}${more}`:'<span class="tl-mnone">暂无负责项目</span>'}</span></div>`};
+     const actions=write?`<div class="tl-home-actions"><button type="button" class="tl-home-import" data-timeline-import-open>⇪ 导入 Excel</button><button type="button" class="tl-home-export" data-timeline-export>导出 Excel</button><button type="button" data-timeline-create-open>＋ 新建项目</button></div>`:'';
+-    return `<div class="tl-home"><header class="tl-home-head"><div><h1>我的工作</h1><small>今天 ${shanghaiToday()}</small></div>${actions}</header><div class="tl-kpis"><button type="button" class="tl-kpi" data-timeline-kpi="mine"><small>我的项目</small><span><b>${stats.mine}</b>${stats.myOverdue?`<em class="r">逾期 ${stats.myOverdue}</em>`:''}</span></button><button type="button" class="tl-kpi" data-timeline-kpi="team"><small>团队项目</small><span><b>${stats.team}</b>${stats.overdue?`<em class="r">逾期 ${stats.overdue}</em>`:''}</span></button><button type="button" class="tl-kpi" data-timeline-kpi="members"><small>团队成员</small><span><b>${stats.members}</b></span></button><button type="button" class="tl-kpi" data-timeline-kpi="feed"><small>今日团队动态</small><span><b>${stats.todayFeed}</b>${stats.yesterdayFeed?`<em class="g">昨日 ${stats.yesterdayFeed}</em>`:''}</span></button></div><div class="tl-cols"><div class="tl-maincol"><div class="tl-tabs" role="tablist"><button type="button" class="on" data-timeline-tab="mine">我的项目（${stats.mine}）</button><button type="button" data-timeline-tab="team">团队项目（${stats.team}）</button></div><section class="tl-section" data-timeline-section="mine" data-order-list="mine">${mine.length?mine.map(row).join(''):'<div class="tl-empty">暂无负责项目，可通过上方“新建项目”创建。</div>'}</section><section class="tl-section team" data-timeline-section="team" hidden>${members.length?members.map(strip).join(''):'<div class="tl-empty">暂无成员</div>'}</section><p class="tl-home-note" data-timeline-home-note="mine">整行点击进入项目页（单项目仪表盘 / 时间表编辑器）；日期、间隔、阶段、轨道、节点状态和备注均可在时间表中维护。</p></div><aside class="tl-feed"><h4>最新动态 <small data-timeline-feed-scope>我 · 最近 6 条 · 新在上</small></h4><p class="tl-feed-note">随左侧标签联动：我的项目显示当前用户最近 6 条，团队项目显示全员最近 20 条；最新记录在上。</p><div data-timeline-feed="mine">${feedRows(review,currentUser?.name,'mine')}</div><div data-timeline-feed="team" hidden>${feedRows(review,currentUser?.name,'team')}</div></aside></div></div>`;
++    return `<div class="tl-home"><header class="tl-home-head"><div><h1>我的工作</h1><small>今天 ${shanghaiToday()}</small></div>${actions}</header><div class="tl-kpis"><button type="button" class="tl-kpi" data-timeline-kpi="mine"><small>我的项目</small><span><b>${stats.mine}</b>${stats.myOverdue?`<em class="r">逾期 ${stats.myOverdue}</em>`:''}</span></button><button type="button" class="tl-kpi" data-timeline-kpi="team"><small>团队项目</small><span><b>${stats.team}</b>${stats.overdue?`<em class="r">逾期 ${stats.overdue}</em>`:''}</span></button><button type="button" class="tl-kpi" data-timeline-kpi="members"><small>团队成员</small><span><b>${stats.members}</b></span></button><button type="button" class="tl-kpi" data-timeline-kpi="feed"><small>今日团队动态</small><span><b>${stats.todayFeed}</b>${stats.yesterdayFeed?`<em class="g">昨日 ${stats.yesterdayFeed}</em>`:''}</span></button></div><div class="tl-cols"><div class="tl-maincol"><div class="tl-tabs" role="tablist"><button type="button" class="on" data-timeline-tab="mine">我的项目（${stats.mine}）</button><button type="button" data-timeline-tab="team">团队项目（${stats.team}）</button></div><section class="tl-section" data-timeline-section="mine" data-order-list="mine">${mine.length?mine.map(row).join(''):'<div class="tl-empty">暂无负责项目，可通过上方“新建项目”创建。</div>'}</section><section class="tl-section team" data-timeline-section="team" data-order-list="team" hidden>${orderedMembers.length?orderedMembers.map(strip).join(''):'<div class="tl-empty">暂无成员</div>'}</section><p class="tl-home-note" data-timeline-home-note="mine">整行点击进入项目页（单项目仪表盘 / 时间表编辑器）；日期、间隔、阶段、轨道、节点状态和备注均可在时间表中维护。</p></div><aside class="tl-feed"><h4>最新动态 <small data-timeline-feed-scope>我 · 最近 6 条 · 新在上</small></h4><p class="tl-feed-note">随左侧标签联动：我的项目显示当前用户最近 6 条，团队项目显示全员最近 20 条；最新记录在上。</p><div data-timeline-feed="mine">${feedRows(review,currentUser?.name,'mine')}</div><div data-timeline-feed="team" hidden>${feedRows(review,currentUser?.name,'team')}</div></aside></div></div>`;
+   }
+ 
+   function renderArchived(projects){
+-    const rows=projects.map(project=>`<article class="tl-archive-row"><strong>${esc(project.name)}</strong>${project.can_unarchive?`<button type="button" data-timeline-unarchive="${project.project_id}">取消归档</button>`:''}</article>`).join('');
++    const rows=projects.map(project=>`<article class="tl-archive-row"><strong>${esc(project.name)}</strong>${project.can_unarchive?`<span class="tl-archive-row-actions"><button type="button" data-timeline-unarchive="${project.project_id}">取消归档</button><button type="button" class="timeline-delete" data-timeline-delete="${project.project_id}" data-project-version="${project.version}">删除项目</button></span>`:''}</article>`).join('');
+     return `<section class="tl-archive-page"><header><div><p>SYSTEM LABEL · 高优先级归档状态</p><h1>已归档</h1><small>归档项目已从普通入口隐藏；取消归档后恢复原标签与个人顺序。</small></div></header><div class="tl-archive-list">${rows||'<div class="tl-empty">暂无已归档项目。</div>'}</div></section>`;
+   }
+ 
+@@ -558,14 +594,14 @@
+     const undo=tagsState.undo?'<button type="button" data-tag-undo>撤销上次归属变更</button>':'';
+     return `<section class="tl-tags"><header class="tl-tags-head"><div><p>SHARED LABELS · 全团队共同维护</p><h1>标签</h1><small>标签名称和项目归属会影响所有成员；此页拖拽不改变任何人的项目顺序。</small></div></header><div class="tl-tags-layout"><aside class="tl-tag-directory"><div class="tl-tag-directory-head"><h3>项目分组标签</h3><button type="button" data-tag-create-open title="新建标签" aria-label="新建标签">＋</button></div><div class="tl-tag-list">${tags||'<p class="tl-empty">还没有标签，先新建一个。</p>'}</div></aside><main class="tl-tag-workbench">${active&&view?`<header><div><p>当前共享标签</p><h2>${esc(active.name)}</h2><small>横向拖到另一栏后立即保存，项目可同时属于多个标签。</small></div>${undo?`<div class="tl-tag-actions">${undo}</div>`:''}</header><div class="tl-tag-columns"><section data-tag-drop="excluded"><h3>未加入 <small>${view.excluded.length}</small></h3><div class="tl-tag-projects">${view.excluded.map(project=>card(project,false)).join('')||'<p class="tl-empty">所有项目都已加入。</p>'}</div></section><section data-tag-drop="included"><h3>已加入 <small>${view.included.length}</small></h3><div class="tl-tag-projects">${view.included.map(project=>card(project,true)).join('')||'<p class="tl-empty">拖项目到这里加入标签。</p>'}</div></section></div>`:'<div class="tl-tag-placeholder"><strong>选择一个标签</strong><p>随后可在“未加入 / 已加入”两栏间拖拽项目。</p></div>'}</main></div></section>`;
+   }
+-  function renderWorkspace(projects,{mode='all',selectedId=null,admin=false,write=false,editor=null,dashboardStates=new Map(),filters={},transfer={},members=[],currentUser='',review=null,tagsState={},mineOrder=null,backMode='home'}={}){
++  function renderWorkspace(projects,{mode='all',selectedId=null,admin=false,write=false,editor=null,dashboardStates=new Map(),filters={},transfer={},members=[],currentUser='',review=null,tagsState={},mineOrder=null,memberOrder=null,backMode='home'}={}){
+     const selected=projects.find(project=>project.project_id===selectedId)||projects[0],empty='<div class="timeline-empty">暂无项目。可先在上方新建项目。</div>',canEdit=project=>Boolean(project&&!project.archived_at&&!project.read_only&&(admin||(write&&(project.created_by===currentUser?.id||project.created_by===currentUser?.name)))),canArchive=project=>Boolean(project?.can_archive),canUnarchive=project=>Boolean(project?.can_unarchive);
+     let content=empty;
+-    if(mode==='home')content=renderHomeView(projects,{admin,write,members,currentUser,review,mineOrder});
++    if(mode==='home')content=renderHomeView(projects,{admin,write,members,currentUser,review,mineOrder,memberOrder});
+     else if(['all','week','month'].includes(mode))content=renderAll(projects,{...filters,timeScope:mode,states:dashboardStates,editable:canEdit});
+     else if(mode==='archived')content=renderArchived(projects);
+     else if(mode==='tags')content=renderTags(tagsState);
+-    else if(selected)content=mode==='editor'?renderEditor(editor?.project||selected,{state:editor,write,editable:canEdit(selected),admin,canArchive:canArchive(selected),canUnarchive:canUnarchive(selected),backMode}):renderSingle(selected,{expanded:filters.expanded||new Set(),state:dashboardStates.get(Number(selected.project_id)),editable:canEdit(selected),write,viewport:filters.viewport,viewportWidth:filters.viewportWidth,fullscreen:filters.fullscreen,canArchive:canArchive(selected),canUnarchive:canUnarchive(selected),backMode});
++    else if(selected)content=mode==='editor'?renderEditor(editor?.project||selected,{state:editor,write,editable:canEdit(selected),admin,canArchive:canArchive(selected),canUnarchive:canUnarchive(selected),backMode}):renderSingle(selected,{expanded:filters.expanded||new Set(),state:dashboardStates.get(Number(selected.project_id)),editable:canEdit(selected),write,viewport:filters.viewport,viewportWidth:filters.viewportWidth,fullscreen:filters.fullscreen,canArchive:canArchive(selected),canUnarchive:canUnarchive(selected),canDelete:canEdit(selected),backMode});
+     return `<section class="timeline-workspace" data-timeline-mode="${esc(mode)}"><div class="timeline-page" data-timeline-page="${esc(mode)}">${content}</div></section>`;
+   }
+   return {bounds,dashboardRange,renderEditor,renderSingle,renderAll,renderTransfer,renderWorkspace,renderTags,renderArchived,renderCreateProjectDialog,renderCreateTagDialog,stageClass,editorState,ordered,orderedEditorNodes,moveNode,toggleDone,createNode,updateNode,removeNode,batchUpdateNodes,batchRemoveNodes,batchRequest,discard,bindEditor,bindDashboard,bindContextController,addDays,formatShanghaiTimestamp};
+diff --git a/timeline.css b/timeline.css
+index 45ebc18..96b7a22 100644
+--- a/timeline.css
++++ b/timeline.css
+@@ -46,9 +46,10 @@
+ .timeline-transfer-dialog>header p{margin:0 0 5px;color:var(--timeline-ink3);font-size:10px;font-weight:800;letter-spacing:.12em}
+ .timeline-transfer-dialog h2{margin:0 0 5px;color:var(--timeline-ink);font-size:22px}.timeline-transfer-dialog header small{color:var(--timeline-ink2);font-size:12px}
+ .timeline-transfer-dialog .timeline-transfer-close{min-width:32px;min-height:32px;border:0;padding:0;color:var(--timeline-ink2);font-size:22px}
+-.timeline-transfer-file{display:flex;align-items:center;justify-content:center;min-height:76px;margin:20px 24px 14px;border:1px dashed #aebbd5;border-radius:10px;background:#f8faff;color:var(--stage-design);font-size:13px;font-weight:700;cursor:pointer}.timeline-transfer-file:hover{border-color:var(--stage-design);background:#f2f6ff}.timeline-transfer-file input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
++.timeline-transfer-file{display:flex;align-items:center;justify-content:center;min-height:76px;padding:12px;text-align:center;margin:20px 24px 14px;border:1px dashed #aebbd5;border-radius:10px;background:#f8faff;color:var(--stage-design);font-size:13px;font-weight:700;cursor:pointer}.timeline-transfer-file:hover,.timeline-transfer-file:focus-within,.timeline-transfer-file.is-drag-over{border-color:var(--stage-design);background:#f2f6ff}.timeline-transfer-file input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+ .timeline-transfer-dialog .timeline-transfer-state{min-height:70px;padding:0 24px 20px}.timeline-transfer-dialog .timeline-transfer-busy{padding:14px;border-radius:8px;background:#f7f8fa}
+ .timeline-transfer-export-start{padding:20px 24px 14px}.timeline-transfer-export-start button{border-color:var(--stage-design);background:var(--stage-design);color:#fff;font-weight:700}
++.timeline-transfer-template{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:0 24px 16px}.timeline-transfer-template button{color:var(--stage-design);font-weight:700}.timeline-transfer-template small{flex:1;min-width:180px;color:var(--timeline-ink2);font-size:12px;line-height:1.6}.timeline-transfer-template-error{margin:0 24px 16px;color:#8a1c1c;font-size:12px}
+ .timeline-transfer-dialog footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 24px;border-top:1px solid var(--timeline-hairline);background:#fafbfc}.timeline-transfer-dialog footer .danger{min-width:92px;border-color:#e5484d;background:#e5484d;color:#fff;font-weight:800}.timeline-transfer-dialog footer .danger:hover{background:#cf3439}.timeline-transfer-dialog footer .danger:disabled{border-color:#e5484d;background:#e5484d;color:#fff}
+ @media(max-width:760px){.timeline-shell{padding:12px}.timeline-project-card>header{align-items:flex-start;flex-direction:column}.timeline-stage-lane{grid-template-columns:58px 1fr}.timeline-calendar{margin-left:70px}.timeline-project-card h2{font-size:25px}}
+ /* Gate5 人工复测：主页严格回到 H1 终稿屏 A */
+@@ -84,7 +85,7 @@
+ .tl-tabs{display:flex;gap:0;margin:0}
+ .tl-tabs button{border:0;border-bottom:2px solid transparent;background:transparent;padding:10px 17px 9px;cursor:pointer;color:var(--timeline-ink2);font:inherit;font-size:12.5px}
+ .tl-tabs button.on{border-bottom-color:var(--stage-design);color:var(--stage-design);font-weight:700}
+-.tl-section{display:grid;gap:0;overflow:hidden;border:1px solid var(--timeline-hairline);border-radius:0 0 10px 10px;background:#fff}.tl-section[hidden]{display:none}.tl-section.team{gap:8px;overflow:visible;border:0;background:transparent}
++.tl-section{display:grid;gap:0;overflow:hidden;border:1px solid var(--timeline-hairline);border-radius:0 0 10px 10px;background:#fff}.tl-section[hidden]{display:none}.tl-section.team{grid-template-columns:minmax(0,1fr);gap:8px;overflow:visible;border:0;background:transparent}
+ .tl-prow{position:relative;display:flex;align-items:center;background:#fff;border-bottom:1px solid var(--timeline-hairline)}
+ .tl-prow:last-child{border-bottom:0}
+ .tl-prow:hover{background:#fafbff}
+@@ -104,7 +105,8 @@
+ .tl-prow.is-renaming{padding:7px 12px;background:#f8faff}.tl-prow.is-renaming>.tl-order-grip,.tl-prow.is-renaming>.tl-prow-main,.tl-prow.is-renaming>.tl-prow-actions{display:none}.tl-prow-rename{display:grid;grid-template-columns:minmax(180px,1fr) auto auto;width:100%;gap:7px}.tl-prow-rename input{min-width:0;height:34px;border:1px solid var(--stage-design);border-radius:6px;padding:0 10px;color:var(--timeline-ink);font:inherit;font-size:13px;font-weight:700;outline:0;box-shadow:0 0 0 3px rgba(23,70,176,.1)}.tl-prow-rename [data-project-rename-error]{grid-column:1/-1}
+ .tl-empty{padding:28px;text-align:center;color:var(--timeline-ink2);background:#fff;border:1px dashed var(--timeline-hairline);border-radius:10px}
+ .tl-home-note{margin:8px 2px 0;color:var(--timeline-ink3);font-size:11px}
+-.tl-mrow{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--timeline-hairline);border-radius:10px;padding:10px 14px}
++.tl-mrow{display:flex;align-items:center;gap:14px;min-width:0;background:#fff;border:1px solid var(--timeline-hairline);border-radius:10px;padding:10px 14px}
++.tl-mrow>.tl-order-grip{align-self:stretch;margin:-2px -7px -2px -5px;touch-action:none}
+ .tl-member-head{display:flex;align-items:center;gap:10px;flex:0 0 190px;min-width:0}
+ .tl-member-head>span:last-child{display:grid;gap:2px;min-width:0}
+ .tl-member-head b{overflow:hidden;color:var(--timeline-ink);font-size:13px;text-overflow:ellipsis;white-space:nowrap}
+@@ -142,7 +144,8 @@
+ .tl-legend i.stage-idea{background:var(--stage-idea)}.tl-legend i.stage-design{background:var(--stage-design)}.tl-legend i.stage-develop{background:var(--stage-develop)}.tl-legend i.stage-test{background:var(--stage-test)}.tl-legend i.stage-production{background:var(--stage-production)}.tl-legend i.stage-iteration{background:var(--stage-iteration)}
+ .tl-legend .ring{width:10px;height:10px;border:2px solid var(--timeline-today);border-radius:50%;background:#fff;display:inline-block;margin-right:4px;vertical-align:-1px}
+ .tl-legend b{color:var(--timeline-ink)}
+-@media(max-width:900px){.tl-home-head{align-items:flex-start;flex-direction:column}.tl-home-actions{flex-wrap:wrap}.tl-cols{grid-template-columns:1fr}.tl-kpis{grid-template-columns:repeat(2,1fr)}.tl-feed{margin-top:0}}
++@media(max-width:900px){.tl-home-head{align-items:flex-start;flex-direction:column}.tl-home-actions{flex-wrap:wrap}.tl-cols{grid-template-columns:minmax(0,1fr)}.tl-maincol{min-width:0}.tl-kpis{grid-template-columns:repeat(2,1fr)}.tl-feed{margin-top:0}}
++@media(max-width:600px){.tl-mrow{flex-wrap:wrap;column-gap:8px;row-gap:8px}.tl-mrow>.tl-order-grip{align-self:auto;min-height:40px;margin:0}.tl-member-head{flex:1 1 calc(100% - 38px)}.tl-mpills{flex:0 0 100%;box-sizing:border-box;padding-left:24px}.tl-pill{max-width:100%;white-space:normal;text-align:left}.tl-pill b{overflow-wrap:anywhere}.tl-pill .dot{flex:0 0 8px}}
+ @media(hover:none){.tl-prow-actions{opacity:1}}
+ 
+ /* Gate5 人工复测修复：终稿屏B链式轴 + 真实仪表盘拖拽反馈 */
+@@ -290,6 +293,7 @@ body.timeline-dragging{cursor:grabbing;user-select:none}
+ .timeline-portfolio-project:has(.timeline-stage-lane.is-expanded),.timeline-portfolio-project:has(.timeline-stage-lane.is-expanded) .timeline-portfolio-lanes,.timeline-portfolio-project:has(.timeline-stage-lane.is-expanded) .timeline-stage-lanes{height:auto}.timeline-portfolio-lanes .timeline-stage-lane.is-expanded{height:auto}
+ .timeline-portfolio-axis-detail,.timeline-portfolio-lanes .timeline-stage-plot,.timeline-portfolio-lanes .timeline-stage{cursor:grab}.timeline-portfolio-card.is-panning,.timeline-portfolio-card.is-panning .timeline-portfolio-axis-detail,.timeline-portfolio-card.is-panning .timeline-stage-plot,.timeline-portfolio-card.is-panning .timeline-stage{cursor:grabbing;user-select:none}.timeline-portfolio-card .timeline-dashboard-node{cursor:context-menu}
+ .timeline-portfolio-card.is-week-locked .timeline-portfolio-axis-detail,.timeline-portfolio-card.is-week-locked .timeline-portfolio-lanes .timeline-stage-plot,.timeline-portfolio-card.is-week-locked .timeline-portfolio-lanes .timeline-stage{cursor:default}.timeline-portfolio-card.is-week-locked .timeline-stage-plot{overflow:hidden}
++.timeline-portfolio-card.is-week-locked .timeline-portfolio-project.is-focused .timeline-stage-plot{overflow:visible}
+ .timeline-portfolio-today{left:240px;right:20px;top:103px}.timeline-portfolio-drag-guides{position:absolute;z-index:3000;left:240px;right:20px;top:0;bottom:0;pointer-events:none}.timeline-portfolio-drag-guides[hidden]{display:none}.timeline-portfolio-drag-guides i{position:absolute;display:block}.timeline-portfolio-drag-guides .origin{top:72px;bottom:0;border-left:1.5px dashed #66758a}.timeline-portfolio-drag-guides .target{top:72px;bottom:0;border-left:2px solid var(--stage-design);background:rgba(23,70,176,.06)}.timeline-portfolio-drag-guides .corridor{top:90px;height:32px;border-block:1px solid rgba(23,70,176,.28);background:rgba(23,70,176,.15)}.timeline-portfolio-drag-guides .target-label{position:absolute;top:91px;border-radius:4px;background:#172033;padding:3px 5px;color:#fff;font-size:9px;font-weight:800;white-space:nowrap;transform:translateX(-50%)}.timeline-portfolio-drag-guides .target-label .target-delta{color:#ff4d5a}.timeline-e-month.is-target{z-index:4;filter:saturate(1.3);box-shadow:inset 0 -4px var(--stage-design)}.timeline-e-day-tick.is-target{z-index:8;border-left:3px solid var(--stage-design)}.timeline-e-day-tick.is-target b{display:none}
+ .timeline-portfolio-card.is-fullscreen{position:fixed;z-index:2000;inset:0;display:block;overflow:hidden;border:0;border-radius:0;background:#fff}.timeline-portfolio-card.is-fullscreen>.tl-tag-filter,.timeline-portfolio-card.is-fullscreen>.timeline-portfolio-head,.timeline-portfolio-card.is-fullscreen>.tl-order-note,.timeline-portfolio-card.is-fullscreen>.timeline-shared-caption,.timeline-portfolio-card.is-fullscreen>.timeline-portfolio-legend{display:flex}.timeline-portfolio-card.is-fullscreen .timeline-portfolio-scroll{max-height:calc(100vh - 224px);height:calc(100vh - 224px)}
+ @media(max-width:760px){.timeline-portfolio-card>.timeline-shared-caption{align-items:flex-start;flex-direction:column}.timeline-portfolio-view-actions{flex-wrap:wrap}.timeline-portfolio-scroll{max-height:70vh}}
+@@ -379,7 +383,7 @@ body.timeline-dragging{cursor:grabbing;user-select:none}
+ .timeline-portfolio-card.is-single-profile .timeline-stage-lane[data-track="main"] .timeline-node-flag-leader{top:13px}.timeline-portfolio-card.is-single-profile .timeline-stage-lane[data-track="parallel"] .timeline-node-flag-leader{top:29px}
+ .timeline-portfolio-card.is-single-profile .timeline-stage-lane[data-track="main"] .timeline-node-flag-hit{bottom:31px}.timeline-portfolio-card.is-single-profile .timeline-stage-lane[data-track="parallel"] .timeline-node-flag-hit{top:29px}
+ .tl-archive-page{min-height:560px;padding:22px;color:#253047}.tl-archive-page>header{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:18px}.tl-archive-page>header p{margin:0;color:#7566d9;font-size:11px;font-weight:800;letter-spacing:.12em}.tl-archive-page>header h1{margin:5px 0 4px;font-size:30px}.tl-archive-page>header small{color:#66738a}
+-.tl-archive-list{overflow:hidden;border:1px solid #dfe4ed;border-radius:10px;background:#fff}.tl-archive-row{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:52px;padding:10px 14px;border-bottom:1px solid #e6eaf0}.tl-archive-row:last-child{border-bottom:0}.tl-archive-row strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}.tl-archive-row button{flex:none;border:1px solid #cfd6e1;border-radius:7px;background:#fff;padding:7px 10px;color:#344968;font:inherit;font-size:11px;font-weight:700;cursor:pointer}.tl-archive-row button:hover{border-color:#7566d9;color:#5b4bc4}
++.tl-archive-list{overflow:hidden;border:1px solid #dfe4ed;border-radius:10px;background:#fff}.tl-archive-row{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:52px;padding:10px 14px;border-bottom:1px solid #e6eaf0}.tl-archive-row:last-child{border-bottom:0}.tl-archive-row strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}.tl-archive-row-actions{display:flex;align-items:center;gap:6px}.tl-archive-row button{flex:none;border:1px solid #cfd6e1;border-radius:7px;background:#fff;padding:7px 10px;color:#344968;font:inherit;font-size:11px;font-weight:700;cursor:pointer}.tl-archive-row button:hover{border-color:#7566d9;color:#5b4bc4}.tl-archive-row button.timeline-delete{border-color:#f0b4bc;color:#b42318}.tl-archive-row button.timeline-delete:hover{border-color:#b42318;background:#fff1f2;color:#b42318}
+ @media(max-width:760px){.tl-archive-page{padding:14px}}
+ 
+ /* Gate5 用户纠偏：生产编辑入口恢复为已确认的类 Excel 时间表 */
+@@ -432,12 +436,12 @@ body:has(#appSidebar.is-collapsed) .timeline-editor-batch-dock{left:calc(50% + 3
+ .tl-order-note{margin:8px 0;padding:8px 12px;border:1px solid #dce5f4;border-radius:8px;background:#f7f9fd;color:#5e6b82;font-size:12px}
+ .tl-order-grip{flex:0 0 auto;border:0;background:transparent;color:#8c98ac;font-weight:800;letter-spacing:-2px;cursor:grab;padding:8px 6px}
+ .tl-order-grip[draggable="true"]{cursor:grab}
+-[data-order-project].is-dragging{z-index:5;opacity:.32;outline:1px solid #c4cfdf;outline-offset:-1px;box-shadow:0 7px 18px rgba(30,47,76,.12);transition:opacity .09s linear}
++[data-order-project].is-dragging,[data-order-member].is-dragging{z-index:5;opacity:.32;outline:1px solid #c4cfdf;outline-offset:-1px;box-shadow:0 7px 18px rgba(30,47,76,.12);transition:opacity .09s linear}
+ .timeline-order-drag-float{position:fixed!important;z-index:1600!important;margin:0!important;overflow:hidden!important;opacity:1!important;outline:1px solid #c4cfdf!important;outline-offset:-1px!important;background:#fff!important;box-shadow:0 7px 18px rgba(30,47,76,.16)!important;transform:none!important;pointer-events:none!important}
+-.timeline-order-drag-float .timeline-portfolio-meta,.timeline-order-drag-float .timeline-portfolio-lanes,.timeline-order-drag-float.tl-prow{opacity:1!important;background:#fff!important}
++.timeline-order-drag-float .timeline-portfolio-meta,.timeline-order-drag-float .timeline-portfolio-lanes,.timeline-order-drag-float.tl-prow,.timeline-order-drag-float.tl-mrow{opacity:1!important;background:#fff!important}
+ .tl-tag-project.is-dragging{opacity:.42;outline:2px dashed #6c5ce7;outline-offset:-2px}
+ [data-order-list].is-order-sorting,[data-order-list].is-order-sorting *{cursor:grabbing!important}
+-@media(prefers-reduced-motion:reduce){[data-order-project].is-dragging{transition:none}.timeline-project-tabs nav button.back:hover .timeline-back-arrow,.timeline-project-tabs nav button.back:focus-visible .timeline-back-arrow{animation:none}}
++@media(prefers-reduced-motion:reduce){[data-order-project].is-dragging,[data-order-member].is-dragging{transition:none}.timeline-project-tabs nav button.back:hover .timeline-back-arrow,.timeline-project-tabs nav button.back:focus-visible .timeline-back-arrow{animation:none}}
+ .tl-tag-filter{display:flex;gap:8px;flex-wrap:wrap;padding:16px 18px 0}
+ .tl-tag-filter button{border:1px solid #d8deea;background:#fff;border-radius:999px;padding:7px 12px;color:#526079;cursor:pointer}
+ .tl-tag-filter button.active{border-color:#6c5ce7;background:#f0edff;color:#4f3ec8;font-weight:700}
+@@ -502,3 +506,26 @@ body:has(#appSidebar.is-collapsed) .timeline-editor-batch-dock{left:calc(50% + 3
+ /* Dashboard overlay stack: modal/toast > node tooltip > context menu > drag feedback > today/past masks > content. */
+ .toast{z-index:5200}
+ .modal-backdrop{z-index:5000}
++
++/* C: shared node remark preview/editor, above the dashboard but below browser annotations. */
++.timeline-remark-popup{position:fixed;z-index:4500;box-sizing:border-box;width:min(420px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:hidden;margin:0;padding:19px 24px;border:1px solid #d7ddeb;border-top:3px solid #7972cf;border-radius:12px;background:#fff;box-shadow:0 16px 65px #1f305b33;color:#2b3950;pointer-events:none}
++.timeline-remark-popup[hidden],.timeline-remark-popup [hidden]{display:none!important}
++.timeline-remark-popup h3{margin:0 0 12px;font-size:17px;line-height:1.5;overflow-wrap:anywhere}
++.timeline-remark-popup [data-remark-preview]{max-height:calc(100vh - 130px);overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.8}
++.timeline-remark-popup .is-empty,.timeline-remark-popup textarea::placeholder{font-style:italic;color:#a0a9b7;opacity:1}
++.timeline-remark-popup.is-editing{pointer-events:auto;overflow:auto}
++.timeline-remark-popup.is-editing [data-remark-preview]{display:none}
++.timeline-remark-popup textarea{display:block;box-sizing:border-box;width:100%;height:220px;max-height:40vh;resize:vertical;padding:12px;border:1px solid #cbd3e3;border-radius:7px;background:#fafbff;color:#2b3950;font-family:inherit;font-size:14px;line-height:1.8}
++.timeline-remark-popup textarea:focus{outline:2px solid #8880d7;outline-offset:1px}
++.timeline-remark-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
++.timeline-remark-actions button{min-height:34px;padding:7px 20px;border:1px solid #d6dce8;border-radius:6px;background:#fff;color:#52617a;font:inherit;font-size:13px;cursor:pointer}
++.timeline-remark-actions [data-remark-save]{background:#6b63c6;border-color:#6b63c6;color:#fff}
++.timeline-remark-actions [data-remark-discard]{color:#b94242;border-color:#e8bcbc;background:#fff5f5}
++.timeline-remark-popup [data-remark-confirm]{margin:12px 0 0;padding:9px 12px;border-radius:6px;background:#fff4e8;color:#986326;font-size:12px}
++.timeline-remark-popup.is-confirming textarea{background:#f4f5f8;color:#7d8797}
++
++.timeline-transfer-file.is-drag-over{outline:2px solid var(--stage-design);outline-offset:2px}.timeline-transfer-file:has(input:disabled){cursor:wait;opacity:.65}
++
++.timeline-transfer-sheet{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 24px 14px;font-size:13px}.timeline-transfer-sheet select{flex:1;min-width:0;max-width:100%;padding:8px;border:1px solid #aebbd5;border-radius:6px;background:white}.timeline-transfer-sheet small{width:100%;color:var(--muted)}
++
++.timeline-transfer-file-result{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:4px 8px;min-width:0;font-size:18px;line-height:1.5}.timeline-transfer-file-result strong{min-width:0;overflow-wrap:anywhere;color:var(--text,#25314c)}.timeline-transfer-file-status.is-success{color:#16834b}.timeline-transfer-file-status.is-error{color:#c93642}.timeline-transfer-file-status.is-pending{color:#667085}

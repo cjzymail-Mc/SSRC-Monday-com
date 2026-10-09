@@ -1,0 +1,497 @@
+--- before/overview-ui.js
++++ after/overview-ui.js
+@@ -3,11 +3,15 @@
+   const stages=['创意','设计','开发','测试','量产','应用迭代'];
+   const stageClasses=['idea','design','develop','test','production','iteration'];
+   const stageClass=stage=>stageClasses[stages.indexOf(stage)]||'empty';
++  // 用户暂时隐藏搜索、日期下拉、高级筛选和工具栏刷新；改为 true 即可恢复。
++  const secondaryControlsEnabled = false;
+   const choices={period:[['all','全部日期'],['week','本周'],['month','本月'],['next30','未来30天']],scope:[['all','全部项目'],['mine','我的项目']],completion:[['all','全部节点'],['open','未完成'],['done','已完成']],stage:[['all','全部阶段'],...stages.map(s=>[s,s])],track:[['all','双轨'],['main','主线'],['parallel','并行']],focus:[['all','全部'],['attention','需关注'],['overdue','逾期'],['today','今日'],['done','已完成']],search_in:[['all','项目与事项'],['project','仅项目'],['node','仅事项']]};
+   const defaults=()=>({period:'all',scope:'all',q:'',stage:'all',track:'all',completion:'all',focus:'all',search_in:'all',tag_id:'all'});
+   function createState(){return {filters:defaults(),payload:null,status:'loading',error:'',expanded:new Set(),collapsed:new Set(),scrollTop:0,scrollLeft:0,request:0,advanced:false,tags:[]}}
+-  function preferences(filters){const result=defaults();for(const key of Object.keys(choices)){if(choices[key].some(([value])=>value===filters?.[key]))result[key]=filters[key]}const tag=String(filters?.tag_id||'all');if(tag==='all'||tag==='uncategorized'||(tag.length<=18&&/^[1-9]\d*$/.test(tag)))result.tag_id=tag;return result}
+-  function applyFocus(state,value){state.filters.focus=value;state.filters.completion=value==='all'?'all':value==='done'?'done':'open'}
++  function preferences(filters){const result=defaults();for(const key of Object.keys(choices)){if(choices[key].some(([value])=>value===filters?.[key]))result[key]=filters[key]}const tag=String(filters?.tag_id||'all');if(tag==='all'||tag==='uncategorized'||(tag.length<=18&&/^[1-9]\d*$/.test(tag)))result.tag_id=tag;if(result.focus==='done'){result.focus='all';result.completion='all'}if(!secondaryControlsEnabled){const visible=defaults();visible.scope=result.scope;applyFocus({filters:visible},result.focus==='all'&&['week','month'].includes(result.period)?result.period:['attention','overdue','today'].includes(result.focus)?result.focus:'all');return visible}return result}
++  const quickChoices=[...choices.focus.filter(([value])=>value!=='done'),['week','本周'],['month','本月']];
++  function quickSelected(filters,value){return ['week','month'].includes(value)?filters.focus==='all'&&filters.period===value:value==='all'?filters.focus==='all'&&!['week','month'].includes(filters.period):filters.focus===value}
++  function applyFocus(state,value){const dated=['week','month'].includes(value);state.filters.period=dated?value:'all';state.filters.focus=dated?'all':value;state.filters.completion=dated||value==='all'?'all':value==='done'?'done':'open'}
+   function toggleExpansion(state,id){const wasExpanded=state.expanded.has(id);state.expanded.clear();if(!wasExpanded)state.expanded.add(id)}
+   function select(key,label,items,filters){return `<label class="ov-filter"><span>${label}</span><select data-overview-filter="${key}" aria-label="${label}">${items.map(([value,text])=>`<option value="${esc(value)}"${filters[key]===value?' selected':''}>${esc(text)}</option>`).join('')}</select></label>`}
+   function status(p){const overdue=p.total_overdue_count??p.overdue_count,today=p.total_today_count??p.today_count;return overdue?['late',`逾期 ${overdue}`]:today?['today',`今日 ${today}`]:!p.total_node_count?['empty','待录入节点']:p.total_done_count===p.total_node_count?['done','全部完成']:p.done_count===p.node_count&&p.node_count?['done','已完成事项']:['upcoming','推进中']}
+@@ -18,12 +22,12 @@
+     return `<tr class="ov-detail" id="ov-detail-${p.project_id}"><td colspan="7"><div class="ov-detail-meta"><span>创建者：${esc(p.creator_name)}</span><span>显示 ${p.node_count} / ${p.total_node_count} 个节点</span><span>项目已完成 ${p.total_done_count} / ${p.total_node_count}</span>${action}</div>${p.matched_nodes.length?`<table class="ov-nodes" aria-label="${esc(p.name)}节点"><thead><tr><th>节点</th><th>轨道</th><th>节点阶段</th><th>节点日期</th><th>状态</th><th>备注</th></tr></thead><tbody>${p.matched_nodes.map(n=>`<tr data-overview-node="${n.id}"${upcomingIds.has(n.id)?` class="ov-current-node" aria-label="当前进展 · 下一个时间节点：${esc(n.name)}"`:''}><td>${esc(n.name)}</td><td>${n.track==='main'?'主线':'并行'}</td><td><span class="ov-tag ov-${stageClass(n.stage)}">${esc(n.stage)}</span></td><td class="ov-date">${esc(n.date)}</td><td><span class="ov-node-status ${n.done_at?'done':n.overdue?'late':n.is_today?'today':'upcoming'}">${n.done_at?'已完成':n.overdue?'逾期未完成':n.is_today?'今日到期':esc(n.status)}</span></td><td class="ov-node-remark">${esc(n.remark||'—')}</td></tr>`).join('')}</tbody></table>`:'<p class="ov-empty-nodes">尚未录入节点，可进入时间表维护。</p>'}</td></tr>`;
+   }
+   function row(p,state){
+-    const expanded=state.expanded.has(p.project_id),[kind,label]=status(p),next=p.next_nodes[0],progress=p.total_progress;
+-    return `<tr class="ov-project" data-overview-project="${p.project_id}"><td><div class="ov-project-name"><button type="button" class="ov-expand" data-overview-expand="${p.project_id}" aria-expanded="${expanded}"${expanded?` aria-controls="ov-detail-${p.project_id}"`:''} aria-label="${expanded?'收起':'展开'} ${esc(p.name)}">${expanded?'⌄':'›'}</button><button type="button" class="ov-open" data-timeline-open="single" data-project-id="${p.project_id}" title="${esc(p.name)}">${esc(p.name)}</button><span class="ov-node-count">${p.total_node_count} 节点</span></div></td><td class="ov-owner" title="${esc(p.creator_name)}" aria-label="${esc(p.creator_name)}">${esc(p.creator_name&&p.creator_name!=='成员已不可用'?Array.from(p.creator_name.trim())[0]||'—':'—')}</td><td class="ov-status ${kind}">${label}</td><td class="ov-stage ov-${stageClass(p.current_stage)}">${esc(p.current_stage)}</td><td class="ov-next"><span title="${esc(nextLabel(p))}">${next?`${esc(next.name)}${p.next_nodes.length>1?` <b>+${p.next_nodes.length-1}</b>`:''}`:esc(nextLabel(p))}</span>${next?`<small class="ov-date">${esc(next.date)} · ${next.track==='main'?'主线':'并行'}</small>`:''}</td><td class="ov-main-remark"><span title="${esc(next?.remark||'')}">${esc(next?.remark||'—')}</span></td><td><div class="ov-progress"><span class="ov-progress-track" role="progressbar" aria-label="全项目有效节点完成比例" aria-valuemin="0" aria-valuemax="100"${progress==null?'':` aria-valuenow="${progress}"`}><i style="width:${progress||0}%"></i></span><small>${p.total_node_count?`${p.total_done_count}/${p.total_node_count}`:'—'}</small></div></td></tr>${expanded?detail(p):''}`;
++    const expanded=state.expanded.has(p.project_id),[kind,label]=status(p),next=p.next_nodes[0],progress=p.total_progress,avatarClass=['avatar-blue','avatar-pink','avatar-green','avatar-purple','avatar-orange'].includes(p.creator_avatar_class)?p.creator_avatar_class:'avatar-purple';
++    return `<tr class="ov-project" data-overview-project="${p.project_id}"><td><div class="ov-project-name"><button type="button" class="ov-expand" data-overview-expand="${p.project_id}" aria-expanded="${expanded}"${expanded?` aria-controls="ov-detail-${p.project_id}"`:''} aria-label="${expanded?'收起':'展开'} ${esc(p.name)}">${expanded?'⌄':'›'}</button><button type="button" class="ov-open" data-timeline-open="single" data-project-id="${p.project_id}" title="${esc(p.name)}">${esc(p.name)}</button><span class="ov-node-count">${p.total_node_count} 节点</span></div></td><td class="ov-owner" title="${esc(p.creator_name)}" aria-label="${esc(p.creator_name)}"><span class="ov-avatar ${avatarClass}" aria-hidden="true">${esc(p.creator_name&&p.creator_name!=='成员已不可用'?Array.from(p.creator_name.trim())[0]||'—':'—')}</span></td><td class="ov-status ${kind}">${label}</td><td class="ov-stage ov-${stageClass(p.current_stage)}">${esc(p.current_stage)}</td><td class="ov-next"><span title="${esc(nextLabel(p))}">${next?`${esc(next.name)}${p.next_nodes.length>1?` <b>+${p.next_nodes.length-1}</b>`:''}`:esc(nextLabel(p))}</span>${next?`<small class="ov-date">${esc(next.date)} · ${next.track==='main'?'主线':'并行'}</small>`:''}</td><td class="ov-main-remark"><span title="${esc(next?.remark||'')}">${esc(next?.remark||'—')}</span></td><td><div class="ov-progress"><span class="ov-progress-track" role="progressbar" aria-label="全项目有效节点完成比例" aria-valuemin="0" aria-valuemax="100"${progress==null?'':` aria-valuenow="${progress}"`}><i style="width:${progress||0}%"></i></span><small>${p.total_node_count?`${p.total_done_count}/${p.total_node_count}`:'—'}</small></div></td></tr>${expanded?detail(p):''}`;
+   }
+-  function group(key,title,projects,state){const collapsed=state.collapsed.has(key);return `<section class="ov-group ov-group-${key}"><h2><button type="button" data-overview-collapse="${key}" aria-expanded="${!collapsed}"><span>${collapsed?'›':'⌄'}</span>${title}<small>${projects.length}</small></button></h2>${collapsed?'':`<div class="ov-table-scroll" data-overview-scroll tabindex="0" aria-label="${title}项目表，可横向滚动；左右方向键查看"><table class="ov-table"><colgroup><col style="width:16%"><col style="width:44px"><col style="width:105px"><col style="width:105px"><col style="width:14%"><col><col style="width:110px"></colgroup><thead><tr><th>项目</th><th title="按项目创建者显示">负责人</th><th>关注状态</th><th>当前阶段</th><th>下一未完成节点</th><th>节点备注</th><th>项目进度</th></tr></thead><tbody>${projects.map(p=>row(p,state)).join('')}</tbody></table></div>`}</section>`}
++  function group(key,title,projects,state){const collapsed=state.collapsed.has(key);return `<section class="ov-group ov-group-${key}"><h2><button type="button" data-overview-collapse="${key}" aria-expanded="${!collapsed}"><span>${collapsed?'›':'⌄'}</span>${title}<small>${projects.length}</small></button></h2>${collapsed?'':`<div class="ov-table-scroll" data-overview-scroll tabindex="0" aria-label="${title}项目表，可横向滚动；左右方向键查看"><table class="ov-table"><colgroup><col style="width:20.8%"><col style="width:44px"><col style="width:105px"><col style="width:105px"><col style="width:14%"><col><col style="width:16.3%"></colgroup><thead><tr><th>项目</th><th title="按项目创建者显示">负责人</th><th>关注状态</th><th>当前阶段</th><th>下一未完成节点</th><th>节点备注</th><th>项目进度</th></tr></thead><tbody>${projects.map(p=>row(p,state)).join('')}</tbody></table></div>`}</section>`}
+   function render(state){
+-    const f=state.filters,payload=state.payload,counts=payload?.counts,tags=[['all','全部标签'],['uncategorized','未分类'],...(state.tags||[]).map(tag=>[String(tag.tag_id),tag.name])];
++    const f=state.filters,payload=state.payload,tags=[['all','全部标签'],['uncategorized','未分类'],...(state.tags||[]).map(tag=>[String(tag.tag_id),tag.name])];
+     let content='';
+     if(state.status==='loading'&&!payload)content='<div class="ov-message" role="status">正在加载项目…</div>';
+     else if(state.status==='error')content=`<div class="ov-message" role="alert"><strong>项目概览加载失败</strong><p>${esc(state.error)}</p><button type="button" data-overview-reload>重新加载</button></div>`;
+@@ -31,7 +35,7 @@
+     else content=['attention','recent'].map(key=>{const projects=payload.projects.filter(p=>p.group===key);return projects.length?group(key,key==='attention'?'需要关注':'项目进展',projects,state):''}).join('');
+     const hasConditions=Object.entries(defaults()).some(([key,value])=>f[key]!==value);
+     const extras=[f.stage!=='all'?f.stage:'',f.track!=='all'?(f.track==='main'?'主线':'并行'):'',f.tag_id!=='all'?(tags.find(([id])=>id===f.tag_id)?.[1]||'标签'):'',f.search_in!=='all'?(f.search_in==='project'?'仅项目搜索':'仅事项搜索'):'',f.focus==='all'&&f.completion!=='all'?(f.completion==='done'?'已完成节点':'未完成节点'):''].filter(Boolean);
+-    return `<section class="ov-board" data-timeline-page="overview" aria-busy="${state.status==='loading'}"><header class="ov-header"><h1>项目概览</h1><span>${payload?esc(payload.server_today):''}</span></header><div class="ov-toolbar"><div class="ov-scope" aria-label="项目归属">${choices.scope.map(([value,text])=>`<button type="button" data-overview-scope="${value}" aria-pressed="${f.scope===value}" class="${f.scope===value?'on':''}">${text}</button>`).join('')}</div><label class="ov-search"><span aria-hidden="true">⌕</span><input data-overview-search type="search" aria-label="搜索项目、创建者、节点或备注" placeholder="搜索项目或事项" maxlength="100" value="${esc(f.q)}"></label>${select('period','日期范围',choices.period,f)}<button type="button" class="ov-filter-toggle" data-overview-advanced aria-expanded="${state.advanced}" aria-controls="ov-advanced">筛选${extras.length?` <b>${extras.length}</b>`:''}</button><button type="button" class="ov-refresh" data-overview-reload aria-label="刷新项目概览">↻</button></div><div class="ov-quick" role="group" aria-label="事项快捷筛选"><span class="ov-quick-label">节点</span>${choices.focus.map(([value,text])=>`<button type="button" data-overview-focus="${value}" aria-pressed="${f.focus===value}" class="${f.focus===value?'on':''}">${text}</button>`).join('')}<button type="button" class="ov-clear" data-overview-reset${hasConditions?'':' hidden'}>清除条件</button></div><div class="ov-advanced" id="ov-advanced"${state.advanced?'':' hidden'}>${select('stage','节点阶段',choices.stage,f)}${select('track','节点轨道',choices.track,f)}${select('completion','节点状态',choices.completion,f)}${select('tag_id','项目标签',tags,f)}${select('search_in','搜索对象',choices.search_in,f)}<button type="button" data-overview-advanced>收起</button></div><div class="ov-result" role="status"><span>${state.status==='loading'?'更新中…':counts?`${counts.projects} 个项目 · ${counts.nodes} 个节点`:''}</span><span>${choices.focus.find(([value])=>value===f.focus)?.[1]} · ${choices.period.find(([value])=>value===f.period)?.[1]}${extras.length?` · ${esc(extras.join(' · '))}`:''}${f.q?` · 搜索「${esc(f.q)}」`:''}</span></div><div class="ov-content">${content}</div><details class="ov-explain"><summary>进度与筛选说明</summary><p>项目按逾期、今日到期、未来节点排序；同类先看最早日期，同日按待处理数量排序。关注状态与分组取全项目风险，每个项目仅展示一次。负责人沿用项目创建者关系，显示姓名首字，悬停可读完整姓名。节点备注对应主表显示的下一节点。项目进度按项目全部有效节点计算。展开只显示当前条件命中的节点；下一未完成节点取全项目最早未完成日期。红色虚线标出今天起最近的未完成时间节点，同日节点一起标记；筛选隐藏该节点时不标记其他节点。近期范围同时纳入更早逾期节点。</p></details></section>`;
++    return `<section class="ov-board" data-timeline-page="overview" aria-busy="${state.status==='loading'}"><header class="ov-header tl-home-head"><div><h1>项目概览</h1><small>今天 ${payload?esc(payload.server_today):''}</small></div></header><div class="ov-toolbar"><div class="ov-scope" aria-label="项目归属">${choices.scope.map(([value,text])=>`<button type="button" data-overview-scope="${value}" aria-pressed="${f.scope===value}" class="${f.scope===value?'on':''}">${text}</button>`).join('')}</div>${secondaryControlsEnabled?`<label class="ov-search"><span aria-hidden="true">⌕</span><input data-overview-search type="search" aria-label="搜索项目、创建者、节点或备注" placeholder="搜索项目或事项" maxlength="100" value="${esc(f.q)}"></label>${select('period','日期范围',choices.period,f)}<button type="button" class="ov-filter-toggle" data-overview-advanced aria-expanded="${state.advanced}" aria-controls="ov-advanced">筛选${extras.length?` <b>${extras.length}</b>`:''}</button><button type="button" class="ov-refresh" data-overview-reload aria-label="刷新项目概览">↻</button>`:''}</div><div class="ov-quick" role="group" aria-label="事项快捷筛选">${quickChoices.map(([value,text])=>`<button type="button" data-overview-focus="${value}" aria-pressed="${quickSelected(f,value)}" class="${quickSelected(f,value)?'on':''}">${text}</button>`).join('')}<button type="button" class="ov-clear" data-overview-reset${hasConditions?'':' hidden'}>清除条件</button></div>${secondaryControlsEnabled?`<div class="ov-advanced" id="ov-advanced"${state.advanced?'':' hidden'}>${select('stage','节点阶段',choices.stage,f)}${select('track','节点轨道',choices.track,f)}${select('completion','节点状态',choices.completion,f)}${select('tag_id','项目标签',tags,f)}${select('search_in','搜索对象',choices.search_in,f)}<button type="button" data-overview-advanced>收起</button></div>`:''}<div class="ov-content">${content}</div><details class="ov-explain"><summary>进度与筛选说明</summary><p>项目按逾期、今日到期、未来节点排序；同类先看最早日期，同日按待处理数量排序。关注状态与分组取全项目风险，每个项目仅展示一次。负责人沿用项目创建者关系，用圆形姓氏头像显示姓名首字，悬停可读完整姓名。节点备注对应主表显示的下一节点。项目进度按项目全部有效节点计算。展开只显示当前条件命中的节点；下一未完成节点取全项目最早未完成日期。红色虚线标出今天起最近的未完成时间节点，同日节点一起标记；筛选隐藏该节点时不标记其他节点。近期范围同时纳入更早逾期节点。</p></details></section>`;
+   }
+   function bind(root,state,{onChange,onReload,onRender}){
+     const signal=root.__timelineAbort.signal;
+--- before/overview.css
++++ after/overview.css
+@@ -1,22 +1,22 @@
+ .ov-board{background:linear-gradient(115deg,#fcfcff 10%,#f5f0ff 76%,#faf7ff);min-height:calc(100vh - 48px);padding:32px 36px 24px;color:#242333;border-radius:8px;font-family:Arial,"Microsoft YaHei",sans-serif}
+-.ov-header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:20px}.ov-header h1{font-size:36px;font-weight:500;line-height:1.2;margin:0;letter-spacing:-.8px}.ov-header>span{font-size:12px;color:#83808e;white-space:nowrap}
++.ov-header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:20px}
+ .ov-board button,.ov-board input,.ov-board select{font:inherit}.ov-tabs{display:flex;gap:6px;border-bottom:1px solid #e6e1ec;margin-bottom:21px}.ov-tabs button{background:transparent;border:0;border-bottom:2px solid transparent;padding:10px 14px;font-size:14px;cursor:pointer;color:#35323e}.ov-tabs .on{border-bottom-color:#528ae4;color:#222}.ov-tabs button:hover{background:#eee9f8}
+ .ov-toolbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:10px;font-size:12px}.ov-search{display:flex;align-items:center;gap:7px;border:1px solid #dcd6e6;border-radius:4px;background:#ffffffa8;padding:7px 10px}.ov-search>span{font-size:19px;line-height:1}.ov-search input{width:172px;border:0;outline:0;background:transparent;font-size:12px}.ov-filter{display:flex;align-items:center;gap:5px;color:#797483}.ov-filter select{max-width:122px;border:1px solid #ddd7e8;border-radius:4px;background:#ffffffa8;color:#38313f;padding:7px 5px}.ov-refresh{margin-left:auto;border:1px solid #ddd7e8;border-radius:4px;background:#ffffffa8;padding:7px 12px;cursor:pointer}
+-.ov-result{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#655e75;font-size:12px;min-height:18px;margin:14px 0 22px}.ov-result>span{color:#91889e;font-size:11px}.ov-group{margin:0 0 34px;--ov-group-color:#7863f5}.ov-group-recent{--ov-group-color:#d979cc}.ov-group h2{font-size:18px;font-weight:500;line-height:24px;margin:0 0 5px;color:var(--ov-group-color)}.ov-group h2 button{display:flex;align-items:center;gap:9px;border:0;background:none;color:inherit;padding:0;cursor:pointer;font-size:18px}.ov-group h2 small{font-size:11px;color:#92909e;font-weight:400;margin-left:4px}
++.ov-group{margin:0 0 34px;--ov-group-color:#7863f5}.ov-group-recent{--ov-group-color:#d979cc}.ov-group h2{font-size:18px;font-weight:500;line-height:24px;margin:0 0 5px;color:var(--ov-group-color)}.ov-group h2 button{display:flex;align-items:center;gap:9px;border:0;background:none;color:inherit;padding:0;cursor:pointer;font-size:18px}.ov-group h2 small{font-size:11px;color:#92909e;font-weight:400;margin-left:4px}
+ .ov-table-scroll{overflow:auto;scrollbar-width:none;max-width:100%;border-left:5px solid var(--ov-group-color);border-radius:4px 0 0 4px}.ov-table{border-collapse:collapse;width:100%;min-width:1225px;table-layout:fixed;font-size:14px}.ov-table th{font-weight:400;text-align:center;font-size:12px;height:29px;color:#49414f;border-bottom:1px solid #ddd7e8;white-space:nowrap}.ov-table th:first-child{text-align:left;padding-left:20px}.ov-project>td{border-right:1px solid #ddd7e8;border-bottom:1px solid #ddd7e8;height:40px;padding:0 9px;background:#ffffff38}.ov-project:hover>td{background:#eeebfa}.ov-project td:first-child{padding:0 9px}.ov-project-name{display:flex;align-items:center;gap:7px;min-width:0}.ov-expand{border:0;background:transparent;color:#89808f;font-size:20px!important;cursor:pointer;padding:3px;width:22px;flex:none}.ov-open{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:0;background:transparent;padding:0;color:#302939;text-align:left;cursor:pointer;min-width:0;font-size:14px!important}.ov-open:hover{text-decoration:underline}.ov-node-count{margin-left:auto;color:#a9a0b5;font-size:10px;flex:none}.ov-creator{text-align:center}.ov-avatar{display:inline-flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:50%;color:#fff;font-size:12px;background:#9685ba;border:2px solid #fff}
+ .ov-project>td.ov-status,.ov-project>td.ov-stage{text-align:center;color:white;font-size:13px}.ov-project>td.ov-status.late{background:#f63365}.ov-project>td.ov-status.today{background:#f5a22d}.ov-project>td.ov-status.done{background:#00c781}.ov-project>td.ov-status.upcoming{background:#8470f5}.ov-project>td.ov-status.empty{background:#b5afc3}.ov-project>td.ov-stage.ov-idea{background:var(--stage-idea)}.ov-project>td.ov-stage.ov-design{background:var(--stage-design)}.ov-project>td.ov-stage.ov-develop{background:var(--stage-develop)}.ov-project>td.ov-stage.ov-test{background:var(--stage-test)}.ov-project>td.ov-stage.ov-production{background:var(--stage-production)}.ov-project>td.ov-stage.ov-iteration{background:var(--stage-iteration)}.ov-project>td.ov-stage.ov-empty{background:#b5afc3}
+ .ov-next>span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;line-height:18px}.ov-next b{color:#8470f5;font-weight:400}.ov-date{white-space:nowrap;font-variant-numeric:tabular-nums}.ov-next small{display:block;font-size:10px;color:#81758e;line-height:14px}.ov-progress{display:flex;align-items:center;gap:7px}.ov-progress-track{background:#cbc5da;border-radius:10px;height:10px;flex:1;overflow:hidden;outline:1px solid #beb6d0}.ov-progress-track i{height:100%;display:block;background:var(--ov-group-color);border-radius:8px 0 0 8px}.ov-progress small{font-size:10px;color:#80748e;min-width:26px}.ov-remark>span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:#6c6379}
+ .ov-detail>td{padding:12px 20px 20px;background:#ffffffa1;border-bottom:1px solid #ded6e9}.ov-detail-meta button,.ov-message button{margin-left:auto;padding:7px 12px;border:1px solid #ded5ee;border-radius:4px;background:#fff;color:#6351b4;cursor:pointer}.ov-nodes{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}.ov-nodes th{text-align:left;height:27px;font-size:11px;color:#94869d}.ov-nodes th:nth-child(1){width:24%}.ov-nodes th:nth-child(2){width:7%}.ov-nodes th:nth-child(3){width:10%}.ov-nodes th:nth-child(4){width:11%}.ov-nodes th:nth-child(5){width:12%}.ov-nodes td{padding:8px 5px;border-bottom:1px solid #eee9f4;overflow-wrap:anywhere;vertical-align:top;line-height:19px}.ov-node-remark{white-space:pre-wrap}.ov-tag{background:#eee5fb;color:#7564a8;border-radius:14px;padding:3px 9px;white-space:nowrap}.ov-node-status.done{color:#009762}.ov-node-status.late{color:#e03258}.ov-node-status.today{color:#b87a18}.ov-empty-nodes,.ov-note{color:#91839f;font-size:11px;line-height:1.8}.ov-note{margin-top:14px}.ov-message{padding:44px 20px;text-align:center;color:#877990;border-top:1px solid #e5ddec;border-bottom:1px solid #e5ddec;font-size:14px}.ov-message p{font-size:12px}.ov-message button{margin:10px 0 0}.ov-board :focus-visible{outline:2px solid #538be3;outline-offset:2px}
+ @media(min-width:1500px){.timeline-shell:has(.ov-board)>div{max-width:1380px}.ov-table{min-width:1225px}}
+-@media(max-width:800px){.timeline-shell:has(.ov-board){padding:12px}.ov-board{padding:22px 18px}.ov-header h1{font-size:28px}.ov-toolbar{gap:8px}.ov-search input{width:180px}.ov-result{margin-bottom:18px}.ov-header{flex-wrap:wrap}.ov-note{font-size:11px}}
++@media(max-width:800px){.timeline-shell:has(.ov-board){padding:12px}.ov-board{padding:22px 18px}.ov-toolbar{gap:8px}.ov-search input{width:180px}.ov-header{flex-wrap:wrap}.ov-note{font-size:11px}}
+ 
+ .ov-table-scroll::-webkit-scrollbar{display:none}
+-.ov-table{min-width:850px}.ov-header{margin-bottom:24px}.ov-toolbar{gap:12px;margin-bottom:12px}.ov-scope{display:flex;border-bottom:1px solid #ded6eb;flex:none}.ov-scope button{border:0;border-bottom:2px solid transparent;background:none;padding:9px 11px;cursor:pointer;font-size:13px;color:#8b8298}.ov-scope button.on{border-bottom-color:#538be3;color:#302743}.ov-search{flex:1;min-width:180px;max-width:300px}.ov-search input{width:100%;min-width:0}.ov-filter-toggle,.ov-advanced>button{border:1px solid #ddd7e8;border-radius:4px;background:#ffffffa8;padding:7px 12px;cursor:pointer;font-size:12px}.ov-filter-toggle b{background:#eae3fb;border-radius:10px;padding:1px 5px;color:#7863d9;font-weight:400}.ov-refresh{margin-left:0;font-size:18px!important;line-height:18px;padding:6px 10px}.ov-quick{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:0 0 12px}.ov-quick button{border:0;border-radius:4px;background:none;padding:6px 12px;color:#908598;cursor:pointer;font-size:12px}.ov-quick button.on{background:#eae4fb;color:#6c54be}.ov-quick button:hover,.ov-scope button:hover{background:#f0eafb}.ov-quick .ov-clear{margin-left:auto;color:#a397b0;padding-right:0}.ov-advanced{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border:1px solid #e6dfee;background:#ffffff7a;border-radius:5px;padding:12px;margin-bottom:12px}.ov-advanced[hidden]{display:none}.ov-result{margin:12px 0 22px}.ov-node-count{font-size:10px;white-space:nowrap}.ov-detail-meta{display:flex;gap:20px;font-size:11px;color:#9b8ba8;margin-bottom:12px}.ov-explain{font-size:11px;color:#a295ad;line-height:1.7;margin-top:8px}.ov-explain summary{cursor:pointer;list-style:none;display:inline}.ov-explain p{max-width:650px;margin:6px 0}
++.ov-table{min-width:850px}.ov-header{margin-bottom:24px}.ov-toolbar{gap:12px;margin-bottom:12px}.ov-scope{display:flex;border-bottom:1px solid #ded6eb;flex:none}.ov-scope button{border:0;border-bottom:2px solid transparent;background:none;padding:9px 11px;cursor:pointer;font-size:13px;color:#8b8298}.ov-scope button.on{border-bottom-color:#538be3;color:#302743}.ov-search{flex:1;min-width:180px;max-width:300px}.ov-search input{width:100%;min-width:0}.ov-filter-toggle,.ov-advanced>button{border:1px solid #ddd7e8;border-radius:4px;background:#ffffffa8;padding:7px 12px;cursor:pointer;font-size:12px}.ov-filter-toggle b{background:#eae3fb;border-radius:10px;padding:1px 5px;color:#7863d9;font-weight:400}.ov-refresh{margin-left:0;font-size:18px!important;line-height:18px;padding:6px 10px}.ov-quick{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:0 0 12px}.ov-quick button{border:0;border-radius:4px;background:none;padding:6px 12px;color:#908598;cursor:pointer;font-size:12px}.ov-quick button.on{background:#eae4fb;color:#6c54be}.ov-quick button:hover,.ov-scope button:hover{background:#f0eafb}.ov-quick .ov-clear{margin-left:auto;color:#a397b0;padding-right:0}.ov-advanced{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border:1px solid #e6dfee;background:#ffffff7a;border-radius:5px;padding:12px;margin-bottom:12px}.ov-advanced[hidden]{display:none}.ov-node-count{font-size:10px;white-space:nowrap}.ov-detail-meta{display:flex;gap:20px;font-size:11px;color:#9b8ba8;margin-bottom:12px}.ov-explain{font-size:11px;color:#a295ad;line-height:1.7;margin-top:8px}.ov-explain summary{cursor:pointer;list-style:none;display:inline}.ov-explain p{max-width:650px;margin:6px 0}
+ @media(max-width:800px){.ov-board{padding:22px 16px}.ov-toolbar{gap:10px}.ov-scope{order:0}.ov-search{order:1;max-width:none;min-width:180px}.ov-detail-meta{gap:10px;flex-wrap:wrap}.ov-quick button{padding:6px 9px}.ov-advanced{gap:10px}}
+ 
+ .tl-archive-open{border:0;background:none;padding:0;text-align:left;color:inherit;font:inherit;font-weight:600;cursor:pointer;overflow-wrap:anywhere}.tl-archive-open:hover{text-decoration:underline}
+ 
+-.ov-quick-label{font-size:11px;color:#9a8ca6;margin-right:5px}
++
+ 
+ .timeline-subnav .nav-item.active,.timeline-subnav .nav-item:hover,.timeline-subnav .nav-item:focus-visible{background:#ecebfa;color:#554ac7}.timeline-subnav .nav-item:focus-visible{outline:2px solid #9686dc;outline-offset:-2px}
+ 
+@@ -25,3 +25,7 @@
+ .ov-main-remark>span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;white-space:pre-line;overflow-wrap:anywhere;line-height:16px;font-size:12px;color:#81758e}
+ 
+ .ov-project>td.ov-owner{text-align:center;padding:0 4px;color:#81758e;font-size:13px;white-space:nowrap}
++
++.ov-avatar.avatar-blue{background:#6a8ed1}.ov-avatar.avatar-pink{background:#d77fa8}.ov-avatar.avatar-green{background:#5cae8d}.ov-avatar.avatar-purple{background:#806dcc}.ov-avatar.avatar-orange{background:#d99555}
++
++.ov-header{font-family:"DM Sans",Segoe UI,sans-serif}
+--- before/index.html
++++ after/index.html
+@@ -12,7 +12,7 @@
+   <link rel="stylesheet" href="i12.css" />
+   <link rel="stylesheet" href="i13.css" />
+   <link rel="stylesheet" href="timeline.css?v=20261008-week-flags" />
+-  <link rel="stylesheet" href="overview.css?v=20261009-f02-owner-column" />
++  <link rel="stylesheet" href="overview.css?v=20261009-f02-minimal-feed" />
+ </head>
+ <body>
+   <div class="app-shell">
+@@ -41,6 +41,6 @@
+   <div class="modal-backdrop" id="taskModal"><div class="task-modal"><button class="modal-close" data-close="taskModal">×</button><div id="modalBody"></div></div></div>
+   <div class="modal-backdrop" id="listModal"><div class="task-modal list-modal"><button class="modal-close" data-close="listModal">×</button><div id="listModalBody"></div></div></div>
+   <div class="modal-backdrop login-backdrop" id="loginModal"><form class="login-card" id="loginForm"><div class="brand login-brand"><span class="brand-mark">F</span><span>flowboard</span></div><h2>登录工作空间</h2><p>使用管理员提供的账号登录。</p><label>用户名<input id="loginUser" name="username" autocomplete="username" required /></label><label>密码<input id="loginPassword" name="password" type="password" autocomplete="current-password" required /></label><div class="login-error" id="loginError"></div><button class="primary-btn" type="submit">登录</button></form></div>
+-  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js?v=20261009-f02-owner-column"></script><script src="overview-ui.js?v=20261009-f02-owner-column"></script><script src="i12-ui.js"></script><script src="app.js?v=20261009-f02-owner-column"></script>
++  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js?v=20261009-f02-minimal-feed"></script><script src="overview-ui.js?v=20261009-f02-minimal-feed"></script><script src="i12-ui.js"></script><script src="app.js?v=20261009-f02-minimal-feed"></script>
+ </body>
+ </html>
+--- before/tests/overview_ui.test.js
++++ after/tests/overview_ui.test.js
+@@ -3,11 +3,13 @@
+ const overview=require('../overview-ui.js');
+ function fixture(){return {project_id:7,name:'真实项目',creator_name:'成员',creator_avatar_class:'avatar-green',current_stage:'开发',group:'attention',can_edit:false,node_count:2,done_count:1,progress:50,overdue_count:1,today_count:0,total_node_count:3,total_done_count:1,total_progress:33,next_nodes:[{name:'最早节点',date:'2026-10-01',track:'main'},{name:'同日并行',date:'2026-10-01',track:'parallel'}],matched_nodes:[{id:1,name:'主线节点',track:'main',stage:'开发',date:'2026-10-01',done_at:false,overdue:true,is_today:false,status:'进行中',remark:'真实备注'},{id:2,name:'完成节点',track:'parallel',stage:'测试',date:'2026-10-08',done_at:true,remark:''}]}}
+ test('overview preserves project stage and exposes every same-day next node',()=>{const p=fixture();assert.equal(overview.status(p)[1],'逾期 1');assert.match(overview.nextLabel(p),/同日并行.*并行/);const s=overview.createState();s.status='ready';s.payload={projects:[p],counts:{projects:1,nodes:2,done:1,overdue:1},server_today:'2026-10-08'};s.expanded.add(7);const html=overview.render(s);assert.match(html,/ov-stage ov-develop/);assert.match(html,/返回|查看时间表 · 只读/);assert.match(html,/aria-valuenow="33"/);assert.match(html,/逾期未完成/);assert.match(html,/已完成/);assert.match(html,/同日并行/)});
+-test('project names node remarks and creator attributes cannot inject HTML',()=>{const p=fixture();p.name='<img src=x onerror=alert(1)>';p.creator_name='" autofocus onfocus=alert(1)';p.creator_avatar_class='avatar-green" onclick="bad';p.matched_nodes[0].remark='<script>bad()</script>';const s=overview.createState();s.status='ready';s.payload={projects:[p],counts:{},server_today:'2026-10-08'};s.expanded.add(7);const html=overview.render(s);assert.ok(!html.includes('<img'));assert.ok(!html.includes('<script>'));assert.ok(!html.includes('onclick="bad'));assert.match(html,/&lt;script&gt;/);assert.match(html,/&quot; autofocus/)});
++test('project names node remarks and creator attributes cannot inject HTML',()=>{const p=fixture();p.name='<img src=x onerror=alert(1)>';p.creator_name='" autofocus onfocus=alert(1)';p.creator_avatar_class='avatar-green" onclick="bad';p.matched_nodes[0].remark='<script>bad()</script>';const s=overview.createState();s.status='ready';s.payload={projects:[p],counts:{},server_today:'2026-10-08'};s.expanded.add(7);const html=overview.render(s);assert.ok(!html.includes('<img'));assert.ok(!html.includes('<script>'));assert.ok(!html.includes('onclick="bad'));assert.match(html,/class="ov-avatar avatar-purple"/);assert.match(html,/&lt;script&gt;/);assert.match(html,/&quot; autofocus/)});
+ test('missing nodes and completed projects have accurate no-next copy',()=>{const p=fixture();p.next_nodes=[];p.total_node_count=0;assert.equal(overview.nextLabel(p),'尚未录入节点');assert.equal(overview.status({...p,overdue_count:0,today_count:0})[1],'待录入节点');p.total_node_count=2;p.total_done_count=2;assert.equal(overview.nextLabel(p),'暂无未完成节点');assert.equal(overview.status({...p,overdue_count:0,today_count:0})[1],'全部完成')});
+ test('error and empty-result rendering provide an actionable recovery control',()=>{const s=overview.createState();s.status='error';s.error='<故障>';assert.match(overview.render(s),/data-overview-reload/);assert.match(overview.render(s),/&lt;故障&gt;/);s.status='ready';s.payload={projects:[],counts:{}};assert.match(overview.render(s),/data-overview-reset/)});
+ test('first overview is complete and stored preferences exclude transient search',()=>{const s=overview.createState();assert.equal(s.filters.period,'all');assert.equal(s.filters.completion,'all');const saved=overview.preferences({...s.filters,scope:'mine',q:'私有临时搜索',stage:'伪造阶段',tag_id:'9'.repeat(40)});assert.equal(saved.scope,'mine');assert.equal(saved.q,'');assert.equal(saved.stage,'all');assert.equal(saved.tag_id,'all')});
+-test('quick focus chooses compatible completion and advanced controls stay collapsed',()=>{const s=overview.createState();overview.applyFocus(s,'done');assert.equal(s.filters.completion,'done');overview.applyFocus(s,'overdue');assert.equal(s.filters.completion,'open');overview.applyFocus(s,'all');assert.equal(s.filters.completion,'all');assert.match(overview.render(s),/id="ov-advanced" hidden/);assert.doesNotMatch(overview.render(s),/ov-tabs/)});
++test('quick focus chooses compatible completion while secondary controls are temporarily absent',()=>{const s=overview.createState();overview.applyFocus(s,'done');assert.equal(s.filters.completion,'done');overview.applyFocus(s,'overdue');assert.equal(s.filters.completion,'open');overview.applyFocus(s,'all');assert.equal(s.filters.completion,'all');assert.doesNotMatch(overview.render(s),/id="ov-advanced"|ov-tabs|data-overview-search|data-overview-filter="period"/)});
+ test('detail uses server upcoming IDs without duplicate headers or next list',()=>{const p=fixture();p.upcoming_nodes=[{id:1}];const s=overview.createState();s.status='ready';s.payload={projects:[p],counts:{},server_today:'2026-10-08'};s.expanded.add(7);let html=overview.render(s);assert.match(html,/data-overview-node="1" class="ov-current-node"/);assert.doesNotMatch(html,/data-overview-node="2" class="ov-current-node"/);assert.doesNotMatch(html,/ov-detail-head|ov-next-list/);assert.match(html,/data-timeline-open="editor"/);p.matched_nodes=p.matched_nodes.filter(n=>n.id!==1);html=overview.render(s);assert.doesNotMatch(html,/class="ov-current-node"/)});
+ test('opening a different project collapses the previous project and toggling closes it',()=>{const s=overview.createState();overview.toggleExpansion(s,7);assert.deepEqual([...s.expanded],[7]);overview.toggleExpansion(s,9);assert.deepEqual([...s.expanded],[9]);overview.toggleExpansion(s,9);assert.equal(s.expanded.size,0)});
+ test('compact next column and note column correspond to the earliest node and full project risk',()=>{const p=fixture();p.overdue_count=0;p.total_overdue_count=2;p.total_today_count=0;p.next_nodes[0].remark='最早节点备注\n<script>bad()</script>';p.next_nodes[1].remark='其他同日备注';const s=overview.createState();s.status='ready';s.payload={projects:[p],counts:{},server_today:'2026-10-09'};s.expanded.add(7);const html=overview.render(s);assert.match(html,/<col style="width:14%">/);assert.match(html,/<th>节点备注<\/th>/);assert.match(html,/colspan="7"/);assert.match(html,/class="ov-main-remark"><span title="最早节点备注/);assert.match(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>/);assert.equal(overview.status(p)[1],'逾期 2');assert.equal((html.match(/data-overview-project="7"/g)||[]).length,1)});
++test('week/month shortcuts stay mutually exclusive and hidden completion filters do not persist',()=>{const s=overview.createState();overview.applyFocus(s,'week');assert.deepEqual([s.filters.period,s.filters.focus,s.filters.completion],['week','all','all']);let html=overview.render(s);assert.match(html,/data-overview-focus="week" aria-pressed="true"/);assert.doesNotMatch(html,/data-overview-focus="done"|ov-quick-label|ov-result/);overview.applyFocus(s,'month');assert.equal(s.filters.period,'month');overview.applyFocus(s,'today');assert.deepEqual([s.filters.period,s.filters.focus,s.filters.completion],['all','today','open']);overview.applyFocus(s,'all');assert.deepEqual([s.filters.period,s.filters.focus,s.filters.completion],['all','all','all']);const legacy=overview.preferences({focus:'done',completion:'done',scope:'mine'});assert.equal(legacy.focus,'all');assert.equal(legacy.completion,'all');assert.equal(legacy.scope,'mine');assert.equal(overview.preferences({focus:'all',completion:'done'}).completion,'all')});
++test('hidden old conditions reset while visible scope and date shortcuts restore',()=>{const saved=overview.preferences({scope:'mine',period:'month',focus:'all',completion:'done',stage:'开发',track:'parallel',tag_id:'3',search_in:'node',q:'旧搜索'});assert.deepEqual(saved,{...overview.createState().filters,scope:'mine',period:'month'});assert.deepEqual(overview.preferences({period:'week',focus:'overdue',stage:'开发'}),{...overview.createState().filters,period:'all',focus:'overdue',completion:'open'})});
+--- before/tests/test_overview_ux_e2e.py
++++ after/tests/test_overview_ux_e2e.py
+@@ -19,9 +19,12 @@
+     def ready(self,page):page.locator('[data-timeline-page="overview"][aria-busy="false"]').wait_for()
+ 
+     def focus(self,page,key):
+-        with page.expect_response(lambda r:'/timeline/overview?' in r.url and f'focus={key}' in r.url and r.status==200):
+-            page.locator(f'[data-overview-focus="{key}"]').click()
++        parameter='completion=done' if key=='done' else f'period={key}' if key in ('week','month') else f'focus={key}'
++        with page.expect_response(lambda r:'/timeline/overview?' in r.url and parameter in r.url and r.status==200) as response:
++            if key=='done':self.select(page,'completion','done')
++            else:page.locator(f'[data-overview-focus="{key}"]').click()
+         self.ready(page)
++        return response.value.json()
+ 
+     def test_menu_five_modules_and_focus_progress_never_resets_to_zero(self):
+         ids=self.seed();context,page=self.login('u1');self.open_overview(page)
+@@ -34,8 +37,9 @@
+         risk=page.locator(f'[data-overview-project="{ids["risk"]}"]')
+         self.assertEqual(risk.locator('[role=progressbar]').get_attribute('aria-valuenow'),'20')
+         for key,projects,nodes in [('attention',1,3),('overdue',1,1),('today',1,2),('done',3,3),('all',6,10)]:
+-            self.focus(page,key)
+-            self.assertIn(f'{projects} 个项目 · {nodes} 个节点',page.locator('.ov-result').inner_text())
++            payload=self.focus(page,key)
++            self.assertEqual((payload['counts']['projects'],payload['counts']['nodes']),(projects,nodes))
++            self.assertEqual(page.locator('.ov-project').count(),projects)
+             self.assertEqual(risk.locator('[role=progressbar]').get_attribute('aria-valuenow'),'20')
+         self.assert_clean_browser(page);context.close()
+ 
+@@ -87,7 +91,7 @@
+         self.assertEqual(page.locator('[data-overview-search]').input_value(),'')
+         self.assertEqual(page.locator('[data-overview-scope=mine]').get_attribute('aria-pressed'),'true')
+         self.assertEqual(page.locator('[data-overview-focus=overdue]').get_attribute('aria-pressed'),'true')
+-        self.assertIn('创意',page.locator('.ov-result').inner_text());self.assertIn('主线',page.locator('.ov-result').inner_text())
++        self.assertEqual(page.locator('[data-overview-filter=stage]').input_value(),'创意');self.assertEqual(page.locator('[data-overview-filter=track]').input_value(),'main')
+         self.assertTrue(page.locator('#timelineOverviewBtn').evaluate('el=>el.classList.contains("active")'))
+         page.locator('[data-overview-reset]').first.click();self.ready(page)
+         self.assertEqual(page.locator('.ov-project').count(),6)
+@@ -186,7 +190,13 @@
+         self.assertEqual(risk.locator('.ov-next').evaluate('el=>el.closest("table").querySelectorAll("col")[4].style.width'),'14%')
+         self.assertEqual(risk.locator('.ov-owner').inner_text(),'管')
+         self.assertEqual(risk.locator('.ov-owner').get_attribute('title'),'管理员')
+-        self.assertEqual(risk.locator('.ov-owner').evaluate('el=>el.closest("table").querySelector("col").style.width'),'16%')
++        avatar=risk.locator('.ov-owner .ov-avatar')
++        self.assertEqual(avatar.inner_text(),'管')
++        self.assertEqual(avatar.evaluate('el=>getComputedStyle(el).borderRadius'),'50%')
++        self.assertEqual(avatar.evaluate('el=>getComputedStyle(el).width'),'27px')
++        self.assertEqual(avatar.evaluate('el=>getComputedStyle(el).height'),'27px')
++        self.assertNotIn(avatar.evaluate('el=>getComputedStyle(el).backgroundColor'),['transparent','rgba(0, 0, 0, 0)'])
++        self.assertEqual(risk.locator('.ov-owner').evaluate('el=>el.closest("table").querySelector("col").style.width'),'20.8%')
+         self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'),1244)
+         self.focus(page,'done')
+         self.assertEqual(page.locator('.ov-group-attention .ov-project').count(),1)
+@@ -195,5 +205,37 @@
+         self.assertEqual(risk.locator('.ov-main-remark span').inner_text(),'供应商色卡待确认')
+         self.assert_clean_browser(page);context.close()
+ 
++    def test_date_shortcuts_clean_header_and_column_balance(self):
++        self.seed();context,page=self.login('u1');self.open_overview(page)
++        self.assertEqual(page.locator('.ov-quick [data-overview-focus]').all_inner_texts(),['全部','需关注','逾期','今日','本周','本月'])
++        self.assertEqual(page.locator('.ov-quick-label,.ov-result').count(),0)
++        self.assertEqual(page.locator('[data-overview-focus=done]').count(),0)
++        for mode in ('week','month'):
++            payload=self.focus(page,mode)
++            self.assertEqual(payload['filters']['period'],mode)
++            self.assertEqual(payload['filters']['focus'],'all')
++            self.assertEqual(payload['filters']['completion'],'all')
++            self.assertEqual(page.locator('[data-overview-filter=period]').input_value(),mode)
++            self.assertEqual(page.locator('.ov-quick button[aria-pressed=true]').count(),1)
++            self.assertEqual(page.locator(f'[data-overview-focus={mode}]').get_attribute('aria-pressed'),'true')
++            self.assertEqual(page.locator('.ov-project').count(),payload['counts']['projects'])
++        self.focus(page,'all')
++        self.assertEqual(page.locator('[data-overview-filter=period]').input_value(),'all')
++        self.assertEqual(page.locator('.ov-project').count(),6)
++        for width in (1242,1480):
++            page.set_viewport_size({'width':width,'height':676})
++            row=page.locator('.ov-project').first
++            tableWidth=row.evaluate('el=>el.closest("table").getBoundingClientRect().width')
++            oldNoteWidth=tableWidth*.70-364
++            ratio=row.locator('.ov-main-remark').evaluate('el=>el.getBoundingClientRect().width')/oldNoteWidth
++            self.assertGreater(ratio,.67);self.assertLess(ratio,.73)
++            self.assertEqual(row.evaluate('el=>el.closest("table").querySelectorAll("col")[6].style.width'),'16.3%')
++            self.assertGreater(row.locator('.ov-progress').evaluate('el=>el.parentElement.getBoundingClientRect().width'),110)
++        page.screenshot(path=str(overview_harness.EVIDENCE/'avatar-shortcuts-ready.png'))
++        # Explicit completion filtering remains available in advanced controls.
++        self.focus(page,'done');self.assertEqual(page.locator('.ov-project').count(),3)
++        self.assertEqual(page.locator('[data-overview-filter=completion]').input_value(),'done')
++        self.assert_clean_browser(page);context.close()
++
+ 
+ if __name__=='__main__':unittest.main()
+--- before/tests/test_overview_e2e.py
++++ after/tests/test_overview_e2e.py
+@@ -3,6 +3,7 @@
+ from urllib.parse import parse_qs, urlparse
+ from datetime import datetime, timedelta, timezone
+ from pathlib import Path
++from unittest.mock import patch
+ 
+ import test_timeline_e2e as harness
+ from overview_fixtures import seed_overview
+@@ -14,7 +15,22 @@
+ class OverviewE2E(unittest.TestCase):
+     setUpClass = classmethod(harness.TimelineProductionE2E.setUpClass.__func__)
+     tearDownClass = classmethod(harness.TimelineProductionE2E.tearDownClass.__func__)
+-    setUp = harness.TimelineProductionE2E.setUp
++    secondary_controls_for_test = True  # Full retained features under their restore switch.
++
++    def setUp(self):
++        harness.TimelineProductionE2E.setUp(self)
++        if getattr(self,'secondary_controls_for_test',True):
++            original=self.browser.new_context
++            def context_with_controls(*args,**kwargs):
++                context=original(*args,**kwargs)
++                def restore_controls(route):
++                    response=route.fetch()
++                    body=response.text().replace('const secondaryControlsEnabled = false;', 'const secondaryControlsEnabled = true;')
++                    route.fulfill(response=response,body=body)
++                context.route('**/overview-ui.js*',restore_controls)
++                return context
++            switch=patch.object(self.browser,'new_context',side_effect=context_with_controls)
++            switch.start();self.addCleanup(switch.stop)
+     tearDown = harness.TimelineProductionE2E.tearDown
+     login = harness.TimelineProductionE2E.login
+     assert_clean_browser = harness.TimelineProductionE2E.assert_clean_browser
+@@ -170,8 +186,11 @@
+         self.assertEqual(len(pending),1)
+         response=pending[0].fetch()
+         page.locator('[data-overview-search]').fill('鞋面材料')
+-        pending[0].fulfill(response=response)
+-        page.locator('.ov-result',has_text='1 个项目 · 1 个节点').wait_for()
++        with page.expect_response(lambda r:'/timeline/overview?' in r.url and parse_qs(urlparse(r.url).query).get('q')==['鞋面材料'] and r.status==200) as search_result:
++            pending[0].fulfill(response=response)
++        payload=search_result.value.json()
++        self.assertEqual((payload['counts']['projects'],payload['counts']['nodes']),(1,1))
++        page.locator('[data-timeline-page=overview][aria-busy=false]').wait_for()
+         self.assertEqual(page.locator('.ov-project').count(),1)
+         self.assertEqual(page.locator('[data-overview-search]').input_value(),'鞋面材料')
+         self.assertIn('疾风跑鞋',page.locator('.ov-project').inner_text())
+--- before/timeline-ui.js
++++ after/timeline-ui.js
+@@ -560,11 +560,21 @@
+     root.querySelectorAll('[data-dashboard-undo]').forEach(button=>button.addEventListener('click',()=>onUndo?.(Number(button.dataset.dashboardUndo))));
+   }
+   function renderTransfer(transfer={},{mode='import'}={}){const importing=mode==='import',preview=transfer.preview,error=transfer.error,detailRows=error?.details?.rows,rows=Array.isArray(detailRows)?detailRows:error?.details?.row?[error.details]:[],projects=preview?.projects||[],warnings=(preview?.warnings||[]).filter(warning=>warning!=='状态将按日期重算，仅『已完成』保留');return `<section class="timeline-transfer-dialog timeline-transfer" role="dialog" aria-modal="true" aria-labelledby="timelineTransferTitle" data-timeline-transfer-dialog="${mode}"><header><div><p>${importing?'IMPORT PROJECT TIMELINE':'EXPORT PROJECT TIMELINE'}</p><h2 id="timelineTransferTitle">${importing?'导入项目时间表':'导出项目时间表'}</h2>${importing?'':'<small>导出全部未归档项目，使用与标准模板相同的格式和下拉选项。</small>'}</div><button type="button" class="timeline-transfer-close" data-timeline-transfer-close aria-label="关闭">×</button></header>${importing?`<label class="timeline-transfer-file">${transfer.filename?`<span class="timeline-transfer-file-result"><strong data-timeline-import-filename>${esc(transfer.filename)}</strong><span class="timeline-transfer-file-status ${error?'is-error':preview?'is-success':'is-pending'}">${error?'-文件格式匹配失败×':preview?'-文件格式匹配成功√':'-正在校验文件…'}</span></span>`:'拖拽 Excel / CSV 文件到此处，或点击选择'}<input type="file" accept=".xlsx,.csv" data-timeline-import-file ${transfer.busy?'disabled':''}></label>${transfer.sheets?.length?`<label class="timeline-transfer-sheet">工作表（Sheet）<select data-timeline-import-sheet ${transfer.busy?'disabled':''}>${transfer.sheets.map(name=>`<option value="${esc(name)}" ${name===transfer.selectedSheet?'selected':''}>${esc(name)}</option>`).join('')}</select></label>`:''}<div class="timeline-transfer-template"><button type="button" data-timeline-template ${transfer.templateBusy||transfer.busy?'disabled':''}>${transfer.templateBusy?'正在下载…':'下载标准模板'}</button></div>${transfer.templateError?`<p class="timeline-transfer-template-error" role="alert">${esc(transfer.templateError)}</p>`:''}`:`<div class="timeline-transfer-export-start"><button type="button" data-timeline-export-run ${transfer.busy?'disabled':''}>${transfer.busy?'正在生成…':'生成导出文件'}</button></div>`}<div class="timeline-transfer-state" aria-live="polite">${transfer.busy?`<p class="timeline-transfer-busy">${importing?'正在校验文件…':'正在生成并校验文件…'}</p>`:''}${preview?`<article class="timeline-import-preview" data-timeline-preview-id="${preview.batch_id}"><strong>预览通过：${preview.row_count} 行 · ${projects.length} 个项目</strong><ul class="timeline-project-summary">${projects.map(project=>`<li>${esc(project.name)}：${project.node_count} 个节点</li>`).join('')}</ul>${warnings.length?`<ul class="timeline-import-warnings">${warnings.map(warning=>`<li>提示：${esc(warning)}</li>`).join('')}</ul>`:''}</article>`:''}${error?`<article class="timeline-import-error" data-timeline-import-error="${esc(error.code||'IMPORT_ERROR')}"><strong>${esc(error.code||'IMPORT_ERROR')}：${esc(error.message)}</strong>${rows.length?`<table><thead><tr><th>行</th><th>项目/列</th><th>问题</th></tr></thead><tbody>${rows.map(row=>`<tr data-import-error-row="${esc(row.row||'')}"><td>${esc(row.row||'—')}</td><td>${esc(row.project||row.header||row.column||'—')}</td><td>${esc(row.message||error.message)}</td></tr>`).join('')}</tbody></table>`:''}</article>`:''}${transfer.exportReady?`<article class="timeline-export-ready"><strong>服务端文件校验通过</strong><span>${esc(transfer.exportReady.filename)} · SHA-256 ${esc(transfer.exportReady.sha256)}</span><a data-timeline-download href="${esc(transfer.exportReady.url)}" download="${esc(transfer.exportReady.filename)}">下载 Excel</a></article>`:''}</div><footer><button type="button" data-timeline-transfer-close>取消</button>${importing?`<button type="button" class="danger" data-timeline-import-commit ${!preview||error||transfer.busy?'disabled':''}>提交</button>`:''}</footer></section>`}
+-  function feedKind(kind,changes=[]){const fields=new Set(changes.map(row=>row.field));if(fields.has('created'))return '新增节点';if(fields.has('deleted'))return '删除节点';return ({direct_edit:'更新节点',status_toggle:'切换状态',undo:'撤销提交',initial_correction:'纠正初始日期',import:'导入项目'})[kind]||kind||'更新'}
+-  function feedTime(stamp){const parts=shanghaiTimestampParts(stamp);if(!parts)return String(stamp||'');const today=shanghaiToday();if(parts.date===today)return `今天 ${parts.clock}`;if(parts.date===addDays(today,-1))return `昨天 ${parts.clock}`;return `${parts.date.slice(5)} ${parts.clock}`}
+-  function feedValue(value){if(value===null||value===undefined)return '';if(typeof value==='object')return '';const text=String(value).trim();return /^[\[{]/.test(text)?'':text}
+-  function feedRowSummary(row){const node=String(row?.node_name||'节点'),field=String(row?.field||''),oldValue=feedValue(row?.old_value),newValue=feedValue(row?.new_value),labels={created:'新建节点',deleted:'删除节点',date:'调整日期',initial_date:'纠正初始日期',status:'切换状态',done_at:'切换状态',stage:'调整阶段',track:'调整轨道',name:'重命名节点',remark:'更新备注'},action=labels[field]||'更新节点',change=oldValue||newValue?`：${oldValue||'—'} → ${newValue||'—'}`:'';return `${node} · ${action}${change}`}
+-  function feedRows(review,currentUser,scope){const limit=scope==='mine'?6:20,flat=(review||[]).flatMap(project=>(project.batches||[]).map(batch=>({project:project.name,batch}))).filter(item=>scope!=='mine'||item.batch.actor?.name===currentUser).sort((a,b)=>String(b.batch.created_at||'').localeCompare(String(a.batch.created_at||''))||b.batch.batch_id-a.batch.batch_id).slice(0,limit);if(!flat.length)return '<p class="tl-feed-empty">暂无动态</p>';return flat.map(item=>{const batch=item.batch,actor=batch.actor?.name||'—',changes=batch.change_rows||[],summary=changes.length?`${feedRowSummary(changes[0])}${changes.length>1?`（共 ${changes.length} 项）`:''}`:'';return `<article class="tl-feed-item"><span class="tl-feed-avatar" aria-hidden="true">${esc(actor.slice(0,1))}</span><span class="tl-feed-copy"><span><b>${esc(actor)}</b> ${esc(feedKind(batch.change_kind,changes))} · ${esc(item.project)}</span>${summary?`<small title="${esc(summary)}">${esc(summary)}</small>`:''}</span><time>${esc(feedTime(batch.created_at))}</time></article>`}).join('')}
++  function feedDone(value){if(value===true||value===1)return true;if(value===false||value===0||value==null)return false;const text=String(value).trim().toLowerCase();if(['true','1'].includes(text)||/^\d{4}-\d{2}-\d{2}/.test(text))return true;if(['false','0','','none','null'].includes(text))return false;return null}
++  function feedKind(kind,changes=[],source=''){const fields=new Set(changes.map(row=>row.field));if(kind==='undo')return '撤销修改';if(source==='import'||kind==='import')return '导入节点';if(kind==='initial_correction')return '纠正初始日期';if(fields.size===1&&fields.has('done_at')){const values=changes.map(row=>feedDone(row.new_value));return values.every(value=>value===true)?'标记完成':values.every(value=>value===false)?'恢复未完成':'调整完成状态'}if(fields.has('created'))return '新增节点';if(fields.has('deleted'))return '删除节点';if(fields.size===1)return ({date:'调整日期',initial_date:'纠正初始日期',stage:'调整阶段',track:'调整轨道',name:'修改名称',remark:'修改备注',status:'调整状态'})[changes[0].field]||'更新节点';return '更新节点'}
++  function feedTime(stamp){const parts=shanghaiTimestampParts(stamp);if(!parts)return '时间未知';const today=shanghaiToday();if(parts.date===today)return `今天 ${parts.clock}`;if(parts.date===addDays(today,-1))return `昨天 ${parts.clock}`;return `${parts.date.slice(5)} ${parts.clock}`}
++  function feedValue(value){if(value===null||value===undefined||typeof value==='object')return '';const text=String(value).trim();return /^[\[{]/.test(text)||['None','null','undefined'].includes(text)?'':text}
++  function feedRowSummary(row,kind=''){const node=String(row?.node_name||'节点'),field=String(row?.field||''),oldValue=feedValue(row?.old_value),newValue=feedValue(row?.new_value),prefix=`${node} · `;
++    if(field==='created')return prefix+(kind==='undo'?'撤销新建节点':'新建节点');
++    if(field==='deleted')return prefix+(kind==='undo'?'恢复节点':'删除节点');
++    if(field==='done_at'||field==='status'&&['true','false','1','0'].includes(newValue.toLowerCase())){const done=feedDone(row?.new_value);return prefix+(done===true?'标记为已完成':done===false?'恢复为未完成':'更新完成状态')}
++    if(field==='remark')return prefix+(!newValue?'清空备注':!oldValue?`添加备注：${newValue}`:`修改备注：${oldValue} → ${newValue}`);
++    const labels={date:row?.change_role==='cascaded'?'联动调整日期':'调整日期',initial_date:'纠正初始日期',status:'调整状态',stage:'调整阶段',track:'调整轨道',name:'修改名称'};
++    if(!labels[field])return prefix+'更新节点信息';
++    const readable=value=>field==='track'?({main:'主线',parallel:'并行'})[value]||'未设置':value||'未设置';
++    return prefix+labels[field]+`：${readable(oldValue)} → ${readable(newValue)}`;
++  }
++  function feedRows(review,currentUser,scope){const limit=scope==='mine'?6:20,flat=(review||[]).flatMap(project=>(project.batches||[]).map(batch=>({project:project.name,batch}))).filter(item=>scope!=='mine'||item.batch.actor?.name===currentUser).sort((a,b)=>String(b.batch.created_at||'').localeCompare(String(a.batch.created_at||''))||b.batch.batch_id-a.batch.batch_id).slice(0,limit);if(!flat.length)return '<p class="tl-feed-empty">暂无动态</p>';return flat.map(item=>{const batch=item.batch,actor=batch.actor?.name||'成员',changes=batch.change_rows||[],details=changes.map(row=>feedRowSummary(row,batch.change_kind)),summary=details.length?`${details[0]}${details.length>1?`（共 ${details.length} 项修改）`:''}`:'';return `<article class="tl-feed-item"><span class="tl-feed-avatar" aria-hidden="true">${esc(actor.slice(0,1))}</span><span class="tl-feed-copy"><span><b>${esc(actor)}</b> ${esc(feedKind(batch.change_kind,changes,batch.trigger_source))} · ${esc(item.project)}</span>${summary?`<small title="${esc(details.join('\n'))}">${esc(summary)}</small>`:''}</span><time>${esc(feedTime(batch.created_at))}</time></article>`}).join('')}
+   function ownedBy(project,person){return !!person&&(project.created_by===person.id||project.created_by===person.name)}
+   function homeStats(projects,members,currentUser,review){const mine=projects.filter(project=>ownedBy(project,currentUser)),sum=list=>list.reduce((total,project)=>total+(Number(project.metrics?.overdue_count)||0),0),today=shanghaiToday(),flat=(review||[]).flatMap(project=>project.batches||[]),day=batch=>shanghaiTimestampParts(batch.created_at)?.date||'';return {mine:mine.length,myOverdue:sum(mine),team:projects.length,overdue:sum(projects),members:(members||[]).length,todayFeed:flat.filter(batch=>day(batch)===today).length,yesterdayFeed:flat.filter(batch=>day(batch)===addDays(today,-1)).length}}
+   function renderCreateProjectDialog(){
+--- before/tests/timeline_ui.test.js
++++ after/tests/timeline_ui.test.js
+@@ -168,7 +168,7 @@
+ const manyProjects=Array.from({length:12},(_,index)=>({...project,project_id:100+index,name:`成员项目 ${index+1}`,created_by:'u1'}));
+ const compactTeam=Timeline.renderWorkspace(manyProjects,{mode:'home',admin:true,members:[{id:'u1',name:'林晓'}],currentUser:{id:'u1',name:'林晓'},review:[{name:'成员项目 1',batches:[{batch_id:1,created_at:'2026-08-25T06:30:00',change_kind:'direct_edit',actor:{name:'林晓'},change_rows:[{node_name:'鞋底转图',field:'created',old_value:null,new_value:'{"row":551,"project":"成员项目 1","remark":"很长的 raw"}'},{node_name:'一轮高频',field:'date',old_value:'2026-08-18',new_value:'2026-08-26'}]}]}]});
+ ok((compactTeam.match(/data-member-extra hidden/g)||[]).length===2&&compactTeam.includes('显示全部（剩余 2 个）'),'team member projects collapse after ten and expose a prominent remaining-count control');
+-ok(compactTeam.includes('鞋底转图 · 新建节点（共 2 项）')&&!compactTeam.includes('&quot;row&quot;')&&!compactTeam.includes('很长的 raw'),'home feed summarizes the core change in one detail line without rendering raw JSON');
++ok(compactTeam.includes('鞋底转图 · 新建节点（共 2 项修改）')&&!compactTeam.includes('&quot;row&quot;')&&!compactTeam.includes('很长的 raw'),'home feed summarizes the core change in one detail line without rendering raw JSON');
+ ok(compactTeam.includes('08-25 14:30'),'home feed treats timezone-less server audit stamps as UTC and displays Beijing time');
+ ok(Timeline.formatShanghaiTimestamp('2026-08-31T02:30:00+00:00')==='2026-08-31 10:30'&&Timeline.formatShanghaiTimestamp('2026-08-31T16:30:00+00:00',{seconds:true})==='2026-09-01 00:30:00','Beijing formatter handles UTC conversion and cross-day boundaries');
+ const owned={...project,created_by:'u1'},ownedB={...projectB,created_by:'u1'};
+--- before/STATE.md
++++ after/STATE.md
+@@ -2,6 +2,8 @@
+ 
+ > 跨会话当前快照；完整历史：`team-progress/STATE-archive-20260904-pre-production-rebaseline.md`。
+ > 更新：2026-10-09
++
++> 2026-10-09 当前精简界面与动态：项目列20.8%、圆形姓氏头像、备注约缩窄30%与进度列16.3%；六快捷项（全部/需关注/逾期/今日/本周/月），移除“节点”及已完成快捷项，统计/文本摘要整行删除。搜索/日期下拉/高级/普通刷新暂时隐藏，overview-ui.js的secondaryControlsEnabled可恢复，旧隐藏条件清除；标题与我的工作统一。动态完成/取消、轨道、备注、日期/联动、撤销等改为中文实际动作，悬停包含全部修改，不重写审计。Node16/16及原timeline Node PASS；20场景19初验＋动态定向复验PASS，真实库19历史编码只读核对。8083仍直连生产库，此轮没有服务重启或数据库写入。最新续接 `team-progress/20261009-overview-minimal-and-feed.md`，覆盖下方旧控件、标题、头像及统计布局。
+ 
+ > 2026-10-09 最新布局：项目名称列32%→16%，第二列44px“负责人”显示创建者姓名首字，悬停/读屏显示完整姓名，展开同步七列。现有我的工作把创建关系作为负责项目归属，此轮沿用该关系，没有独立负责人字段/迁移。真实库25项目均有创建者姓名（6个不同姓名），只读核对；浏览器5/5、Node9/9及静态检查PASS。8083静态资源版本20261009-f02-owner-column，仍直连真实库，未重启服务或写入数据库。最新入口 `team-progress/20261009-overview-owner-column.md`，覆盖下方六列布局描述。
+ 
+--- before/feature-02-进阶仪表盘/03-UX_OPTIMIZATION_CONTRACT.md
++++ after/feature-02-进阶仪表盘/03-UX_OPTIMIZATION_CONTRACT.md
+@@ -14,19 +14,23 @@
+ 
+ ## 快捷与高级筛选
+ 
+-首次项目概览默认全部项目、全部日期、包含已完成，展示完整项目。顶部只保留我的/全部项目切换、搜索、日期范围、筛选入口和刷新。常用事项捷径为全部、需关注、逾期、今日、已完成，分别限定命中节点；“需关注”=逾期或今日未完成，“已完成”=已完成节点，项目不重复计数。日期仍为上海自然日，近期范围保留更早逾期规则。
++首次项目概览默认全部项目、全部日期、包含已完成，展示完整项目。顶部保留我的/全部项目切换。2026-10-09最新反馈：搜索、日期下拉、高级筛选入口和工具栏刷新暂时隐藏，代码保留；overview-ui.js的secondaryControlsEnabled改回true即可恢复。当前本周/月由快捷项切换。当前快捷项为全部、需关注、逾期、今日、本周、本月；删除“节点”前缀及“已完成”快捷项。“需关注”=逾期或今日未完成；本周/月设定相应日期范围、全部节点及focus=all，切回全部恢复全部日期；项目归属与其他可见选择保持。旧已完成快捷状态刷新时清除，后端完成筛选接口不删除。项目不重复计数。日期仍为上海自然日，近期范围保留更早逾期规则。
+ 
+-阶段、轨道、节点状态、共享标签及搜索对象放入高级筛选。搜索对象区分项目（含创建者）、事项（节点名称/备注）及综合搜索；不新增待办、项目类型或负责人模型。标签复用活跃共享关系，未知/停用/跨工作区标签拒绝，未分类为无活跃标签项目。当前情境、时间范围和额外条件可见，并可一键清除/恢复全部；空结果提供清晰恢复入口。
++阶段、轨道、节点状态、共享标签及搜索对象放入高级筛选。搜索对象区分项目（含创建者）、事项（节点名称/备注）及综合搜索；不新增待办、项目类型或负责人模型。标签复用活跃共享关系，未知/停用/跨工作区标签拒绝，未分类为无活跃标签项目。暂时隐藏的高级条件从会话偏好清除，避免不可见过滤；当前情境/时间由选中的快捷项表达，可一键清除/恢复全部，空结果保留恢复入口。搜索、阶段、轨道、节点状态、标签和搜索对象的代码/接口保留，恢复开关后仍可用。
+ 
+ 快捷情境切换设定相容的节点状态；手工改节点状态时退出旧事项捷径，避免“已完成+未完成”等冲突。全部/我的切换保留其他当前条件。高级面板位置与键盘焦点稳定；组合筛选、新旧响应、延迟搜索和账户切换不得产生输入与结果不一致。
+ 
+ ## 信息层级
+ 
+-概览常态表格七列：项目、负责人、关注状态、当前阶段、下一未完成节点、节点备注、项目进度。2026-10-09追加：项目名称列32%→16%，第二列44px负责人姓氏；沿用现有我的工作以创建者归属负责项目的关系，按creator_name姓名首字显示，悬停/读屏可读完整姓名，未映射成员显示短横线，不新增独立负责人模型或改写账户。下一节点列由28%缩至14%，备注为主表当前显示的最早未完成节点的备注，长备注显示两行、悬停可读全文，展开保留所有节点原始备注。项目按全项目紧急程度排序：最早逾期、今日到期、未来节点（越近越先）、全部完成、待录入；同日按逾期/今日未完成数量及稳定ID排序。关注状态与唯一分组依全项目风险，不因阶段、事项或完成筛选而挪走逾期项目；筛选命中节点统计保持独立。每个项目仅展示一次，两组互斥，已在需要关注出现的项目不在项目进展重复。项目进度按全项目有效节点计算，由服务端返回，不能因为“未完成”筛选显示为零进度；命中数量与展开明细基于筛选集，项目行和展开处分别清楚表达总节点与显示节点。
++概览常态表格七列：项目、负责人、关注状态、当前阶段、下一未完成节点、节点备注、项目进度。2026-10-09追加：项目名称列最终20.8%（16%增加30%），第二列44px圆形姓氏头像；头像直径27px，白色姓氏、按现有账户avatar_class配色，悬停显示全名；沿用现有我的工作以创建者归属负责项目的关系，按creator_name姓名首字放入头像显示，悬停/读屏可读完整姓名，未映射成员显示短横线，不新增独立负责人模型或改写账户。下一节点列由28%缩至14%；备注列相对本轮最初布局缩窄约30%，进度列从110px改为16.3%以接收腾出的空间。备注为主表当前显示的最早未完成节点的备注，长备注显示两行、悬停可读全文，展开保留所有节点原始备注。项目按全项目紧急程度排序：最早逾期、今日到期、未来节点（越近越先）、全部完成、待录入；同日按逾期/今日未完成数量及稳定ID排序。关注状态与唯一分组依全项目风险，不因阶段、事项或完成筛选而挪走逾期项目；筛选命中节点统计保持独立。每个项目仅展示一次，两组互斥，已在需要关注出现的项目不在项目进展重复。项目进度按全项目有效节点计算，由服务端返回，不能因为“未完成”筛选显示为零进度；命中数量与展开明细基于筛选集，项目行和展开处分别清楚表达总节点与显示节点。
+ 
+ 创建者与备注进入直接展开区；项目行标题保留完整名称，名称点击进入单项目，箭头展开详情。2026-10-08追加反馈：展开区删除重复项目名和“下一未完成节点”折叠行，编辑时间表按钮并入元数据行；一次只展开一个项目，打开另一个自动收起此前项目，并保持新项目展开入口可见。红色虚线框标出全项目今天起最近的未完成时间节点，同日多个节点全部标记；没有今天/未来未完成节点时不标记，筛选隐藏目标时不把其他命中节点替代为目标。主表“下一未完成节点”仍包含更早逾期节点，与未来时间标记分别表达。服务端只读投影提供upcoming_nodes，不新增存储或schema。无备注使用简洁空值，不重复堆“暂无备注”。常态删除长篇底部规则说明与重复计数，仅在按需“说明”中解释有助判断的口径。状态与六阶段色、浅紫白底、紫/粉组头及紧凑行高保留。
+ 
+ 缩减横向密度，使桌面关键列易读；隐藏两组可见横向滚动条，支持触控/横向滚动及明确键盘横向访问。窄屏日期不截断，长名称、备注和21节点明细可展开全文。加载时不清空已有结果导致闪烁，错误重试仍明确，初次加载正常反馈。
++
++概览标题复用我的工作的tl-home-head样式：30px标题，下面显示“今天＋日期”，字号/字重/字体/行高/颜色经实际浏览器比较一致。项目/节点总统计及筛选文本摘要整行删除，保留分组、行和展开内必要统计。
++
++工作台动态用中文实际动作描述：完成/恢复未完成、主线/并行、联动改期、添加/清空/修改备注、名称/阶段/初始日期、创建/删除及撤销恢复。批次摘要显示首项及修改项数，悬停列出该批全部动作；不展示True/False、轨道代码或原始快照JSON，也不重写历史记录。
+ 
+ ## 数据与工程
+ 
+--- before/feature-02-进阶仪表盘/04-UX_DELIVERY.md
++++ after/feature-02-进阶仪表盘/04-UX_DELIVERY.md
+@@ -7,6 +7,8 @@
+ > 2026-10-09最新概览：六列（追加当前显示节点的备注），下一节点列14%（此前28%）；全项目风险与日期排序，两组互斥。浏览器12/12、后端9/9、Node9/9 PASS；真实库只读投影25项目/230节点，上方9/下方16，无重复ID，备注对应原节点。当前说明覆盖下方五列/备注只在展开区的历史取舍，证据与续接 `../team-progress/20261009-overview-urgency-feedback.md`。
+ 
+ > 同日进一步调整：项目名称列16%（此前32%），第二列44px显示负责人姓名首字，hover为完整姓名；按现有创建者关系展示，不新增数据模型。七列及展开跨度同步，浏览器5/5、Node9/9 PASS；入口静态资源已更新，无服务重启或数据库写入。最新续接 `../team-progress/20261009-overview-owner-column.md`。
++
++> 2026-10-09当前界面覆盖：项目列20.8%、圆形姓氏头像、备注缩窄约30%并给进度列16.3%；快捷项为全部/需关注/逾期/今日/本周/本月，统计及摘要整行删除。搜索/日期下拉/高级/刷新暂时隐藏且保留恢复开关，隐藏旧条件清除；标题与我的工作统一。动态已改为中文动作，完成/取消、轨道、备注、联动改期及撤销等均按实际修改显示。最新证据与恢复路径：`../team-progress/20261009-overview-minimal-and-feed.md`。下方搜索/高级操作是保留能力的历史体验路线，当前未显示。
+ 
+ ## 直接体验
+ 
+--- /dev/null
++++ after/tests/timeline_feed.test.js
+@@ -0,0 +1,40 @@
++const test=require('node:test');
++const assert=require('node:assert/strict');
++const Timeline=require('../timeline-ui.js');
++function feed(rows,kind='direct_edit',source='manual'){
++  const html=Timeline.renderWorkspace([],{mode:'home',currentUser:{id:'u1',name:'林晓'},review:[{name:'项目A',batches:[{batch_id:1,created_at:'2026-10-09T05:30:00+00:00',change_kind:kind,trigger_source:source,actor:{name:'林晓'},change_rows:rows}]}]});
++  return html.match(/<article class="tl-feed-item">[\s\S]*?<\/article>/)[0];
++}
++test('completion and reopening use action words for historical boolean encodings',()=>{
++  for(const value of ['True','true',true,1,'1','2026-10-09T05:30:00+00:00']){
++    const html=feed([{node_name:'量产上市',field:'done_at',old_value:'False',new_value:value}],'status_toggle');
++    assert.match(html,/量产上市 · 标记为已完成/);assert.doesNotMatch(html,/False|True|done_at|status_toggle/);
++  }
++  for(const value of ['False','false',false,0,'0',null])assert.match(feed([{node_name:'量产上市',field:'done_at',old_value:'True',new_value:value}],'status_toggle'),/恢复为未完成/);
++});
++test('tracks, cascaded dates, added and cleared remarks describe actual edits',()=>{
++  assert.match(feed([{node_name:'节点A',field:'track',old_value:'main',new_value:'parallel'}]),/主线 → 并行/);
++  assert.match(feed([{node_name:'节点A',field:'date',change_role:'cascaded',old_value:'2026-10-09',new_value:'2026-10-12'}]),/联动调整日期：2026-10-09 → 2026-10-12/);
++  assert.match(feed([{node_name:'节点A',field:'remark',old_value:'',new_value:'材料待确认'}]),/添加备注：材料待确认/);
++  assert.match(feed([{node_name:'节点A',field:'remark',old_value:'材料待确认',new_value:''}]),/清空备注/);
++  assert.match(feed([{node_name:'节点A',field:'stage',old_value:'设计',new_value:'开发'}]),/调整阶段：设计 → 开发/);
++});
++test('create, delete and their undo never show raw snapshots or deleted tokens',()=>{
++  const create={node_name:'节点A',field:'created',old_value:null,new_value:'{"name":"节点A","track":"main"}'};
++  assert.match(feed([create]),/新建节点/);assert.doesNotMatch(feed([create]),/track|&quot;name&quot;/);
++  assert.match(feed([create],'undo'),/撤销新建节点/);
++  const remove={node_name:'节点A',field:'deleted',old_value:null,new_value:'deleted'};
++  assert.match(feed([remove]),/删除节点/);assert.doesNotMatch(feed([remove]),/deleted/);
++  assert.match(feed([remove],'undo'),/恢复节点/);
++  assert.match(feed([create],'direct_edit','import'),/导入节点/);
++});
++test('batch tooltip includes every action and unknown fields never expose code',()=>{
++  const html=feed([{node_name:'节点A',field:'done_at',new_value:'True'},{node_name:'节点B',field:'done_at',new_value:'False'}],'status_toggle');
++  assert.match(html,/共 2 项修改/);assert.match(html,/节点B · 恢复为未完成/);assert.doesNotMatch(html,/True|False/);
++  const unknown=feed([{node_name:'节点A',field:'internal_flag',old_value:'False',new_value:'True'}],'internal_change');
++  assert.match(unknown,/更新节点信息/);assert.doesNotMatch(unknown,/internal_flag|internal_change|False|True/);
++});
++test('names and note text remain escaped in both summaries and tooltip',()=>{
++  const html=feed([{node_name:'<img src=x onerror=bad()>',field:'remark',old_value:'',new_value:'<script>bad()</script>'}]);
++  assert.doesNotMatch(html,/<img|<script/);assert.match(html,/&lt;script&gt;/);
++});
+--- /dev/null
++++ after/tests/test_overview_minimal_e2e.py
+@@ -0,0 +1,72 @@
++import json
++import unittest
++import test_overview_e2e as overview
++from test_overview_ux_e2e import OverviewUXE2E
++from flowboard.timeline import TimelineService
++
++
++class OverviewMinimalE2E(unittest.TestCase):
++    secondary_controls_for_test=False
++    setUpClass=classmethod(overview.OverviewE2E.setUpClass.__func__)
++    tearDownClass=classmethod(overview.OverviewE2E.tearDownClass.__func__)
++    setUp=overview.OverviewE2E.setUp
++    tearDown=overview.OverviewE2E.tearDown
++    login=overview.OverviewE2E.login
++    seed=overview.OverviewE2E.seed
++    open_overview=overview.OverviewE2E.open_overview
++    assert_clean_browser=overview.OverviewE2E.assert_clean_browser
++    focus=OverviewUXE2E.focus
++    ready=OverviewUXE2E.ready
++
++    def test_hidden_toolbar_shared_heading_and_visible_shortcuts(self):
++        self.seed();context,page=self.login('u1')
++        page.locator('.tl-home-head h1').wait_for()
++        style='el=>{const s=getComputedStyle(el);return [s.fontSize,s.fontWeight,s.fontFamily,s.lineHeight,s.letterSpacing,s.color]}'
++        homeStyle=page.locator('.tl-home-head h1').evaluate(style)
++        homeDateStyle=page.locator('.tl-home-head small').evaluate('el=>{const s=getComputedStyle(el);return [s.fontSize,s.fontFamily,s.color]}')
++        self.open_overview(page)
++        self.assertEqual(page.locator('.ov-header h1').evaluate(style),homeStyle)
++        self.assertEqual(page.locator('.ov-header small').evaluate('el=>{const s=getComputedStyle(el);return [s.fontSize,s.fontFamily,s.color]}'),homeDateStyle)
++        self.assertTrue(page.locator('.ov-header small').inner_text().startswith('今天 '))
++        self.assertGreater(page.locator('.ov-header small').bounding_box()['y'],page.locator('.ov-header h1').bounding_box()['y'])
++        self.assertEqual(page.locator('.ov-search,[data-overview-filter],.ov-filter-toggle,.ov-toolbar .ov-refresh,.ov-advanced,.ov-result,.ov-quick-label').count(),0)
++        self.assertEqual(page.locator('.ov-quick [data-overview-focus]').all_inner_texts(),['全部','需关注','逾期','今日','本周','本月'])
++        for key in ('week','month','today','all'):
++            payload=self.focus(page,key)
++            self.assertEqual(page.locator('.ov-project').count(),payload['counts']['projects'])
++            self.assertEqual(page.locator('.ov-quick button[aria-pressed=true]').count(),1)
++        page.locator('[data-overview-scope=mine]').click();self.ready(page)
++        self.assertEqual(page.locator('[data-overview-scope=mine]').get_attribute('aria-pressed'),'true')
++        self.assertTrue(page.locator('.ov-owner .ov-avatar').first.is_visible())
++        page.screenshot(path=str(overview.EVIDENCE/'overview-minimal-ready.png'))
++        self.assert_clean_browser(page);context.close()
++
++    def test_hidden_old_filters_are_cleared_on_refresh(self):
++        self.seed();context,page=self.login('u1');self.open_overview(page)
++        page.evaluate("""()=>{const key=Object.keys(sessionStorage).find(k=>k.startsWith('flowboard:ux:overview:'));sessionStorage.setItem(key,JSON.stringify({scope:'all',period:'month',focus:'all',stage:'测试',track:'parallel',completion:'done',tag_id:'999',search_in:'node',q:'旧搜索'}))}""")
++        with page.expect_response(lambda r:'/timeline/overview?' in r.url and r.status==200) as response:
++            page.reload()
++        self.ready(page);filters=response.value.json()['filters']
++        self.assertEqual(filters['period'],'month')
++        for key in ('stage','track','completion','tag_id','search_in'):self.assertEqual(filters[key],'all')
++        self.assertEqual(filters['q'],'')
++        self.assertEqual(page.locator('[data-overview-focus=month]').get_attribute('aria-pressed'),'true')
++        self.focus(page,'all');self.assertEqual(page.locator('.ov-project').count(),6)
++        self.assert_clean_browser(page);context.close()
++
++    def test_actual_history_completion_and_reopening_are_human_readable(self):
++        ids=self.seed();service=TimelineService(self.db_path);user={'id':'u1'}
++        def mark(value):
++            version=service.get_project(user,ids['risk'])['version']
++            service.submit_batches(user,1,{'requests':[{'project_id':ids['risk'],'base_version':version,'changes':[{'node_id':ids['today_node'],'set':{'done_at':value}}]}]})
++        mark(True);context,page=self.login('u1')
++        page.locator('[data-timeline-feed=mine] .tl-feed-item',has_text='标记为已完成').wait_for()
++        self.assertNotIn('False',page.locator('.tl-feed').inner_text());self.assertNotIn('True',page.locator('.tl-feed').inner_text())
++        mark(False);page.reload()
++        page.locator('[data-timeline-feed=mine] .tl-feed-item',has_text='恢复为未完成').wait_for()
++        self.assertNotIn('False',page.locator('.tl-feed').inner_text());self.assertNotIn('True',page.locator('.tl-feed').inner_text())
++        page.screenshot(path=str(overview.EVIDENCE/'home-feed-readable.png'))
++        self.assert_clean_browser(page);context.close()
++
++
++if __name__=='__main__':unittest.main()
+--- /dev/null
++++ after/team-progress/20261009-overview-minimal-and-feed.md
+@@ -0,0 +1,25 @@
++# 概览精简与动态中文动作交付
++
++2026-10-09，连续浏览器反馈已合并收口；当前交互以feature02契约03为准。
++
++## 当前效果
++
++- 项目列从16%增加30%到20.8%；负责人沿用现有创建者关系，用27px圆形姓氏头像及原账户配色，悬停/读屏保留完整姓名。颜色class限定现有白名单，长名称仍有title全文。
++- 备注列相对本轮初始布局缩窄约30%，腾出宽度给项目进度：进度列由110px改为16.3%，下一节点14%及七列/展开保持。1242和1480视口实测备注宽度约原宽的70%，进度列大于110px。
++- 快捷项为全部、需关注、逾期、今日、本周、本月；删除“节点”前缀与已完成快捷项。日期快捷使用原近期范围（保留更早逾期），全部恢复全部日期。本周/月包含未完成与已完成节点，项目归属保留。
++- 用户随后明确删除整行项目/节点总统计和文本筛选摘要，覆盖之前“并到左侧”的选择；没有改动数据统计接口或伪造节点数量。
++- 搜索、日期下拉、高级筛选、正常刷新按钮暂时不渲染，代码/接口保留。恢复开关在overview-ui.js的secondaryControlsEnabled。隐藏期间偏好仅恢复可见归属和快捷情境，阶段/轨道/标签/完成等旧限制清除；错误重试与空结果恢复仍可用。
++- 标题复用我的工作样式，30px标题下方显示“今天＋日期”，六项标题样式和日期样式均在浏览器对比一致。
++- 工作台动态展示实际中文动作：标记为已完成、恢复为未完成、主线→并行、调整阶段/名称/日期、联动调整日期、添加/修改/清空备注、创建/删除、撤销新建/恢复删除等。批次首项＋修改项数，悬停可看全部动作；不显示布尔/字段/轨道代码或快照JSON。不修改原始审计或记录。
++
++## 验证
++
++证据目录`verification/20261009-overview-minimal/`；前一阶段头像/快捷项/列宽/删统计的17/17浏览器、10/10 Node记录在`verification/20261009-overview-avatar/`。
++
++- Node16/16 PASS（概览11＋动态5），原timeline Node脚本PASS；完成/取消的布尔、数字、大小写文本/时间戳、轨道、联动日期、备注、撤销、批次全部动作与转义负例均保留。
++- 20个浏览器场景最终覆盖通过：17项保留功能在隔离浏览器恢复开关true下验证；当前默认隐藏模式3项验证控件不存在、旧条件清除、标题/日期字体一致、快捷项、头像及实际完成/取消操作。首次20项中19 PASS，动态定位同时命中我的/隐藏团队两份feed造成严格定位错误；修正定位到当前我的动态后，该项定向复验PASS，没有改产品实现或放宽数据断言。日志`browser.log`与`feed-browser-recheck.log`共同判断，不将初次失败日志伪称全绿。
++- 对真实库19条完成/轨道历史编码mode=ro抽取，同一渲染器逐条验证没有程序词。证据去掉人名/项目名，见live-feed-encodings.json与live-feed-proof.json；没有登录或写真实业务/审计数据。
++- 截图overview-minimal-ready.png、home-feed-readable.png为临时库真实操作产物；以前的avatar-shortcuts-ready.png对应控件隐藏之前的版本，不冒充当前真实生产页面。
++- 语法、差异及HTTP静态资源/health检查见static-checks.log与http-proof.json。source.diff绑定本轮两阶段基线；artifact-manifest.json记录源码、测试、文档、证据哈希。
++
++当前8083仍直连用户授权的真实生产库，使用生产账号，保存会写真实记录。此轮仅前端修改，真实数据只读验证，没有重启服务、迁移、初始化或改账户，没有commit/push/部署。整体体验待用户刷新8083确认；恢复隐藏功能只改上述开关，不必重建代码。

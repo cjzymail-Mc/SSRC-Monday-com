@@ -1,0 +1,11 @@
+{
+  "health": {
+    "status": "ok",
+    "schema_version": 20
+  },
+  "served_asset_version": "20261009-f02-owner-column",
+  "project_column_percent": 16,
+  "owner_column_pixels": 44,
+  "columns": 7,
+  "database_connection": "unchanged from live production preview"
+}

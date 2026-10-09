@@ -1,0 +1,319 @@
+{
+  "production_access": "mode=ro; PRAGMA query_only=ON; read transaction",
+  "production_profiles": 25,
+  "production_profile_hash": "105cdcb94c4426750a1a38f34745293aefbc4a9e528f972906e884c27dc1f687",
+  "preview_database": "D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\local-test-data\\feature02-preview\\flowboard.db",
+  "backup": "D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\local-test-data\\feature02-preview\\backups\\preview-before-realistic-shapes-20261008-134451.db",
+  "updated": [
+    {
+      "project_id": 10,
+      "template_id": 3,
+      "nodes": 21,
+      "done": 21,
+      "tracks": {
+        "main": 10,
+        "parallel": 11
+      }
+    },
+    {
+      "project_id": 11,
+      "template_id": 5,
+      "nodes": 7,
+      "done": 7,
+      "tracks": {
+        "main": 7
+      }
+    },
+    {
+      "project_id": 12,
+      "template_id": 8,
+      "nodes": 10,
+      "done": 5,
+      "tracks": {
+        "main": 10
+      }
+    },
+    {
+      "project_id": 13,
+      "template_id": 9,
+      "nodes": 0,
+      "done": 0,
+      "tracks": {}
+    },
+    {
+      "project_id": 14,
+      "template_id": 10,
+      "nodes": 0,
+      "done": 0,
+      "tracks": {}
+    },
+    {
+      "project_id": 15,
+      "template_id": 11,
+      "nodes": 2,
+      "done": 1,
+      "tracks": {
+        "main": 2
+      }
+    },
+    {
+      "project_id": 16,
+      "template_id": 12,
+      "nodes": 6,
+      "done": 2,
+      "tracks": {
+        "main": 6
+      }
+    },
+    {
+      "project_id": 17,
+      "template_id": 13,
+      "nodes": 6,
+      "done": 4,
+      "tracks": {
+        "main": 6
+      }
+    },
+    {
+      "project_id": 18,
+      "template_id": 14,
+      "nodes": 6,
+      "done": 3,
+      "tracks": {
+        "main": 6
+      }
+    },
+    {
+      "project_id": 19,
+      "template_id": 15,
+      "nodes": 6,
+      "done": 2,
+      "tracks": {
+        "main": 6
+      }
+    },
+    {
+      "project_id": 20,
+      "template_id": 16,
+      "nodes": 6,
+      "done": 2,
+      "tracks": {
+        "main": 6
+      }
+    },
+    {
+      "project_id": 21,
+      "template_id": 17,
+      "nodes": 13,
+      "done": 13,
+      "tracks": {
+        "main": 13
+      }
+    },
+    {
+      "project_id": 22,
+      "template_id": 18,
+      "nodes": 11,
+      "done": 11,
+      "tracks": {
+        "main": 11
+      }
+    },
+    {
+      "project_id": 23,
+      "template_id": 19,
+      "nodes": 12,
+      "done": 7,
+      "tracks": {
+        "main": 12
+      }
+    },
+    {
+      "project_id": 24,
+      "template_id": 20,
+      "nodes": 11,
+      "done": 9,
+      "tracks": {
+        "main": 11
+      }
+    },
+    {
+      "project_id": 25,
+      "template_id": 21,
+      "nodes": 11,
+      "done": 9,
+      "tracks": {
+        "main": 11
+      }
+    },
+    {
+      "project_id": 26,
+      "template_id": 22,
+      "nodes": 11,
+      "done": 8,
+      "tracks": {
+        "main": 11
+      }
+    },
+    {
+      "project_id": 27,
+      "template_id": 23,
+      "nodes": 12,
+      "done": 6,
+      "tracks": {
+        "main": 12
+      }
+    },
+    {
+      "project_id": 28,
+      "template_id": 24,
+      "nodes": 10,
+      "done": 5,
+      "tracks": {
+        "main": 10
+      }
+    },
+    {
+      "project_id": 29,
+      "template_id": 25,
+      "nodes": 12,
+      "done": 9,
+      "tracks": {
+        "main": 12
+      }
+    },
+    {
+      "project_id": 30,
+      "template_id": 31,
+      "nodes": 12,
+      "done": 10,
+      "tracks": {
+        "main": 12
+      }
+    },
+    {
+      "project_id": 31,
+      "template_id": 32,
+      "nodes": 12,
+      "done": 9,
+      "tracks": {
+        "main": 12
+      }
+    },
+    {
+      "project_id": 32,
+      "template_id": 33,
+      "nodes": 11,
+      "done": 9,
+      "tracks": {
+        "main": 11
+      }
+    },
+    {
+      "project_id": 33,
+      "template_id": 34,
+      "nodes": 11,
+      "done": 5,
+      "tracks": {
+        "main": 11
+      }
+    },
+    {
+      "project_id": 34,
+      "template_id": 35,
+      "nodes": 11,
+      "done": 5,
+      "tracks": {
+        "main": 11
+      }
+    },
+    {
+      "project_id": 35,
+      "template_id": 3,
+      "nodes": 21,
+      "done": 21,
+      "tracks": {
+        "main": 10,
+        "parallel": 11
+      }
+    },
+    {
+      "project_id": 36,
+      "template_id": 17,
+      "nodes": 13,
+      "done": 13,
+      "tracks": {
+        "main": 13
+      }
+    },
+    {
+      "project_id": 37,
+      "template_id": 19,
+      "nodes": 12,
+      "done": 7,
+      "tracks": {
+        "main": 12
+      }
+    },
+    {
+      "project_id": 38,
+      "template_id": 23,
+      "nodes": 12,
+      "done": 6,
+      "tracks": {
+        "main": 12
+      }
+    },
+    {
+      "project_id": 39,
+      "template_id": 25,
+      "nodes": 12,
+      "done": 9,
+      "tracks": {
+        "main": 12
+      }
+    }
+  ],
+  "unchanged": [],
+  "protected_user_edits": [],
+  "counts": {
+    "projects": 30,
+    "nodes": 300,
+    "done": 218,
+    "overdue": 11
+  },
+  "node_count_distribution": {
+    "0": 2,
+    "2": 1,
+    "6": 5,
+    "7": 1,
+    "10": 2,
+    "11": 7,
+    "12": 8,
+    "13": 2,
+    "21": 2
+  },
+  "progress_distribution": {
+    "null": 2,
+    "33": 3,
+    "45": 2,
+    "50": 6,
+    "58": 2,
+    "67": 1,
+    "73": 1,
+    "75": 3,
+    "82": 3,
+    "83": 1,
+    "100": 6
+  },
+  "date_span_days_min": 7,
+  "date_span_days_max": 590,
+  "track_distribution": {
+    "main": 278,
+    "parallel": 22
+  },
+  "sample_groups": {
+    "attention": 11,
+    "recent": 19
+  }
+}

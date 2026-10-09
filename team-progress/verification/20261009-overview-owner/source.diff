@@ -1,0 +1,121 @@
+--- before/overview-ui.js
++++ after/overview-ui.js
+@@ -15,13 +15,13 @@
+   function detail(p){
+     const upcomingIds=new Set((p.upcoming_nodes||[]).map(n=>n.id));
+     const action=`<button type="button" data-timeline-open="editor" data-project-id="${p.project_id}">${p.can_edit?'编辑时间表':'查看时间表 · 只读'}</button>`;
+-    return `<tr class="ov-detail" id="ov-detail-${p.project_id}"><td colspan="6"><div class="ov-detail-meta"><span>创建者：${esc(p.creator_name)}</span><span>显示 ${p.node_count} / ${p.total_node_count} 个节点</span><span>项目已完成 ${p.total_done_count} / ${p.total_node_count}</span>${action}</div>${p.matched_nodes.length?`<table class="ov-nodes" aria-label="${esc(p.name)}节点"><thead><tr><th>节点</th><th>轨道</th><th>节点阶段</th><th>节点日期</th><th>状态</th><th>备注</th></tr></thead><tbody>${p.matched_nodes.map(n=>`<tr data-overview-node="${n.id}"${upcomingIds.has(n.id)?` class="ov-current-node" aria-label="当前进展 · 下一个时间节点：${esc(n.name)}"`:''}><td>${esc(n.name)}</td><td>${n.track==='main'?'主线':'并行'}</td><td><span class="ov-tag ov-${stageClass(n.stage)}">${esc(n.stage)}</span></td><td class="ov-date">${esc(n.date)}</td><td><span class="ov-node-status ${n.done_at?'done':n.overdue?'late':n.is_today?'today':'upcoming'}">${n.done_at?'已完成':n.overdue?'逾期未完成':n.is_today?'今日到期':esc(n.status)}</span></td><td class="ov-node-remark">${esc(n.remark||'—')}</td></tr>`).join('')}</tbody></table>`:'<p class="ov-empty-nodes">尚未录入节点，可进入时间表维护。</p>'}</td></tr>`;
++    return `<tr class="ov-detail" id="ov-detail-${p.project_id}"><td colspan="7"><div class="ov-detail-meta"><span>创建者：${esc(p.creator_name)}</span><span>显示 ${p.node_count} / ${p.total_node_count} 个节点</span><span>项目已完成 ${p.total_done_count} / ${p.total_node_count}</span>${action}</div>${p.matched_nodes.length?`<table class="ov-nodes" aria-label="${esc(p.name)}节点"><thead><tr><th>节点</th><th>轨道</th><th>节点阶段</th><th>节点日期</th><th>状态</th><th>备注</th></tr></thead><tbody>${p.matched_nodes.map(n=>`<tr data-overview-node="${n.id}"${upcomingIds.has(n.id)?` class="ov-current-node" aria-label="当前进展 · 下一个时间节点：${esc(n.name)}"`:''}><td>${esc(n.name)}</td><td>${n.track==='main'?'主线':'并行'}</td><td><span class="ov-tag ov-${stageClass(n.stage)}">${esc(n.stage)}</span></td><td class="ov-date">${esc(n.date)}</td><td><span class="ov-node-status ${n.done_at?'done':n.overdue?'late':n.is_today?'today':'upcoming'}">${n.done_at?'已完成':n.overdue?'逾期未完成':n.is_today?'今日到期':esc(n.status)}</span></td><td class="ov-node-remark">${esc(n.remark||'—')}</td></tr>`).join('')}</tbody></table>`:'<p class="ov-empty-nodes">尚未录入节点，可进入时间表维护。</p>'}</td></tr>`;
+   }
+   function row(p,state){
+     const expanded=state.expanded.has(p.project_id),[kind,label]=status(p),next=p.next_nodes[0],progress=p.total_progress;
+-    return `<tr class="ov-project" data-overview-project="${p.project_id}"><td><div class="ov-project-name"><button type="button" class="ov-expand" data-overview-expand="${p.project_id}" aria-expanded="${expanded}"${expanded?` aria-controls="ov-detail-${p.project_id}"`:''} aria-label="${expanded?'收起':'展开'} ${esc(p.name)}">${expanded?'⌄':'›'}</button><button type="button" class="ov-open" data-timeline-open="single" data-project-id="${p.project_id}" title="${esc(p.name)}">${esc(p.name)}</button><span class="ov-node-count">${p.total_node_count} 节点</span></div></td><td class="ov-status ${kind}">${label}</td><td class="ov-stage ov-${stageClass(p.current_stage)}">${esc(p.current_stage)}</td><td class="ov-next"><span title="${esc(nextLabel(p))}">${next?`${esc(next.name)}${p.next_nodes.length>1?` <b>+${p.next_nodes.length-1}</b>`:''}`:esc(nextLabel(p))}</span>${next?`<small class="ov-date">${esc(next.date)} · ${next.track==='main'?'主线':'并行'}</small>`:''}</td><td class="ov-main-remark"><span title="${esc(next?.remark||'')}">${esc(next?.remark||'—')}</span></td><td><div class="ov-progress"><span class="ov-progress-track" role="progressbar" aria-label="全项目有效节点完成比例" aria-valuemin="0" aria-valuemax="100"${progress==null?'':` aria-valuenow="${progress}"`}><i style="width:${progress||0}%"></i></span><small>${p.total_node_count?`${p.total_done_count}/${p.total_node_count}`:'—'}</small></div></td></tr>${expanded?detail(p):''}`;
++    return `<tr class="ov-project" data-overview-project="${p.project_id}"><td><div class="ov-project-name"><button type="button" class="ov-expand" data-overview-expand="${p.project_id}" aria-expanded="${expanded}"${expanded?` aria-controls="ov-detail-${p.project_id}"`:''} aria-label="${expanded?'收起':'展开'} ${esc(p.name)}">${expanded?'⌄':'›'}</button><button type="button" class="ov-open" data-timeline-open="single" data-project-id="${p.project_id}" title="${esc(p.name)}">${esc(p.name)}</button><span class="ov-node-count">${p.total_node_count} 节点</span></div></td><td class="ov-owner" title="${esc(p.creator_name)}" aria-label="${esc(p.creator_name)}">${esc(p.creator_name&&p.creator_name!=='成员已不可用'?Array.from(p.creator_name.trim())[0]||'—':'—')}</td><td class="ov-status ${kind}">${label}</td><td class="ov-stage ov-${stageClass(p.current_stage)}">${esc(p.current_stage)}</td><td class="ov-next"><span title="${esc(nextLabel(p))}">${next?`${esc(next.name)}${p.next_nodes.length>1?` <b>+${p.next_nodes.length-1}</b>`:''}`:esc(nextLabel(p))}</span>${next?`<small class="ov-date">${esc(next.date)} · ${next.track==='main'?'主线':'并行'}</small>`:''}</td><td class="ov-main-remark"><span title="${esc(next?.remark||'')}">${esc(next?.remark||'—')}</span></td><td><div class="ov-progress"><span class="ov-progress-track" role="progressbar" aria-label="全项目有效节点完成比例" aria-valuemin="0" aria-valuemax="100"${progress==null?'':` aria-valuenow="${progress}"`}><i style="width:${progress||0}%"></i></span><small>${p.total_node_count?`${p.total_done_count}/${p.total_node_count}`:'—'}</small></div></td></tr>${expanded?detail(p):''}`;
+   }
+-  function group(key,title,projects,state){const collapsed=state.collapsed.has(key);return `<section class="ov-group ov-group-${key}"><h2><button type="button" data-overview-collapse="${key}" aria-expanded="${!collapsed}"><span>${collapsed?'›':'⌄'}</span>${title}<small>${projects.length}</small></button></h2>${collapsed?'':`<div class="ov-table-scroll" data-overview-scroll tabindex="0" aria-label="${title}项目表，可横向滚动；左右方向键查看"><table class="ov-table"><colgroup><col style="width:32%"><col style="width:105px"><col style="width:105px"><col style="width:14%"><col><col style="width:110px"></colgroup><thead><tr><th>项目</th><th>关注状态</th><th>当前阶段</th><th>下一未完成节点</th><th>节点备注</th><th>项目进度</th></tr></thead><tbody>${projects.map(p=>row(p,state)).join('')}</tbody></table></div>`}</section>`}
++  function group(key,title,projects,state){const collapsed=state.collapsed.has(key);return `<section class="ov-group ov-group-${key}"><h2><button type="button" data-overview-collapse="${key}" aria-expanded="${!collapsed}"><span>${collapsed?'›':'⌄'}</span>${title}<small>${projects.length}</small></button></h2>${collapsed?'':`<div class="ov-table-scroll" data-overview-scroll tabindex="0" aria-label="${title}项目表，可横向滚动；左右方向键查看"><table class="ov-table"><colgroup><col style="width:16%"><col style="width:44px"><col style="width:105px"><col style="width:105px"><col style="width:14%"><col><col style="width:110px"></colgroup><thead><tr><th>项目</th><th title="按项目创建者显示">负责人</th><th>关注状态</th><th>当前阶段</th><th>下一未完成节点</th><th>节点备注</th><th>项目进度</th></tr></thead><tbody>${projects.map(p=>row(p,state)).join('')}</tbody></table></div>`}</section>`}
+   function render(state){
+     const f=state.filters,payload=state.payload,counts=payload?.counts,tags=[['all','全部标签'],['uncategorized','未分类'],...(state.tags||[]).map(tag=>[String(tag.tag_id),tag.name])];
+     let content='';
+@@ -31,7 +31,7 @@
+     else content=['attention','recent'].map(key=>{const projects=payload.projects.filter(p=>p.group===key);return projects.length?group(key,key==='attention'?'需要关注':'项目进展',projects,state):''}).join('');
+     const hasConditions=Object.entries(defaults()).some(([key,value])=>f[key]!==value);
+     const extras=[f.stage!=='all'?f.stage:'',f.track!=='all'?(f.track==='main'?'主线':'并行'):'',f.tag_id!=='all'?(tags.find(([id])=>id===f.tag_id)?.[1]||'标签'):'',f.search_in!=='all'?(f.search_in==='project'?'仅项目搜索':'仅事项搜索'):'',f.focus==='all'&&f.completion!=='all'?(f.completion==='done'?'已完成节点':'未完成节点'):''].filter(Boolean);
+-    return `<section class="ov-board" data-timeline-page="overview" aria-busy="${state.status==='loading'}"><header class="ov-header"><h1>项目概览</h1><span>${payload?esc(payload.server_today):''}</span></header><div class="ov-toolbar"><div class="ov-scope" aria-label="项目归属">${choices.scope.map(([value,text])=>`<button type="button" data-overview-scope="${value}" aria-pressed="${f.scope===value}" class="${f.scope===value?'on':''}">${text}</button>`).join('')}</div><label class="ov-search"><span aria-hidden="true">⌕</span><input data-overview-search type="search" aria-label="搜索项目、创建者、节点或备注" placeholder="搜索项目或事项" maxlength="100" value="${esc(f.q)}"></label>${select('period','日期范围',choices.period,f)}<button type="button" class="ov-filter-toggle" data-overview-advanced aria-expanded="${state.advanced}" aria-controls="ov-advanced">筛选${extras.length?` <b>${extras.length}</b>`:''}</button><button type="button" class="ov-refresh" data-overview-reload aria-label="刷新项目概览">↻</button></div><div class="ov-quick" role="group" aria-label="事项快捷筛选"><span class="ov-quick-label">节点</span>${choices.focus.map(([value,text])=>`<button type="button" data-overview-focus="${value}" aria-pressed="${f.focus===value}" class="${f.focus===value?'on':''}">${text}</button>`).join('')}<button type="button" class="ov-clear" data-overview-reset${hasConditions?'':' hidden'}>清除条件</button></div><div class="ov-advanced" id="ov-advanced"${state.advanced?'':' hidden'}>${select('stage','节点阶段',choices.stage,f)}${select('track','节点轨道',choices.track,f)}${select('completion','节点状态',choices.completion,f)}${select('tag_id','项目标签',tags,f)}${select('search_in','搜索对象',choices.search_in,f)}<button type="button" data-overview-advanced>收起</button></div><div class="ov-result" role="status"><span>${state.status==='loading'?'更新中…':counts?`${counts.projects} 个项目 · ${counts.nodes} 个节点`:''}</span><span>${choices.focus.find(([value])=>value===f.focus)?.[1]} · ${choices.period.find(([value])=>value===f.period)?.[1]}${extras.length?` · ${esc(extras.join(' · '))}`:''}${f.q?` · 搜索「${esc(f.q)}」`:''}</span></div><div class="ov-content">${content}</div><details class="ov-explain"><summary>进度与筛选说明</summary><p>项目按逾期、今日到期、未来节点排序；同类先看最早日期，同日按待处理数量排序。关注状态与分组取全项目风险，每个项目仅展示一次。节点备注对应主表显示的下一节点。项目进度按项目全部有效节点计算。展开只显示当前条件命中的节点；下一未完成节点取全项目最早未完成日期。红色虚线标出今天起最近的未完成时间节点，同日节点一起标记；筛选隐藏该节点时不标记其他节点。近期范围同时纳入更早逾期节点。</p></details></section>`;
++    return `<section class="ov-board" data-timeline-page="overview" aria-busy="${state.status==='loading'}"><header class="ov-header"><h1>项目概览</h1><span>${payload?esc(payload.server_today):''}</span></header><div class="ov-toolbar"><div class="ov-scope" aria-label="项目归属">${choices.scope.map(([value,text])=>`<button type="button" data-overview-scope="${value}" aria-pressed="${f.scope===value}" class="${f.scope===value?'on':''}">${text}</button>`).join('')}</div><label class="ov-search"><span aria-hidden="true">⌕</span><input data-overview-search type="search" aria-label="搜索项目、创建者、节点或备注" placeholder="搜索项目或事项" maxlength="100" value="${esc(f.q)}"></label>${select('period','日期范围',choices.period,f)}<button type="button" class="ov-filter-toggle" data-overview-advanced aria-expanded="${state.advanced}" aria-controls="ov-advanced">筛选${extras.length?` <b>${extras.length}</b>`:''}</button><button type="button" class="ov-refresh" data-overview-reload aria-label="刷新项目概览">↻</button></div><div class="ov-quick" role="group" aria-label="事项快捷筛选"><span class="ov-quick-label">节点</span>${choices.focus.map(([value,text])=>`<button type="button" data-overview-focus="${value}" aria-pressed="${f.focus===value}" class="${f.focus===value?'on':''}">${text}</button>`).join('')}<button type="button" class="ov-clear" data-overview-reset${hasConditions?'':' hidden'}>清除条件</button></div><div class="ov-advanced" id="ov-advanced"${state.advanced?'':' hidden'}>${select('stage','节点阶段',choices.stage,f)}${select('track','节点轨道',choices.track,f)}${select('completion','节点状态',choices.completion,f)}${select('tag_id','项目标签',tags,f)}${select('search_in','搜索对象',choices.search_in,f)}<button type="button" data-overview-advanced>收起</button></div><div class="ov-result" role="status"><span>${state.status==='loading'?'更新中…':counts?`${counts.projects} 个项目 · ${counts.nodes} 个节点`:''}</span><span>${choices.focus.find(([value])=>value===f.focus)?.[1]} · ${choices.period.find(([value])=>value===f.period)?.[1]}${extras.length?` · ${esc(extras.join(' · '))}`:''}${f.q?` · 搜索「${esc(f.q)}」`:''}</span></div><div class="ov-content">${content}</div><details class="ov-explain"><summary>进度与筛选说明</summary><p>项目按逾期、今日到期、未来节点排序；同类先看最早日期，同日按待处理数量排序。关注状态与分组取全项目风险，每个项目仅展示一次。负责人沿用项目创建者关系，显示姓名首字，悬停可读完整姓名。节点备注对应主表显示的下一节点。项目进度按项目全部有效节点计算。展开只显示当前条件命中的节点；下一未完成节点取全项目最早未完成日期。红色虚线标出今天起最近的未完成时间节点，同日节点一起标记；筛选隐藏该节点时不标记其他节点。近期范围同时纳入更早逾期节点。</p></details></section>`;
+   }
+   function bind(root,state,{onChange,onReload,onRender}){
+     const signal=root.__timelineAbort.signal;
+--- before/overview.css
++++ after/overview.css
+@@ -23,3 +23,5 @@
+ .ov-detail-meta{align-items:center}.ov-nodes tr.ov-current-node{outline:2px dashed #e03258;outline-offset:-1px}
+ 
+ .ov-main-remark>span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;white-space:pre-line;overflow-wrap:anywhere;line-height:16px;font-size:12px;color:#81758e}
++
++.ov-project>td.ov-owner{text-align:center;padding:0 4px;color:#81758e;font-size:13px;white-space:nowrap}
+--- before/index.html
++++ after/index.html
+@@ -12,7 +12,7 @@
+   <link rel="stylesheet" href="i12.css" />
+   <link rel="stylesheet" href="i13.css" />
+   <link rel="stylesheet" href="timeline.css?v=20261008-week-flags" />
+-  <link rel="stylesheet" href="overview.css?v=20261009-f02-urgency-remarks" />
++  <link rel="stylesheet" href="overview.css?v=20261009-f02-owner-column" />
+ </head>
+ <body>
+   <div class="app-shell">
+@@ -41,6 +41,6 @@
+   <div class="modal-backdrop" id="taskModal"><div class="task-modal"><button class="modal-close" data-close="taskModal">×</button><div id="modalBody"></div></div></div>
+   <div class="modal-backdrop" id="listModal"><div class="task-modal list-modal"><button class="modal-close" data-close="listModal">×</button><div id="listModalBody"></div></div></div>
+   <div class="modal-backdrop login-backdrop" id="loginModal"><form class="login-card" id="loginForm"><div class="brand login-brand"><span class="brand-mark">F</span><span>flowboard</span></div><h2>登录工作空间</h2><p>使用管理员提供的账号登录。</p><label>用户名<input id="loginUser" name="username" autocomplete="username" required /></label><label>密码<input id="loginPassword" name="password" type="password" autocomplete="current-password" required /></label><div class="login-error" id="loginError"></div><button class="primary-btn" type="submit">登录</button></form></div>
+-  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js?v=20261009-f02-urgency-remarks"></script><script src="overview-ui.js?v=20261009-f02-urgency-remarks"></script><script src="i12-ui.js"></script><script src="app.js?v=20261009-f02-urgency-remarks"></script>
++  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js?v=20261009-f02-owner-column"></script><script src="overview-ui.js?v=20261009-f02-owner-column"></script><script src="i12-ui.js"></script><script src="app.js?v=20261009-f02-owner-column"></script>
+ </body>
+ </html>
+--- before/tests/overview_ui.test.js
++++ after/tests/overview_ui.test.js
+@@ -10,4 +10,4 @@
+ test('quick focus chooses compatible completion and advanced controls stay collapsed',()=>{const s=overview.createState();overview.applyFocus(s,'done');assert.equal(s.filters.completion,'done');overview.applyFocus(s,'overdue');assert.equal(s.filters.completion,'open');overview.applyFocus(s,'all');assert.equal(s.filters.completion,'all');assert.match(overview.render(s),/id="ov-advanced" hidden/);assert.doesNotMatch(overview.render(s),/ov-tabs/)});
+ test('detail uses server upcoming IDs without duplicate headers or next list',()=>{const p=fixture();p.upcoming_nodes=[{id:1}];const s=overview.createState();s.status='ready';s.payload={projects:[p],counts:{},server_today:'2026-10-08'};s.expanded.add(7);let html=overview.render(s);assert.match(html,/data-overview-node="1" class="ov-current-node"/);assert.doesNotMatch(html,/data-overview-node="2" class="ov-current-node"/);assert.doesNotMatch(html,/ov-detail-head|ov-next-list/);assert.match(html,/data-timeline-open="editor"/);p.matched_nodes=p.matched_nodes.filter(n=>n.id!==1);html=overview.render(s);assert.doesNotMatch(html,/class="ov-current-node"/)});
+ test('opening a different project collapses the previous project and toggling closes it',()=>{const s=overview.createState();overview.toggleExpansion(s,7);assert.deepEqual([...s.expanded],[7]);overview.toggleExpansion(s,9);assert.deepEqual([...s.expanded],[9]);overview.toggleExpansion(s,9);assert.equal(s.expanded.size,0)});
+-test('compact next column and note column correspond to the earliest node and full project risk',()=>{const p=fixture();p.overdue_count=0;p.total_overdue_count=2;p.total_today_count=0;p.next_nodes[0].remark='最早节点备注\n<script>bad()</script>';p.next_nodes[1].remark='其他同日备注';const s=overview.createState();s.status='ready';s.payload={projects:[p],counts:{},server_today:'2026-10-09'};s.expanded.add(7);const html=overview.render(s);assert.match(html,/<col style="width:14%">/);assert.match(html,/<th>节点备注<\/th>/);assert.match(html,/colspan="6"/);assert.match(html,/class="ov-main-remark"><span title="最早节点备注/);assert.match(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>/);assert.equal(overview.status(p)[1],'逾期 2');assert.equal((html.match(/data-overview-project="7"/g)||[]).length,1)});
++test('compact next column and note column correspond to the earliest node and full project risk',()=>{const p=fixture();p.overdue_count=0;p.total_overdue_count=2;p.total_today_count=0;p.next_nodes[0].remark='最早节点备注\n<script>bad()</script>';p.next_nodes[1].remark='其他同日备注';const s=overview.createState();s.status='ready';s.payload={projects:[p],counts:{},server_today:'2026-10-09'};s.expanded.add(7);const html=overview.render(s);assert.match(html,/<col style="width:14%">/);assert.match(html,/<th>节点备注<\/th>/);assert.match(html,/colspan="7"/);assert.match(html,/class="ov-main-remark"><span title="最早节点备注/);assert.match(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>/);assert.equal(overview.status(p)[1],'逾期 2');assert.equal((html.match(/data-overview-project="7"/g)||[]).length,1)});
+--- before/tests/test_overview_ux_e2e.py
++++ after/tests/test_overview_ux_e2e.py
+@@ -29,7 +29,7 @@
+         self.assertEqual(page.locator('#timelineCanvasNav').count(),0)
+         self.assertEqual(page.locator('.timeline-subnav .nav-label').all_inner_texts(),['本周','本月'])
+         self.assertEqual(page.locator('.ov-tabs').count(),0)
+-        self.assertEqual(page.locator('.ov-table').first.locator('thead th').all_inner_texts(),['项目','关注状态','当前阶段','下一未完成节点','节点备注','项目进度'])
++        self.assertEqual(page.locator('.ov-table').first.locator('thead th').all_inner_texts(),['项目','负责人','关注状态','当前阶段','下一未完成节点','节点备注','项目进度'])
+         self.assertEqual(page.locator('.ov-project').count(),6)
+         risk=page.locator(f'[data-overview-project="{ids["risk"]}"]')
+         self.assertEqual(risk.locator('[role=progressbar]').get_attribute('aria-valuenow'),'20')
+@@ -182,8 +182,11 @@
+         self.assertIn('鞋面材料确认',risk.locator('.ov-next').inner_text())
+         self.assertEqual(risk.locator('.ov-main-remark span').inner_text(),'供应商色卡待确认')
+         self.assertEqual(risk.locator('.ov-main-remark span').get_attribute('title'),'供应商色卡待确认')
+-        self.assertEqual(risk.locator('td').count(),6)
+-        self.assertEqual(risk.locator('.ov-next').evaluate('el=>el.closest("table").querySelectorAll("col")[3].style.width'),'14%')
++        self.assertEqual(risk.locator('td').count(),7)
++        self.assertEqual(risk.locator('.ov-next').evaluate('el=>el.closest("table").querySelectorAll("col")[4].style.width'),'14%')
++        self.assertEqual(risk.locator('.ov-owner').inner_text(),'管')
++        self.assertEqual(risk.locator('.ov-owner').get_attribute('title'),'管理员')
++        self.assertEqual(risk.locator('.ov-owner').evaluate('el=>el.closest("table").querySelector("col").style.width'),'16%')
+         self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'),1244)
+         self.focus(page,'done')
+         self.assertEqual(page.locator('.ov-group-attention .ov-project').count(),1)
+--- before/STATE.md
++++ after/STATE.md
+@@ -2,6 +2,8 @@
+ 
+ > 跨会话当前快照；完整历史：`team-progress/STATE-archive-20260904-pre-production-rebaseline.md`。
+ > 更新：2026-10-09
++
++> 2026-10-09 最新布局：项目名称列32%→16%，第二列44px“负责人”显示创建者姓名首字，悬停/读屏显示完整姓名，展开同步七列。现有我的工作把创建关系作为负责项目归属，此轮沿用该关系，没有独立负责人字段/迁移。真实库25项目均有创建者姓名（6个不同姓名），只读核对；浏览器5/5、Node9/9及静态检查PASS。8083静态资源版本20261009-f02-owner-column，仍直连真实库，未重启服务或写入数据库。最新入口 `team-progress/20261009-overview-owner-column.md`，覆盖下方六列布局描述。
+ 
+ > 2026-10-09 最新概览反馈：主表新增节点备注，下一未完成列宽28%→14%，展开colspan同步六列。项目按全项目逾期/今日/未来日期/完成/空项目排序；状态与互斥分组采用全项目风险，避免过滤后的事项影响项目优先级，统计仍是筛选命中节点。真实库只读投影25项目/230节点，上方9、下方16、25唯一ID，备注与原节点一致；回归Chromium12/12、后端9/9、Node9/9 PASS。仅重载8083 production-preview，启动时PID16744，仍直连真实库，未操作8080、迁移、账号或业务数据。最新续接 `team-progress/20261009-overview-urgency-feedback.md`；本条覆盖下方五列与旧排序展示描述。
+ 
+--- before/feature-02-进阶仪表盘/03-UX_OPTIMIZATION_CONTRACT.md
++++ after/feature-02-进阶仪表盘/03-UX_OPTIMIZATION_CONTRACT.md
+@@ -22,7 +22,7 @@
+ 
+ ## 信息层级
+ 
+-概览常态表格六列：项目、关注状态、当前阶段、下一未完成节点、节点备注、项目进度。2026-10-09用户追加反馈：下一节点列由28%缩至14%，备注为主表当前显示的最早未完成节点的备注，长备注显示两行、悬停可读全文，展开保留所有节点原始备注。项目按全项目紧急程度排序：最早逾期、今日到期、未来节点（越近越先）、全部完成、待录入；同日按逾期/今日未完成数量及稳定ID排序。关注状态与唯一分组依全项目风险，不因阶段、事项或完成筛选而挪走逾期项目；筛选命中节点统计保持独立。每个项目仅展示一次，两组互斥，已在需要关注出现的项目不在项目进展重复。项目进度按全项目有效节点计算，由服务端返回，不能因为“未完成”筛选显示为零进度；命中数量与展开明细基于筛选集，项目行和展开处分别清楚表达总节点与显示节点。
++概览常态表格七列：项目、负责人、关注状态、当前阶段、下一未完成节点、节点备注、项目进度。2026-10-09追加：项目名称列32%→16%，第二列44px负责人姓氏；沿用现有我的工作以创建者归属负责项目的关系，按creator_name姓名首字显示，悬停/读屏可读完整姓名，未映射成员显示短横线，不新增独立负责人模型或改写账户。下一节点列由28%缩至14%，备注为主表当前显示的最早未完成节点的备注，长备注显示两行、悬停可读全文，展开保留所有节点原始备注。项目按全项目紧急程度排序：最早逾期、今日到期、未来节点（越近越先）、全部完成、待录入；同日按逾期/今日未完成数量及稳定ID排序。关注状态与唯一分组依全项目风险，不因阶段、事项或完成筛选而挪走逾期项目；筛选命中节点统计保持独立。每个项目仅展示一次，两组互斥，已在需要关注出现的项目不在项目进展重复。项目进度按全项目有效节点计算，由服务端返回，不能因为“未完成”筛选显示为零进度；命中数量与展开明细基于筛选集，项目行和展开处分别清楚表达总节点与显示节点。
+ 
+ 创建者与备注进入直接展开区；项目行标题保留完整名称，名称点击进入单项目，箭头展开详情。2026-10-08追加反馈：展开区删除重复项目名和“下一未完成节点”折叠行，编辑时间表按钮并入元数据行；一次只展开一个项目，打开另一个自动收起此前项目，并保持新项目展开入口可见。红色虚线框标出全项目今天起最近的未完成时间节点，同日多个节点全部标记；没有今天/未来未完成节点时不标记，筛选隐藏目标时不把其他命中节点替代为目标。主表“下一未完成节点”仍包含更早逾期节点，与未来时间标记分别表达。服务端只读投影提供upcoming_nodes，不新增存储或schema。无备注使用简洁空值，不重复堆“暂无备注”。常态删除长篇底部规则说明与重复计数，仅在按需“说明”中解释有助判断的口径。状态与六阶段色、浅紫白底、紫/粉组头及紧凑行高保留。
+ 
+--- before/feature-02-进阶仪表盘/04-UX_DELIVERY.md
++++ after/feature-02-进阶仪表盘/04-UX_DELIVERY.md
+@@ -5,6 +5,8 @@
+ > 2026-10-09当前入口覆盖：用户明确要求8083临时连接真实生产数据库，现直接使用根flowboard.db（25活跃项目/230节点），请使用原生产账号；test账号仅存在于下述隔离演示库。8083保存会写真实数据，原演示库保留。启动/证据/切回路径见 `../team-progress/20261009-production-preview-switch.md`；下方37/314与test/test是此前隔离验收记录。
+ 
+ > 2026-10-09最新概览：六列（追加当前显示节点的备注），下一节点列14%（此前28%）；全项目风险与日期排序，两组互斥。浏览器12/12、后端9/9、Node9/9 PASS；真实库只读投影25项目/230节点，上方9/下方16，无重复ID，备注对应原节点。当前说明覆盖下方五列/备注只在展开区的历史取舍，证据与续接 `../team-progress/20261009-overview-urgency-feedback.md`。
++
++> 同日进一步调整：项目名称列16%（此前32%），第二列44px显示负责人姓名首字，hover为完整姓名；按现有创建者关系展示，不新增数据模型。七列及展开跨度同步，浏览器5/5、Node9/9 PASS；入口静态资源已更新，无服务重启或数据库写入。最新续接 `../team-progress/20261009-overview-owner-column.md`。
+ 
+ ## 直接体验
+ 

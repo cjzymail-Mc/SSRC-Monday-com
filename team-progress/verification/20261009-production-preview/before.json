@@ -1,0 +1,44 @@
+{
+  "database": "D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\flowboard.db",
+  "schema": 20,
+  "active_projects": 25,
+  "active_nodes": 230,
+  "active_test_account_exists": false,
+  "table_hashes": {
+    "users": {
+      "rows": 7,
+      "sha256": "61d6447ab45aa73ee3d042e67f5802bc25f688b81d1a26845705ea16afc5ce47"
+    },
+    "workspace_memberships": {
+      "rows": 7,
+      "sha256": "632a12dbb9ea6f2bd25e06a2f00324dccf8c79078b5cfce2a13028a9c2e85c65"
+    },
+    "timeline_projects": {
+      "rows": 35,
+      "sha256": "2f3e99994509b4e5e5baaca209fa412a7da0531a418f59d17078b657aaa5c0b6"
+    },
+    "timeline_nodes": {
+      "rows": 348,
+      "sha256": "b9cd28eb85f344322a8e2e5b04ebdcc98a943286286a2a68eb24c014a24e409d"
+    },
+    "timeline_tags": {
+      "rows": 2,
+      "sha256": "fa0e6d46111bbfffc08a0f212bbe3f81c8070452ee2012e37d4c7068212d35d2"
+    },
+    "timeline_project_tags": {
+      "rows": 2,
+      "sha256": "07a6040307055de92a502c51d2d0552eb709ec96d5c75e7ee6c318946e7737b7"
+    },
+    "timeline_member_orders": {
+      "rows": 1,
+      "sha256": "aa7c98f5cb18d0cecc6326762acb9af967d9a4f86a1f8a324ce0c95202259b96"
+    }
+  },
+  "captured_at": "2026-10-09T03:42:58.239267+00:00",
+  "backup": {
+    "path": "D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\local-test-data\\production-preview-backups\\flowboard-before-8083-20261009-114258-218303.db",
+    "sha256": "a89e1518b5639d6d15dacde292451cf477c0803a79c70ade4c749afb01cb5cf3",
+    "integrity": "ok",
+    "foreign_key_violations": 0
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "database": "D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\local-test-data\\feature02-preview\\flowboard.db",
+  "backup": "D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\local-test-data\\feature02-preview\\backups\\preview-before-ux-tags-20261008-153038.db",
+  "categories": [
+    {
+      "name": "跑步与训练",
+      "tag_id": 1,
+      "projects": 10
+    },
+    {
+      "name": "球类运动",
+      "tag_id": 2,
+      "projects": 10
+    },
+    {
+      "name": "休闲与户外",
+      "tag_id": 3,
+      "projects": 10
+    }
+  ],
+  "timeline_contents_unchanged": true
+}
