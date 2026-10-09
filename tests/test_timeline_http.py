@@ -12,6 +12,7 @@ from pathlib import Path
 
 from flowboard.database import connect, migrate
 from flowboard.transfer import make_xlsx, parse_upload
+from flowboard.timeline_excel import TEMPLATE_ROWS, make_timeline_xlsx
 from server import create_server
 
 
@@ -59,6 +60,71 @@ class TimelineHTTPTests(unittest.TestCase):
         status, payload, cookie = self.request("POST", "/api/auth/login", {"username": username, "password": "test-password"})
         self.assertEqual(status, 200)
         return cookie.split(";", 1)[0], payload["csrf_token"]
+
+    def test_member_card_order_is_private_versioned_and_scoped(self):
+        path = "/api/workspaces/1/timeline/member-order"
+        admin, admin_csrf = self.login("u1")
+        member, member_csrf = self.login("u2")
+        viewer, viewer_csrf = self.login("u3")
+        status, initial, _ = self.request("GET", path, cookie=admin)
+        self.assertEqual(status, 200)
+        self.assertEqual(set(initial["member_ids"]), {"u1", "u2", "u3"})
+        self.assertEqual(initial["order_version"], 0)
+        reversed_ids = list(reversed(initial["member_ids"]))
+        status, saved, _ = self.request("PUT", path, {"base_order_version": 0, "member_ids": reversed_ids}, cookie=admin, csrf=admin_csrf)
+        self.assertEqual((status, saved), (200, {"order_version": 1, "member_ids": reversed_ids}))
+        self.assertEqual(self.request("GET", path, cookie=admin)[1], saved)
+        self.assertEqual(self.request("GET", path, cookie=member)[1], initial)
+        status, member_saved, _ = self.request("PUT", path, {"base_order_version": 0, "member_ids": initial["member_ids"][1:] + initial["member_ids"][:1]}, cookie=member, csrf=member_csrf)
+        self.assertEqual(status, 200)
+        self.assertEqual(member_saved["order_version"], 1)
+        self.assertEqual(self.request("GET", path, cookie=admin)[1], saved)
+        status, conflict, _ = self.request("PUT", path, {"base_order_version": 0, "member_ids": initial["member_ids"]}, cookie=admin, csrf=admin_csrf)
+        self.assertEqual((status, conflict["error"]["code"]), (409, "ORDER_VERSION_CONFLICT"))
+        self.assertEqual(self.request("PUT", path, {"base_order_version": 1, "member_ids": ["u1", "u1", "u3"]}, cookie=admin, csrf=admin_csrf)[0], 422)
+        self.assertEqual(self.request("PUT", path, {"base_order_version": 1, "member_ids": ["u1", "u2", "ghost"]}, cookie=admin, csrf=admin_csrf)[1]["error"]["code"], "ORDER_SCOPE_CHANGED")
+        self.assertEqual(self.request("PUT", path, {"base_order_version": 1, "member_ids": reversed_ids}, cookie=admin)[0], 403)
+        self.assertEqual(self.request("GET", path, cookie=viewer)[0], 403)
+        self.assertEqual(self.request("PUT", path, {"base_order_version": 0, "member_ids": reversed_ids}, cookie=viewer, csrf=viewer_csrf)[0], 403)
+        self.assertEqual(self.request("GET", path.replace("/1/", "/999/"), cookie=admin)[0], 403)
+        db = connect(self.db_path)
+        try:
+            db.execute("UPDATE users SET is_active=0 WHERE id='u3'")
+            db.commit()
+        finally:
+            db.close()
+        current = self.request("GET", path, cookie=admin)[1]
+        self.assertEqual(current["member_ids"], [value for value in reversed_ids if value != "u3"])
+        self.assertEqual(self.request("PUT", path, {"base_order_version": 1, "member_ids": reversed_ids}, cookie=admin, csrf=admin_csrf)[1]["error"]["code"], "ORDER_SCOPE_CHANGED")
+        db = connect(self.db_path)
+        try:
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM audit_log WHERE action_code='timeline.member_order_changed'").fetchone()[0], 2)
+        finally:
+            db.close()
+
+    def test_import_sheet_metadata_selection_and_access(self):
+        cookie, csrf = self.login()
+        headers = ["项目名称", "阶段", "主线/并行", "节点", "日期", "状态", "备注"]
+        raw = make_xlsx(headers, [["所选表项目", "创意", "主线", "立项", "2026-08-01", "", ""]], sheet="数据表")
+        data = {"filename": "sheets.xlsx", "content_base64": base64.b64encode(raw).decode()}
+        path = "/api/workspaces/1/timeline/imports/"
+        before = self.counts()
+        status, payload, _ = self.request("POST", path + "sheets", data, cookie=cookie, csrf=csrf)
+        self.assertEqual(status, 200)
+        self.assertEqual(payload["sheets"], ["数据表"])
+        self.assertEqual(self.counts(), before)
+        self.assertEqual(self.request("POST", path + "sheets", data, cookie=cookie)[0], 403)
+        viewer, viewer_csrf = self.login("u3")
+        self.assertEqual(self.request("POST", path + "sheets", data, cookie=viewer, csrf=viewer_csrf)[0], 403)
+        self.assertEqual(self.request("POST", path.replace('/1/', '/999/') + "sheets", data, cookie=cookie, csrf=csrf)[0], 403)
+        status, payload, _ = self.request("POST", path + "preview", {**data, "sheet_name": "不存在"}, cookie=cookie, csrf=csrf)
+        self.assertEqual(status, 422)
+        self.assertEqual(payload["error"]["code"], "IMPORT_SHEET_NOT_FOUND")
+        self.assertEqual(self.counts(), before)
+        status, payload, _ = self.request("POST", path + "preview", {**data, "sheet_name": "数据表"}, cookie=cookie, csrf=csrf)
+        self.assertEqual(status, 201)
+        self.assertEqual(payload["sheet"], "数据表")
+        self.assertEqual(payload["projects"], [{"name": "所选表项目", "node_count": 1}])
 
     def create_project(self, cookie, csrf, name="HTTP 项目"):
         status, payload, _ = self.request("POST", "/api/workspaces/1/timeline/projects", {"name": name}, cookie=cookie, csrf=csrf)
@@ -189,7 +255,7 @@ class TimelineHTTPTests(unittest.TestCase):
         self.assertEqual((status, error["error"]["code"]), (409, "VERSION_CONFLICT"))
         member_cookie, member_csrf = self.login("u2")
         status, error, _ = self.request("DELETE", path, {"base_version": 1}, cookie=member_cookie, csrf=member_csrf)
-        self.assertIn((status, error["error"]["code"]), {(403, "PROJECT_FORBIDDEN"), (403, "ADMIN_REQUIRED")})
+        self.assertEqual((status, error["error"]["code"]), (403, "PROJECT_FORBIDDEN"))
         status, deleted, _ = self.request("DELETE", path, {"base_version": 1}, cookie=cookie, csrf=csrf)
         self.assertEqual((status, deleted["version"]), (200, 2))
         db = connect(self.db_path)
@@ -197,6 +263,35 @@ class TimelineHTTPTests(unittest.TestCase):
         db.close()
         status, error, _ = self.request("DELETE", path, {"base_version": 2}, cookie=cookie, csrf=csrf)
         self.assertEqual((status, error["error"]["code"]), (404, "PROJECT_NOT_ACTIVE"))
+
+    def test_creator_can_delete_archived_project_through_http(self):
+        member_cookie, member_csrf = self.login("u2")
+        created = self.create_project(member_cookie, member_csrf, "成员归档后删除")
+        project_id = created["project_id"]
+        path = f"/api/workspaces/1/timeline/projects/{project_id}"
+        admin_cookie, admin_csrf = self.login()
+        other_project = self.create_project(admin_cookie, admin_csrf, "其他人项目")
+        other_path = f"/api/workspaces/1/timeline/projects/{other_project['project_id']}"
+        status, error, _ = self.request("DELETE", other_path, {"base_version": 1}, cookie=member_cookie, csrf=member_csrf)
+        self.assertEqual((status, error["error"]["code"]), (403, "PROJECT_FORBIDDEN"))
+
+        status, archived, _ = self.request("POST", path + "/archive", {"base_version": 1}, cookie=member_cookie, csrf=member_csrf)
+        self.assertEqual(status, 200)
+        status, deleted, _ = self.request("DELETE", path, {"base_version": archived["version"]}, cookie=member_cookie, csrf=member_csrf)
+        self.assertEqual((status, deleted["project_id"]), (200, project_id))
+        status, listed, _ = self.request("GET", "/api/workspaces/1/timeline?archive_state=archived", cookie=member_cookie)
+        self.assertEqual(status, 200)
+        self.assertNotIn(project_id, [item["project_id"] for item in listed["projects"]])
+        db = connect(self.db_path)
+        try:
+            event = db.execute(
+                "SELECT actor_user_id,details_json FROM audit_log WHERE action_code='timeline.project_deleted' AND entity_id=?",
+                (str(project_id),),
+            ).fetchone()
+            self.assertEqual(event["actor_user_id"], "u2")
+            self.assertIsNotNone(json.loads(event["details_json"])["archived_at"])
+        finally:
+            db.close()
 
     def test_r06_batch_http_complete_view_csrf_version_atomic_and_interval_bounds(self):
         cookie, csrf = self.login()
@@ -376,7 +471,7 @@ class TimelineHTTPTests(unittest.TestCase):
         multi = self.two_sheet_xlsx(headers, [["多表", "创意", "main", "A", "2026-08-01", "", "", ""]])
         status, preview, _ = self.request("POST", path, self.upload("multi.xlsx", multi), cookie=cookie, csrf=csrf)
         self.assertEqual(status, 201, preview)
-        self.assertIn("仅导入第一个 sheet", preview["warnings"])
+        self.assertIn("仅导入所选工作表：First", preview["warnings"])
 
         text_integer = make_xlsx(headers, [["文本整数", "创意", "main", "A", "46234", "", "", ""]])
         status, error, _ = self.request("POST", path, self.upload("text.xlsx", text_integer), cookie=cookie, csrf=csrf)
@@ -385,6 +480,47 @@ class TimelineHTTPTests(unittest.TestCase):
         status, error, _ = self.request("POST", path, self.upload("dates.csv", csv_raw), cookie=cookie, csrf=csrf)
         self.assertEqual(status, 422)
         self.assertIn("改用 .xlsx 导入", error["error"]["message"])
+
+    def test_template_download_permissions_example_data_and_no_mutation(self):
+        cookie, csrf = self.login()
+        path = "/api/workspaces/1/timeline/template"
+        before = self.counts()
+        status, error, _ = self.request("POST", path, {}, cookie=cookie)
+        self.assertEqual((status, error["error"]["code"]), (403, "CSRF_INVALID"))
+        viewer_cookie, viewer_csrf = self.login("u3")
+        status, error, _ = self.request("POST", path, {}, cookie=viewer_cookie, csrf=viewer_csrf)
+        self.assertEqual((status, error["error"]["code"]), (403, "PROJECT_FORBIDDEN"))
+        status, error, _ = self.request("POST", "/api/workspaces/999/timeline/template", {}, cookie=cookie, csrf=csrf)
+        self.assertEqual(status, 403)
+        for username in ("u1", "u2"):
+            member_cookie, member_csrf = self.login(username)
+            status, exported, _ = self.request("POST", path, {}, cookie=member_cookie, csrf=member_csrf)
+            self.assertEqual(status, 200, exported)
+            raw = base64.b64decode(exported["content_base64"], validate=True)
+            self.assertEqual(hashlib.sha256(raw).hexdigest(), exported["sha256"])
+            parsed = parse_upload(exported["filename"], raw)
+            self.assertEqual(len(parsed["rows"]), 15)
+            self.assertEqual(len({row[0] for row in parsed["rows"]}), 3)
+            self.assertEqual(self.counts(), before)
+            status, preview, _ = self.request("POST", "/api/workspaces/1/timeline/imports/preview", self.upload("examples.xlsx", raw), cookie=member_cookie, csrf=member_csrf)
+            self.assertEqual((status, preview["row_count"], len(preview["projects"])), (201, 15, 3))
+            status, error, _ = self.request("POST", "/api/workspaces/1/timeline/imports/preview", self.upload("blank.xlsx", make_timeline_xlsx([])), cookie=member_cookie, csrf=member_csrf)
+            self.assertEqual((status, error["error"]["code"]), (422, "IMPORT_EMPTY"))
+        self.assertEqual(self.counts(), before)
+
+    def test_template_three_projects_commit_and_single_project_reuse(self):
+        cookie, csrf = self.login()
+        _, template, _ = self.request('POST', '/api/workspaces/1/timeline/template', {}, cookie=cookie, csrf=csrf)
+        path = '/api/workspaces/1/timeline/imports/'
+        status, preview, _ = self.request('POST', path + 'preview', {"filename": template['filename'], "content_base64": template['content_base64'], "sheet_name": "Timeline"}, cookie=cookie, csrf=csrf)
+        self.assertEqual(status, 201)
+        status, result, _ = self.request('POST', path + 'commit', {"batch_id": preview['batch_id']}, cookie=cookie, csrf=csrf)
+        self.assertEqual((status, result['projects'], result['nodes']), (201, 3, 15))
+        single = [["我的新项目", *row[1:]] for row in TEMPLATE_ROWS if row[0] == TEMPLATE_ROWS[0][0]]
+        status, preview, _ = self.request('POST', path + 'preview', self.upload('single.xlsx', make_timeline_xlsx(single)), cookie=cookie, csrf=csrf)
+        self.assertEqual((status, preview['row_count'], preview['projects']), (201, 7, [{"name": "我的新项目", "node_count": 7}]))
+        status, result, _ = self.request('POST', path + 'commit', {"batch_id": preview['batch_id']}, cookie=cookie, csrf=csrf)
+        self.assertEqual((status, result['projects'], result['nodes']), (201, 1, 7))
 
     def test_r11_export_post_json_order_permissions_and_round_trip(self):
         cookie, csrf = self.login()
@@ -419,7 +555,7 @@ class TimelineHTTPTests(unittest.TestCase):
         self.assertEqual(exported["sha256"], hashlib.sha256(raw).hexdigest())
         parsed = parse_upload(exported["filename"], raw)
         self.assertEqual(parsed["headers"], ["项目名称", "阶段", "主线/并行", "节点", "日期", "状态", "备注"])
-        self.assertEqual(len(parsed["sheets"]), 1)
+        self.assertEqual(parsed["sheets"], ["Timeline", "填写说明"])
         self.assertEqual([(row[0], row[2], row[3]) for row in parsed["rows"]], [
             ("P10", "主线", "B2"), ("P10", "主线", "B10"), ("P10", "并行", "B10"), ("P2", "主线", "N")
         ])

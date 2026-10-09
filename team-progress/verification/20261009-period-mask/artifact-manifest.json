@@ -1,0 +1,174 @@
+{
+  "timeline-ui.js": {
+    "sha256": "fc6c68b72ba58bf21c9c598b332242f6a0b86c46d4f6ec9c70dc29c3bf32a283",
+    "size": 136283
+  },
+  "app.js": {
+    "sha256": "d7a815560f957123cf3fda3611c3fb4239f45f8fe76ca603f2e9074be43abc6c",
+    "size": 151362
+  },
+  "flowboard/service.py": {
+    "sha256": "54f6c1e5a94724de21277d374cef97711dc67e1a4696db00f97c090a24ccccc9",
+    "size": 256918
+  },
+  "index.html": {
+    "sha256": "7302d7ee9fc28a3dc5e7c5d0db24658c105b1eee324d80440333ae28892e0d84",
+    "size": 7658
+  },
+  "tests/timeline_ui.test.js": {
+    "sha256": "124e540ef51a138ffa9684c8ed08e5bf3cc45abf136f5061e379aa6a563258d4",
+    "size": 49613
+  },
+  "tests/timeline_team_cards.test.js": {
+    "sha256": "2b4647458f800bb08207442cd31df2d0b00f05813cd5a3748ec62999d36647b1",
+    "size": 1790
+  },
+  "tests/test_team_cards_http.py": {
+    "sha256": "f647cb78286e0aaaf3eed02356b545eb2da8c5955a68358c4c36549d7462f59e",
+    "size": 1207
+  },
+  "tests/test_team_cards_e2e.py": {
+    "sha256": "416d78bb334b7c6210d31e15cce87adffe223f0322cb4672baa0c12423af7f6c",
+    "size": 3789
+  },
+  "tests/timeline_period_mask.test.js": {
+    "sha256": "bdc5f5a77cf20ba6d1c0a2de1ede856171555f66c4fd0d8f28c9888c3c166291",
+    "size": 1614
+  },
+  "tests/test_timeline_period_mask_e2e.py": {
+    "sha256": "e99b5f5472fdd49b050c5fe670d449c75ec025a47f6a2bc77af98d79a7375f46",
+    "size": 5440
+  },
+  "team-progress/20261009-team-cards-and-period-mask.md": {
+    "sha256": "b8b549767dc9a7cd89ab812744996a0df81759a1ac6da8852e90cad134c1d88a",
+    "size": 2807
+  },
+  "STATE.md": {
+    "sha256": "1102d1fcfc42945530014cfcb28879031f27ca05d85e8239a2749c05a25cfbf5",
+    "size": 13579
+  },
+  "feature-02-进阶仪表盘/03-UX_OPTIMIZATION_CONTRACT.md": {
+    "sha256": "37309307d52b2d88cc484fa65ff0cfab1ee1b21c73dc34905882b20cfd89b2fa",
+    "size": 9065
+  },
+  "feature-02-进阶仪表盘/04-UX_DELIVERY.md": {
+    "sha256": "3fbd3d6688eda874552f9beb45ea39e56e7efe6fabdd247ccdb8d732b47113aa",
+    "size": 10294
+  },
+  "team-progress/verification/20261009-period-mask/after-node.log": {
+    "sha256": "469c78d3a70b88c238e662e1ee152957e9b933778402621c97447947f16adec2",
+    "size": 378
+  },
+  "team-progress/verification/20261009-period-mask/before-node.log": {
+    "sha256": "12c7f2c8310a44e3873b299ebd54130bb963ec5a3daf7d8f560ad6c4fd7b6252",
+    "size": 2080
+  },
+  "team-progress/verification/20261009-period-mask/browser.log": {
+    "sha256": "a3d6b0a63ae09746bc407e5c2304e3ac4b3110532090f85ca62033ee87abf1bb",
+    "size": 6359
+  },
+  "team-progress/verification/20261009-period-mask/closeout.py": {
+    "sha256": "bad6bdcb139bf6e8316fbd8e6875449c99844a94fa4e85fae16fdd02c6bb5bf6",
+    "size": 3668
+  },
+  "team-progress/verification/20261009-period-mask/http-proof.json": {
+    "sha256": "604e44c5005184670281a3daacc8742f935c384da976e86d6adb23a17b9677e3",
+    "size": 611
+  },
+  "team-progress/verification/20261009-period-mask/month-before.png": {
+    "sha256": "ba94218ec031e69eda22603ba7ccb9581c3a2edbe5a453a608ef876855472c6c",
+    "size": 42942
+  },
+  "team-progress/verification/20261009-period-mask/month-ready.png": {
+    "sha256": "587a9faa9308cf4131e40126270cbfcfd0b717b17f5a2f3cf1100b1eb807c0fc",
+    "size": 37819
+  },
+  "team-progress/verification/20261009-period-mask/source.diff": {
+    "sha256": "f798fca099eea0bd220675a3935b24eb0e7370c4d359712d1577b1bda890b618",
+    "size": 3288
+  },
+  "team-progress/verification/20261009-period-mask/static-checks.json": {
+    "sha256": "6a03586c0ba2b5fc6f8ee961210221727848e1f72eec67275bfb56e27561f82b",
+    "size": 2233
+  },
+  "team-progress/verification/20261009-period-mask/timeline-node.log": {
+    "sha256": "cf5b5cf557b3dceda699c0b56476f79fcf74f498efa0558bf5c326902470ccd2",
+    "size": 11200
+  },
+  "team-progress/verification/20261009-period-mask/week-before.png": {
+    "sha256": "66adf873a693f60445678df5b28dd3eb4198cab7a07ccdb30f3effc1bcee5937",
+    "size": 41772
+  },
+  "team-progress/verification/20261009-period-mask/week-ready.png": {
+    "sha256": "fa6cddda065b7ff93b539657e237f891e5856288b82e5b16c5b4d403469827c3",
+    "size": 34165
+  },
+  "team-progress/verification/20261009-period-mask/baseline/index.html": {
+    "sha256": "3727ccccffdb299419cb4eed452d742bbc4ffea4677ae26173d42410a4be5de5",
+    "size": 7661
+  },
+  "team-progress/verification/20261009-period-mask/baseline/timeline-ui.js": {
+    "sha256": "3b2a13f5bf15b4fb2bc974ea5b1b346410d6abb7c190c79c82fe374f7727b5c4",
+    "size": 136256
+  },
+  "team-progress/verification/20261009-team-hide-admin/apply_card_update.py": {
+    "sha256": "e14277d33d62a31fd769fe41c992ccbe6ed95877c80580ccd38907d9a3d53683",
+    "size": 1781
+  },
+  "team-progress/verification/20261009-team-hide-admin/browser.log": {
+    "sha256": "6a9211caaf0c0aaf5f55b2a39c413708d41a50562e80a64064953d1c1a0c75bf",
+    "size": 6138
+  },
+  "team-progress/verification/20261009-team-hide-admin/http.log": {
+    "sha256": "87247573c1d2ca1f844ff526def316f3b34094c183375abbad535b1ee77502e2",
+    "size": 461
+  },
+  "team-progress/verification/20261009-team-hide-admin/runtime-stderr.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0
+  },
+  "team-progress/verification/20261009-team-hide-admin/runtime-stdout.log": {
+    "sha256": "3ae35013f8eecee2ffc77d58e17530efc2bd922dd6066d1ea2baa39c8bcf892f",
+    "size": 18126
+  },
+  "team-progress/verification/20261009-team-hide-admin/source.diff": {
+    "sha256": "2e199ccbc02beceb18283899d4aa6faf74fc5f0f4d457d609ed86d45fd6a59d4",
+    "size": 24427
+  },
+  "team-progress/verification/20261009-team-hide-admin/team-cards-ready.png": {
+    "sha256": "2480bde7b7cd2dc780dc7e121a130eeb542d9cdd78c36c7f8b6d1f22e4437813",
+    "size": 63131
+  },
+  "team-progress/verification/20261009-team-hide-admin/team-node.log": {
+    "sha256": "7a791f5ebc7b16f4e3e9a216503c744d38dc005df54188d123900b1f62fb604a",
+    "size": 309
+  },
+  "team-progress/verification/20261009-team-hide-admin/timeline-browser-recheck.log": {
+    "sha256": "5e28006dad6b403d0049c07e575ff86655cd3d71781a11cd65e0a31e9274fd51",
+    "size": 2393
+  },
+  "team-progress/verification/20261009-team-hide-admin/timeline-node.log": {
+    "sha256": "cf5b5cf557b3dceda699c0b56476f79fcf74f498efa0558bf5c326902470ccd2",
+    "size": 11200
+  },
+  "team-progress/verification/20261009-team-hide-admin/baseline/app.js": {
+    "sha256": "6968eaa13ceb48783acd2246920b45c9e93c46313d76295fb4710e979b2e00f3",
+    "size": 151268
+  },
+  "team-progress/verification/20261009-team-hide-admin/baseline/flowboard_service.py": {
+    "sha256": "4e782371ba08a13168c21ba6d3f8974b9e80cbfd4ca5465e49b16603c425292b",
+    "size": 256860
+  },
+  "team-progress/verification/20261009-team-hide-admin/baseline/index.html": {
+    "sha256": "10109c870bab269f7fa28ba1ef14add60ff20e4b2251bb0101c3eb043ac47693",
+    "size": 7669
+  },
+  "team-progress/verification/20261009-team-hide-admin/baseline/tests_timeline_ui.test.js": {
+    "sha256": "97440132ac4cbedbf453dde88b0d8a7d44ed3c98eee49456bce5cc076d67c295",
+    "size": 49562
+  },
+  "team-progress/verification/20261009-team-hide-admin/baseline/timeline-ui.js": {
+    "sha256": "4a08e969f5f4d957bb040365a0138da6535545afb6c5741ba8f16684dd91e9f7",
+    "size": 135850
+  }
+}

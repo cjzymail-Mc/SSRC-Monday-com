@@ -193,9 +193,9 @@ class TimelineCoreTests(unittest.TestCase):
         db = connect(self.db)
         db.execute("UPDATE workspace_memberships SET role='member' WHERE user_id='u2'")
         db.commit(); db.close()
-        with self.assertRaises(Exception) as member_delete:
-            self.service.delete_project(owner, 1, project_id, {"base_version": 1})
-        self.assertEqual(member_delete.exception.status, 403)
+        with self.assertRaises(Exception) as other_member_delete:
+            self.service.delete_project(other, 1, project_id, {"base_version": 1})
+        self.assertEqual(other_member_delete.exception.status, 403)
         deleted = self.service.delete_project(self.admin, 1, project_id, {"base_version": 1})
         self.assertEqual(deleted["version"], 2)
         for operation in (
@@ -209,6 +209,47 @@ class TimelineCoreTests(unittest.TestCase):
         db = connect(self.db)
         self.assertIsNotNone(db.execute("SELECT deleted_at FROM timeline_projects WHERE id=?", (project_id,)).fetchone()[0])
         db.close()
+
+    def test_creator_can_soft_delete_active_and_archived_projects_with_audit(self):
+        owner, active_id = self._create_as_member("创建者删除活跃项目")
+        active = self.service.delete_project(owner, 1, active_id, {"base_version": 1})
+        self.assertEqual(active["version"], 2)
+
+        archived_id = self.service.create_project(owner, 1, {"name": "创建者删除归档项目"})["project_id"]
+        created = self.service.submit_batches(owner, 1, {"requests": [{
+            "project_id": archived_id, "base_version": 1,
+            "changes": [{"create": {"track": "main", "stage": "创意", "name": "保留节点", "date": "2026-09-24"}}],
+        }]})["results"][0]
+        archived = self.service.archive_project(owner, 1, archived_id, {"base_version": created["view"]["version"]})
+        deleted = self.service.delete_project(owner, 1, archived_id, {"base_version": archived["version"]})
+        self.assertEqual(deleted["version"], archived["version"] + 1)
+        admin_target_id = self.service.create_project(owner, 1, {"name": "管理员删除成员归档项目"})["project_id"]
+        admin_target = self.service.archive_project(owner, 1, admin_target_id, {"base_version": 1})
+        self.service.delete_project(self.admin, 1, admin_target_id, {"base_version": admin_target["version"]})
+
+        db = connect(self.db)
+        try:
+            row = db.execute("SELECT archived_at,deleted_at,deleted_by FROM timeline_projects WHERE id=?", (archived_id,)).fetchone()
+            self.assertIsNotNone(row["archived_at"])
+            self.assertIsNotNone(row["deleted_at"])
+            self.assertEqual(row["deleted_by"], owner["id"])
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM timeline_nodes WHERE project_id=? AND deleted_at IS NULL", (archived_id,)).fetchone()[0], 1)
+            events = db.execute(
+                "SELECT actor_user_id,action_code,details_json FROM audit_log WHERE entity_type='timeline_project' AND entity_id=? ORDER BY id",
+                (str(archived_id),),
+            ).fetchall()
+            self.assertEqual([event["action_code"] for event in events], [
+                "timeline.project_created", "timeline.project_archived", "timeline.project_deleted",
+            ])
+            self.assertTrue(all(event["actor_user_id"] == owner["id"] for event in events))
+            self.assertEqual(json.loads(events[-1]["details_json"])["archived_at"], row["archived_at"])
+            admin_event = db.execute(
+                "SELECT actor_user_id FROM audit_log WHERE action_code='timeline.project_deleted' AND entity_id=?",
+                (str(admin_target_id),),
+            ).fetchone()
+            self.assertEqual(admin_event["actor_user_id"], self.admin["id"])
+        finally:
+            db.close()
 
     def test_group2_initial_date_lock_and_group3_conflict_views(self):
         project_id, created = self._create_with_nodes("锁字段", [
@@ -1068,6 +1109,44 @@ class TimelineCoreTests(unittest.TestCase):
         with self.assertRaises(Exception) as undo_undo:
             self.service.undo_batches(self.admin, 1, {"batch_ids": [undone["batch_id"]]})
         self.assertEqual(undo_undo.exception.status, 409)
+
+    def test_member_order_v20_migration_backup_and_restore(self):
+        path = Path(self.temp.name) / "member-order-v19.db"
+        database.copy_database(self.db, path)
+        db = connect(path)
+        try:
+            db.execute("DROP TABLE timeline_member_orders")
+            db.execute("DELETE FROM schema_migrations WHERE version=20")
+            db.execute("PRAGMA user_version=19")
+            db.commit()
+        finally:
+            db.close()
+        backup = migrate(path)
+        self.assertTrue(backup and Path(backup).exists())
+        old = connect(backup)
+        try:
+            self.assertEqual(old.execute("PRAGMA user_version").fetchone()[0], 19)
+            self.assertIsNone(old.execute("SELECT name FROM sqlite_master WHERE name='timeline_member_orders'").fetchone())
+            self.assertEqual(old.execute("PRAGMA integrity_check").fetchone()[0], "ok")
+        finally:
+            old.close()
+        current = connect(path)
+        try:
+            self.assertEqual(current.execute("PRAGMA user_version").fetchone()[0], SCHEMA_VERSION)
+            self.assertIsNotNone(current.execute("SELECT name FROM sqlite_master WHERE name='timeline_member_orders'").fetchone())
+            self.assertEqual(current.execute("PRAGMA foreign_key_check").fetchall(), [])
+        finally:
+            current.close()
+        restored = Path(self.temp.name) / "member-order-restored.db"
+        database.copy_database(backup, restored)
+        migrate(restored)
+        recovered = connect(restored)
+        try:
+            self.assertEqual(recovered.execute("PRAGMA user_version").fetchone()[0], SCHEMA_VERSION)
+            self.assertEqual(recovered.execute("PRAGMA integrity_check").fetchone()[0], "ok")
+        finally:
+            recovered.close()
+        self.assertIsNone(migrate(path))
 
     def test_group10_backup_content_idempotence_rollback(self):
         path = Path(self.temp.name) / "seeded-v15-evidence.db"

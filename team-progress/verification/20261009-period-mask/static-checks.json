@@ -1,0 +1,46 @@
+[
+  {
+    "command": [
+      "node",
+      "--check",
+      "timeline-ui.js"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "--check",
+      "app.js"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python",
+      "-m",
+      "py_compile",
+      "flowboard/service.py",
+      "tests/test_timeline_period_mask_e2e.py",
+      "tests/test_team_cards_e2e.py",
+      "tests/test_team_cards_http.py"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "warning: in the working copy of 'STATE.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'feature-01-项目时间管理-仪表盘/15-MANUAL_ARCHIVE_AND_TIMELINE_VIEW_TECH_FREEZE.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'feature-01-项目时间管理-仪表盘/STATE.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'feature-01-项目时间管理-仪表盘/mainline-feature01.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'flowboard/database.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'flowboard/service.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'flowboard/timeline.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'flowboard/transfer.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_timeline.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_timeline_archive.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_timeline_http.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'timeline.css', LF will be replaced by CRLF the next time Git touches it\n"
+  }
+]

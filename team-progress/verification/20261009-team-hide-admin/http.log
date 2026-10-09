@@ -1,0 +1,9 @@
+test_bootstrap_roles_match_current_workspace_and_keep_permissions (test_team_cards_http.TeamCardsHTTP.test_bootstrap_roles_match_current_workspace_and_keep_permissions) ... ok
+[09/Oct/2026 14:41:04] "GET /api/bootstrap HTTP/1.1" 401 -
+[09/Oct/2026 14:41:04] "POST /api/auth/login HTTP/1.1" 200 -
+[09/Oct/2026 14:41:04] "GET /api/bootstrap HTTP/1.1" 200 -
+
+----------------------------------------------------------------------
+Ran 1 test in 1.389s
+
+OK

@@ -1,0 +1,20 @@
+{
+  "wheel_handler_unchanged": true,
+  "wheel_sha256": "049cc73cd1e4a9e98e760b35c200d6c71f4b51fe1d3539bf6a695807ae9ace84",
+  "index.html": {
+    "source_sha256": "7302d7ee9fc28a3dc5e7c5d0db24658c105b1eee324d80440333ae28892e0d84",
+    "http_status": 200
+  },
+  "timeline-ui.js": {
+    "source_sha256": "fc6c68b72ba58bf21c9c598b332242f6a0b86c46d4f6ec9c70dc29c3bf32a283",
+    "http_status": 200
+  },
+  "app.js": {
+    "source_sha256": "d7a815560f957123cf3fda3611c3fb4239f45f8fe76ca603f2e9074be43abc6c",
+    "http_status": 200
+  },
+  "health": {
+    "status": "ok",
+    "schema_version": 20
+  }
+}

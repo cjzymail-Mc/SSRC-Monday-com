@@ -8,6 +8,7 @@ import unittest
 import zipfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from xml.etree import ElementTree as ET
 
 from playwright.sync_api import sync_playwright
 
@@ -223,14 +224,14 @@ class TimelineProductionE2E(unittest.TestCase):
         if page.locator('#timelineModal [data-timeline-import-file]').count() == 0:
             self.physical_click(page, page.locator('[data-timeline-import-open]'))
             page.locator('#timelineModal [data-timeline-import-file]').wait_for()
-        predicate = lambda response: response.url.endswith("/timeline/imports/preview") and response.request.method == "POST"
+        predicate = lambda response: (response.url.endswith("/timeline/imports/preview") or (response.url.endswith("/timeline/imports/sheets") and response.status >= 400)) and response.request.method == "POST"
         with page.expect_response(predicate) as pending:
             page.locator("#timelineModal [data-timeline-import-file]").set_input_files({"name": filename, "mimeType": "text/csv" if filename.endswith(".csv") else "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "buffer": raw})
         response = pending.value
         if status is not None:
             self.assertEqual(response.status, status)
         if error_code is not None:
-            self.assertTrue(response.url.endswith("/timeline/imports/preview"))
+            self.assertTrue(response.url.endswith(("/timeline/imports/preview", "/timeline/imports/sheets")))
             self.assertEqual(response.status, 422)
             self.assertEqual(response.json()["error"]["code"], error_code)
             page.locator(f'[data-timeline-import-error="{error_code}"]').wait_for()
@@ -283,12 +284,11 @@ class TimelineProductionE2E(unittest.TestCase):
 
         context, page = self.login("u1")
         nav_ids = page.locator(".main-nav > button").evaluate_all("items => items.map(item => item.id)")
-        self.assertLess(nav_ids.index("timelineBtn"), nav_ids.index("timelineWeekBtn"))
-        self.assertLess(nav_ids.index("timelineWeekBtn"), nav_ids.index("timelineMonthBtn"))
-        self.assertLess(nav_ids.index("timelineMonthBtn"), nav_ids.index("timelineAllBtn"))
-        self.assertTrue(page.locator("#timelineWeekBtn").evaluate("el => el.classList.contains('nav-child')"))
-        self.assertTrue(page.locator("#timelineMonthBtn").evaluate("el => el.classList.contains('nav-child')"))
-
+        self.assertEqual(nav_ids[:5], ['timelineBtn','timelineOverviewBtn','timelineAllBtn','timelineTagsBtn','archivedBtn'])
+        self.assertEqual(page.locator('#timelineCanvasNav').count(),0)
+        self.physical_click(page, page.locator('#timelineAllBtn'))
+        self.assertTrue(page.locator('#timelineWeekBtn').is_visible())
+        self.assertTrue(page.locator('#timelineMonthBtn').is_visible())
         self.physical_click(page, page.locator("#timelineMonthBtn"))
         chart = page.locator('[data-timeline-page="month"] .timeline-portfolio-chart')
         chart.wait_for()
@@ -369,6 +369,46 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assert_clean_browser(page)
         context.close()
 
+    def test_week_and_month_focused_flags_are_not_vertically_clipped(self):
+        today = datetime.now(timezone(timedelta(hours=8))).date().isoformat()
+        db = connect(self.db_path)
+        try:
+            stamp = datetime.now(timezone.utc).isoformat()
+            for index in range(7):
+                project = db.execute(
+                    "INSERT INTO timeline_projects(workspace_id,name,created_by,version,created_at,updated_at) VALUES (1,?,'u1',1,?,?)",
+                    (f"双轨旗标项目 {index}", stamp, stamp),
+                )
+                for track in ("main", "parallel"):
+                    db.execute(
+                        "INSERT INTO timeline_nodes(project_id,track,stage,name,date,initial_date,remark,created_at,updated_at) VALUES (?,?,'测试',?,?,?,'',?,?)",
+                        (project.lastrowid, track, f"{track} 节点", today, today, stamp, stamp),
+                    )
+            db.commit()
+        finally:
+            db.close()
+
+        context, page = self.login("u1")
+        self.physical_click(page, page.locator('#timelineAllBtn'))
+        page.locator('[data-timeline-page="all"] .timeline-portfolio-chart').wait_for()
+        page.set_viewport_size({"width": 1600, "height": 900})
+        for scope in ("week", "month", "week"):
+            with self.subTest(scope=scope):
+                self.physical_click(page, page.locator(f"#timeline{scope.title()}Btn"))
+                row = page.locator(f'[data-timeline-page="{scope}"] .timeline-portfolio-project').nth(3)
+                row.locator('.timeline-portfolio-meta strong').click()
+                page.wait_for_function("document.querySelector('.timeline-portfolio-project.is-focused')?.getBoundingClientRect().height >= 167")
+                geometry = row.locator('.timeline-node-flag').evaluate_all("""flags => flags.map(flag => {
+                  const rect=flag.getBoundingClientRect(),plot=flag.closest('.timeline-stage-plot'),bounds=plot.getBoundingClientRect(),style=getComputedStyle(plot);
+                  return {track:flag.dataset.nodeTrack,overflow:style.overflowY,clipped:style.overflowY!=='visible'&&(rect.top<bounds.top-1||rect.bottom>bounds.bottom+1)};
+                })""")
+                self.assertEqual({item["track"] for item in geometry}, {"main", "parallel"})
+                self.assertTrue(all(not item["clipped"] for item in geometry), geometry)
+                self.assertEqual(row.locator('.timeline-node-flag b:visible').count(), 2)
+                self.assertEqual(row.locator('.timeline-node-flag small:visible').count(), 2)
+        self.assert_clean_browser(page)
+        context.close()
+
     def test_week_and_month_reorder_visible_subset_updates_full_personal_order(self):
         today = datetime.now(timezone(timedelta(hours=8))).date()
         next_month = (today.replace(day=28) + timedelta(days=4)).replace(day=1)
@@ -413,6 +453,7 @@ class TimelineProductionE2E(unittest.TestCase):
 
         a, b, c, d, e = project_ids
         context, page = self.login("u1")
+        self.physical_click(page, page.locator('#timelineAllBtn'))
         self.physical_click(page, page.locator("#timelineWeekBtn"))
         page.locator('[data-timeline-page="week"] .timeline-portfolio-chart').wait_for()
         self.assertEqual(visible_ids(), [a, c, e])
@@ -1308,7 +1349,7 @@ class TimelineProductionE2E(unittest.TestCase):
         editor.wait_for(state="visible")
         self.assertEqual(editor.locator('[data-dashboard-node-editor-title]').inner_text(), "插入到主线")
         self.assertIn(inserted_date, editor.locator('[data-dashboard-node-editor-context]').inner_text())
-        self.assertTrue(editor.locator('[data-dashboard-node-remark-field]').is_hidden())
+        self.assertEqual(editor.locator('textarea[name="remark"]').count(), 0)
         self.assertIn("is-quick-insert", editor.get_attribute("class"))
         self.assertLess(editor.bounding_box()["width"], 300, "insert uses the approved D mini bubble instead of the modal-sized editor")
         self.assertEqual(editor.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
@@ -1326,17 +1367,28 @@ class TimelineProductionE2E(unittest.TestCase):
         menu = page.locator('[data-timeline-context]')
         menu.wait_for(state="visible")
         self.physical_click(page, menu.locator('[data-draft-action="remark"]'))
-        editor = page.locator('[data-dashboard-node-editor]')
+        editor = page.locator('[data-dashboard-remark]')
         editor.wait_for(state="visible")
-        self.assertEqual(editor.locator('[data-dashboard-node-editor-title]').inner_text(), "编辑备注")
-        self.assertTrue(editor.locator('[data-dashboard-node-name-field]').is_hidden())
+        self.assertIn(existing.get_attribute("data-node-date"), editor.locator('[data-remark-title]').inner_text())
+        self.assertEqual(editor.locator('input[name="name"]').count(), 0)
         editor.locator('textarea[name="remark"]').fill("来自仪表盘的多行备注\n第二行")
         self.physical_click(page, editor.locator('button[type="submit"]'))
         editor.wait_for(state="hidden")
 
         removable = page.locator(f'[data-dashboard-project="{project_id}"] .timeline-dashboard-node:not([data-node-id="{edited_node_id}"]):not([data-node-id^="-"])').first
         removed_node_id = int(removable.get_attribute("data-node-id"))
-        self.physical_click(page, removable, button="right")
+        # Zoom through the real controls until this ring has an independent physical hit target.
+        for _ in range(12):
+            removable.scroll_into_view_if_needed()
+            if removable.evaluate("e=>{const r=e.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('.timeline-dashboard-node')===e}"):
+                break
+            zoom_point = removable.bounding_box()
+            page.mouse.move(zoom_point['x'] + zoom_point['width'] / 2, zoom_point['y'] + zoom_point['height'] / 2)
+            page.mouse.wheel(0, -500)
+            page.wait_for_timeout(100)
+        self.assertTrue(removable.evaluate("e=>{const r=e.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('.timeline-dashboard-node')===e}"))
+        self.physical_click(page, removable, button='right')
+        self.assertEqual(page.locator('[data-timeline-context]').get_attribute('data-node-id'), str(removed_node_id))
         remove_action = page.locator('[data-timeline-context] [data-draft-action="remove"]')
         self.assertEqual(remove_action.inner_text(), "删除节点")
         self.assertEqual(remove_action.evaluate("el => getComputedStyle(el).color"), "rgb(216, 52, 69)")
@@ -1360,6 +1412,185 @@ class TimelineProductionE2E(unittest.TestCase):
         finally:
             db.close()
         self.assert_clean_browser(page); context.close()
+
+    def test_dashboard_remark_hover_pin_escape_draft_save_and_undo(self):
+        (project_id, _, _), _today = self.seed_cp4_dashboard_projects()
+        context, page = self.login("u1")
+        self.open_cp4_single(page, project_id)
+        self.zoom_single_until_node_visible(page)
+        node = page.locator(f'.timeline-dashboard-node[data-project-id="{project_id}"]').first
+        node_id = int(node.get_attribute('data-node-id'))
+        popup = page.locator('[data-dashboard-remark]')
+        preview = popup.locator('[data-remark-preview]')
+        editor = popup.locator('textarea')
+        node.hover()
+        self.assertEqual(preview.inner_text(), '--暂无备注信息--')
+        self.assertEqual(preview.evaluate('e=>getComputedStyle(e).fontStyle'), 'italic')
+        self.assertIn(node.get_attribute('data-node-date'), popup.locator('h3').inner_text())
+        page.mouse.move(5, 5)
+        self.assertTrue(popup.is_hidden())
+        node.dblclick()
+        self.assertEqual(editor.input_value(), '')
+        self.assertEqual(editor.get_attribute('placeholder'), '--暂无备注信息--')
+        page.mouse.move(5, 5)
+        page.keyboard.press('Escape')
+        self.assertTrue(popup.is_hidden())
+        stable_hash = self.timeline_content_hash()
+        node.dblclick()
+        text = '<b>备注纯文本</b>\n第二行，保留换行'
+        editor.fill(text)
+        page.mouse.move(5, 5)
+        page.keyboard.press('Escape')
+        self.assertTrue(popup.locator('[data-remark-confirm]').is_visible())
+        self.assertTrue(popup.locator('[data-remark-save]').is_hidden())
+        page.keyboard.press('Escape')
+        self.assertEqual(editor.input_value(), text)
+        self.assertTrue(popup.is_visible())
+        popup.locator('[data-remark-continue]').click()
+        self.assertEqual(editor.input_value(), text)
+        page.evaluate('renderTimeline()')
+        self.assertEqual(editor.input_value(), text, 'background render must retain the active editor')
+        page.keyboard.press('Escape')
+        popup.locator('[data-remark-discard]').click()
+        self.assertEqual(self.timeline_content_hash(), stable_hash)
+        node.dblclick()
+        self.assertEqual(editor.input_value(), '')
+        editor.fill('cancel this')
+        popup.locator('[data-remark-cancel]').click()
+        node.dblclick()
+        self.assertEqual(editor.input_value(), '')
+        editor.fill(text)
+        popup.locator('[data-remark-save]').click()
+        self.assertEqual(self.timeline_content_hash(), stable_hash, 'confirm remains a local draft until project update')
+        node.hover()
+        self.assertEqual(preview.inner_text(), text)
+        self.assertEqual(preview.locator('b').count(), 0, 'remark text must never become HTML')
+        with page.expect_response(lambda r: r.request.method == 'POST' and r.url.endswith('/timeline/batches')) as submitted:
+            page.locator('[data-dashboard-submit]').click()
+        self.assertEqual(submitted.value.status, 200)
+        db = connect(self.db_path)
+        try:
+            self.assertEqual(db.execute('SELECT remark FROM timeline_nodes WHERE id=?', (node_id,)).fetchone()['remark'], text)
+            change = db.execute("SELECT old_value,new_value FROM timeline_node_changes WHERE node_id=? AND field='remark' ORDER BY id DESC", (node_id,)).fetchone()
+            self.assertEqual((change['old_value'], change['new_value']), ('', text))
+        finally:
+            db.close()
+        # Remark commits remain part of the existing recoverable batch history.
+        self.physical_click(page, page.locator('.timeline-portfolio-meta'), button='right')
+        with page.expect_response(lambda r: r.request.method == 'POST' and r.url.endswith('/timeline/batches/undo')) as undone:
+            page.locator('[data-portfolio-undo-action]').click()
+        self.assertEqual(undone.value.status, 200)
+        node.hover()
+        self.assertEqual(preview.inner_text(), '--暂无备注信息--')
+        node.dblclick()
+        editor.fill(text)
+        popup.locator('[data-remark-save]').click()
+        with page.expect_response(lambda r: r.request.method == 'POST' and r.url.endswith('/timeline/batches')):
+            page.locator('[data-dashboard-submit]').click()
+        page.reload()
+        page.locator('#loadState', has_text='刚刚同步').wait_for()
+        self.open_cp4_single(page, project_id)
+        self.zoom_single_until_node_visible(page)
+        node.hover()
+        self.assertEqual(preview.inner_text(), text)
+        # Both the flag and its precise hit surface open the same node, including after arming drag.
+        flag = page.locator(f'.timeline-node-flag[data-project-id="{project_id}"][data-node-id="{node_id}"]')
+        hit = page.locator(f'.timeline-node-flag-hit[data-project-id="{project_id}"][data-node-id="{node_id}"]')
+        trigger = hit if hit.is_visible() else flag
+        trigger.dblclick(position={'x': 4, 'y': 8})
+        self.assertEqual(editor.input_value(), text)
+        popup.locator('[data-remark-cancel]').click()
+        self.physical_click(page, node, button='right')
+        page.locator('[data-draft-action="single"]').click()
+        node.dblclick()
+        self.assertEqual(editor.input_value(), text)
+        page.mouse.move(5, 5)
+        page.keyboard.press('Escape')
+        self.assertTrue(popup.is_hidden())
+        self.assert_clean_browser(page)
+        context.close()
+
+    def test_dashboard_remark_readonly_and_fullscreen_escape(self):
+        (project_id, _, _), _today = self.seed_cp4_dashboard_projects()
+        context, page = self.login('u2')
+        page.locator('[data-timeline-tab="team"]').click()
+        self.physical_click(page, page.locator(f'[data-timeline-member-open="{project_id}"]'))
+        page.locator('[data-timeline-page="single"]').wait_for()
+        self.zoom_single_until_node_visible(page)
+        node = page.locator(f'.timeline-dashboard-node[data-project-id="{project_id}"]').first
+        popup = page.locator('[data-dashboard-remark]')
+        node.hover()
+        self.assertEqual(popup.locator('[data-remark-preview]').inner_text(), '--暂无备注信息--')
+        node.dblclick()
+        self.assertTrue(popup.locator('form').is_hidden(), 'another member may preview but cannot edit')
+        self.assert_clean_browser(page)
+        context.close()
+        context, page = self.login('u1')
+        self.open_cp4_single(page, project_id)
+        page.locator('[data-portfolio-fullscreen]').click()
+        self.zoom_single_until_node_visible(page)
+        node = page.locator(f'.timeline-dashboard-node[data-project-id="{project_id}"]').first
+        popup = page.locator('[data-dashboard-remark]')
+        node.dblclick()
+        popup.locator('textarea').fill('未提交')
+        page.mouse.move(5, 5)
+        page.keyboard.press('Escape')
+        self.assertTrue(popup.locator('[data-remark-confirm]').is_visible())
+        self.assertEqual(page.locator('.timeline-portfolio-card.is-fullscreen').count(), 1)
+        self.assertTrue(popup.evaluate("e=>{const r=e.getBoundingClientRect();return r.left>=0&&r.top>=0&&r.right<=innerWidth&&r.bottom<=innerHeight&&e.contains(document.elementFromPoint(r.left+20,r.top+20))}"))
+        popup.locator('[data-remark-discard]').click()
+        self.assertEqual(page.locator('.timeline-portfolio-card.is-fullscreen').count(), 1)
+        self.assert_clean_browser(page)
+        context.close()
+
+    def test_dashboard_remark_empty_navigation_and_logout_cleanup(self):
+        (project_id, _, _), _today = self.seed_cp4_dashboard_projects()
+        context, page = self.login('u1')
+        self.open_cp4_single(page, project_id)
+        self.zoom_single_until_node_visible(page)
+        node = page.locator(f'.timeline-dashboard-node[data-project-id="{project_id}"]').first
+        popup = page.locator('[data-dashboard-remark]')
+        editor = popup.locator('textarea')
+        node.dblclick()
+        popup.locator('[data-remark-save]').click()
+        self.assertFalse(page.evaluate('timelineHasDraft()'), 'empty placeholder must not become a change')
+        node.dblclick()
+        editor.fill('改后又清空')
+        editor.fill('')
+        page.mouse.move(5, 5)
+        page.keyboard.press('Escape')
+        self.assertTrue(popup.is_hidden(), 'returning to the baseline is not dirty')
+        node.dblclick()
+        editor.fill('保留当前编辑')
+        page.locator('#timelineAllBtn').click()
+        self.assertTrue(popup.locator('[data-remark-confirm]').is_visible())
+        self.assertEqual(page.locator('[data-timeline-page="single"]').count(), 1)
+        popup.locator('[data-remark-continue]').click()
+        self.assertEqual(editor.input_value(), '保留当前编辑')
+        page.keyboard.press('Shift+Tab')
+        self.assertTrue(popup.locator('[data-remark-save]').evaluate('e=>e===document.activeElement'))
+        page.keyboard.press('Tab')
+        self.assertTrue(editor.evaluate('e=>e===document.activeElement'))
+        page.locator('#logoutBtn').click()
+        self.assertTrue(popup.locator('[data-remark-confirm]').is_visible())
+        self.assertTrue(page.locator('#loginModal').evaluate("e=>!e.classList.contains('open')"))
+        popup.locator('[data-remark-discard]').click()
+        page.locator('#logoutBtn').click()
+        page.locator('#loginModal.open').wait_for()
+        self.assertEqual(popup.count(), 0, 'logout must remove the body portal and its listeners')
+        self.assertTrue(page.evaluate("document.querySelector('#timelineBody').__timelineRemark===undefined"))
+        page.locator('#loginUser').fill('u1')
+        page.locator('#loginPassword').fill('test-password')
+        page.locator('#loginForm button[type="submit"]').click()
+        page.locator('[data-timeline-page="home"]').wait_for()
+        self.open_cp4_single(page, project_id)
+        self.zoom_single_until_node_visible(page)
+        self.assertEqual(popup.count(), 1)
+        node.dblclick()
+        self.assertEqual(editor.input_value(), '')
+        popup.locator('[data-remark-cancel]').click()
+        self.assert_clean_browser(page)
+        context.close()
 
     def test_timeline_all_dashboard_filter_and_sort(self):
         (project_id, _, _), _today = self.seed_cp4_dashboard_projects()
@@ -1503,7 +1734,11 @@ class TimelineProductionE2E(unittest.TestCase):
         ).first
         self.assertEqual(overlap_project.locator('.timeline-node-flag').count(), 0)
         unfocused_node.hover()
-        self.assertFalse(page.locator('[data-timeline-node-tooltip]').is_hidden(), "collapsed row must keep the existing node tooltip")
+        if unfocused_node.evaluate("e=>e.matches('.timeline-node-cluster')"):
+            self.assertFalse(page.locator('[data-timeline-node-tooltip]').is_hidden(), "a cluster retains its multi-node list tooltip")
+            self.assertTrue(page.locator('[data-dashboard-remark]').is_hidden(), "a cluster must not be treated as one editable node")
+        else:
+            self.assertFalse(page.locator('[data-dashboard-remark]').is_hidden(), "individual nodes show the shared remark preview")
 
         self.physical_click(page, overlap_project.locator('.timeline-portfolio-meta strong'))
         page.wait_for_timeout(220)
@@ -2060,7 +2295,7 @@ class TimelineProductionE2E(unittest.TestCase):
         payload = response.json()
         self.assertEqual(preview.get_attribute("data-timeline-preview-id"), str(payload["batch_id"]))
         self.assertIn("CP5 导入：2 个节点", preview.inner_text())
-        self.assertIn("状态将按日期重算，仅『已完成』保留", preview.inner_text())
+        self.assertNotIn("状态将按日期重算，仅『已完成』保留", preview.inner_text())
         self.assertTrue(page.locator("[data-timeline-import-commit]").is_enabled())
         committed = self.commit_timeline(page)
         self.assertEqual(committed.status, 201)
@@ -2107,6 +2342,64 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(self.timeline_content_hash(), stable)
         self.assert_clean_browser(page); context.close()
 
+    def test_timeline_sheet_selection_recovers_invalid_first_sheet(self):
+        context, page = self.login("u1")
+        self.open_timeline_home(page)
+        valid = make_xlsx(self.timeline_headers(), [["第二表项目", "创意", "main", "立项", "2026-08-01", "", "", ""]])
+        raw = self.two_sheet_xlsx(valid)
+        with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+            entries = {name: archive.read(name) for name in archive.namelist()}
+        with zipfile.ZipFile(io.BytesIO(make_xlsx(["使用说明"], [["请选数据表"]]))) as archive:
+            entries['xl/worksheets/sheet1.xml'] = archive.read('xl/worksheets/sheet1.xml')
+        output = io.BytesIO()
+        with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as archive:
+            for name, content in entries.items():
+                archive.writestr(name, content)
+        stable = self.timeline_content_hash()
+        self.upload_timeline(page, 'two-sheets.xlsx', output.getvalue(), 422, 'IMPORT_HEADERS_MISMATCH')
+        self.assertIn('-文件格式匹配失败×', page.locator('.timeline-transfer-file').inner_text())
+        selector = page.locator('[data-timeline-import-sheet]')
+        self.assertEqual(selector.locator('option').all_text_contents(), ['Tasks', 'Ignored'])
+        self.assertTrue(page.locator('[data-timeline-import-commit]').is_disabled())
+        with page.expect_response(lambda response: response.url.endswith('/timeline/imports/preview')) as pending:
+            selector.select_option('Ignored')
+        self.assertEqual(pending.value.status, 201)
+        page.locator('.timeline-import-preview').wait_for()
+        self.assertEqual(selector.input_value(), 'Ignored')
+        self.assertIn('第二表项目', page.locator('.timeline-project-summary').inner_text())
+        self.assertIn('-文件格式匹配成功√', page.locator('.timeline-transfer-file').inner_text())
+        artifacts = os.environ.get('FLOWBOARD_EXCEL_TEST_ARTIFACTS')
+        if artifacts:
+            page.screenshot(path=str(Path(artifacts) / 'sheet-file-success.png'))
+            page.set_viewport_size({"width": 390, "height": 844})
+            page.screenshot(path=str(Path(artifacts) / 'sheet-file-success-mobile.png'))
+            page.set_viewport_size({"width": 1280, "height": 800})
+        self.assertEqual(self.timeline_content_hash(), stable)
+        # Switching back to an invalid sheet must discard the valid commit target.
+        with page.expect_response(lambda response: response.url.endswith('/timeline/imports/preview')):
+            selector.select_option('Tasks')
+        page.locator('[data-timeline-import-error="IMPORT_HEADERS_MISMATCH"]').wait_for()
+        self.assertIn('-文件格式匹配失败×', page.locator('.timeline-transfer-file').inner_text())
+        if artifacts:
+            page.screenshot(path=str(Path(artifacts) / 'sheet-file-failure.png'))
+        self.assertEqual(page.locator('.timeline-import-preview').count(), 0)
+        self.assertTrue(page.locator('[data-timeline-import-commit]').is_disabled())
+        self.assertEqual(len(page.flowboard_console_errors), 1)
+        self.assertIn('422', page.flowboard_console_errors.pop())
+        with page.expect_response(lambda response: response.url.endswith('/timeline/imports/preview')):
+            selector.select_option('Ignored')
+        page.locator('.timeline-import-preview').wait_for()
+        self.assertEqual(self.commit_timeline(page).status, 201)
+        db = connect(self.db_path)
+        try:
+            self.assertEqual([row[0] for row in db.execute('SELECT name FROM timeline_projects')], ['第二表项目'])
+        finally:
+            db.close()
+        csv = (','.join(self.timeline_export_headers()) + '\nCSV新项目,创意,主线,立项,2026-08-01,,\n').encode()
+        self.upload_timeline(page, 'new.csv', csv, 201)
+        self.assertEqual(page.locator('[data-timeline-import-sheet]').count(), 0)
+        self.assert_clean_browser(page); context.close()
+
     def test_timeline_import_warnings_multisheet_and_csv_date(self):
         context, page = self.login("u1")
         self.open_timeline_home(page)
@@ -2114,8 +2407,8 @@ class TimelineProductionE2E(unittest.TestCase):
         self.upload_timeline(page, "multi.xlsx", self.two_sheet_xlsx(raw), 201)
         warnings = page.locator(".timeline-import-warnings")
         warnings.wait_for()
-        self.assertIn("仅导入第一个 sheet", warnings.inner_text())
-        self.assertIn("仅『已完成』保留", warnings.inner_text())
+        self.assertIn("仅导入所选工作表：Tasks", warnings.inner_text())
+        self.assertNotIn("仅『已完成』保留", warnings.inner_text())
         csv_raw = (",".join(self.timeline_headers()) + "\nCSV日期,创意,main,A,46234,,,\n").encode()
         self.upload_timeline(page, "dates.csv", csv_raw, 422, "VALIDATION_ERROR")
         error = page.locator(".timeline-import-error")
@@ -2132,7 +2425,7 @@ class TimelineProductionE2E(unittest.TestCase):
         page.on("request", lambda request: commits.append(request.url) if request.url.endswith("/timeline/imports/commit") else None)
         good = make_xlsx(self.timeline_headers(), [["状态项目", "创意", "main", "A", "2026-08-01", "", "已完成", ""]])
         self.upload_timeline(page, "status.xlsx", good, 201)
-        self.assertIn("仅『已完成』保留", page.locator(".timeline-import-warnings").inner_text())
+        self.assertNotIn("仅『已完成』保留", page.locator(".timeline-import-preview").inner_text())
         self.assertTrue(page.locator("[data-timeline-import-commit]").is_enabled())
         invalid = make_xlsx(self.timeline_headers(), [["坏状态", "创意", "main", "A", "2026-08-01", "", "暂停", ""]])
         self.upload_timeline(page, "bad-status.xlsx", invalid, 422, "VALIDATION_ERROR")
@@ -2192,6 +2485,161 @@ class TimelineProductionE2E(unittest.TestCase):
             self.assertEqual(db.execute("SELECT COUNT(*) FROM timeline_nodes WHERE project_id=?", (project["id"],)).fetchone()[0], 4)
         finally:
             db.close()
+        self.assert_clean_browser(page); context.close()
+
+    def test_timeline_import_drop_and_click_compatibility(self):
+        context, page = self.login("u1")
+        self.open_timeline_home(page)
+        self.physical_click(page, page.locator('[data-timeline-import-open]'))
+        zone = page.locator('.timeline-transfer-file')
+        stable = self.timeline_content_hash()
+        raw = make_xlsx(self.timeline_headers(), [["拖入项目", "创意", "main", "立项", "2026-08-01", "", "", ""]])
+        transfer = page.evaluate_handle("""bytes => {
+            const data = new DataTransfer();
+            data.items.add(new File([new Uint8Array(bytes)], 'dropped.xlsx'));
+            return data;
+        }""", list(raw))
+        zone.dispatch_event('dragenter', {"dataTransfer": transfer})
+        self.assertIn('is-drag-over', zone.get_attribute('class'))
+        zone.dispatch_event('dragleave', {"dataTransfer": transfer})
+        self.assertNotIn('is-drag-over', zone.get_attribute('class'))
+        # An outside drop is cancelled without navigation or an import request.
+        cancelled = page.locator('#timelineModal header').evaluate("""(node, data) => {
+            const event = new DragEvent('drop', {bubbles:true, cancelable:true, dataTransfer:data});
+            node.dispatchEvent(event); return event.defaultPrevented;
+        }""", transfer)
+        self.assertTrue(cancelled)
+        self.assertEqual(page.locator('.timeline-import-preview').count(), 0)
+        with page.expect_response(lambda response: response.url.endswith('/timeline/imports/preview')) as pending:
+            zone.dispatch_event('drop', {"dataTransfer": transfer})
+        self.assertEqual(pending.value.status, 201)
+        page.locator('.timeline-import-preview').wait_for()
+        self.assertTrue(page.locator('[data-timeline-import-commit]').is_enabled())
+        self.assertEqual(self.timeline_content_hash(), stable)
+        # Multiple files must never silently import only the first one.
+        page.evaluate("data => data.items.add(new File(['x'], 'second.csv'))", transfer)
+        zone.dispatch_event('drop', {"dataTransfer": transfer})
+        page.locator('[data-timeline-import-error="IMPORT_SINGLE_FILE"]').wait_for()
+        self.assertTrue(page.locator('[data-timeline-import-commit]').is_disabled())
+        # Click still opens the native picker and can recover from a rejected drop.
+        with page.expect_file_chooser() as chooser:
+            self.physical_click(page, zone)
+        with page.expect_response(lambda response: response.url.endswith('/timeline/imports/preview')):
+            chooser.value.set_files({"name": "clicked.xlsx", "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "buffer": raw})
+        page.locator('.timeline-import-preview').wait_for()
+        self.assertIn('clicked.xlsx', page.locator('[data-timeline-import-filename]').inner_text())
+        csv = ','.join(self.timeline_export_headers()) + '\nCSV拖入,创意,主线,立项,2026-08-01,,\n'
+        csv_transfer = page.evaluate_handle("""text => {const data=new DataTransfer();data.items.add(new File([text],'dropped.csv',{type:'text/csv'}));return data;}""", csv)
+        with page.expect_response(lambda response: response.url.endswith('/timeline/imports/preview')) as pending:
+            zone.dispatch_event('drop', {"dataTransfer": csv_transfer})
+        self.assertEqual(pending.value.status, 201)
+        page.locator('.timeline-import-preview').wait_for()
+        self.assertIn('CSV拖入', page.locator('.timeline-project-summary').inner_text())
+        self.assertEqual(self.timeline_content_hash(), stable)
+        self.assertEqual(self.commit_timeline(page).status, 201)
+        transfer.dispose(); csv_transfer.dispose()
+        self.assert_clean_browser(page); context.close()
+
+    def test_timeline_template_download_fill_two_projects_and_import(self):
+        context, page = self.login("u1")
+        self.open_timeline_home(page)
+        self.physical_click(page, page.locator('[data-timeline-import-open]'))
+        button = page.locator('[data-timeline-template]')
+        button.wait_for()
+        self.assertEqual(page.locator('#timelineModal header small').count(), 0)
+        self.assertFalse(page.locator('[data-timeline-import-file]').evaluate('(input) => input.multiple'))
+        artifacts = os.environ.get("FLOWBOARD_EXCEL_TEST_ARTIFACTS")
+        if artifacts:
+            artifact_dir = Path(artifacts)
+            artifact_dir.mkdir(parents=True, exist_ok=True)
+            page.screenshot(path=str(artifact_dir / "import-dialog-desktop.png"))
+            page.set_viewport_size({"width": 390, "height": 844})
+            self.assertLessEqual(page.locator('.timeline-transfer-dialog').bounding_box()["width"], 390)
+            page.screenshot(path=str(artifact_dir / "import-dialog-mobile.png"))
+            page.set_viewport_size({"width": 1280, "height": 800})
+        with page.expect_download() as pending:
+            self.physical_click(page, button)
+        download = pending.value
+        downloaded = Path(self.temp.name) / "downloaded-template.xlsx"
+        download.save_as(downloaded)
+        self.assertEqual(download.suggested_filename, "Flowboard-项目时间表填写模板.xlsx")
+        if artifacts:
+            download.save_as(artifact_dir / "downloaded-template.xlsx")
+        samples = parse_upload(downloaded.name, downloaded.read_bytes())["rows"]
+        self.assertEqual((len(samples), len({row[0] for row in samples})), (15, 3))
+        self.upload_timeline(page, downloaded.name, downloaded.read_bytes(), 201)
+        self.assertIn("15 行 · 3 个项目", page.locator('.timeline-import-preview strong').inner_text())
+        self.assertFalse(page.locator('#timelineModal').evaluate('(modal) => modal.hidden'))
+        # Fill the actual downloaded file while preserving native dates/styles.
+        with zipfile.ZipFile(downloaded) as archive:
+            entries = {name: archive.read(name) for name in archive.namelist()}
+        ns = {"s": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
+        uri = "{" + ns["s"] + "}"
+        sheet = ET.fromstring(entries["xl/worksheets/sheet1.xml"])
+        # Follow the guide: clear all sample contents but retain cell formatting.
+        for row in sheet.findall('s:sheetData/s:row', ns)[1:]:
+            for cell in row:
+                for child in list(cell):
+                    cell.remove(child)
+                cell.attrib.pop('t', None)
+        values = [
+            ["模板项目甲", "创意", "主线", "立项", "46235", "已完成", "模板往返备注"],
+            ["模板项目甲", "设计", "并行", "材料验证", "46236", "", ""],
+            ["模板项目乙", "开发", "主线", "样品", "46237", "", ""],
+        ]
+        for number, row in enumerate(values, 2):
+            for column, value in zip("ABCDEFG", row):
+                cell = sheet.find(f'.//s:c[@r="{column}{number}"]', ns)
+                if column == "E":
+                    ET.SubElement(cell, uri + "v").text = value
+                else:
+                    cell.set("t", "inlineStr")
+                    ET.SubElement(ET.SubElement(cell, uri + "is"), uri + "t").text = value
+        entries["xl/worksheets/sheet1.xml"] = ET.tostring(sheet, encoding="utf-8", xml_declaration=True)
+        filled = Path(self.temp.name) / "filled-template.xlsx"
+        with zipfile.ZipFile(filled, "w", zipfile.ZIP_DEFLATED) as archive:
+            for name, content in entries.items():
+                archive.writestr(name, content)
+        self.upload_timeline(page, filled.name, filled.read_bytes(), 201)
+        self.assertIn("3 行 · 2 个项目", page.locator('.timeline-import-preview strong').inner_text())
+        self.assertIn("模板项目甲：2 个节点", page.locator('.timeline-project-summary').inner_text())
+        if artifacts:
+            page.screenshot(path=str(artifact_dir / "two-project-preview.png"))
+            (artifact_dir / "filled-template.xlsx").write_bytes(filled.read_bytes())
+        response = self.commit_timeline(page)
+        self.assertEqual(response.status, 201)
+        self.assertEqual((response.json()["projects"], response.json()["nodes"]), (2, 3))
+        db = connect(self.db_path)
+        try:
+            rows = db.execute("SELECT p.name project,n.name,n.date,n.done_at,n.remark FROM timeline_nodes n JOIN timeline_projects p ON p.id=n.project_id ORDER BY n.id").fetchall()
+            self.assertEqual([(row["project"], row["name"], row["date"]) for row in rows], [
+                ("模板项目甲", "立项", "2026-08-01"), ("模板项目甲", "材料验证", "2026-08-02"), ("模板项目乙", "样品", "2026-08-03")])
+            self.assertTrue(rows[0]["done_at"])
+            self.assertEqual(rows[0]["remark"], "模板往返备注")
+        finally:
+            db.close()
+        self.assert_clean_browser(page); context.close()
+
+    def test_timeline_template_hash_failure_preserves_import_preview(self):
+        context, page = self.login("u1")
+        self.open_timeline_home(page)
+        raw = make_xlsx(self.timeline_headers(), [["待导入", "创意", "main", "立项", "2026-08-01", "", "", ""]])
+        self.upload_timeline(page, "source.xlsx", raw, 201)
+        batch = page.locator('.timeline-import-preview').get_attribute('data-timeline-preview-id')
+        def tamper(route):
+            response = route.fetch()
+            payload = response.json()
+            payload["sha256"] = "0" * 64
+            route.fulfill(response=response, json=payload)
+        page.route('**/timeline/template', tamper)
+        downloads = []
+        page.on('download', lambda download: downloads.append(download))
+        self.physical_click(page, page.locator('[data-timeline-template]'))
+        page.locator('.timeline-transfer-template-error').wait_for()
+        self.assertIn("校验失败", page.locator('.timeline-transfer-template-error').inner_text())
+        self.assertEqual(downloads, [])
+        self.assertEqual(page.locator('.timeline-import-preview').get_attribute('data-timeline-preview-id'), batch)
+        self.assertTrue(page.locator('[data-timeline-import-commit]').is_enabled())
         self.assert_clean_browser(page); context.close()
 
     def test_timeline_import_file_safety_and_strict_headers(self):

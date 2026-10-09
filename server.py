@@ -14,6 +14,7 @@ from urllib.parse import parse_qs, quote, urlparse
 from flowboard.database import SCHEMA_VERSION, migrate
 from flowboard.service import ApiError, FlowboardService, reject_unknown, require_object, require_text
 from flowboard.timeline import TimelineService
+from flowboard.overview import project_overview
 
 
 ROOT = Path(__file__).resolve().parent
@@ -21,7 +22,7 @@ HOST = os.getenv("FLOWBOARD_HOST", "0.0.0.0")
 PORT = int(os.getenv("FLOWBOARD_PORT", "8080"))
 DB = os.getenv("FLOWBOARD_DB", str(ROOT / "flowboard.db"))
 SESSION_COOKIE = "flowboard_session"
-PUBLIC_PATHS = {"/", "/index.html", "/styles.css", "/auth.css", "/lifecycle.css", "/dashboard.css", "/dashboard-mobile.css", "/timeline.css", "/i12.css", "/i13.css", "/view-state.js", "/view-ui.js", "/schedule-ui.js", "/dashboard-ui.js", "/timeline-ui.js", "/i12-ui.js", "/app.js"}
+PUBLIC_PATHS = {"/", "/index.html", "/styles.css", "/auth.css", "/lifecycle.css", "/dashboard.css", "/dashboard-mobile.css", "/timeline.css", "/overview.css", "/overview-ui.js", "/i12.css", "/i13.css", "/view-state.js", "/view-ui.js", "/schedule-ui.js", "/dashboard-ui.js", "/timeline-ui.js", "/i12-ui.js", "/app.js"}
 
 
 class PresenceRegistry:
@@ -188,6 +189,11 @@ class Handler(SimpleHTTPRequestHandler):
                 raw_tag=query.get("tag_id",[None])[0]
                 return 200,self.timeline.get_personal_order(user,int(parts[2]),context_type,int(raw_tag) if raw_tag is not None else None),None
             if method=="PUT":return 200,self.timeline.put_personal_order(user,int(parts[2]),data),None
+        if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","member-order"]:
+            if method=="GET":return 200,self.timeline.get_member_order(user,int(parts[2])),None
+            if method=="PUT":return 200,self.timeline.put_member_order(user,int(parts[2]),data),None
+        if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","overview"] and method=="GET":
+            return 200,project_overview(self.timeline,user,int(parts[2]),parse_qs(parsed.query,keep_blank_values=True)),None
         if len(parts)==4 and parts[:2]==["api","workspaces"] and parts[3]=="timeline" and method=="GET":
             return 200,self.timeline.list_projects(user,int(parts[2]),query.get("archive_state",["active"])[0]),None
         if len(parts)==4 and parts[:3]==["api","timeline","projects"] and method=="GET":
@@ -210,17 +216,23 @@ class Handler(SimpleHTTPRequestHandler):
         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","review"] and method=="GET":
             selected=[int(value) for value in query.get("project_ids",[[]])[0].split(",") if value] if "project_ids" in query else []
             return 200,self.timeline.review(user,int(parts[2]),selected),None
-        if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","imports","preview"] and method=="POST":
+        if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:5]==["timeline","imports"] and parts[5] in ("preview","sheets") and method=="POST":
             filename=require_text(data,"filename",max_length=255);content=require_text(data,"content_base64",max_length=3_000_000)
             try:raw=base64.b64decode(content,validate=True)
             except Exception:raise ApiError(422,"IMPORT_FILE_INVALID","文件内容不是有效 base64")
-            return 201,self.timeline.preview_import(user,int(parts[2]),filename,raw),None
+            if parts[5]=="sheets":return 200,self.timeline.import_sheets(user,int(parts[2]),filename,raw),None
+            sheet_name=require_text(data,"sheet_name",max_length=255) if "sheet_name" in data else None
+            return 201,self.timeline.preview_import(user,int(parts[2]),filename,raw,sheet_name),None
         if len(parts)==6 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","imports","commit"] and method=="POST":
             return 201,self.timeline.commit_import(user,int(parts[2]),data),None
         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","export"] and method=="POST":
             reject_unknown(data, set())
             raw=self.timeline.export_timeline(user,int(parts[2]))
             return 200,{"filename":"timeline.xlsx","content_type":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","content_base64":base64.b64encode(raw).decode("ascii"),"sha256":hashlib.sha256(raw).hexdigest()},None
+        if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","template"] and method=="POST":
+            reject_unknown(data, set())
+            raw=self.timeline.timeline_template(user,int(parts[2]))
+            return 200,{"filename":"Flowboard-项目时间表填写模板.xlsx","content_type":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","content_base64":base64.b64encode(raw).decode("ascii"),"sha256":hashlib.sha256(raw).hexdigest()},None
         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["timeline","projects"] and method=="POST":
             return 201,self.timeline.create_project(user,int(parts[2]),data),None
         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["events","poll"] and method=="GET":

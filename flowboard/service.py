@@ -550,8 +550,8 @@ class FlowboardService:
             boards = self.list_boards(user, workspace_id, "active")
             if board_id is None:
                 board_id = boards[0]["id"] if boards else None
-            members = [self._public_user(row) for row in conn.execute(
-                """SELECT u.* FROM users u JOIN workspace_memberships wm ON wm.user_id=u.id
+            members = [{**self._public_user(row), "role": row["workspace_role"]} for row in conn.execute(
+                """SELECT u.*,wm.role workspace_role FROM users u JOIN workspace_memberships wm ON wm.user_id=u.id
                    WHERE wm.workspace_id=? AND u.is_active=1 ORDER BY u.name""", (workspace_id,)
             )]
             if board_id is None:

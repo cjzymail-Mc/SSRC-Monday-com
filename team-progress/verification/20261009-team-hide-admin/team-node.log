@@ -1,0 +1,10 @@
+✔ only team cards hide every admin while my projects and timeline keep their projects (28.7208ms)
+✔ visible member reorder preserves hidden admin positions and full roster (0.9678ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 50.1365

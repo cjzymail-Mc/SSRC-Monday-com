@@ -1,0 +1,11 @@
+✔ week: cross-period bars keep past masks when only future nodes are visible (4.9825ms)
+✔ month: cross-period bars keep past masks when only future nodes are visible (1.3921ms)
+✔ future-only project remains unmasked in both period views (11.8847ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 25.4356

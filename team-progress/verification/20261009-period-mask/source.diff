@@ -1,0 +1,22 @@
+--- team-progress\verification\20261009-period-mask\baseline\timeline-ui.js
++++ timeline-ui.js
+@@ -194,7 +194,8 @@
+     const project=state?.project?.project_id===source.project_id?state.project:source;
+     const range=start&&end?{start,end,today}:dashboardRange([project],today),intervals=project.stage_intervals||[],nodes=project.nodes||[],nodesById=new Map(nodes.map(node=>[Number(node.id),node]));
+     const inRange=date=>!clipRange||(date>=range.start&&date<range.end),visibleNodes=nodes.filter(node=>inRange(node.date));
+-    const nodeDates=visibleNodes.map(node=>node.date).filter(Boolean).sort(),hasPast=nodeDates.length&&nodeDates[0]<=range.today,pastMask=hasPast?`<i class="timeline-past-mask" aria-hidden="true" style="width:${position(range.today,range.start,range.end)}%"></i>`:'';
++    // Clipped period nodes can all be future while a stage began before the period.
++    const hasPast=nodes.some(node=>node.date&&node.date<=range.today),pastMask=hasPast?`<i class="timeline-past-mask" aria-hidden="true" style="width:${position(range.today,range.start,range.end)}%"></i>`:'';
+     const originalById=new Map((state?.original?.nodes||[]).map(node=>[Number(node.id),node]));
+     const lanes=['main','parallel'].map(track=>{
+       const trackIntervals=intervals.filter(item=>item.track===track),maxRow=Math.max(0,...trackIntervals.map(item=>Number(item.row_index)||0)),key=`${project.project_id}:${track}`,open=expanded.has(key);
+--- team-progress\verification\20261009-period-mask\baseline\index.html
++++ index.html
+@@ -41,6 +41,6 @@
+   <div class="modal-backdrop" id="taskModal"><div class="task-modal"><button class="modal-close" data-close="taskModal">×</button><div id="modalBody"></div></div></div>
+   <div class="modal-backdrop" id="listModal"><div class="task-modal list-modal"><button class="modal-close" data-close="listModal">×</button><div id="listModalBody"></div></div></div>
+   <div class="modal-backdrop login-backdrop" id="loginModal"><form class="login-card" id="loginForm"><div class="brand login-brand"><span class="brand-mark">F</span><span>flowboard</span></div><h2>登录工作空间</h2><p>使用管理员提供的账号登录。</p><label>用户名<input id="loginUser" name="username" autocomplete="username" required /></label><label>密码<input id="loginPassword" name="password" type="password" autocomplete="current-password" required /></label><div class="login-error" id="loginError"></div><button class="primary-btn" type="submit">登录</button></form></div>
+-  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js?v=20261009-f02-team-cards"></script><script src="overview-ui.js?v=20261009-f02-team-cards"></script><script src="i12-ui.js"></script><script src="app.js?v=20261009-f02-team-cards"></script>
++  <script src="view-state.js"></script><script src="view-ui.js"></script><script src="schedule-ui.js"></script><script src="dashboard-ui.js"></script><script src="timeline-ui.js?v=20261009-period-mask"></script><script src="overview-ui.js?v=20261009-f02-team-cards"></script><script src="i12-ui.js"></script><script src="app.js?v=20261009-f02-team-cards"></script>
+ </body>
+ </html>

@@ -6,12 +6,11 @@ from datetime import datetime, timedelta, timezone
 
 from .database import connect, transaction, utc_now
 from .service import ApiError, reject_unknown, require_int, require_text, validate_choice
-from .transfer import MAX_ROWS, XlsxNumericCell, make_xlsx, parse_upload
+from .transfer import MAX_ROWS, XlsxNumericCell, parse_upload
+from .timeline_excel import HEADERS as IMPORT_HEADERS, STAGES, make_timeline_xlsx, make_timeline_template
 
 
 TRACKS = ("main", "parallel")
-STAGES = ("创意", "设计", "开发", "测试", "量产", "应用迭代")
-IMPORT_HEADERS = ["项目名称", "阶段", "主线/并行", "节点", "日期", "状态", "备注"]
 INTERVAL_IMPORT_HEADERS = ["项目名称", "阶段", "主线/并行", "节点", "日期", "间隔", "状态", "备注"]
 LEGACY_IMPORT_HEADERS = ["项目名称", "阶段", "轨道", "节点", "日期", "间隔", "状态", "备注"]
 LEGACY_NO_INTERVAL_IMPORT_HEADERS = ["项目名称", "阶段", "轨道", "节点", "日期", "状态", "备注"]
@@ -98,9 +97,9 @@ class TimelineService:
     def _date(value):
         return datetime.strptime(value, "%Y-%m-%d").date()
 
-    def _view(self, conn, project, *, user_id=None, role=None):
-        nodes = self._nodes(conn, project["id"])
-        today = self._server_today()
+    def _view(self, conn, project, *, user_id=None, role=None, nodes=None, today=None):
+        nodes = self._nodes(conn, project["id"]) if nodes is None else nodes
+        today = self._server_today() if today is None else today
         payloads = []
         intervals = {}
         segments = []
@@ -707,9 +706,7 @@ class TimelineService:
         conn = self._db()
         try:
             with transaction(conn):
-                project = self._project_access(conn, user["id"], project_id, workspace_id=workspace_id, write=True, require_active=True)
-                if project["role"] != "admin":
-                    raise ApiError(403, "ADMIN_REQUIRED", "仅管理员可删除项目")
+                project = self._project_access(conn, user["id"], project_id, workspace_id=workspace_id, write=True, require_active=True, allow_archived=True)
                 if project["version"] != version:
                     raise ApiError(409, "VERSION_CONFLICT", "项目版本冲突", {"server_version": project["version"]})
                 stamp = utc_now()
@@ -720,7 +717,10 @@ class TimelineService:
                 )
                 if cursor.rowcount != 1:
                     raise ApiError(409, "VERSION_CONFLICT", "项目版本冲突", {"server_version": project["version"]})
-                self._audit(conn, workspace_id, user["id"], project_id, "timeline.project_deleted", "timeline_project")
+                self._audit(
+                    conn, workspace_id, user["id"], project_id, "timeline.project_deleted", "timeline_project",
+                    {"version_before": version, "version_after": version + 1, "archived_at": project["archived_at"], "deleted_at": deleted_at},
+                )
                 return {"project_id": project_id, "version": version + 1, "deleted_at": deleted_at}
         finally:
             conn.close()
@@ -1114,16 +1114,38 @@ class TimelineService:
             conn.close()
 
     def export_timeline(self, user, workspace_id):
-        return make_xlsx(IMPORT_HEADERS, self._timeline_rows(user, workspace_id), sheet="Timeline")
+        return make_timeline_xlsx(self._timeline_rows(user, workspace_id))
 
-    def preview_import(self, user, workspace_id, filename, raw):
+    def timeline_template(self, user, workspace_id):
+        conn = self._db()
         try:
-            parsed = parse_upload(filename, raw)
+            self._workspace_access(conn, user["id"], workspace_id)
+            return make_timeline_template()
+        finally:
+            conn.close()
+
+    def import_sheets(self, user, workspace_id, filename, raw):
+        conn = self._db()
+        try:
+            self._workspace_access(conn, user["id"], workspace_id)
+        finally:
+            conn.close()
+        try:
+            parsed = parse_upload(filename, raw, metadata_only=True)
+            return {"format": parsed["format"], "sheet": parsed["sheet"], "sheets": parsed.get("sheets", [])}
+        except Exception as error:
+            raise ApiError(422, getattr(error, "code", "IMPORT_INVALID"), str(error), getattr(error, "details", None))
+
+    def preview_import(self, user, workspace_id, filename, raw, sheet_name=None):
+        try:
+            parsed = parse_upload(filename, raw, sheet_name)
         except Exception as error:
             raise ApiError(422, getattr(error, "code", "IMPORT_INVALID"), str(error), getattr(error, "details", None))
         supported_headers = (IMPORT_HEADERS, INTERVAL_IMPORT_HEADERS, LEGACY_IMPORT_HEADERS, LEGACY_NO_INTERVAL_IMPORT_HEADERS)
         if parsed["headers"] not in supported_headers:
             raise ApiError(422, "IMPORT_HEADERS_MISMATCH", f"Excel 表头不匹配，标准表头：{'｜'.join(IMPORT_HEADERS)}", {"headers": IMPORT_HEADERS})
+        if not parsed["rows"]:
+            raise ApiError(422, "IMPORT_EMPTY", "没有可导入的节点，请先在 Timeline 表填写项目数据")
         conn = self._db()
         try:
             with transaction(conn):
@@ -1153,9 +1175,9 @@ class TimelineService:
                 ).lastrowid
                 warnings = ["状态将按日期重算，仅『已完成』保留"]
                 if parsed["format"] == "xlsx" and len(parsed.get("sheets", [])) > 1:
-                    warnings.append("仅导入第一个 sheet")
+                    warnings.append(f"仅导入所选工作表：{parsed['sheet']}")
                 return {
-                    "batch_id": batch_id, "format": parsed["format"], "row_count": len(clean),
+                    "batch_id": batch_id, "format": parsed["format"], "row_count": len(clean), "sheet": parsed["sheet"],
                     "projects": [{"name": name, "node_count": len(group)} for name, group in self._group_import_rows(clean).items()],
                     "warnings": warnings,
                 }
@@ -1617,5 +1639,72 @@ class TimelineService:
                     )
                 self._audit(conn, workspace_id, user["id"], context_id, "timeline.personal_order_changed", "timeline_order_context", {"context_type": context_type, "tag_id": tag_id, "version": next_version, "project_count": len(project_ids)})
                 return {"context_type": context_type, "tag_id": tag_id, "order_version": next_version, "project_ids": project_ids}
+        finally:
+            conn.close()
+
+    @staticmethod
+    def _member_order_view(conn, user_id, workspace_id):
+        members = [row["id"] for row in conn.execute(
+            """SELECT u.id FROM users u
+               JOIN workspace_memberships wm ON wm.user_id=u.id
+               WHERE wm.workspace_id=? AND u.is_active=1 ORDER BY u.name,u.id""",
+            (workspace_id,),
+        )]
+        row = conn.execute(
+            "SELECT version,member_ids_json FROM timeline_member_orders WHERE workspace_id=? AND user_id=?",
+            (workspace_id, user_id),
+        ).fetchone()
+        stored = json.loads(row["member_ids_json"]) if row else []
+        current = set(members)
+        ordered = [member_id for member_id in stored if member_id in current]
+        seen = set(ordered)
+        ordered.extend(member_id for member_id in members if member_id not in seen)
+        return {"order_version": row["version"] if row else 0, "member_ids": ordered}
+
+    def get_member_order(self, user, workspace_id):
+        conn = self._db()
+        try:
+            self._workspace_access(conn, user["id"], workspace_id)
+            return self._member_order_view(conn, user["id"], workspace_id)
+        finally:
+            conn.close()
+
+    def put_member_order(self, user, workspace_id, data):
+        reject_unknown(data, {"base_order_version", "member_ids"})
+        if "base_order_version" not in data:
+            raise ApiError(428, "VERSION_REQUIRED", "base_order_version is required")
+        base_version = require_int(data["base_order_version"], "base_order_version", minimum=0)
+        member_ids = data.get("member_ids")
+        if not isinstance(member_ids, list) or any(not isinstance(value, str) or not value for value in member_ids):
+            raise ApiError(422, "VALIDATION_ERROR", "member_ids must be nonempty user ids")
+        if len(member_ids) != len(set(member_ids)):
+            raise ApiError(422, "VALIDATION_ERROR", "member_ids must not contain duplicates")
+        conn = self._db()
+        try:
+            with transaction(conn):
+                self._workspace_access(conn, user["id"], workspace_id)
+                latest = self._member_order_view(conn, user["id"], workspace_id)
+                if latest["order_version"] != base_version:
+                    raise ApiError(409, "ORDER_VERSION_CONFLICT", "成员卡片排序版本冲突", {"order": latest})
+                if len(member_ids) != len(latest["member_ids"]) or set(member_ids) != set(latest["member_ids"]):
+                    raise ApiError(409, "ORDER_SCOPE_CHANGED", "成员集合已变化", {"order": latest})
+                stamp = utc_now()
+                encoded = json.dumps(member_ids, ensure_ascii=False, separators=(",", ":"))
+                if base_version:
+                    updated = conn.execute(
+                        """UPDATE timeline_member_orders SET member_ids_json=?,version=version+1,updated_at=?
+                           WHERE workspace_id=? AND user_id=? AND version=?""",
+                        (encoded, stamp, workspace_id, user["id"], base_version),
+                    )
+                    if updated.rowcount != 1:
+                        raise ApiError(409, "ORDER_VERSION_CONFLICT", "成员卡片排序版本冲突", {"order": self._member_order_view(conn, user["id"], workspace_id)})
+                else:
+                    conn.execute(
+                        """INSERT INTO timeline_member_orders(workspace_id,user_id,version,member_ids_json,created_at,updated_at)
+                           VALUES (?,?,1,?,?,?)""",
+                        (workspace_id, user["id"], encoded, stamp, stamp),
+                    )
+                self._audit(conn, workspace_id, user["id"], workspace_id, "timeline.member_order_changed", "timeline_member_order", {"version": base_version + 1, "member_count": len(member_ids)})
+                return {"order_version": base_version + 1, "member_ids": member_ids}
         finally:
             conn.close()

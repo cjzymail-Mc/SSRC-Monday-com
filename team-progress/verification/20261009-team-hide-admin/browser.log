@@ -1,0 +1,86 @@
+test_admin_team_card_hidden_but_my_projects_and_timeline_unchanged (test_team_cards_e2e.TeamCardsE2E.test_admin_team_card_hidden_but_my_projects_and_timeline_unchanged) ... FAIL
+test_visible_drag_saves_full_roster_and_restores_order_after_reload (test_team_cards_e2e.TeamCardsE2E.test_visible_drag_saves_full_roster_and_restores_order_after_reload) ... ok
+
+======================================================================
+FAIL: test_admin_team_card_hidden_but_my_projects_and_timeline_unchanged (test_team_cards_e2e.TeamCardsE2E.test_admin_team_card_hidden_but_my_projects_and_timeline_unchanged)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_team_cards_e2e.py", line 29, in test_admin_team_card_hidden_but_my_projects_and_timeline_unchanged
+    self.assertEqual(page.locator('[data-order-project]').count(),6)
+AssertionError: 4 != 6
+
+----------------------------------------------------------------------
+Ran 2 tests in 42.354s
+
+FAILED (failures=1)
+[09/Oct/2026 14:41:11] "GET / HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /styles.css?v=20260831-a HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /auth.css HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /lifecycle.css HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /dashboard.css HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /dashboard-mobile.css HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /i12.css HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /i13.css HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /timeline.css?v=20261008-week-flags HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /overview.css?v=20261009-f02-team-cards HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /view-state.js HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /view-ui.js HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /schedule-ui.js HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /dashboard-ui.js HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /timeline-ui.js?v=20261009-f02-team-cards HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /overview-ui.js?v=20261009-f02-team-cards HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /i12-ui.js HTTP/1.1" 200 -
+[09/Oct/2026 14:41:11] "GET /app.js?v=20261009-f02-team-cards HTTP/1.1" 200 -
+[09/Oct/2026 14:41:34] "GET /api/session HTTP/1.1" 401 -
+[09/Oct/2026 14:41:40] "POST /api/auth/login HTTP/1.1" 200 -
+[09/Oct/2026 14:41:40] "GET /api/bootstrap HTTP/1.1" 200 -
+[09/Oct/2026 14:41:40] "POST /api/boards/1/query HTTP/1.1" 200 -
+[09/Oct/2026 14:41:40] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[09/Oct/2026 14:41:40] "GET /api/workspaces/1/events/stream?cursor=0 HTTP/1.1" 200 -
+[09/Oct/2026 14:41:40] "GET /api/workspaces/1/timeline/tags HTTP/1.1" 200 -
+[09/Oct/2026 14:41:40] "GET /api/workspaces/1/timeline/member-order HTTP/1.1" 200 -
+[09/Oct/2026 14:41:40] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[09/Oct/2026 14:41:40] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[09/Oct/2026 14:41:40] "GET /api/workspaces/1/timeline/review HTTP/1.1" 200 -
+[09/Oct/2026 14:41:40] "GET /api/workspaces/1/timeline/order?context_type=all HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET / HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /styles.css?v=20260831-a HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /auth.css HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /lifecycle.css HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /dashboard.css HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /dashboard-mobile.css HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /i12.css HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /i13.css HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /timeline.css?v=20261008-week-flags HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /overview.css?v=20261009-f02-team-cards HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /view-state.js HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /view-ui.js HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /schedule-ui.js HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /dashboard-ui.js HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /timeline-ui.js?v=20261009-f02-team-cards HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /overview-ui.js?v=20261009-f02-team-cards HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /i12-ui.js HTTP/1.1" 200 -
+[09/Oct/2026 14:41:41] "GET /app.js?v=20261009-f02-team-cards HTTP/1.1" 200 -
+[09/Oct/2026 14:41:50] "GET /api/session HTTP/1.1" 401 -
+[09/Oct/2026 14:41:51] "POST /api/auth/login HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/bootstrap HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "POST /api/boards/1/query HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/workspaces/1/events/stream?cursor=0 HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/workspaces/1/timeline/tags HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/workspaces/1/timeline/member-order HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/workspaces/1/timeline/review HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "PUT /api/workspaces/1/timeline/member-order HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET / HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/session HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/bootstrap HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "POST /api/boards/1/query HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/workspaces/1/events/stream?cursor=0 HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/workspaces/1/timeline/tags HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/workspaces/1/timeline/member-order HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[09/Oct/2026 14:41:51] "GET /api/workspaces/1/timeline/review HTTP/1.1" 200 -

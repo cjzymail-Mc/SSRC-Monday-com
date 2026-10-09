@@ -81,8 +81,8 @@ class TimelineArchiveServiceTests(unittest.TestCase):
             self.service.set_tag_project(self.creator, 1, tag["tag_id"], first["project_id"], {"base_tag_version": 2}, included=False)
         self.assertEqual(tag_denied.exception.code, "PROJECT_ARCHIVED")
         with self.assertRaises(ApiError) as delete_denied:
-            self.service.delete_project(self.admin, 1, first["project_id"], {"base_version": archived["version"]})
-        self.assertEqual(delete_denied.exception.code, "PROJECT_ARCHIVED")
+            self.service.delete_project(self.other, 1, first["project_id"], {"base_version": archived["version"]})
+        self.assertEqual(delete_denied.exception.code, "PROJECT_FORBIDDEN")
 
         restored = self.service.unarchive_project(self.creator, 1, first["project_id"], {"base_version": archived["version"]})
         self.assertFalse(restored["read_only"])
