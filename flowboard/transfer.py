@@ -65,7 +65,7 @@ def _xlsx_cell(cell,shared):
     if kind=="b":return "true" if raw=="1" else "false"
     return XlsxNumericCell(raw) if kind in (None,"n") and raw != "" else raw
 
-def parse_xlsx(raw,sheet_name=None):
+def parse_xlsx(raw,sheet_name=None,*,metadata_only=False):
     try:z=zipfile.ZipFile(io.BytesIO(raw))
     except (zipfile.BadZipFile,OSError):raise TransferError("IMPORT_XLSX_INVALID","Excel 文件无效")
     with z:
@@ -80,11 +80,12 @@ def parse_xlsx(raw,sheet_name=None):
         sheets=[]
         for node in workbook.findall(".//"+NS+"sheet"):
             rid=node.get("{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id");target=targets.get(rid,"")
-            path="xl/"+target.lstrip("/").replace("../","")
+            path=target.lstrip("/") if target.startswith("/") else "xl/"+target.replace("../","")
             sheets.append((node.get("name"),path))
         if not sheets:raise TransferError("IMPORT_XLSX_INVALID","Excel 不包含工作表")
         selected=next((item for item in sheets if item[0]==sheet_name),None) if sheet_name else sheets[0]
         if not selected:raise TransferError("IMPORT_SHEET_NOT_FOUND","指定工作表不存在")
+        if metadata_only:return {"format":"xlsx","sheet":selected[0],"sheets":[item[0] for item in sheets]}
         shared=[]
         if "xl/sharedStrings.xml" in names:
             try:root=ET.fromstring(z.read("xl/sharedStrings.xml"));shared=["".join(n.text or "" for n in item.findall(".//"+NS+"t")) for item in root.findall(NS+"si")]
@@ -107,12 +108,12 @@ def parse_xlsx(raw,sheet_name=None):
         headers,data=_check_table(rows)
         return {"format":"xlsx","encoding":"OOXML","sheet":selected[0],"sheets":[item[0] for item in sheets],"headers":headers,"rows":data}
 
-def parse_upload(filename,raw,sheet_name=None):
+def parse_upload(filename,raw,sheet_name=None,*,metadata_only=False):
     if not raw:raise TransferError("IMPORT_EMPTY","文件为空")
     if len(raw)>MAX_FILE_BYTES:raise TransferError("IMPORT_FILE_TOO_LARGE","文件大小超过限制",{"max_bytes":MAX_FILE_BYTES})
     lower=filename.lower()
     if lower.endswith(".csv"):return parse_csv(raw)
-    if lower.endswith(".xlsx"):return parse_xlsx(raw,sheet_name)
+    if lower.endswith(".xlsx"):return parse_xlsx(raw,sheet_name,metadata_only=metadata_only)
     raise TransferError("IMPORT_FORMAT_UNSUPPORTED","仅支持 .csv 和 .xlsx")
 
 def infer_columns(headers,rows):

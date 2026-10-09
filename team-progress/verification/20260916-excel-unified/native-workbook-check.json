@@ -1,0 +1,47 @@
+[
+  {
+    "file": "standard-template.xlsx",
+    "sheets": [
+      "Timeline",
+      "填写说明"
+    ],
+    "freeze": "A2",
+    "filter": "A1:G301",
+    "validations": 7,
+    "E2_type": "n",
+    "E2_value": "None",
+    "E2_format": "yyyy-mm-dd",
+    "native_date": true,
+    "node_count": 0
+  },
+  {
+    "file": "styled-export.xlsx",
+    "sheets": [
+      "Timeline",
+      "填写说明"
+    ],
+    "freeze": "A2",
+    "filter": "A1:G301",
+    "validations": 7,
+    "E2_type": "d",
+    "E2_value": "2026-01-10 00:00:00",
+    "E2_format": "yyyy-mm-dd",
+    "native_date": true,
+    "node_count": 13
+  },
+  {
+    "file": "97-projects-export.xlsx",
+    "sheets": [
+      "Timeline",
+      "填写说明"
+    ],
+    "freeze": "A2",
+    "filter": "A1:G858",
+    "validations": 7,
+    "E2_type": "d",
+    "E2_value": "2025-11-18 00:00:00",
+    "E2_format": "yyyy-mm-dd",
+    "native_date": true,
+    "node_count": 857
+  }
+]

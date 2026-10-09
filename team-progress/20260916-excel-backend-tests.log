@@ -1,0 +1,185 @@
+test_blank_template_does_not_import_instruction_examples (test_timeline_excel.TimelineWorkbookTests.test_blank_template_does_not_import_instruction_examples) ... ok
+test_export_escapes_text_without_creating_cell_formulas (test_timeline_excel.TimelineWorkbookTests.test_export_escapes_text_without_creating_cell_formulas) ... ok
+test_export_native_dates_and_out_of_range_text_remain_importable (test_timeline_excel.TimelineWorkbookTests.test_export_native_dates_and_out_of_range_text_remain_importable) ... ok
+test_legacy_board_export_stays_unchanged (test_timeline_excel.TimelineWorkbookTests.test_legacy_board_export_stays_unchanged) ... ok
+test_template_and_export_share_layout_and_editing_controls (test_timeline_excel.TimelineWorkbookTests.test_template_and_export_share_layout_and_editing_controls) ... ok
+test_thousand_rows_and_long_text_fit_the_export_contract (test_timeline_excel.TimelineWorkbookTests.test_thousand_rows_and_long_text_fit_the_export_contract) ... ok
+test_audit_kinds_follow_actual_changed_fields (test_timeline.TimelineCoreTests.test_audit_kinds_follow_actual_changed_fields) ... ok
+test_batch_update_conflict_noop_and_cascade (test_timeline.TimelineCoreTests.test_batch_update_conflict_noop_and_cascade) ... ok
+test_cascade_anchors_status_only_and_date_priority (test_timeline.TimelineCoreTests.test_cascade_anchors_status_only_and_date_priority) ... ok
+test_drag_single_uses_one_day_minimum_and_pushes_only_colliding_tail (test_timeline.TimelineCoreTests.test_drag_single_uses_one_day_minimum_and_pushes_only_colliding_tail) ... ok
+test_excel_import_preview_commit_and_export (test_timeline.TimelineCoreTests.test_excel_import_preview_commit_and_export) ... ok
+test_export_exact_1000_and_over_limit_fail_closed (test_timeline.TimelineCoreTests.test_export_exact_1000_and_over_limit_fail_closed) ... ok
+test_group10_backup_content_idempotence_rollback (test_timeline.TimelineCoreTests.test_group10_backup_content_idempotence_rollback) ... ok
+test_group10_true_v15_to_v16_migration_backup_and_idempotence (test_timeline.TimelineCoreTests.test_group10_true_v15_to_v16_migration_backup_and_idempotence) ... ok
+test_group11_import_two_phase_race_and_replay (test_timeline.TimelineCoreTests.test_group11_import_two_phase_race_and_replay) ... ok
+test_group12_empty_and_project_unique_contract (test_timeline.TimelineCoreTests.test_group12_empty_and_project_unique_contract) ... ok
+test_group1_project_permissions_and_lifecycle (test_timeline.TimelineCoreTests.test_group1_project_permissions_and_lifecycle) ... ok
+test_group1_unauthenticated_http_401 (test_timeline.TimelineCoreTests.test_group1_unauthenticated_http_401) ... ok
+test_group2_initial_date_lock_and_group3_conflict_views (test_timeline.TimelineCoreTests.test_group2_initial_date_lock_and_group3_conflict_views) ... ok
+test_group3_missing_versions_and_exact_zero_writes (test_timeline.TimelineCoreTests.test_group3_missing_versions_and_exact_zero_writes) ... ok
+test_group4_undo_guards (test_timeline.TimelineCoreTests.test_group4_undo_guards) ... ok
+test_group4_undo_three_batch_middle_and_reverse_roles (test_timeline.TimelineCoreTests.test_group4_undo_three_batch_middle_and_reverse_roles) ... ok
+test_group5_mixed_batch_audit_kinds (test_timeline.TimelineCoreTests.test_group5_mixed_batch_audit_kinds) ... ok
+test_group6_write_chain_rules_and_snapshot_neighbor (test_timeline.TimelineCoreTests.test_group6_write_chain_rules_and_snapshot_neighbor) ... ok
+test_group7_view_metrics_review_pagination_and_undo_count (test_timeline.TimelineCoreTests.test_group7_view_metrics_review_pagination_and_undo_count) ... ok
+test_group8_excel_negative_controls (test_timeline.TimelineCoreTests.test_group8_excel_negative_controls) ... ok
+test_group9_excel_round_trip_in_new_workspace (test_timeline.TimelineCoreTests.test_group9_excel_round_trip_in_new_workspace) ... ok
+test_import_field_limits_boundaries (test_timeline.TimelineCoreTests.test_import_field_limits_boundaries) ... ok
+test_import_headers_contract_literal (test_timeline.TimelineCoreTests.test_import_headers_contract_literal) ... ok
+test_import_multirow_aggregation_and_counts (test_timeline.TimelineCoreTests.test_import_multirow_aggregation_and_counts) ... ok
+test_import_status_three_states_and_recompute (test_timeline.TimelineCoreTests.test_import_status_three_states_and_recompute) ... ok
+test_import_xlsx_serial_positive_and_boundaries (test_timeline.TimelineCoreTests.test_import_xlsx_serial_positive_and_boundaries) ... ok
+test_initial_correction_undo_and_review (test_timeline.TimelineCoreTests.test_initial_correction_undo_and_review) ... ok
+test_name_conflict_and_viewer_denied (test_timeline.TimelineCoreTests.test_name_conflict_and_viewer_denied) ... ok
+test_project_create_then_batch_nodes_and_derived_view (test_timeline.TimelineCoreTests.test_project_create_then_batch_nodes_and_derived_view) ... ok
+test_project_rename_is_versioned_audited_and_not_undoable (test_timeline.TimelineCoreTests.test_project_rename_is_versioned_audited_and_not_undoable) ... ok
+test_same_day_numeric_and_text_node_names_have_a_total_natural_order (test_timeline.TimelineCoreTests.test_same_day_numeric_and_text_node_names_have_a_total_natural_order) ... ok
+test_single_and_cascade_clamping (test_timeline.TimelineCoreTests.test_single_and_cascade_clamping) ... ok
+test_v16_migration_five_tables_and_checks (test_timeline.TimelineCoreTests.test_v16_migration_five_tables_and_checks) ... ok
+test_project_rename_patch_permissions_conflicts_and_csrf (test_timeline_http.TimelineHTTPTests.test_project_rename_patch_permissions_conflicts_and_csrf) ... ok
+test_r01_r02_list_and_single_get_auth_permissions_and_shapes (test_timeline_http.TimelineHTTPTests.test_r01_r02_list_and_single_get_auth_permissions_and_shapes) ... ok
+test_r03_review_actor_change_rows_metrics_and_overlap_rows (test_timeline_http.TimelineHTTPTests.test_r03_review_actor_change_rows_metrics_and_overlap_rows) ... ok
+test_r04_create_lifecycle_conflict_csrf_and_viewer (test_timeline_http.TimelineHTTPTests.test_r04_create_lifecycle_conflict_csrf_and_viewer) ... ok
+test_r05_delete_path_version_admin_soft_delete_and_repeat (test_timeline_http.TimelineHTTPTests.test_r05_delete_path_version_admin_soft_delete_and_repeat) ... ok
+test_r06_batch_http_complete_view_csrf_version_atomic_and_interval_bounds (test_timeline_http.TimelineHTTPTests.test_r06_batch_http_complete_view_csrf_version_atomic_and_interval_bounds) ... ok
+test_r07_undo_http_success_csrf_stale_soft_delete_and_zero_write (test_timeline_http.TimelineHTTPTests.test_r07_undo_http_success_csrf_stale_soft_delete_and_zero_write) ... ok
+test_r08_initial_correction_http_noop_no_cascade_permissions_and_invalid_node (test_timeline_http.TimelineHTTPTests.test_r08_initial_correction_http_noop_no_cascade_permissions_and_invalid_node) ... ok
+test_r09_import_d4_d5_d7_error_rows_warnings_and_cell_types (test_timeline_http.TimelineHTTPTests.test_r09_import_d4_d5_d7_error_rows_warnings_and_cell_types) ... ok
+test_r09_r10_import_http_preview_commit_permissions_state_and_race (test_timeline_http.TimelineHTTPTests.test_r09_r10_import_http_preview_commit_permissions_state_and_race) ... ok
+test_r11_export_post_json_order_permissions_and_round_trip (test_timeline_http.TimelineHTTPTests.test_r11_export_post_json_order_permissions_and_round_trip) ... ok
+test_template_download_permissions_blank_data_and_no_mutation (test_timeline_http.TimelineHTTPTests.test_template_download_permissions_blank_data_and_no_mutation) ... ok
+test_http_archive_unarchive_and_bootstrap_preview (test_timeline_archive.TimelineArchiveHTTPTests.test_http_archive_unarchive_and_bootstrap_preview) ... ok
+test_bootstrap_snapshot_drift_is_atomic (test_timeline_archive.TimelineArchiveServiceTests.test_bootstrap_snapshot_drift_is_atomic) ... ok
+test_manual_archive_permissions_readonly_visibility_and_restore (test_timeline_archive.TimelineArchiveServiceTests.test_manual_archive_permissions_readonly_visibility_and_restore) ... ok
+test_one_time_bootstrap_uses_strict_last_node_date_snapshot (test_timeline_archive.TimelineArchiveServiceTests.test_one_time_bootstrap_uses_strict_last_node_date_snapshot) ... ok
+test_reordering_visible_projects_preserves_archived_hidden_slot (test_timeline_archive.TimelineArchiveServiceTests.test_reordering_visible_projects_preserves_archived_hidden_slot) ... ok
+
+----------------------------------------------------------------------
+Ran 56 tests in 61.792s
+
+OK
+[16/Sep/2026 10:40:51] "GET /api/workspaces/1/timeline HTTP/1.1" 401 -
+[16/Sep/2026 10:41:11] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:11] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:11] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:12] "PATCH /api/workspaces/1/timeline/projects/1 HTTP/1.1" 403 -
+[16/Sep/2026 10:41:12] "PATCH /api/workspaces/1/timeline/projects/1 HTTP/1.1" 200 -
+[16/Sep/2026 10:41:12] "PATCH /api/workspaces/1/timeline/projects/1 HTTP/1.1" 409 -
+[16/Sep/2026 10:41:12] "PATCH /api/workspaces/1/timeline/projects/1 HTTP/1.1" 422 -
+[16/Sep/2026 10:41:12] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:12] "PATCH /api/workspaces/1/timeline/projects/1 HTTP/1.1" 403 -
+[16/Sep/2026 10:41:13] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:13] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:13] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[16/Sep/2026 10:41:13] "GET /api/timeline/projects/1 HTTP/1.1" 200 -
+[16/Sep/2026 10:41:13] "GET /api/timeline/projects/1 HTTP/1.1" 401 -
+[16/Sep/2026 10:41:14] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:14] "GET /api/timeline/projects/1 HTTP/1.1" 403 -
+[16/Sep/2026 10:41:15] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:15] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:15] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 10:41:15] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 10:41:15] "GET /api/workspaces/1/timeline/review?project_ids=1 HTTP/1.1" 200 -
+[16/Sep/2026 10:41:17] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:17] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:17] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 422 -
+[16/Sep/2026 10:41:17] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 403 -
+[16/Sep/2026 10:41:17] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:17] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 403 -
+[16/Sep/2026 10:41:19] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:19] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:19] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 428 -
+[16/Sep/2026 10:41:19] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 409 -
+[16/Sep/2026 10:41:19] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:19] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 403 -
+[16/Sep/2026 10:41:19] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 200 -
+[16/Sep/2026 10:41:19] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 404 -
+[16/Sep/2026 10:41:21] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:21] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:21] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 10:41:21] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 403 -
+[16/Sep/2026 10:41:21] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 428 -
+[16/Sep/2026 10:41:21] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 409 -
+[16/Sep/2026 10:41:21] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 422 -
+[16/Sep/2026 10:41:21] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:21] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 403 -
+[16/Sep/2026 10:41:21] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 10:41:21] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:22] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 409 -
+[16/Sep/2026 10:41:23] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:23] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:23] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 10:41:23] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 403 -
+[16/Sep/2026 10:41:23] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 200 -
+[16/Sep/2026 10:41:23] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 409 -
+[16/Sep/2026 10:41:23] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:23] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 10:41:23] "DELETE /api/workspaces/1/timeline/projects/2 HTTP/1.1" 200 -
+[16/Sep/2026 10:41:23] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 404 -
+[16/Sep/2026 10:41:25] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:25] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:25] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 10:41:25] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 403 -
+[16/Sep/2026 10:41:25] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:25] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:25] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 10:41:25] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 403 -
+[16/Sep/2026 10:41:25] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 200 -
+[16/Sep/2026 10:41:25] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 200 -
+[16/Sep/2026 10:41:25] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 422 -
+[16/Sep/2026 10:41:25] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 200 -
+[16/Sep/2026 10:41:25] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 404 -
+[16/Sep/2026 10:41:27] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:27] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:27] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[16/Sep/2026 10:41:27] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[16/Sep/2026 10:41:27] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[16/Sep/2026 10:41:27] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[16/Sep/2026 10:41:29] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:29] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 403 -
+[16/Sep/2026 10:41:29] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:29] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 403 -
+[16/Sep/2026 10:41:29] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[16/Sep/2026 10:41:29] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 201 -
+[16/Sep/2026 10:41:29] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 409 -
+[16/Sep/2026 10:41:29] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[16/Sep/2026 10:41:29] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:29] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 422 -
+[16/Sep/2026 10:41:30] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:30] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 404 -
+[16/Sep/2026 10:41:30] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[16/Sep/2026 10:41:30] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 403 -
+[16/Sep/2026 10:41:30] "POST /api/workspaces/2/timeline/imports/commit HTTP/1.1" 403 -
+[16/Sep/2026 10:41:31] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:31] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:31] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:31] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 10:41:31] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 10:41:31] "GET /api/workspaces/1/timeline/export HTTP/1.1" 404 -
+[16/Sep/2026 10:41:31] "POST /api/workspaces/1/timeline/export HTTP/1.1" 403 -
+[16/Sep/2026 10:41:32] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:32] "POST /api/workspaces/1/timeline/export HTTP/1.1" 403 -
+[16/Sep/2026 10:41:32] "POST /api/workspaces/1/timeline/export HTTP/1.1" 422 -
+[16/Sep/2026 10:41:32] "POST /api/workspaces/1/timeline/export HTTP/1.1" 422 -
+[16/Sep/2026 10:41:32] "POST /api/workspaces/1/timeline/export HTTP/1.1" 200 -
+[16/Sep/2026 10:41:32] "POST /api/workspaces/2/timeline/imports/preview HTTP/1.1" 201 -
+[16/Sep/2026 10:41:32] "POST /api/workspaces/2/timeline/imports/commit HTTP/1.1" 201 -
+[16/Sep/2026 10:41:32] "POST /api/workspaces/1/timeline/export HTTP/1.1" 422 -
+[16/Sep/2026 10:41:34] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:34] "POST /api/workspaces/1/timeline/template HTTP/1.1" 403 -
+[16/Sep/2026 10:41:34] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:34] "POST /api/workspaces/1/timeline/template HTTP/1.1" 403 -
+[16/Sep/2026 10:41:34] "POST /api/workspaces/999/timeline/template HTTP/1.1" 403 -
+[16/Sep/2026 10:41:34] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:34] "POST /api/workspaces/1/timeline/template HTTP/1.1" 200 -
+[16/Sep/2026 10:41:34] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[16/Sep/2026 10:41:35] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:35] "POST /api/workspaces/1/timeline/template HTTP/1.1" 200 -
+[16/Sep/2026 10:41:35] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[16/Sep/2026 10:41:36] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 10:41:36] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 10:41:36] "POST /api/workspaces/1/timeline/projects/1/archive HTTP/1.1" 200 -
+[16/Sep/2026 10:41:36] "GET /api/workspaces/1/timeline?archive_state=archived HTTP/1.1" 200 -
+[16/Sep/2026 10:41:36] "POST /api/workspaces/1/timeline/projects/1/unarchive HTTP/1.1" 200 -
+[16/Sep/2026 10:41:36] "POST /api/admin/workspaces/1/timeline/archive-bootstrap/preview HTTP/1.1" 200 -

@@ -1,0 +1,137 @@
+.........F..........................................
+======================================================================
+FAIL: test_r09_import_d4_d5_d7_error_rows_warnings_and_cell_types (test_timeline_http.TimelineHTTPTests.test_r09_import_d4_d5_d7_error_rows_warnings_and_cell_types)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_timeline_http.py", line 403, in test_r09_import_d4_d5_d7_error_rows_warnings_and_cell_types
+    self.assertIn("�������һ�� sheet", preview["warnings"])
+AssertionError: '�������һ�� sheet' not found in ['״̬�����������㣬��������ɡ�����', '��������ѡ��������First']
+
+----------------------------------------------------------------------
+Ran 52 tests in 58.968s
+
+FAILED (failures=1)
+[16/Sep/2026 13:40:22] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:22] "POST /api/workspaces/1/timeline/imports/sheets HTTP/1.1" 200 -
+[16/Sep/2026 13:40:22] "POST /api/workspaces/1/timeline/imports/sheets HTTP/1.1" 403 -
+[16/Sep/2026 13:40:23] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:23] "POST /api/workspaces/1/timeline/imports/sheets HTTP/1.1" 403 -
+[16/Sep/2026 13:40:23] "POST /api/workspaces/999/timeline/imports/sheets HTTP/1.1" 403 -
+[16/Sep/2026 13:40:23] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[16/Sep/2026 13:40:23] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[16/Sep/2026 13:40:24] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:24] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:24] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:24] "PATCH /api/workspaces/1/timeline/projects/1 HTTP/1.1" 403 -
+[16/Sep/2026 13:40:24] "PATCH /api/workspaces/1/timeline/projects/1 HTTP/1.1" 200 -
+[16/Sep/2026 13:40:24] "PATCH /api/workspaces/1/timeline/projects/1 HTTP/1.1" 409 -
+[16/Sep/2026 13:40:24] "PATCH /api/workspaces/1/timeline/projects/1 HTTP/1.1" 422 -
+[16/Sep/2026 13:40:25] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:25] "PATCH /api/workspaces/1/timeline/projects/1 HTTP/1.1" 403 -
+[16/Sep/2026 13:40:26] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:26] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:26] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[16/Sep/2026 13:40:26] "GET /api/timeline/projects/1 HTTP/1.1" 200 -
+[16/Sep/2026 13:40:26] "GET /api/timeline/projects/1 HTTP/1.1" 401 -
+[16/Sep/2026 13:40:27] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:27] "GET /api/timeline/projects/1 HTTP/1.1" 403 -
+[16/Sep/2026 13:40:28] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:28] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:28] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 13:40:28] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 13:40:28] "GET /api/workspaces/1/timeline/review?project_ids=1 HTTP/1.1" 200 -
+[16/Sep/2026 13:40:30] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:30] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:30] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 422 -
+[16/Sep/2026 13:40:30] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 403 -
+[16/Sep/2026 13:40:30] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:30] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 403 -
+[16/Sep/2026 13:40:32] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:32] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:32] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 428 -
+[16/Sep/2026 13:40:32] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 409 -
+[16/Sep/2026 13:40:32] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:32] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 403 -
+[16/Sep/2026 13:40:32] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 200 -
+[16/Sep/2026 13:40:32] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 404 -
+[16/Sep/2026 13:40:34] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:34] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:34] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 13:40:34] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 403 -
+[16/Sep/2026 13:40:34] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 428 -
+[16/Sep/2026 13:40:34] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 409 -
+[16/Sep/2026 13:40:34] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 422 -
+[16/Sep/2026 13:40:34] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:34] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 403 -
+[16/Sep/2026 13:40:34] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 13:40:34] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:34] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 409 -
+[16/Sep/2026 13:40:36] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:36] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:36] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 13:40:36] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 403 -
+[16/Sep/2026 13:40:36] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 200 -
+[16/Sep/2026 13:40:36] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 409 -
+[16/Sep/2026 13:40:36] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:36] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 13:40:36] "DELETE /api/workspaces/1/timeline/projects/2 HTTP/1.1" 200 -
+[16/Sep/2026 13:40:36] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 404 -
+[16/Sep/2026 13:40:38] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:38] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:38] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 13:40:38] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 403 -
+[16/Sep/2026 13:40:38] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:38] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:38] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 13:40:38] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 403 -
+[16/Sep/2026 13:40:38] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 200 -
+[16/Sep/2026 13:40:38] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 200 -
+[16/Sep/2026 13:40:38] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 422 -
+[16/Sep/2026 13:40:38] "DELETE /api/workspaces/1/timeline/projects/1 HTTP/1.1" 200 -
+[16/Sep/2026 13:40:38] "POST /api/workspaces/1/timeline/batches/initial-correction HTTP/1.1" 404 -
+[16/Sep/2026 13:40:40] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:40] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:40] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[16/Sep/2026 13:40:40] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[16/Sep/2026 13:40:42] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:42] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 403 -
+[16/Sep/2026 13:40:42] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:42] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 403 -
+[16/Sep/2026 13:40:42] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[16/Sep/2026 13:40:42] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 201 -
+[16/Sep/2026 13:40:42] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 409 -
+[16/Sep/2026 13:40:42] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[16/Sep/2026 13:40:42] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:42] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 422 -
+[16/Sep/2026 13:40:42] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:42] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 404 -
+[16/Sep/2026 13:40:43] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 201 -
+[16/Sep/2026 13:40:43] "POST /api/workspaces/1/timeline/imports/commit HTTP/1.1" 403 -
+[16/Sep/2026 13:40:43] "POST /api/workspaces/2/timeline/imports/commit HTTP/1.1" 403 -
+[16/Sep/2026 13:40:44] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:44] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:44] "POST /api/workspaces/1/timeline/projects HTTP/1.1" 201 -
+[16/Sep/2026 13:40:44] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 13:40:44] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[16/Sep/2026 13:40:44] "GET /api/workspaces/1/timeline/export HTTP/1.1" 404 -
+[16/Sep/2026 13:40:44] "POST /api/workspaces/1/timeline/export HTTP/1.1" 403 -
+[16/Sep/2026 13:40:45] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:45] "POST /api/workspaces/1/timeline/export HTTP/1.1" 403 -
+[16/Sep/2026 13:40:45] "POST /api/workspaces/1/timeline/export HTTP/1.1" 422 -
+[16/Sep/2026 13:40:45] "POST /api/workspaces/1/timeline/export HTTP/1.1" 422 -
+[16/Sep/2026 13:40:45] "POST /api/workspaces/1/timeline/export HTTP/1.1" 200 -
+[16/Sep/2026 13:40:45] "POST /api/workspaces/2/timeline/imports/preview HTTP/1.1" 201 -
+[16/Sep/2026 13:40:45] "POST /api/workspaces/2/timeline/imports/commit HTTP/1.1" 201 -
+[16/Sep/2026 13:40:45] "POST /api/workspaces/1/timeline/export HTTP/1.1" 422 -
+[16/Sep/2026 13:40:46] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:46] "POST /api/workspaces/1/timeline/template HTTP/1.1" 403 -
+[16/Sep/2026 13:40:47] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:47] "POST /api/workspaces/1/timeline/template HTTP/1.1" 403 -
+[16/Sep/2026 13:40:47] "POST /api/workspaces/999/timeline/template HTTP/1.1" 403 -
+[16/Sep/2026 13:40:47] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:47] "POST /api/workspaces/1/timeline/template HTTP/1.1" 200 -
+[16/Sep/2026 13:40:47] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[16/Sep/2026 13:40:47] "POST /api/auth/login HTTP/1.1" 200 -
+[16/Sep/2026 13:40:48] "POST /api/workspaces/1/timeline/template HTTP/1.1" 200 -
+[16/Sep/2026 13:40:48] "POST /api/workspaces/1/timeline/imports/preview HTTP/1.1" 422 -
+[16/Sep/2026 13:41:01] "GET /api/workspaces/1/timeline HTTP/1.1" 401 -

@@ -1,0 +1,1 @@
+template {"kind":"region","sheet":"Timeline","address":"A1:G3","rows":3,"cols":7,"nonEmpty":20,"blank":1,"text":20,"maxTextLength":11,"preview":[["项目名称","阶段","主线/并行","节点","日期","状态"],["示例A-新品开发","创意","主线","项目立项","46296","已完成"],["示例A-新品开发","设计","主线","设计定稿","46307",null]],"previewAddress":"A1:F3","previewRows":3,"previewCols":6}

@@ -1,0 +1,257 @@
+[
+  {
+    "file": "Flowboard-项目时间表填写模板-无间隔列.xlsx",
+    "structure": {
+      "sheets": [
+        "Timeline",
+        "填写说明"
+      ],
+      "styles": true,
+      "column_width_definitions": 6,
+      "frozen_panes": 1,
+      "filters": 1,
+      "validations": 7,
+      "date_E2": [
+        [
+          "n",
+          "33"
+        ]
+      ]
+    },
+    "table": {
+      "headers": [
+        "项目名称",
+        "阶段",
+        "主线/并行",
+        "节点",
+        "日期",
+        "状态",
+        "备注"
+      ],
+      "rows": 13,
+      "projects": 1
+    },
+    "preview": {
+      "row_count": 13,
+      "warnings": [
+        "状态将按日期重算，仅『已完成』保留",
+        "仅导入第一个 sheet"
+      ],
+      "project_count": 1
+    },
+    "commit": {
+      "batch_id": 1,
+      "projects": 1,
+      "nodes": 13
+    },
+    "export_structure": {
+      "sheets": [
+        "Timeline"
+      ],
+      "styles": false,
+      "column_width_definitions": 0,
+      "frozen_panes": 0,
+      "filters": 0,
+      "validations": 0,
+      "date_E2": [
+        [
+          "inlineStr",
+          null
+        ]
+      ]
+    },
+    "export_table": {
+      "headers": [
+        "项目名称",
+        "阶段",
+        "主线/并行",
+        "节点",
+        "日期",
+        "状态",
+        "备注"
+      ],
+      "rows": 13,
+      "projects": 1
+    },
+    "same_workspace": {
+      "code": "NAME_CONFLICT",
+      "message": "项目名称唯一：已存在同名项目"
+    },
+    "fresh_workspace_commit": {
+      "batch_id": 1,
+      "projects": 1,
+      "nodes": 13
+    },
+    "roundtrip_rows_equal": true
+  },
+  {
+    "file": "Flowboard-项目时间表填写模板.xlsx",
+    "structure": {
+      "sheets": [
+        "Timeline",
+        "填写说明"
+      ],
+      "styles": true,
+      "column_width_definitions": 8,
+      "frozen_panes": 1,
+      "filters": 1,
+      "validations": 7,
+      "date_E2": [
+        [
+          "n",
+          "30"
+        ]
+      ]
+    },
+    "table": {
+      "headers": [
+        "项目名称",
+        "阶段",
+        "主线/并行",
+        "节点",
+        "日期",
+        "间隔",
+        "状态",
+        "备注"
+      ],
+      "rows": 13,
+      "projects": 1
+    },
+    "preview": {
+      "row_count": 13,
+      "warnings": [
+        "状态将按日期重算，仅『已完成』保留",
+        "仅导入第一个 sheet"
+      ],
+      "project_count": 1
+    },
+    "commit": {
+      "batch_id": 1,
+      "projects": 1,
+      "nodes": 13
+    },
+    "export_structure": {
+      "sheets": [
+        "Timeline"
+      ],
+      "styles": false,
+      "column_width_definitions": 0,
+      "frozen_panes": 0,
+      "filters": 0,
+      "validations": 0,
+      "date_E2": [
+        [
+          "inlineStr",
+          null
+        ]
+      ]
+    },
+    "export_table": {
+      "headers": [
+        "项目名称",
+        "阶段",
+        "主线/并行",
+        "节点",
+        "日期",
+        "状态",
+        "备注"
+      ],
+      "rows": 13,
+      "projects": 1
+    },
+    "same_workspace": {
+      "code": "NAME_CONFLICT",
+      "message": "项目名称唯一：已存在同名项目"
+    },
+    "fresh_workspace_commit": {
+      "batch_id": 1,
+      "projects": 1,
+      "nodes": 13
+    },
+    "roundtrip_rows_equal": true
+  },
+  {
+    "file": "测试数据-Flowboard标准时间表.xlsx",
+    "structure": {
+      "sheets": [
+        "Timeline"
+      ],
+      "styles": false,
+      "column_width_definitions": 0,
+      "frozen_panes": 0,
+      "filters": 0,
+      "validations": 0,
+      "date_E2": [
+        [
+          "inlineStr",
+          null
+        ]
+      ]
+    },
+    "table": {
+      "headers": [
+        "项目名称",
+        "阶段",
+        "轨道",
+        "节点",
+        "日期",
+        "间隔",
+        "状态",
+        "备注"
+      ],
+      "rows": 857,
+      "projects": 97
+    },
+    "preview": {
+      "row_count": 857,
+      "warnings": [
+        "状态将按日期重算，仅『已完成』保留"
+      ],
+      "project_count": 97
+    },
+    "commit": {
+      "batch_id": 1,
+      "projects": 97,
+      "nodes": 857
+    },
+    "export_structure": {
+      "sheets": [
+        "Timeline"
+      ],
+      "styles": false,
+      "column_width_definitions": 0,
+      "frozen_panes": 0,
+      "filters": 0,
+      "validations": 0,
+      "date_E2": [
+        [
+          "inlineStr",
+          null
+        ]
+      ]
+    },
+    "export_table": {
+      "headers": [
+        "项目名称",
+        "阶段",
+        "主线/并行",
+        "节点",
+        "日期",
+        "状态",
+        "备注"
+      ],
+      "rows": 857,
+      "projects": 97
+    },
+    "same_workspace": {
+      "code": "NAME_CONFLICT",
+      "message": "项目名称唯一：已存在同名项目"
+    },
+    "fresh_workspace_commit": {
+      "batch_id": 1,
+      "projects": 97,
+      "nodes": 857
+    },
+    "roundtrip_rows_equal": true
+  }
+]
