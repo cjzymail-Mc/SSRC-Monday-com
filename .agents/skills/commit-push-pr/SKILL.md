@@ -1,19 +1,20 @@
 ---
 name: commit-push-pr
-description: Submit completed Flowboard main fixes through a fresh fix branch, resolve conflicts with updated origin/main, reuse valid test evidence, push to the contributor's fork and create an upstream PR, then return to main. Use only when explicitly invoked as $commit-push-pr; do not expand the fix, merge or deploy the PR.
+description: Submit current Flowboard changes and local-only main commits according to verified GitHub identity; upstream owners/admins push main directly; other contributors use a fresh fix branch, their fork and an upstream PR. Integrate origin/main and reuse valid test evidence. Use only when explicitly invoked as $commit-push-pr; do not expand the fix, merge or deploy.
 ---
 
 # Commit Push PR
 
-Package a finished repair for the team's existing fork/PR workflow. Normal submissions should be short: inspect once, reuse applicable PASS, submit, and return to main. First-time fork setup and conflict recovery are conditional work.
+Package the current submission batch through the verified account's route: upstream owners/admins commit and push main directly; other contributors submit through their fork and an upstream PR, then return to main. Inspect once and reuse applicable PASS. Fork setup and conflict recovery are conditional work.
 
 ## Boundaries
 
 - Read AGENTS.md once; reuse unchanged instructions already read in this session. Read current feature contracts and README test guidance only when needed to understand the submitted change or choose missing coverage.
 - Preserve local work. Never use reset --hard, clean, checkout-overwrite, arbitrary automatic stash, force-push or destructive recovery. Do not reuse a branch from an earlier PR.
 - Never stage, commit, copy, migrate or test against real flowboard.db, its WAL/SHM files, backups/, attachments, credentials, .env files or machine-local state. Review names beyond the helper's known guards. Stage explicit reviewed paths only; never git add . or git add -A.
-- Keep origin at github.com/cjzymail-Mc/SSRC-Monday-com. Only the authenticated upstream owner may push origin; other contributors use their verified public fork via contributor-fork. Never request upstream Write access or retarget a mismatched remote.
-- Submission does not authorize unrelated fixes, test rewrites, merging, deployment, branch deletion or cleaning old backups. Explicit submission authorization must cover the fork/push/PR writes; permission to edit alone does not.
+- Keep origin at github.com/cjzymail-Mc/SSRC-Monday-com. Only the authenticated upstream owner or a verified upstream admin may push origin/main; other contributors use their verified public fork via contributor-fork. Never request additional upstream access, change branch protection or retarget a mismatched remote.
+- Explicitly invoking $commit-push-pr authorizes committing and submitting all current eligible tracked/staged/untracked changes and local-only main commits through the verified route, unless the user expressly narrows the scope. For owners/admins this includes push to origin/main; for contributors it includes any needed verified fork setup, fork push and upstream PR creation. Do not request another scope or push confirmation merely because several features, earlier local commits or other tasks' existing changes are present.
+- Review the whole outgoing batch and exclude protected data; `all` never overrides those exclusions. Submission packages existing work but does not authorize implementing additional fixes, rewriting unrelated tests, merging, deployment, branch deletion or cleaning old backups. A request only to read/edit this skill does not invoke submission.
 
 ## 1. Local preflight and early exit
 
@@ -31,19 +32,23 @@ git rev-list --left-right --count main...origin/main
 
 Record original main OID and fetched origin/main OID as the initial submission base. Judge divergence after this fetch. If **no uncommitted work and no local-only main commits** exist, finish with "nothing to submit"; no GitHub authentication/topology queries, branch, rebase, tests, push or PR. A clean index alone is insufficient: existing local commits may be the intended repair.
 
-Otherwise review the actual diff and any local-only commit list. Separate the requested repair from unrelated state. If scope is materially ambiguous, or unrelated dirty work would prevent a clean rebase/submission, ask the concrete recovery question before packaging; do not stash or sweep it into the PR.
+Otherwise review the actual diff and all local-only commits as the outgoing batch. Include every eligible current change and existing local-only commit by default; list them in the submission summary and proceed without asking whether to include them. Honor any explicit narrower scope, preserve excluded work and never stash it automatically. Stop for protected-data exposure, an unresolved semantic conflict or an invalid destination that cannot be resolved within the existing authorization; the mere size or mixed-feature nature of the batch is not such a blocker.
 
 ## 2. Resolve the submission target once
 
 Determine the current account once with `gh api user --jq .login`; a failed authentication/tool check stops the submission. Do not also run gh auth status merely to repeat a successful identity check.
 
-- Upstream owner cjzymail-Mc: use origin; skip contributor fork/public-visibility queries.
-- Other contributor: inspect upstream visibility and `repos/<contributor>/SSRC-Monday-com` metadata once. Require public upstream; an existing same-name repository must have fork=true and source.full_name=cjzymail-Mc/SSRC-Monday-com. Only a verified 404 means the fork is absent. A contributor-fork remote, if present, must identify this exact repository; do not repair a mismatch automatically.
+- Upstream owner: the authenticated login equals cjzymail-Mc (case-insensitive). Use the direct-main route; skip contributor fork/public-visibility queries.
+- Other accounts: inspect `gh api repos/cjzymail-Mc/SSRC-Monday-com` once and retain upstream identity, visibility and `permissions.admin`. Require the expected full_name. Only `permissions.admin == true` qualifies as another upstream admin; ordinary Write/Maintain access, commit author names, `site_admin` or an unverified claim do not.
+- Verified upstream admin: use the direct-main route. A failed identity/repository query stops submission; missing permission evidence never grants direct-main access.
+- Non-admin contributor: reuse upstream visibility from that response and inspect `repos/<contributor>/SSRC-Monday-com` metadata once. Require public upstream; an existing same-name repository must have fork=true and source.full_name=cjzymail-Mc/SSRC-Monday-com. Only a verified 404 means the fork is absent. A contributor-fork remote, if present, must identify this exact repository; do not repair a mismatch automatically.
 - Reuse these verified facts within this invocation while identity/remotes remain unchanged. Re-query only a target that was newly created/changed, a resumed session, or an actual failure suggesting stale evidence. Do not build a persistent account cache.
 
-Use a fresh unique fix/<date>-<summary>-<suffix> branch. Validate its name and absence locally, in fetched upstream refs, and on the existing verified submission remote. Never append to an existing PR branch. Missing-fork creation is deferred until submission is authorized.
+**Owners/admins:** follow [Direct main submission](references/direct-main.md), reusing the shared verification guidance in section 4, then finish. Do not create a fix branch, fork or PR, or run the contributor return-to-main steps.
 
-## 3. Package and integrate
+**Non-admin contributors:** continue through sections 3-6. Use a fresh unique fix/<date>-<summary>-<suffix> branch. Validate its name and absence locally, in fetched upstream refs, and on the existing verified submission remote. Never append to an existing PR branch. Missing-fork creation is deferred until submission is authorized.
+
+## 3. Contributor: package and integrate
 
 1. Switch to the new fix branch; uncommitted work follows the checkout. If main has local-only commits, first retain a unique rescue/pre-submit-main-* reference to the recorded original main.
 2. Stage only the reviewed paths, inspect the staged diff, and commit the requested repair. If existing commits already contain the entire repair, do not create an empty commit. Require a clean index/worktree before rebase or push.
@@ -82,13 +87,13 @@ python -m unittest discover -s tests/skill_checks -p 'test_*.py' -v -f
 
 Do not run those tool tests on ordinary product fixes. For one Python product test use `python -m unittest discover -s tests -p "test_name.py" -v -f`; tests/ is not a Python package. Preserve evidence for unrelated, stale or environmental failures and stop that repair path without editing unrelated code/tests. Resolve required sandbox subprocess access rather than skipping checks. Stop after three consecutive failures of the same resolution/test or a product decision that evidence cannot settle.
 
-## 5. Review once, refresh once, submit
+## 5. Contributor: review once, refresh once, submit
 
 Prepare a concise summary from the already-fetched/tested base; **do not fetch again just to assemble the summary**. Include the final branch/commit list and scope, checks run/reused, proposed PR title/body, current identity and destination, any needed fork/remote creation, and protected-data exclusion.
 
-Obtain one explicit confirmation covering any needed fork creation, push and PR, unless the user's current instruction already explicitly authorizes these same writes and destination. Editing/testing permission alone is insufficient. If already authorized, present the concrete result and proceed without asking again.
+Present the concrete summary and proceed: explicit invocation already authorizes the default batch, any needed verified fork setup, push and upstream PR. Do not ask for another confirmation for those actions. If the user expressly limited submission, respect that limit; an actual destination change or unresolved semantic decision outside the authorized work still requires a decision.
 
-After approval and before push, fetch origin once more and pin this final fetched OID. If it advanced, integrate that OID using section 3, actively resolve conflicts and repeat only impact-triggered checks from section 4. Show the updated summary. Compatible resolution/SHA changes within the same repair and destination remain covered by approval; materially changed behavior, scope or destination requires a new decision.
+Before push, fetch origin once more and pin this final fetched OID. If it advanced, integrate that OID using section 3, actively resolve conflicts and repeat only impact-triggered checks from section 4. Show the updated summary. Compatible resolution/SHA changes within the submitted batch and verified destination remain authorized; a materially new implementation decision or destination outside that authorization requires a decision.
 
 This is the second and final ordinary fetch in this invocation. Finish this tested batch rather than chasing every later coworker update. Record tested base and fix OIDs; do not claim newer upstream commits are integrated or that the PR is merge-ready without evidence.
 
@@ -96,7 +101,6 @@ Prepare only the verified, authorized target:
 
 - Existing verified fork and contributor-fork remote: reuse them without repeating unchanged metadata queries.
 - Missing/changed fork or remote: read [Fork setup](references/fork-setup.md), perform only the needed setup, then revalidate the changed target and origin.
-- Upstream owner: skip fork setup.
 
 Push without force, and create the PR with explicit upstream and cross-fork head:
 
@@ -105,9 +109,9 @@ git push -u contributor-fork <fix-branch>
 gh pr create --repo cjzymail-Mc/SSRC-Monday-com --base main --head "<contributor>:<fix-branch>" --title <title> --body-file <prepared-body-file>
 ```
 
-The upstream owner substitutes origin and the owner-qualified head. Never rely on an implicit gh prompt to choose or push a repository. If push succeeded but PR creation failed, retain the branch and retry only PR creation after diagnosis; do not restart the whole packaging workflow.
+Never rely on an implicit gh prompt to choose or push a repository. If push succeeded but PR creation failed, retain the branch and retry only PR creation after diagnosis; do not restart the whole packaging workflow.
 
-## 6. Verify the PR and return to main
+## 6. Contributor: verify the PR and return to main
 
 Verify PR URL, upstream main base, expected head repository/branch and that the remote head is the tested local OID. Reuse PR/API output containing those facts rather than duplicating reads. Retain all local fix, remote and rescue branches.
 
