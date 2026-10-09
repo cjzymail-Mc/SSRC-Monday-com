@@ -1,0 +1,36 @@
+test_approved_badges_all_stages_empty_hover_and_narrow_layout (test_overview_stage_badge_e2e.StageBadgeE2E.test_approved_badges_all_stages_empty_hover_and_narrow_layout) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 21.014s
+
+OK
+[09/Oct/2026 16:08:32] "GET / HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /auth.css HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /lifecycle.css HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /dashboard.css HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /i12.css HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /dashboard-mobile.css HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /styles.css?v=20260831-a HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /i13.css HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /view-state.js HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /view-ui.js HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /dashboard-ui.js HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /schedule-ui.js HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /timeline.css?v=20261008-week-flags HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /overview.css?v=20261009-stage-badge HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /i12-ui.js HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /timeline-ui.js?v=20261009-period-mask HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /overview-ui.js?v=20261009-stage-badge HTTP/1.1" 200 -
+[09/Oct/2026 16:08:32] "GET /app.js?v=20261009-f02-team-cards HTTP/1.1" 200 -
+[09/Oct/2026 16:08:40] "GET /api/session HTTP/1.1" 401 -
+[09/Oct/2026 16:08:41] "POST /api/auth/login HTTP/1.1" 200 -
+[09/Oct/2026 16:08:41] "GET /api/bootstrap HTTP/1.1" 200 -
+[09/Oct/2026 16:08:41] "POST /api/boards/1/query HTTP/1.1" 200 -
+[09/Oct/2026 16:08:41] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[09/Oct/2026 16:08:41] "GET /api/workspaces/1/events/stream?cursor=0 HTTP/1.1" 200 -
+[09/Oct/2026 16:08:41] "GET /api/workspaces/1/timeline/member-order HTTP/1.1" 200 -
+[09/Oct/2026 16:08:41] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[09/Oct/2026 16:08:41] "GET /api/workspaces/1/timeline/tags HTTP/1.1" 200 -
+[09/Oct/2026 16:08:41] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[09/Oct/2026 16:08:41] "GET /api/workspaces/1/timeline/review HTTP/1.1" 200 -
+[09/Oct/2026 16:08:41] "GET /api/workspaces/1/timeline/overview?period=all&scope=all&q=&stage=all&track=all&completion=all&focus=all&search_in=all&tag_id=all HTTP/1.1" 200 -

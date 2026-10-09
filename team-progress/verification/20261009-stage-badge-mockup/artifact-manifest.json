@@ -1,0 +1,29 @@
+{
+  "production_sources_unchanged": true,
+  "files": {
+    "feature-02-进阶仪表盘\\（静态样张）当前阶段-圆角标签.html": {
+      "sha256": "c495775c4a6208c83005783017a3262ae8d5b0e9ec8772fce449e9a79f7b27b0",
+      "size": 149783
+    },
+    "team-progress\\verification\\20261009-stage-badge-mockup\\build.cjs": {
+      "sha256": "5a0fea20086091eb342566543aabf85d6c4758a3e35b3a9d0dd244cb94b11144",
+      "size": 5229
+    },
+    "team-progress\\verification\\20261009-stage-badge-mockup\\preview-1480.png": {
+      "sha256": "65515ac74efc25414a294a7319a6ba23c26530083458a003838efd9e7b3c8a96",
+      "size": 303659
+    },
+    "team-progress\\verification\\20261009-stage-badge-mockup\\preview-794.png": {
+      "sha256": "56a567f802e5996274bafa7095346e8992d4bc25dcf4ff67df5f54caa04c3f54",
+      "size": 206344
+    },
+    "team-progress\\verification\\20261009-stage-badge-mockup\\render.py": {
+      "sha256": "7eb8dfb33935874e76631e04ab1c480cd3c2104a05bee9b8ee81c7aebe35cd43",
+      "size": 2149
+    },
+    "team-progress\\verification\\20261009-stage-badge-mockup\\visual-proof.json": {
+      "sha256": "e1fc8e499766772fa3c0feb7cc02783b0f7521bf4bf5311c460246c6dddae250",
+      "size": 4476
+    }
+  }
+}

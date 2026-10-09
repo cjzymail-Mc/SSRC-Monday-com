@@ -1,0 +1,178 @@
+[
+  {
+    "viewport_width": 1480,
+    "badge_styles": [
+      {
+        "text": "测试",
+        "color": "rgb(217, 140, 0)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 56
+      },
+      {
+        "text": "开发",
+        "color": "rgb(10, 166, 126)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 56
+      },
+      {
+        "text": "测试",
+        "color": "rgb(217, 140, 0)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 56
+      },
+      {
+        "text": "应用迭代",
+        "color": "rgb(143, 106, 16)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 72
+      },
+      {
+        "text": "创意",
+        "color": "rgb(171, 95, 232)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 56
+      },
+      {
+        "text": "设计",
+        "color": "rgb(23, 70, 176)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 56
+      },
+      {
+        "text": "量产",
+        "color": "rgb(100, 188, 70)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 56
+      },
+      {
+        "text": "开发",
+        "color": "rgb(10, 166, 126)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 56
+      },
+      {
+        "text": "未录入节点",
+        "color": "rgb(181, 175, 195)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 66
+      }
+    ],
+    "no_remote_resources": true,
+    "page_errors": []
+  },
+  {
+    "viewport_width": 794,
+    "badge_styles": [
+      {
+        "text": "测试",
+        "color": "rgb(217, 140, 0)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 56
+      },
+      {
+        "text": "开发",
+        "color": "rgb(10, 166, 126)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 56
+      },
+      {
+        "text": "测试",
+        "color": "rgb(217, 140, 0)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 56
+      },
+      {
+        "text": "应用迭代",
+        "color": "rgb(143, 106, 16)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 72
+      },
+      {
+        "text": "创意",
+        "color": "rgb(171, 95, 232)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 56
+      },
+      {
+        "text": "设计",
+        "color": "rgb(23, 70, 176)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 56
+      },
+      {
+        "text": "量产",
+        "color": "rgb(100, 188, 70)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 56
+      },
+      {
+        "text": "开发",
+        "color": "rgb(10, 166, 126)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 56
+      },
+      {
+        "text": "未录入节点",
+        "color": "rgb(181, 175, 195)",
+        "radius": "6px",
+        "height": 26,
+        "cell": "rgba(255, 255, 255, 0.22)",
+        "cellWidth": 105,
+        "badgeWidth": 66
+      }
+    ],
+    "no_remote_resources": true,
+    "page_errors": []
+  }
+]

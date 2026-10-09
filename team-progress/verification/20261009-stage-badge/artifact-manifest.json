@@ -1,0 +1,86 @@
+{
+  "overview-ui.js": {
+    "sha256": "8769f1ef5f0d55c6f3c535aeedc00a918b2e33e130be027ec360200baaa3d7e9",
+    "size": 15533
+  },
+  "overview.css": {
+    "sha256": "f417e8a4cdb1ca2b72bd44fad59064ecdc1a041636a322d07b8b7b32caf322bc",
+    "size": 9695
+  },
+  "index.html": {
+    "sha256": "86a35803954205b4483c751f9a9d1db30b288733d3bdab2cad014f52e229731d",
+    "size": 7652
+  },
+  "tests\\overview_ui.test.js": {
+    "sha256": "d98af2e7d550f8e7bcb4bd92143ace6cc2bb213a26cfbaafd0f1d980805fadc7",
+    "size": 7350
+  },
+  "tests\\test_overview_stage_badge_e2e.py": {
+    "sha256": "9864092a0cd0ffc672935710ad1d9fcc0ea245e205d24ae7b0653ee82a70bb26",
+    "size": 4168
+  },
+  "STATE.md": {
+    "sha256": "2a332f84ee01ea8f6f987a83de9e3521f5a56a41b363fda7b3bbefa6668228e4",
+    "size": 15875
+  },
+  "README.md": {
+    "sha256": "f6756c496d3bb57ef983b2788263ea52447440e1ab0472f73eb4f8ed4df6f332",
+    "size": 26410
+  },
+  "team-progress\\20261009-stage-badge-implementation.md": {
+    "sha256": "423af026aca365d837834acc0bc8d499d50ebdbf1ca062c33e3b4bb394fe8762",
+    "size": 2317
+  },
+  "feature-02-进阶仪表盘\\03-UX_OPTIMIZATION_CONTRACT.md": {
+    "sha256": "a25b48d2d2668310fc5ab528c713b110876cc8411c422579ebb489d1b150d86a",
+    "size": 9787
+  },
+  "feature-02-进阶仪表盘\\04-UX_DELIVERY.md": {
+    "sha256": "df2122bd05dc40255a57cc19ef25cce5c538b690c27b99aa2b1b82d11955e9b0",
+    "size": 11289
+  },
+  "team-progress\\verification\\20261009-stage-badge\\browser.log": {
+    "sha256": "1af0e7f4a9fd5fccec9d4136902fa5a4c897bb90664699c41f763588a6afed9d",
+    "size": 2466
+  },
+  "team-progress\\verification\\20261009-stage-badge\\change-scope.json": {
+    "sha256": "a05c41594e74bc1ef8a03e189363b1581cf2e212bc2ce57d6eb45f0da56b5f67",
+    "size": 258
+  },
+  "team-progress\\verification\\20261009-stage-badge\\diff-check.log": {
+    "sha256": "4f026956fcc5e12b668d7fc8025d1bec94216121c1ea5491f430fd8c42d741f8",
+    "size": 102
+  },
+  "team-progress\\verification\\20261009-stage-badge\\node.log": {
+    "sha256": "862797dac91970ca40c88b740d4cd5438f3318220742d4b8d65127275a060e5b",
+    "size": 1143
+  },
+  "team-progress\\verification\\20261009-stage-badge\\overview-stage-badge-1480.png": {
+    "sha256": "468ddf36adcbe7e9f89067fe7ffe277abb7e70633de15c13f2ec50f851f56574",
+    "size": 343454
+  },
+  "team-progress\\verification\\20261009-stage-badge\\overview-stage-badge-794.png": {
+    "sha256": "943b59f81a0f5b26bd4e2772920db26081922343250295ebf6fa2c8df5c98d6f",
+    "size": 220585
+  },
+  "team-progress\\verification\\20261009-stage-badge\\source.diff": {
+    "sha256": "dda01a9e34fcc7410d95fec3bd53898bb187fa4b725fbf0a8dd4cf21c3b68dcd",
+    "size": 17360
+  },
+  "team-progress\\verification\\20261009-stage-badge\\baseline\\index.html": {
+    "sha256": "7302d7ee9fc28a3dc5e7c5d0db24658c105b1eee324d80440333ae28892e0d84",
+    "size": 7658
+  },
+  "team-progress\\verification\\20261009-stage-badge\\baseline\\overview-ui.js": {
+    "sha256": "18e3d6880a1a96f384ac96e3b508a1cdd4e654e543e50cddd6e5ce1a02e369c1",
+    "size": 15497
+  },
+  "team-progress\\verification\\20261009-stage-badge\\baseline\\overview.css": {
+    "sha256": "cdf01a132ed9822bd1e57a85b8543b7feaf5e020fdde0b6bc145e4640be605cc",
+    "size": 9446
+  },
+  "team-progress\\verification\\20261009-stage-badge\\baseline\\overview_ui.test.js": {
+    "sha256": "0335e87055721f93fbb4d8def7592f126dddc1a6142b0e19164658ad2cc83550",
+    "size": 7288
+  }
+}
