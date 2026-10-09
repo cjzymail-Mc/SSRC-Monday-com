@@ -1,0 +1,114 @@
+test_dashboard_hover_date_insert_remark_and_delete_share_draft_pipeline (test_timeline_e2e.TimelineProductionE2E.test_dashboard_hover_date_insert_remark_and_delete_share_draft_pipeline) ... [07/Sep/2026 17:11:12] "GET / HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /styles.css?v=20260831-a HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /auth.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /lifecycle.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /dashboard.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /dashboard-mobile.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /i12.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /i13.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /timeline.css?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /view-state.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /view-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /schedule-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /dashboard-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /timeline-ui.js?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /i12-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:12] "GET /app.js?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:11:13] "GET /api/session HTTP/1.1" 401 -
+[07/Sep/2026 17:11:13] "POST /api/auth/login HTTP/1.1" 200 -
+[07/Sep/2026 17:11:13] "GET /api/bootstrap HTTP/1.1" 200 -
+[07/Sep/2026 17:11:13] "POST /api/boards/1/query HTTP/1.1" 200 -
+[07/Sep/2026 17:11:13] "GET /api/workspaces/1/events/stream?cursor=0 HTTP/1.1" 200 -
+[07/Sep/2026 17:11:13] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[07/Sep/2026 17:11:13] "GET /api/workspaces/1/timeline/tags HTTP/1.1" 200 -
+[07/Sep/2026 17:11:13] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[07/Sep/2026 17:11:13] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[07/Sep/2026 17:11:13] "GET /api/workspaces/1/timeline/review HTTP/1.1" 200 -
+[07/Sep/2026 17:11:14] "GET /api/timeline/projects/1 HTTP/1.1" 200 -
+[07/Sep/2026 17:11:15] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+ok
+test_dashboard_remark_empty_navigation_and_logout_cleanup (test_timeline_e2e.TimelineProductionE2E.test_dashboard_remark_empty_navigation_and_logout_cleanup) ... [07/Sep/2026 17:11:16] "GET / HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /styles.css?v=20260831-a HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /auth.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /lifecycle.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /dashboard.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /dashboard-mobile.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /i12.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /i13.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /timeline.css?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /view-state.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /view-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /schedule-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /dashboard-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /timeline-ui.js?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /i12-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:16] "GET /app.js?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:11:17] "GET /api/session HTTP/1.1" 401 -
+[07/Sep/2026 17:11:17] "POST /api/auth/login HTTP/1.1" 200 -
+[07/Sep/2026 17:11:17] "GET /api/bootstrap HTTP/1.1" 200 -
+[07/Sep/2026 17:11:17] "POST /api/boards/1/query HTTP/1.1" 200 -
+[07/Sep/2026 17:11:17] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[07/Sep/2026 17:11:17] "GET /api/workspaces/1/events/stream?cursor=0 HTTP/1.1" 200 -
+[07/Sep/2026 17:11:17] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[07/Sep/2026 17:11:17] "GET /api/workspaces/1/timeline/tags HTTP/1.1" 200 -
+[07/Sep/2026 17:11:17] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[07/Sep/2026 17:11:17] "GET /api/workspaces/1/timeline/review HTTP/1.1" 200 -
+[07/Sep/2026 17:11:18] "GET /api/timeline/projects/1 HTTP/1.1" 200 -
+[07/Sep/2026 17:11:19] "POST /api/auth/logout HTTP/1.1" 200 -
+[07/Sep/2026 17:11:19] "POST /api/auth/login HTTP/1.1" 200 -
+[07/Sep/2026 17:11:19] "GET /api/bootstrap?board_id=1 HTTP/1.1" 200 -
+[07/Sep/2026 17:11:19] "POST /api/boards/1/query HTTP/1.1" 200 -
+[07/Sep/2026 17:11:19] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[07/Sep/2026 17:11:19] "GET /api/workspaces/1/timeline/tags HTTP/1.1" 200 -
+[07/Sep/2026 17:11:19] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[07/Sep/2026 17:11:19] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[07/Sep/2026 17:11:19] "GET /api/workspaces/1/timeline/review HTTP/1.1" 200 -
+[07/Sep/2026 17:11:20] "GET /api/timeline/projects/1 HTTP/1.1" 200 -
+ok
+test_dashboard_remark_hover_pin_escape_draft_save_and_undo (test_timeline_e2e.TimelineProductionE2E.test_dashboard_remark_hover_pin_escape_draft_save_and_undo) ... [07/Sep/2026 17:11:21] "GET / HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /styles.css?v=20260831-a HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /auth.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /lifecycle.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /dashboard.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /dashboard-mobile.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /i12.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /i13.css HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /timeline.css?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /view-state.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /view-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /schedule-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /timeline-ui.js?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /dashboard-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /i12-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /app.js?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:11:21] "GET /api/session HTTP/1.1" 401 -
+[07/Sep/2026 17:11:22] "POST /api/auth/login HTTP/1.1" 200 -
+[07/Sep/2026 17:11:22] "GET /api/bootstrap HTTP/1.1" 200 -
+[07/Sep/2026 17:11:22] "POST /api/boards/1/query HTTP/1.1" 200 -
+[07/Sep/2026 17:11:22] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[07/Sep/2026 17:11:22] "GET /api/workspaces/1/events/stream?cursor=0 HTTP/1.1" 200 -
+[07/Sep/2026 17:11:22] "GET /api/workspaces/1/timeline/tags HTTP/1.1" 200 -
+[07/Sep/2026 17:11:22] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[07/Sep/2026 17:11:22] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[07/Sep/2026 17:11:22] "GET /api/workspaces/1/timeline/review HTTP/1.1" 200 -
+[07/Sep/2026 17:11:23] "GET /api/timeline/projects/1 HTTP/1.1" 200 -
+[07/Sep/2026 17:11:23] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[07/Sep/2026 17:11:23] "POST /api/workspaces/1/timeline/batches/undo HTTP/1.1" 200 -
+[07/Sep/2026 17:11:24] "POST /api/workspaces/1/timeline/batches HTTP/1.1" 200 -
+[07/Sep/2026 17:11:24] "GET / HTTP/1.1" 200 -
+[07/Sep/2026 17:11:24] "GET /api/session HTTP/1.1" 200 -
+[07/Sep/2026 17:11:24] "GET /api/bootstrap HTTP/1.1" 200 -
+[07/Sep/2026 17:11:24] "POST /api/boards/1/query HTTP/1.1" 200 -
+[07/Sep/2026 17:11:24] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[07/Sep/2026 17:11:24] "GET /api/workspaces/1/timeline/tags HTTP/1.1" 200 -
+[07/Sep/2026 17:11:24] "GET /api/workspaces/1/events/stream?cursor=0 HTTP/1.1" 200 -
+[07/Sep/2026 17:11:24] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[07/Sep/2026 17:11:24] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[07/Sep/2026 17:11:24] "GET /api/workspaces/1/timeline/review HTTP/1.1" 200 -
+[07/Sep/2026 17:11:24] "GET /api/timeline/projects/1 HTTP/1.1" 200 -
+ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 13.844s
+
+OK

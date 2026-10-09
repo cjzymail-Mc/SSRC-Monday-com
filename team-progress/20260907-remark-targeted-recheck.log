@@ -1,0 +1,104 @@
+test_dashboard_hover_date_insert_remark_and_delete_share_draft_pipeline (test_timeline_e2e.TimelineProductionE2E.test_dashboard_hover_date_insert_remark_and_delete_share_draft_pipeline) ... [07/Sep/2026 17:09:12] "GET / HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /styles.css?v=20260831-a HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /auth.css HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /lifecycle.css HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /dashboard.css HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /dashboard-mobile.css HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /i12.css HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /i13.css HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /timeline.css?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /view-state.js HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /view-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /schedule-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /dashboard-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /timeline-ui.js?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /i12-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:09:12] "GET /app.js?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:09:13] "GET /api/session HTTP/1.1" 401 -
+[07/Sep/2026 17:09:13] "POST /api/auth/login HTTP/1.1" 200 -
+[07/Sep/2026 17:09:13] "GET /api/bootstrap HTTP/1.1" 200 -
+[07/Sep/2026 17:09:13] "POST /api/boards/1/query HTTP/1.1" 200 -
+[07/Sep/2026 17:09:13] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[07/Sep/2026 17:09:13] "GET /api/workspaces/1/events/stream?cursor=0 HTTP/1.1" 200 -
+[07/Sep/2026 17:09:13] "GET /api/workspaces/1/timeline/tags HTTP/1.1" 200 -
+[07/Sep/2026 17:09:13] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[07/Sep/2026 17:09:13] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[07/Sep/2026 17:09:13] "GET /api/workspaces/1/timeline/review HTTP/1.1" 200 -
+[07/Sep/2026 17:09:13] "GET /api/timeline/projects/1 HTTP/1.1" 200 -
+[07/Sep/2026 17:09:29] "GET /api/workspaces/1/events/stream?cursor=0 HTTP/1.1" 200 -
+ERROR
+test_timeline_portfolio_e_d4_p1_canvas (test_timeline_e2e.TimelineProductionE2E.test_timeline_portfolio_e_d4_p1_canvas) ... [07/Sep/2026 17:09:45] "GET / HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /styles.css?v=20260831-a HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /auth.css HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /lifecycle.css HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /dashboard-mobile.css HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /dashboard.css HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /i12.css HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /i13.css HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /timeline.css?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /view-state.js HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /view-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /schedule-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /dashboard-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /timeline-ui.js?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /i12-ui.js HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /app.js?v=20260907-remark-a HTTP/1.1" 200 -
+[07/Sep/2026 17:09:45] "GET /api/session HTTP/1.1" 401 -
+[07/Sep/2026 17:09:46] "POST /api/auth/login HTTP/1.1" 200 -
+[07/Sep/2026 17:09:46] "GET /api/bootstrap HTTP/1.1" 200 -
+[07/Sep/2026 17:09:46] "POST /api/boards/1/query HTTP/1.1" 200 -
+[07/Sep/2026 17:09:46] "GET /api/workspaces/1/events/stream?cursor=0 HTTP/1.1" 200 -
+[07/Sep/2026 17:09:46] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[07/Sep/2026 17:09:46] "GET /api/workspaces/1/timeline/tags HTTP/1.1" 200 -
+[07/Sep/2026 17:09:46] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[07/Sep/2026 17:09:46] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[07/Sep/2026 17:09:46] "GET /api/workspaces/1/timeline/review HTTP/1.1" 200 -
+[07/Sep/2026 17:09:47] "GET /api/timeline/projects/1 HTTP/1.1" 200 -
+[07/Sep/2026 17:09:54] "GET /api/workspaces/1/timeline/order?context_type=uncategorized HTTP/1.1" 200 -
+[07/Sep/2026 17:09:54] "GET /api/workspaces/1/timeline/order?context_type=all HTTP/1.1" 200 -
+ok
+
+======================================================================
+ERROR: test_dashboard_hover_date_insert_remark_and_delete_share_draft_pipeline (test_timeline_e2e.TimelineProductionE2E.test_dashboard_hover_date_insert_remark_and_delete_share_draft_pipeline)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\tests\test_timeline_e2e.py", line 1344, in test_dashboard_hover_date_insert_remark_and_delete_share_draft_pipeline
+    page.locator('[data-portfolio-zoom-in]').click()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_generated.py", line 17422, in click
+    self._sync(
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_locator.py", line 163, in click
+    return await self._frame._click(self._selector, strict=True, **params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_frame.py", line 569, in _click
+    await self._channel.send("click", self._timeout, locals_to_params(locals()))
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-portfolio-zoom-in]")
+    - locator resolved to <button type="button" aria-label="放大时间轴" data-portfolio-zoom-in="">＋</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not visible
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not visible
+    - retrying click action
+      - waiting 100ms
+    57 × waiting for element to be visible, enabled and stable
+       - element is not visible
+     - retrying click action
+       - waiting 500ms
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 44.779s
+
+FAILED (errors=1)
