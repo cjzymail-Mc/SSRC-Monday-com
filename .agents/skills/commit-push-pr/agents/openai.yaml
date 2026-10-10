@@ -1,6 +1,6 @@
 interface:
   display_name: "commit-push-pr 提交并推送"
   short_description: "默认全部提交，无需重复确认；管理员推送 main，贡献者经 fork 提交 PR"
-  default_prompt: "Use $commit-push-pr to commit and submit all current eligible changes and local-only main commits without another scope or push confirmation: verify my GitHub identity, push main directly as the upstream owner/admin or use my fork and an upstream PR, reuse valid checks, and finish on main."
+  default_prompt: "Use $commit-push-pr to commit and submit all the selected repository's current eligible changes and local-only main commits without another scope or push confirmation: verify my GitHub identity, push main directly as the upstream owner/admin or use my fork and an upstream PR, reuse valid checks, and finish on main."
 policy:
   allow_implicit_invocation: false

@@ -1,0 +1,14 @@
+{
+  "upstreamRepository": "cjzymail-Mc/SSRC-Monday-com",
+  "protectedPaths": [
+    "flowboard.db",
+    "flowboard.db-wal",
+    "flowboard.db-shm",
+    "backups",
+    "flowboard-attachments",
+    "local-test-data"
+  ],
+  "legacyRecoveryJournals": [
+    "flowboard-sync-main.json"
+  ]
+}

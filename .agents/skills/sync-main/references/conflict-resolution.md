@@ -25,16 +25,16 @@ For `restoring` / `restore_failed`:
 5. Verify the combined diff/behavior and absence of unmerged entries, then acknowledge completion:
 
    ```powershell
-   pwsh -NoProfile -File .agents/skills/sync-main/scripts/sync-main.ps1 -CompleteRecovery -RecoverySnapshot <exact-oid>
+   pwsh -NoProfile -File $SyncScript -RepositoryPath $RepositoryPath -ExpectedRepository $UpstreamRepository -Remote $UpstreamRemote -MainBranch $MainBranch -CompleteRecovery -RecoverySnapshot $SnapshotOid
    ```
 
-   This checks journal identity, branch/base, unmerged entries and diff integrity; it does not replace semantic review/tests. Do not initiate fetch during recovery. If a background fetch has advanced origin/main anyway, finish against the journal target and report the newer observed reference separately before another sync batch.
+   This checks journal identity, branch/base, unmerged entries and diff integrity; it does not replace semantic review/tests. Do not initiate fetch during recovery. If a background fetch has advanced the pinned upstream main anyway, finish against the journal target and report the newer observed reference separately before another sync batch.
 
 For `saving` / `saved` or an update failure: inspect the stash reflog for the journal's unique label if its OID is not recorded. Confirm which writes completed. If HEAD remains originalHead and index/worktree are clean, restore the exact snapshot with `--index`, verify original tracked/index/untracked content, then remove only this journal and retry after fixing the obstruction. If HEAD reached target, continue restoration as above; change journal phase only after proving that state. If HEAD moved elsewhere or the snapshot is missing, preserve everything and report the recovery decision. Never clear a journal to suppress an unexplained failure. Keep all recovery stashes/refs.
 
 ## commit-push-pr: rebasing completed work
 
-Record the pre-rebase fix OID and retain it under a unique local `rescue/pre-rebase-*` reference before each rebase, protecting work across interruptions and refreshes. Rebase onto the recorded fetched origin/main OID; resolve each conflict as above, stage explicit paths, then `git -c core.editor=true rebase --continue`. Do not skip commits just to finish. If Git omits a patch already upstream, prove its effect is present.
+Record the pre-rebase fix OID and retain it under a unique local `rescue/pre-rebase-*` reference before each rebase, protecting work across interruptions and refreshes. Rebase onto the recorded fetched the pinned upstream main OID; resolve each conflict as above, stage explicit paths, then `git -c core.editor=true rebase --continue`. Do not skip commits just to finish. If Git omits a patch already upstream, prove its effect is present.
 
 Compare pre/post repair commits (for example `git range-diff` with recorded old/new bases) and the final diff against the new base. Verify local fixes and relevant upstream behavior. Resolution changes test evidence: run checks required by that impact.
 

@@ -1,21 +1,17 @@
 # Conditional contributor fork setup
 
-Read only when the verified contributor fork or contributor-fork remote is missing/changed. Authorization must already cover this setup and submission; no real GitHub writes during skill development/tests.
+Read only when a verified personal fork or its submission remote is missing. Submission authorization already covers required setup; skill development/tests never create real GitHub forks or PRs.
 
-Keep origin at github.com/cjzymail-Mc/SSRC-Monday-com. Never overwrite a same-name non-fork repository or retarget a mismatched remote. Never request upstream Write access as a fallback.
+Retain canonical `$UpstreamRepository`, authenticated `$Contributor` and `$RepositoryName` derived from that upstream's name. Preserve origin and every existing remote. Require a public upstream and a personal repository with fork=true, expected owner and source.full_name equal to the canonical upstream. Only an actual 404 proves absence; authentication, rate-limit and network failures stop this path.
 
-1. If the fork was confirmed absent (404), create it without cloning or replacing origin:
-
-   ```powershell
-   gh repo fork cjzymail-Mc/SSRC-Monday-com --clone=false --fork-name SSRC-Monday-com --remote --remote-name contributor-fork
-   ```
-
-2. If the fork already exists but the local remote is absent, add exactly the previously verified contributor-owned URL:
+1. If confirmed absent, create without cloning or changing remotes:
 
    ```powershell
-   git remote add contributor-fork "https://github.com/<contributor>/SSRC-Monday-com.git"
+   gh repo fork $UpstreamRepository --clone=false --remote=false
    ```
 
-3. After setup, validate origin with `.agents/skills/sync-main/scripts/sync-main.ps1 -ValidateOriginOnly`, confirm contributor-fork resolves to the exact authenticated contributor's fork, and query its metadata. Require fork=true and source.full_name=cjzymail-Mc/SSRC-Monday-com before push. A setup/validation failure stops this external-write path; preserve existing state and report the resumable step.
+   Re-query the new fork and verify identity/source before adding a remote.
+2. Reuse origin or contributor-fork only if its fetch and single push URL identify that verified fork. Otherwise add a missing contributor-fork with the verified owner/repository URL. Never overwrite a mismatched name or same-name non-fork repository. Do not request upstream Write access as a fallback.
+3. Revalidate only changed targets and the unchanged upstream assertion. Then return to push/PR; adding a remote alone does not invalidate tested content or require repeating fetch, rebase, tests or approval.
 
-Return to the main skill's push/PR step. Do not redo fetch, rebase, tests or submission confirmation merely because a remote was added; the checked code has not changed.
+A setup/validation failure preserves local state and reports the exact resumable step. A successful push followed by PR failure is resumed at PR creation, not repackaged.

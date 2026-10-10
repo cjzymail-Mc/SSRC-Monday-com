@@ -1,9 +1,9 @@
 [CmdletBinding()]
 param(
-    [string]$Remote = "origin",
-    [string]$MainBranch = "main",
-    [ValidateNotNullOrEmpty()]
-    [string]$ExpectedRepository = "cjzymail-Mc/SSRC-Monday-com",
+    [string]$RepositoryPath = ".",
+    [string]$Remote = "",
+    [string]$MainBranch = "",
+    [string]$ExpectedRepository = "",
     [switch]$ValidateOriginOnly,
     [switch]$RequireClean,
     [switch]$CompleteRecovery,
@@ -13,6 +13,7 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot "git-workflow-common.ps1")
 
 function Invoke-Git {
     param([Parameter(Mandatory)][string[]]$Arguments)
@@ -29,25 +30,6 @@ function Stop-Sync {
     exit $Code
 }
 
-function Get-GitHubRepositorySlug {
-    param([Parameter(Mandatory)][string]$Url)
-
-    $candidate = $Url.Trim().TrimEnd("/")
-    if ($candidate.EndsWith(".git", [System.StringComparison]::OrdinalIgnoreCase)) {
-        $candidate = $candidate.Substring(0, $candidate.Length - 4)
-    }
-
-    $match = [regex]::Match(
-        $candidate,
-        "^(?:https?://|ssh://git@|git@)github\.com[:/](?<slug>[^/\s]+/[^/\s]+)$",
-        [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
-    )
-    if (-not $match.Success) {
-        return $null
-    }
-    return $match.Groups["slug"].Value
-}
-
 function Get-GitPaths {
     param([string[]]$Arguments)
     # NUL-delimited paths preserve spaces, Unicode, quoting and rename endpoints.
@@ -58,9 +40,7 @@ function Get-GitPaths {
 function Assert-SafePaths {
     param([string[]]$Paths)
     foreach ($path in $Paths) {
-        if ($path -match '(?i)(^|/)(flowboard\.db(?:-(?:wal|shm))?|backups|flowboard-attachments|local-test-data|\.env(?:\.[^/]*)?|credentials(?:\.[^/]*)?|\.ssh|id_rsa|id_ed25519)(/|$)' -or
-            $path -match '(?i)^(temp\.md|\.copilot-(?:message\.md|state\.json|task\.md))$' -or
-            $path -match '(?i)\.(pem|key|pfx|p12)$') {
+        if (Test-WorkflowProtectedPath -Path $path -Config $context.config) {
             Stop-Sync -Code 16 -Message "SYNC_MAIN_GUARDED_PATH: $path; leave runtime data/credentials in place and resolve tracking separately."
         }
     }
@@ -80,6 +60,8 @@ function Write-SyncReport {
     Write-Output $(if ($WorktreeDirty -or $snapshot) { "SYNC_MAIN_WIP_OK" } else { "SYNC_MAIN_OK" })
     Write-Output "mode=$Mode"
     Write-Output "root=$root"
+    Write-Output "upstream_remote=$Remote"
+    Write-Output "upstream_repository=$ExpectedRepository"
     Write-Output "origin=$originUrl"
     Write-Output "branch=$MainBranch"
     Write-Output "commit=$localCommit"
@@ -97,34 +79,24 @@ function Write-SyncReport {
     }
 }
 
-$root = (Invoke-Git -Arguments @("rev-parse", "--show-toplevel") | Select-Object -First 1).Trim()
-Set-Location -LiteralPath $root
-
-$operationPaths = @(
-    "MERGE_HEAD",
-    "CHERRY_PICK_HEAD",
-    "REVERT_HEAD",
-    "rebase-merge",
-    "rebase-apply"
-)
-foreach ($operation in $operationPaths) {
-    $operationPath = (Invoke-Git -Arguments @("rev-parse", "--git-path", $operation) | Select-Object -First 1).Trim()
-    if (Test-Path -LiteralPath $operationPath) {
-        Stop-Sync -Code 12 -Message "SYNC_MAIN_OPERATION_IN_PROGRESS: $operationPath"
-    }
+try {
+    $context = Resolve-WorkflowContext -RepositoryPath $RepositoryPath -Remote $Remote -MainBranch $MainBranch -ExpectedRepository $ExpectedRepository -ResolveUpstream:(-not $ValidateOriginOnly)
+} catch {
+    $code = if ($_.Exception.Message -match 'OPERATION_IN_PROGRESS|DETACHED') { 12 } else { 15 }
+    Stop-Sync -Code $code -Message $_.Exception.Message
 }
-
-$originUrl = (Invoke-Git -Arguments @("remote", "get-url", $Remote) | Select-Object -First 1).Trim()
-$actualRepository = Get-GitHubRepositorySlug -Url $originUrl
-if ($null -eq $actualRepository -or
-    -not $actualRepository.Equals($ExpectedRepository, [System.StringComparison]::OrdinalIgnoreCase)) {
-    Stop-Sync -Code 15 -Message "SYNC_MAIN_UNEXPECTED_ORIGIN: expected=github.com/$ExpectedRepository actual=$originUrl"
-}
+$root = $context.root
+$Remote = $context.upstream_remote
+$MainBranch = $context.main_branch
+$ExpectedRepository = $context.upstream_repository
+$originUrl = (Invoke-Git -Arguments @("remote", "get-url", $context.candidate_remote) | Select-Object -First 1).Trim()
 if ($ValidateOriginOnly) {
-    Write-Output "SYNC_MAIN_ORIGIN_OK"
-    Write-Output "root=$root"
-    Write-Output "origin=$originUrl"
+    Write-Output "SYNC_MAIN_CONTEXT_OK"
+    $context | ConvertTo-Json -Depth 10
     exit 0
+}
+if (-not $Remote -or -not $ExpectedRepository) {
+    Stop-Sync -Code 15 -Message "SYNC_MAIN_UPSTREAM_REMOTE_REQUIRED: add a remote for the verified upstream; do not retarget origin."
 }
 
 # Only an already-fetched, exact upstream commit can be reused by a clean-return
@@ -134,7 +106,7 @@ if ($FetchedMainCommit -and (-not $RequireClean -or $CompleteRecovery -or
     Stop-Sync -Code 17 -Message "SYNC_MAIN_INVALID_FETCH_REUSE: requires -RequireClean and an exact fetched commit OID; not available for WIP/recovery."
 }
 
-$recoveryPath = (Invoke-Git -Arguments @("rev-parse", "--git-path", "flowboard-sync-main.json") | Select-Object -First 1).Trim()
+$recoveryPath = $context.recovery_journal
 $branch = (Invoke-Git -Arguments @("branch", "--show-current") | Select-Object -First 1)
 if (-not $branch) {
     Stop-Sync -Code 12 -Message "SYNC_MAIN_DETACHED: attach the checkout before synchronization."
@@ -144,6 +116,11 @@ $received = 0
 $recovering = Test-Path -LiteralPath $recoveryPath
 if ($recovering) {
     $recovery = Get-Content -Raw -LiteralPath $recoveryPath -Encoding utf8 | ConvertFrom-Json
+    foreach ($binding in @{ repository = $ExpectedRepository; remote = $Remote; mainBranch = $MainBranch }.GetEnumerator()) {
+        if ($recovery.PSObject.Properties.Name -contains $binding.Key -and $recovery.($binding.Key) -ine $binding.Value) {
+            Stop-Sync -Code 20 -Message "SYNC_MAIN_RECOVERY_TARGET_CHANGED: preserve the journal and restore its original repository context."
+        }
+    }
     if (-not $CompleteRecovery) {
         Stop-Sync -Code 20 -Message "SYNC_MAIN_RECOVERY_REQUIRED: journal=$recoveryPath snapshot=$($recovery.snapshot) phase=$($recovery.phase); continue the skill's conflict-resolution workflow, do not start another sync."
     }
@@ -200,7 +177,7 @@ if ($recovering) {
     }
     $remoteCommit = (Invoke-Git -Arguments @("rev-parse", "$Remote/$MainBranch") | Select-Object -First 1).Trim()
     if ($FetchedMainCommit -and $FetchedMainCommit -ne $remoteCommit) {
-        Stop-Sync -Code 17 -Message "SYNC_MAIN_FETCH_REUSE_CHANGED: origin/main differs from the supplied fetched OID; no checkout mutation; inspect the new reference or run normal -RequireClean synchronization."
+        Stop-Sync -Code 17 -Message "SYNC_MAIN_FETCH_REUSE_CHANGED: the upstream main reference differs from the supplied fetched OID; no checkout mutation; inspect the new reference or run normal -RequireClean synchronization."
     }
     & git show-ref --verify --quiet "refs/heads/$MainBranch"
     $localMainExists = $LASTEXITCODE -eq 0
@@ -223,6 +200,9 @@ if ($recovering) {
     if ($dirty -and $received -gt 0) {
         $id = [guid]::NewGuid().ToString("N")
         $recovery = [ordered]@{
+            repository = $ExpectedRepository
+            remote = $Remote
+            mainBranch = $MainBranch
             originalHead = ((Invoke-Git -Arguments @("rev-parse", "HEAD")) -join "").Trim()
             target = $remoteCommit
             received = $received
