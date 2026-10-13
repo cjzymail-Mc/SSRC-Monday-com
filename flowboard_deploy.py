@@ -11,6 +11,7 @@ import sys
 import time
 import urllib.request
 import uuid
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -25,6 +26,82 @@ CONFIG_KEYS = {"format_version", "data_dir", "backup_dir", "host", "port", "secu
 
 class DeploymentError(RuntimeError):
     pass
+
+
+def _owner_is_alive(marker):
+    try:
+        pid = int(marker.read_text(encoding="ascii"))
+        if not 0 < pid <= 0xffffffff:
+            raise ValueError("Invalid process ID")
+    except (ValueError, UnicodeError) as error:
+        raise DeploymentError("Unrecognized host lock; preserve it for inspection") from error
+    if os.name != "nt":
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return False
+        return True
+
+    import ctypes
+    from ctypes import wintypes
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.OpenProcess.argtypes = (wintypes.DWORD, wintypes.BOOL, wintypes.DWORD)
+    kernel.OpenProcess.restype = wintypes.HANDLE
+    kernel.CloseHandle.argtypes = (wintypes.HANDLE,)
+    kernel.GetExitCodeProcess.argtypes = (wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD))
+    kernel.GetProcessTimes.argtypes = (wintypes.HANDLE,) + (ctypes.POINTER(wintypes.FILETIME),) * 4
+    handle = kernel.OpenProcess(0x1000, False, pid)  # PROCESS_QUERY_LIMITED_INFORMATION
+    if not handle:
+        if ctypes.get_last_error() == 87:  # ERROR_INVALID_PARAMETER: process no longer exists
+            return False
+        raise DeploymentError("Cannot inspect the host lock owner; preserve the lock")
+    try:
+        code = wintypes.DWORD()
+        if not kernel.GetExitCodeProcess(handle, ctypes.byref(code)):
+            raise ctypes.WinError(ctypes.get_last_error())
+        if code.value != 259:  # STILL_ACTIVE
+            return False
+        created, exited, system, user = (wintypes.FILETIME() for _ in range(4))
+        if not kernel.GetProcessTimes(handle, *(ctypes.byref(t) for t in (created, exited, system, user))):
+            raise ctypes.WinError(ctypes.get_last_error())
+        created_ns = ((created.dwHighDateTime << 32) | created.dwLowDateTime) * 100 - 11644473600000000000
+        # A PID reused after the marker was written belongs to a different process.
+        return created_ns <= marker.stat().st_mtime_ns
+    finally:
+        kernel.CloseHandle(handle)
+
+
+@contextmanager
+def host_lock(lock_path):
+    marker = Path(lock_path)
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    # The OS releases this lock on abrupt exit/reboot. Keep its file in place so
+    # concurrent launchers always lock the same file, even during marker recovery.
+    with marker.with_suffix(".guard").open("a+b") as guard:
+        if os.name == "nt":
+            import msvcrt
+            acquire = lambda: msvcrt.locking(guard.fileno(), msvcrt.LK_NBLCK, 1)
+            release = lambda: msvcrt.locking(guard.fileno(), msvcrt.LK_UNLCK, 1)
+        else:
+            import fcntl
+            acquire = lambda: fcntl.flock(guard, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            release = lambda: fcntl.flock(guard, fcntl.LOCK_UN)
+        guard.seek(0)
+        try:
+            acquire()
+        except OSError as error:
+            raise DeploymentError("Flowboard is already running or updating; stop it before starting again") from error
+        try:
+            if marker.exists():
+                # Protect existing supervisors from before OS locking was added.
+                if _owner_is_alive(marker):
+                    raise DeploymentError("Flowboard is already running or updating; stop it before starting again")
+                marker.unlink()
+            with maintenance_lock(marker):
+                yield
+        finally:
+            guard.seek(0)
+            release()
 
 
 @dataclass(frozen=True)
@@ -171,7 +248,7 @@ def start(settings, *, check_only=False):
                       "database": str(settings.db), "port": settings.port, **validation}, ensure_ascii=False), flush=True)
     if check_only:
         return 0
-    with maintenance_lock(settings.lock):
+    with host_lock(settings.lock):
         assert_stopped(settings)
         settings.attachments.mkdir(parents=True, exist_ok=True)
         settings.backups.mkdir(parents=True, exist_ok=True)
@@ -225,7 +302,7 @@ def install(args):
         print(json.dumps({"configuration": str(config), "settings": plan, "backup_verified": True,
                           "python": sys.version.split()[0], "git": git(APP_ROOT, "--version")}, ensure_ascii=False, indent=2))
         return 0
-    with maintenance_lock(settings.lock):
+    with host_lock(settings.lock):
         assert_stopped(settings)
         record_path, record = new_record(settings, "install")
         try:
@@ -260,7 +337,7 @@ def finish_migration(settings, record_path, record):
 
 
 def upgrade(settings):
-    with maintenance_lock(settings.lock):
+    with host_lock(settings.lock):
         assert_stopped(settings)
         validation = check_database(settings.db, allow_older=True)
         record_path, record = new_record(settings, "upgrade")
@@ -308,7 +385,7 @@ def update(settings, *, ref=None, no_start=False):
         raise DeploymentError("Code checkout has local changes or untracked files. Preserve them and use a clean release checkout")
     git(settings.app, "symbolic-ref", "--quiet", "--short", "HEAD")
     before = git(settings.app, "rev-parse", "HEAD")
-    with maintenance_lock(settings.lock):
+    with host_lock(settings.lock):
         assert_stopped(settings)
         validation = check_database(settings.db, allow_older=True)
         record_path, record = new_record(settings, "update")

@@ -1,0 +1,20 @@
+test_abrupt_exit_releases_os_lock_and_preserves_active_owner (test_deployment.DeploymentTests.test_abrupt_exit_releases_os_lock_and_preserves_active_owner) ... ok
+test_busy_port_and_active_host_lock_block_mutations (test_deployment.DeploymentTests.test_busy_port_and_active_host_lock_block_mutations) ... ok
+test_configuration_relative_paths_environment_and_missing_file (test_deployment.DeploymentTests.test_configuration_relative_paths_environment_and_missing_file) ... ok
+test_dirty_and_divergent_checkout_are_preserved (test_deployment.DeploymentTests.test_dirty_and_divergent_checkout_are_preserved) ... ok
+test_failed_migration_retains_backup_and_does_not_start_or_reset_code (test_deployment.DeploymentTests.test_failed_migration_retains_backup_and_does_not_start_or_reset_code) ... ok
+test_fast_forward_update_uses_the_new_code_schema_and_preserves_config (test_deployment.DeploymentTests.test_fast_forward_update_uses_the_new_code_schema_and_preserves_config) ... ok
+test_install_dry_run_then_real_restore_preserves_accounts_and_blobs (test_deployment.DeploymentTests.test_install_dry_run_then_real_restore_preserves_accounts_and_blobs) ... ok
+test_install_rejects_corrupt_package_and_data_in_code_checkout (test_deployment.DeploymentTests.test_install_rejects_corrupt_package_and_data_in_code_checkout) ... ok
+test_legacy_launcher_preserves_explicit_environment_paths (test_deployment.DeploymentTests.test_legacy_launcher_preserves_explicit_environment_paths) ... ok
+test_legacy_live_owner_is_protected_and_reused_windows_pid_is_recovered (test_deployment.DeploymentTests.test_legacy_live_owner_is_protected_and_reused_windows_pid_is_recovered) ... ok
+test_missing_database_and_schema_mismatch_do_not_initialize (test_deployment.DeploymentTests.test_missing_database_and_schema_mismatch_do_not_initialize) ... ok
+test_real_cmd_launcher_health_and_unauthenticated_negative (test_deployment.DeploymentTests.test_real_cmd_launcher_health_and_unauthenticated_negative) ... ok
+test_restart_recovers_a_legacy_stale_lock_and_serves_existing_data (test_deployment.DeploymentTests.test_restart_recovers_a_legacy_stale_lock_and_serves_existing_data) ... ok
+test_update_automatically_starts_and_reads_external_attachments (test_deployment.DeploymentTests.test_update_automatically_starts_and_reads_external_attachments) ... ok
+test_upgrade_real_v19_keeps_a_restorable_backup_and_business_data (test_deployment.DeploymentTests.test_upgrade_real_v19_keeps_a_restorable_backup_and_business_data) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 113.038s
+
+OK

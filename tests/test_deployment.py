@@ -247,11 +247,58 @@ class DeploymentTests(unittest.TestCase):
     def test_real_cmd_launcher_health_and_unauthenticated_negative(self):
         self.assert_live_service("start")
 
+    def test_restart_recovers_a_legacy_stale_lock_and_serves_existing_data(self):
+        self.assert_live_service("start", stale_lock=True)
+
+    def test_abrupt_exit_releases_os_lock_and_preserves_active_owner(self):
+        marker = self.data / ".flowboard-host.lock"
+        code = ("import os, sys; from pathlib import Path; from flowboard_deploy import host_lock; "
+                "\nwith host_lock(Path(sys.argv[1])):\n"
+                " print(os.getpid(), flush=True)\n sys.stdin.readline()\n os._exit(0)\n")
+        owner = subprocess.Popen([sys.executable, "-X", "utf8", "-c", code, str(marker)],
+                                 cwd=self.app, env=self.env, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE, text=True)
+        try:
+            self.assertEqual(owner.stdout.readline().strip(), str(owner.pid))
+            with self.assertRaises(deploy.DeploymentError):
+                with deploy.host_lock(marker):
+                    self.fail("A concurrent launcher acquired the active lock")
+            self.assertEqual(marker.read_text(), str(owner.pid))
+        finally:
+            owner.communicate("exit\n", timeout=10)
+        self.assertEqual(owner.returncode, 0)
+        self.assertTrue(marker.exists())  # Abrupt exit bypasses Python cleanup.
+        with deploy.host_lock(marker):
+            self.assertEqual(marker.read_text(), str(os.getpid()))
+        self.assertFalse(marker.exists())
+
+    def test_legacy_live_owner_is_protected_and_reused_windows_pid_is_recovered(self):
+        marker = self.data / ".flowboard-host.lock"
+        marker.parent.mkdir(parents=True)
+        marker.write_text(str(os.getpid()), encoding="ascii")
+        with self.assertRaises(deploy.DeploymentError):
+            with deploy.host_lock(marker):
+                self.fail("An existing legacy owner was displaced")
+        self.assertEqual(marker.read_text(), str(os.getpid()))
+        if os.name == "nt":
+            # Simulate a previous boot's marker whose PID now belongs to this newer process.
+            os.utime(marker, (1, 1))
+            with deploy.host_lock(marker):
+                self.assertEqual(marker.read_text(), str(os.getpid()))
+            self.assertFalse(marker.exists())
+
     def test_update_automatically_starts_and_reads_external_attachments(self):
         self.assert_live_service("update")
 
-    def assert_live_service(self, action):
+    def assert_live_service(self, action, *, stale_lock=False):
         self.install()
+        if stale_lock:
+            code = ("import os, sys; from flowboard.operations import maintenance_lock; "
+                    "\nwith maintenance_lock(sys.argv[1]): os._exit(0)\n")
+            exited = subprocess.run([sys.executable, "-c", code, str(self.settings().lock)],
+                                    cwd=self.app, env=self.env, capture_output=True, timeout=10)
+            self.assertEqual(exited.returncode, 0, exited.stderr)
+            self.assertTrue(self.settings().lock.exists())
         if action == "update":
             self.init_git()
         env = dict(self.env, FLOWBOARD_CONFIG=str(self.config), FLOWBOARD_PYTHON=sys.executable)
@@ -261,8 +308,9 @@ class DeploymentTests(unittest.TestCase):
             self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
         output = self.root / "server-output.log"
         with output.open("w", encoding="utf-8") as stream:
-            process = subprocess.Popen([sys.executable, "-X", "utf8", str(self.app / "flowboard_deploy.py"),
-                                        action, "--config", str(self.config)], cwd=self.app, env=env,
+            command = (["cmd", "/d", "/c", "start-flowboard.cmd"] if os.name == "nt" and action == "start" else
+                       [sys.executable, "-X", "utf8", str(self.app / "flowboard_deploy.py"), action, "--config", str(self.config)])
+            process = subprocess.Popen(command, cwd=self.app, env=env,
                                        stdout=stream, stderr=subprocess.STDOUT)
             try:
                 deadline = time.monotonic() + 15
@@ -280,6 +328,7 @@ class DeploymentTests(unittest.TestCase):
                         time.sleep(0.1)
                 else:
                     self.fail(output.read_text(encoding="utf-8"))
+                self.command("start", "--config", str(self.config), expected=3)
                 for path, expected in (("/api/bootstrap", 401), ("/api/attachments/1/content", 401), ("/flowboard.db", 404), ("/", 200)):
                     conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=2)
                     conn.request("GET", path)

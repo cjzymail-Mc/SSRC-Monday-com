@@ -3,6 +3,8 @@
 > 跨会话当前快照；完整历史：`team-progress/STATE-archive-20260904-pre-production-rebaseline.md`。
 > 更新：2026-10-13
 
+> 2026-10-13 重启启动核验：当前没有开机自启，重启并登录Windows后双击 `start-flowboard.cmd`，保留运行窗口即可恢复正式8080。核验发现旧文件锁在异常退出后残留会阻止启动；本机已增加操作系统自动释放的互斥锁，并在确认旧进程退出后恢复残留标记，保护仍活跃的旧监督进程与无法识别的锁。15项部署回归PASS（含实际CMD启动、异常退出恢复、PID复用、重复启动拒绝、登录/附件、升级成功及失败），证据 [重启核验记录](team-progress/20261013-deployment-restart.md)。正式health200且旧监督进程9348仍活跃，未重启正式服务、未写业务库、未配置自启。用户随后再次调用commit-push-pr，授权本次修复的Git交付；此前部署交付已推送main的dd204b6。
+
 > 2026-10-13 用户已确认正式登录与办公室访问验收：原账号登录成功，真实项目正常，办公室同事通过不同路由器均可访问，本机未连接Wi-Fi。当前 `PRODUCTION_RUNNING / OFFICE_ACCESS_ACCEPTED`，有线入口 `http://192.168.49.194:8080/`。下方“同事验收待确认”已完成；这证明已测试的办公室路径可达，不扩大为未测试的全公司网络。用户随后明确调用 commit-push-pr，授权提交当前全部合规改动，由验证后的仓库所有者按直接main路径交付。运行快照、真实配置及数据库派生的机器记录只保留本机；复制时产生的图片/Excel异常已由用户修复，当前与Git版本一致。
 
 > 2026-10-13 09:20 XY24 正式数据安装与8080启动已按用户明确授权执行，当前 `PRODUCTION_RUNNING / COLLEAGUE_ACCEPTANCE_PENDING`。入口 `http://192.168.49.194:8080/`，监督进程PID9348、服务进程PID288监听0.0.0.0:8080；后台运行，stdout/stderr在仓库父目录flowboard-backups。固定配置为父目录 `flowboard-host.json`，唯一正式库为父目录 `flowboard-data/flowboard.db`，附件 `flowboard-data/attachments`，备份 `flowboard-backups`；后续 `start-flowboard.cmd` 自动读取配置。已从核验包安装最新正式快照并保留本机完整备份；安装记录 `../flowboard-backups/deployment-20261013-011848-7319f8f1.json`。46张表及schema与接受快照一致，启动前后 changed_tables=[]，7原账号、25活跃项目（全部35项目/348节点包含历史），附件0；v20无需结构迁移，密码和业务记录未改。回环与有线IP的health/首页/未登录401/受保护文件404共10项及6份静态资源源码比对PASS，正式库完整性ok/外键0。证据 `team-progress/20261013-production-release.json`、`20261013-production-before-start.json`、`20261013-production-launch.json`；已请求另一台电脑用原账号登录打开真实项目，人工验收尚未确认。没有真实仓库Git提交/推送/更新、防火墙或网络变更；开机自启未配置，重启电脑后需运行正式启动器。当前复制目录既有改动保留，未来更新仍须开发机发布工具并使用干净代码checkout。本条覆盖下方“待授权安装/8080停止/仍为演示库”事实。
