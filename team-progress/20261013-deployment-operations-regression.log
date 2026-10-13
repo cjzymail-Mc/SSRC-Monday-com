@@ -1,0 +1,8 @@
+test_backup_manifest_corruption_retention_and_real_restore_with_blob (test_i13_operations.I13OperationsTests.test_backup_manifest_corruption_retention_and_real_restore_with_blob) ... ok
+test_restore_failure_preserves_originally_missing_targets (test_i13_operations.I13OperationsTests.test_restore_failure_preserves_originally_missing_targets) ... ok
+test_restore_injected_failure_rolls_back_current_database_and_attachment (test_i13_operations.I13OperationsTests.test_restore_injected_failure_rolls_back_current_database_and_attachment) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 8.412s
+
+OK

@@ -1,0 +1,9 @@
+{
+  "format_version": 1,
+  "data_dir": "flowboard-data",
+  "backup_dir": "flowboard-backups",
+  "host": "0.0.0.0",
+  "port": 8080,
+  "secure_cookie": false,
+  "release_ref": "origin/main"
+}

@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-10-13T09:15:08.434119+08:00",
+  "status": "PRODUCTION_RUNNING_OFFICE_ACCEPTED",
+  "scope": [
+    "external host configuration and runtime paths",
+    "verified-backup installation",
+    "daily configured startup",
+    "clean-checkout fast-forward update with backup and new-code migration",
+    "failure records and stopped-service guards"
+  ],
+  "source_sha256": {
+    "flowboard_deploy.py": "a6556ec651cd9988e81a734771007fcaad1cc7f0661767d31bdc978c3f5c9d86",
+    "start-flowboard.cmd": "40cb2604b238f88ddcc160a9e1dfa2cd37a50138233bdb2e6bba4497d7d58947",
+    "install-flowboard.cmd": "f14030432a9b820e44520014ced28e6d2b735272703b37218014d704d8ca732d",
+    "update-flowboard.cmd": "51a271aa53617751aaa0e871be9c7713ac86b32ec1cd25ef8c944a8e4abf3fe5",
+    "flowboard-host.example.json": "f79d0e4a77e85f74e1d726fee6b8182d2d298351db1fb010e9eab9ddf38d551b",
+    "tests/test_deployment.py": "26d1e710b7507e2d7a6e2deacf983901acd5d84739ec14b10c95a40ef0774c71"
+  },
+  "verification": {
+    "deployment_tests": {
+      "passed": 12,
+      "total": 12,
+      "log": "team-progress/20261013-deployment-tests.log"
+    },
+    "existing_operations_tests": {
+      "passed": 3,
+      "total": 3,
+      "log": "team-progress/20261013-deployment-operations-regression.log"
+    },
+    "real_cmd_install_dry_run": "PASS",
+    "cmd_help": "PASS",
+    "whitespace": "PASS (CRLF accounted for)"
+  },
+  "first_run_failure": "Fixture SQLite handles were not explicitly closed; sandbox denied fixture process cleanup. Fixed with closing(), stopped only the identified fixture process tree, and reran outside sandbox.",
+  "current_host_checked_at": "2026-10-13T09:21:25.789841+08:00",
+  "current_host": {
+    "port_8080_listening": true,
+    "formal_db_created": true,
+    "external_config_created": true,
+    "server_pid": 288,
+    "supervisor_pid": 9348
+  },
+  "pending": [
+    "developer publication of the new entry points and a clean release checkout for future updates"
+  ],
+  "real_repo_commit_push_fetch_merge": false,
+  "production_cutover_performed": true,
+  "machine_configuration_changed": false,
+  "plan": "team-progress/20261013-xy24-install-plan.json",
+  "production_release": "team-progress/20261013-production-release.json",
+  "colleague_real_login_and_operation_acceptance": "PASS: user confirmed original-account login and real projects",
+  "office_network_acceptance": {
+    "multiple_routers": true,
+    "host_wifi_connected": false,
+    "evidence": "User explicitly confirmed office colleagues can access across different routers with host Wi-Fi disconnected"
+  },
+  "accepted_at": "2026-10-13T10:18:09.806600+08:00"
+}

@@ -19,3 +19,15 @@ local-test-data/
 
 # double-session 持续任务活文档（随检查点频繁变化，不入库）
 temp.md
+
+# 服务机本地配置；默认放在代码仓库父目录，示例文件可入库。
+flowboard-host.json
+
+# 本机运行快照、代理工具状态及原始环境诊断；保留在本机，不进入发布代码。
+.workbuddy/
+flowboard-usb-snapshot-DO-NOT-USE.db*
+team-progress/fw-*-*.txt
+team-progress/network-check-report.md
+team-progress/20261012-xy24-deployment-preflight-*.json
+team-progress/20261013-production-*.json
+team-progress/20261013-xy24-install-plan.json

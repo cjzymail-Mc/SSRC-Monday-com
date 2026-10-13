@@ -1,7 +1,15 @@
 # STATE.md — Flowboard 当前状态
 
 > 跨会话当前快照；完整历史：`team-progress/STATE-archive-20260904-pre-production-rebaseline.md`。
-> 更新：2026-10-09
+> 更新：2026-10-13
+
+> 2026-10-13 用户已确认正式登录与办公室访问验收：原账号登录成功，真实项目正常，办公室同事通过不同路由器均可访问，本机未连接Wi-Fi。当前 `PRODUCTION_RUNNING / OFFICE_ACCESS_ACCEPTED`，有线入口 `http://192.168.49.194:8080/`。下方“同事验收待确认”已完成；这证明已测试的办公室路径可达，不扩大为未测试的全公司网络。用户随后明确调用 commit-push-pr，授权提交当前全部合规改动，由验证后的仓库所有者按直接main路径交付。运行快照、真实配置及数据库派生的机器记录只保留本机；复制时产生的图片/Excel异常已由用户修复，当前与Git版本一致。
+
+> 2026-10-13 09:20 XY24 正式数据安装与8080启动已按用户明确授权执行，当前 `PRODUCTION_RUNNING / COLLEAGUE_ACCEPTANCE_PENDING`。入口 `http://192.168.49.194:8080/`，监督进程PID9348、服务进程PID288监听0.0.0.0:8080；后台运行，stdout/stderr在仓库父目录flowboard-backups。固定配置为父目录 `flowboard-host.json`，唯一正式库为父目录 `flowboard-data/flowboard.db`，附件 `flowboard-data/attachments`，备份 `flowboard-backups`；后续 `start-flowboard.cmd` 自动读取配置。已从核验包安装最新正式快照并保留本机完整备份；安装记录 `../flowboard-backups/deployment-20261013-011848-7319f8f1.json`。46张表及schema与接受快照一致，启动前后 changed_tables=[]，7原账号、25活跃项目（全部35项目/348节点包含历史），附件0；v20无需结构迁移，密码和业务记录未改。回环与有线IP的health/首页/未登录401/受保护文件404共10项及6份静态资源源码比对PASS，正式库完整性ok/外键0。证据 `team-progress/20261013-production-release.json`、`20261013-production-before-start.json`、`20261013-production-launch.json`；已请求另一台电脑用原账号登录打开真实项目，人工验收尚未确认。没有真实仓库Git提交/推送/更新、防火墙或网络变更；开机自启未配置，重启电脑后需运行正式启动器。当前复制目录既有改动保留，未来更新仍须开发机发布工具并使用干净代码checkout。本条覆盖下方“待授权安装/8080停止/仍为演示库”事实。
+
+> 2026-10-13 两台电脑的最小部署入口已实现并验证：用户确认另一台电脑开发 feature，本机仅部署与上线，并指示继续。新增 `flowboard_deploy.py`、首次安装及更新 CMD、外部配置示例；日常启动器读取服务机配置，保留外部环境变量与旧根库兼容。安装核验完整备份并拒绝覆盖已有数据；更新要求停服、干净工作区及 fast-forward，先备份，再用新代码迁移/核验/启动，失败保留记录并停止。隔离专项 12/12（含真实 CMD、原账号登录、外部附件读取、v19→v20、拉取后新代码迁移、失败与权限负例）、既有备份恢复回归 3/3 PASS；首轮测试收尾错误已修正，未弱化断言。本机真实安装计划 `team-progress/20261013-xy24-install-plan.json` 已通过 CMD --check，交付与日志索引 `team-progress/20261013-deployment-delivery.json`，使用方式见 README。09:09 跨日核对：8080 没有监听、health 连接拒绝，根正式库及外部配置均未创建；没有正式服务切换、真实仓库 Git 变更或机器配置变更。下一步待明确授权，将已核验的最新正式快照安装到仓库父目录的 flowboard-data，配置 flowboard-host.json，备份 flowboard-backups，并启动8080及同事真实验收。当前复制工作区有既有改动；未来自动更新前须由开发机发布这些入口，并建立干净发布 checkout，不得清理现有成果来迎合更新条件。本条覆盖下方旧“工具方案待决定”及服务运行事实。
+
+> 2026-10-12 XY24 部署准备：用户已确认其它电脑可访问 `http://192.168.49.194:8080/`，目前该入口仍运行 `local-test-data/flowboard.db` 演示库；此次访问样本的来源网段及登录操作尚未补记，不能据此宣称全公司网络验收完成。用户确认 U 盘快照 `flowboard-usb-snapshot-DO-NOT-USE.db` 为最新正式数据、复制后无人修改。快照 v20、完整性及外键检查通过；已使用 SQLite 一致备份及现有备份/恢复工具完成隔离恢复，46 张表及 schema 哈希全部一致、附件记录和文件均为 0、源库逻辑内容未变。备份包 `backups/flowboard-before-xy24-cutover-20261012-092742-402502`，证据 `team-progress/20261012-xy24-deployment-preflight-20261012-172742.json`。根正式 `flowboard.db` 仍不存在，未切换生产服务、未修改防火墙或其它机器配置。下一步为确认正式切换范围；部署/升级入口改进方案仍待用户决定，不自动成为施工范围。本条覆盖下方旧电脑地址及历史运行状态，历史交付记录继续保留。
 
 > 2026-10-09最新阶段标签：用户确认静态视觉并授权施工，overview-ui/css已实现独立26px高/6px圆角标签，原阶段颜色仅作用于标签，列宽、头像、关注状态、详情和数据不变。资源20261009-stage-badge；Node11/11、隔离浏览器1/1（六阶段/空状态、宽窄屏、hover、展开）PASS。实际HTTP核对发现8080/8083均已停止、原PID14404/492不存在；正式日志最后活动15:28:50，退出原因未确认，本轮没有停止服务。代码开发验证完成，已询问启动范围，等待用户明确选择再恢复服务；不能称当前正式页面已生效。续接 `team-progress/20261009-stage-badge-implementation.md`，覆盖下方“样张待确认/服务当前运行”状态。
 
