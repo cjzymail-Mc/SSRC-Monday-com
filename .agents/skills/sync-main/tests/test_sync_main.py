@@ -72,6 +72,15 @@ class SyncMainIntegrationTests(unittest.TestCase):
         self.git(self.seed, "push", "origin", "main")
         return self.git(self.seed, "rev-parse", "HEAD").stdout.strip()
 
+    def track_fixture_database(self):
+        fixture = "team-progress/verification/roundtrip.db"
+        self.put(self.seed, fixture, b"isolated test fixture")
+        self.commit(self.seed, "tracked test database")
+        self.git(self.seed, "push", "origin", "main")
+        self.git(self.work, "fetch", str(self.remote), "+refs/heads/main:refs/remotes/origin/main")
+        self.git(self.work, "merge", "--ff-only", "origin/main")
+        return fixture, self.git(self.work, "rev-parse", "HEAD").stdout.strip()
+
     def sync(self, *args, expected=0, fail_fetch=False, fetch_count=None):
         # Origin validation and all Git operations are real. This function changes
         # transport only for fetch; it does not mock merges, stashes or their exits.
@@ -267,6 +276,33 @@ function git {
         self.assertEqual((self.work / "runtime.db").read_text(), "live sentinel")
         self.assertEqual(self.git(self.work, "stash", "list").stdout, "")
 
+    def test_unchanged_tracked_test_database_does_not_block_sync(self):
+        fixture, _ = self.track_fixture_database()
+        self.put(self.work, "local-note.txt", "unfinished note\n")
+        target = self.advance()
+        result = self.sync()
+        self.assertIn("SYNC_MAIN_WIP_OK", result.stdout)
+        self.assert_current(target)
+        self.assertEqual((self.work / fixture).read_bytes(), b"isolated test fixture")
+        self.assertEqual((self.work / "local-note.txt").read_text(), "unfinished note\n")
+
+    def test_modified_tracked_database_stops_before_fetch(self):
+        fixture, baseline = self.track_fixture_database()
+        self.put(self.work, fixture, b"local database change")
+        self.advance()
+        self.sync(expected=16, fetch_count=0)
+        self.assert_current(baseline)
+        self.assertEqual((self.work / fixture).read_bytes(), b"local database change")
+        self.assertEqual(self.git(self.work, "stash", "list").stdout, "")
+
+    def test_incoming_tracked_database_change_is_guarded(self):
+        fixture, baseline = self.track_fixture_database()
+        self.advance(fixture, "incoming database change")
+        self.sync(expected=16, fetch_count=1)
+        self.assert_current(baseline)
+        self.assertEqual((self.work / fixture).read_bytes(), b"isolated test fixture")
+        self.assertEqual(self.git(self.work, "stash", "list").stdout, "")
+
     def test_fetch_failure_leaves_work_in_place(self):
         self.put(self.work, "app.txt", "unfinished\n")
         self.sync(fail_fetch=True, expected=1)
@@ -334,6 +370,26 @@ function git {
         self.assertEqual(self.git(self.work, "show", f"{snapshot}^3:new.txt").stdout, "local new feature\n")
         self.put(self.work, "new.txt", "upstream new feature\nlocal new feature\n")
         self.sync("-CompleteRecovery", "-RecoverySnapshot", snapshot)
+
+    def test_identical_untracked_collision_is_already_preserved_upstream(self):
+        fixture, _ = self.track_fixture_database()
+        self.put(self.work, "new.txt", "same report\n")
+        self.put(self.work, "local-note.txt", "separate unfinished note\n")
+        self.put(self.seed, ".gitignore", "runtime.db\nbackups/\n.env\ncache/\nlocal-note.txt\n")
+        target = self.advance("new.txt", "same report\n")
+        self.sync(expected=20)
+        snapshot = self.journal()["snapshot"]
+        self.assert_current(target)
+        self.assertEqual(
+            self.git(self.work, "rev-parse", f"{snapshot}^3:new.txt").stdout.strip(),
+            self.git(self.work, "rev-parse", f"{target}:new.txt").stdout.strip(),
+        )
+        self.assertEqual((self.work / "new.txt").read_text(), "same report\n")
+        if not (self.work / "local-note.txt").exists():
+            self.put(self.work, "local-note.txt", "separate unfinished note\n")
+        self.sync("-CompleteRecovery", "-RecoverySnapshot", snapshot)
+        self.assertEqual((self.work / fixture).read_bytes(), b"isolated test fixture")
+        self.assertEqual((self.work / "local-note.txt").read_text(), "separate unfinished note\n")
 
     def test_repeated_remote_advances_keep_unfinished_work(self):
         self.put(self.work, "app.txt", "unfinished repair\n")

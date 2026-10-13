@@ -11,7 +11,7 @@ Update the selected repository's main baseline and preserve unfinished work. Dir
 
 Locate this installed skill's `scripts/sync-main.ps1` and bind its actual resource path to `$SyncScript`; bind `scripts/inspect-repository.ps1` to `$InspectScript`. Use the repository explicitly selected by the user, otherwise the current Git working directory, as `$RepositoryPath`. The skill's location does not define the target repository. Resolve paths with Git and optional repo-local `.agents/git-workflow.json`; read [Repository context](references/repository-context.md) when topology/configuration requires it. No workspace path, product name or fixed GitHub account belongs in the shared skill.
 
-Read applicable AGENTS.md once. Preserve local work; never `reset --hard`, `clean`, overwrite checkout, force-delete, `stash pop/drop/clear`, or choose ours/theirs wholesale. Only the helper's named recovery stash is permitted. Keep ignored files in place; never `stash --all`. Guarded tracked/unignored runtime databases, credentials, actual environment files, backups, attachments and configured project data stop snapshotting. Reviewed dummy environment templates may be tracked. Inspect path names beyond known guards.
+Read applicable AGENTS.md once. Preserve local work; never `reset --hard`, `clean`, overwrite checkout, force-delete, `stash pop/drop/clear`, or choose ours/theirs wholesale. Only the helper's named recovery stash is permitted. Keep ignored files in place; never `stash --all`. Guard locally changed or unignored runtime databases, credentials, actual environment files, backups, attachments and configured project data before snapshotting. Clean tracked protected files may remain in place only when the incoming update does not change them; new or changed protected paths in incoming main stop synchronization. Reviewed dummy environment templates may be tracked. Inspect path names beyond known guards.
 
 Do not proceed through an unrelated merge/rebase/cherry-pick/revert/sequencer. Invocation authorizes fetch, fast-forward, a named local recovery snapshot/ref, restoration and in-scope conflict resolution; no ordinary commit, push, PR or deployment. Do not run/edit another synchronizer concurrently.
 
@@ -37,7 +37,7 @@ Do not proceed through an unrelated merge/rebase/cherry-pick/revert/sequencer. I
    | `0`, clean | Report clean switch/fast-forward; no product tests by default. |
    | `0`, wip | Review preservation and incoming path/dependency impact; use a focused check only when relevant. |
    | `0`, recovered | Report completed resolution/evidence; do not repeat checks. |
-   | `20`, recovery/resolve required | Follow [Active conflict resolution](references/conflict-resolution.md) and finish restoration, not just report ordinary conflicts. |
+   | `20`, recovery/resolve required | Follow [Active conflict resolution](references/conflict-resolution.md) and finish restoration, including untracked paths that became tracked upstream. |
    | `21`, update failed | Inspect journal, HEAD and snapshot; restore work and address in-scope obstruction. |
    | `10/11/12/13/15/16/17` | Preserve unsupported state, local-only commits, invalid topology, protected data or stale fetch reuse; explain exact boundary. |
    | Other nonzero | Diagnose evidence; no destructive bypass or success claim. |

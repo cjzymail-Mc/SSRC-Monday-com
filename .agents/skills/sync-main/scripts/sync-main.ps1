@@ -46,6 +46,14 @@ function Assert-SafePaths {
     }
 }
 
+function Assert-SafeWorkingPaths {
+    # Clean tracked protected files already belong to HEAD. Guard changes that
+    # could enter the recovery stash, checking both ends of a rename.
+    Assert-SafePaths -Paths @(Get-GitPaths -Arguments @("diff", "--no-renames", "--name-only", "-z"))
+    Assert-SafePaths -Paths @(Get-GitPaths -Arguments @("diff", "--cached", "--no-renames", "--name-only", "-z"))
+    Assert-SafePaths -Paths @(Get-GitPaths -Arguments @("ls-files", "--others", "--exclude-standard", "-z"))
+}
+
 function Get-WorkStatus {
     return @(Invoke-Git -Arguments @("status", "--porcelain=v1", "--untracked-files=all"))
 }
@@ -154,10 +162,7 @@ if ($recovering) {
         Stop-Sync -Code 10 -Message "SYNC_MAIN_DIRTY: work preserved; WIP synchronization requires main and does not support -RequireClean."
     }
 
-    # Reject protected tracked files even when clean: a stash contains whole trees.
-    Assert-SafePaths -Paths @(Get-GitPaths -Arguments @("ls-files", "-z"))
-    Assert-SafePaths -Paths @(Get-GitPaths -Arguments @("ls-tree", "-r", "--name-only", "-z", "HEAD"))
-    Assert-SafePaths -Paths @(Get-GitPaths -Arguments @("ls-files", "--others", "--exclude-standard", "-z"))
+    Assert-SafeWorkingPaths
     if (@(Invoke-Git -Arguments @("ls-files", "--stage")) -match '^160000 ') {
         Stop-Sync -Code 16 -Message "SYNC_MAIN_SUBMODULE: nested repository work requires a separate preservation decision."
     }
@@ -196,7 +201,8 @@ if ($recovering) {
         Write-SyncReport -Mode "unchanged" -WorktreeDirty $dirty
         exit 0
     }
-    Assert-SafePaths -Paths @(Get-GitPaths -Arguments @("ls-tree", "-r", "--name-only", "-z", $remoteCommit))
+    # Fast-forward must not add, remove or modify any protected path.
+    Assert-SafePaths -Paths @(Get-GitPaths -Arguments @("diff", "--no-renames", "--name-only", "-z", "HEAD", $remoteCommit))
     if ($dirty -and $received -gt 0) {
         $id = [guid]::NewGuid().ToString("N")
         $recovery = [ordered]@{
@@ -268,8 +274,7 @@ $finalBranch = ((Invoke-Git -Arguments @("branch", "--show-current")) -join "").
 if ($localCommit -ne $remoteCommit -or $finalBranch -ne $MainBranch) {
     Stop-Sync -Code 14 -Message "SYNC_MAIN_POSTCONDITION_FAILED: branch/base changed; preserve any recovery journal."
 }
-Assert-SafePaths -Paths @(Get-GitPaths -Arguments @("ls-files", "-z"))
-Assert-SafePaths -Paths @(Get-GitPaths -Arguments @("ls-files", "--others", "--exclude-standard", "-z"))
+Assert-SafeWorkingPaths
 $finalStatus = @(Get-WorkStatus)
 $worktreeDirty = ($finalStatus -join "").Length -gt 0
 if ($RequireClean -and $worktreeDirty) {
