@@ -56,7 +56,7 @@ class StageBadgeE2E(unittest.TestCase):
             page.screenshot(path=str(EVIDENCE/f'overview-stage-badge-{width}.png'),full_page=True)
         page.locator(f'[data-overview-expand="{ids["risk"]}"]').click()
         self.assertTrue(page.locator(f'#ov-detail-{ids["risk"]}').is_visible())
-        self.assertGreater(page.locator(f'#ov-detail-{ids["risk"]} .ov-nodes tbody tr').count(),0)
+        self.assertGreater(page.locator(f'#ov-detail-{ids["risk"]} .timeline-dashboard-node').count(),0)
         self.assert_clean_browser(page);context.close()
 
 if __name__=='__main__':unittest.main()

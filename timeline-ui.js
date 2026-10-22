@@ -190,10 +190,10 @@
     }
     return groups;
   }
-  function renderProjectLanes(source,{start,end,today=shanghaiToday(),expanded=new Set(),state=null,pixelPerDay=Infinity,portfolio=false,clipRange=false,showNodeLabels=false}={}){
+  function renderProjectLanes(source,{start,end,today=shanghaiToday(),expanded=new Set(),state=null,pixelPerDay=Infinity,portfolio=false,clipRange=false,showNodeLabels=false,nodeFilter=null}={}){
     const project=state?.project?.project_id===source.project_id?state.project:source;
     const range=start&&end?{start,end,today}:dashboardRange([project],today),intervals=project.stage_intervals||[],nodes=project.nodes||[],nodesById=new Map(nodes.map(node=>[Number(node.id),node]));
-    const inRange=date=>!clipRange||(date>=range.start&&date<range.end),visibleNodes=nodes.filter(node=>inRange(node.date));
+    const inRange=date=>!clipRange||(date>=range.start&&date<range.end),visibleNodes=nodes.filter(node=>inRange(node.date)&&(!nodeFilter||nodeFilter(node)));
     // Clipped period nodes can all be future while a stage began before the period.
     const hasPast=nodes.some(node=>node.date&&node.date<=range.today),pastMask=hasPast?`<i class="timeline-past-mask" aria-hidden="true" style="width:${position(range.today,range.start,range.end)}%"></i>`:'';
     const originalById=new Map((state?.original?.nodes||[]).map(node=>[Number(node.id),node]));
@@ -325,14 +325,14 @@
       target.addEventListener('pointerenter',enter);target.addEventListener('pointerleave',leave);target.addEventListener('focusin',enter);target.addEventListener('focusout',leave);
     });
   }
-  function bindDashboardRemarks(root,{states,editable,render,hideTooltip,onDraft}){
+  function bindDashboardRemarks(root,{states,editable,render,hideTooltip,onDraft,onSave,onSaved}){
     // A body portal clears canvas clipping/fullscreen stacking without using the browser top layer.
     root.__timelineRemark?.destroy();
     const panel=document.createElement('aside');panel.className='timeline-remark-popup';panel.dataset.dashboardRemark='';panel.id='timelineRemarkPopup';panel.hidden=true;panel.setAttribute('role','tooltip');
     panel.innerHTML='<h3 id="timelineRemarkTitle" data-remark-title></h3><div data-remark-preview></div><form data-remark-form hidden><textarea name="remark" aria-label="节点备注" maxlength="500" placeholder="--暂无备注信息--"></textarea><p data-remark-confirm hidden role="alert">备注尚未保存，是否放弃修改？</p><div class="timeline-remark-actions"><button type="button" data-remark-continue hidden>继续编辑</button><button type="button" data-remark-discard hidden>放弃修改</button><button type="button" data-remark-cancel>取消</button><button type="submit" data-remark-save>确定</button></div></form>';
     document.body.append(panel);
     const signal=root.__timelineAbort?.signal,form=panel.querySelector('form'),input=form.elements.remark,preview=panel.querySelector('[data-remark-preview]'),selector='.timeline-dashboard-node,.timeline-node-flag,.timeline-node-flag-hit';
-    let active=null,record=null,editing=false,confirming=false,baseline='',suppressFocus=false;
+    let active=null,record=null,editing=false,confirming=false,saving=false,baseline='',suppressFocus=false;
     const resolve=anchor=>{const projectId=Number(anchor?.dataset.projectId),nodeId=Number(anchor?.dataset.nodeId),state=states.get(projectId),node=state?.project.nodes.find(item=>Number(item.id)===nodeId);return node?{projectId,nodeId,state,node}:null};
     const place=()=>{if(panel.hidden||!active?.isConnected)return;const r=active.getBoundingClientRect(),w=panel.offsetWidth,h=panel.offsetHeight,pad=12;panel.style.left=Math.max(pad,Math.min(r.left,innerWidth-w-pad))+'px';let top=r.bottom+14;if(top+h>innerHeight-pad)top=r.top-h-14;panel.style.top=Math.max(pad,Math.min(top,innerHeight-h-pad))+'px'};
     const hide=()=>{if(editing)return;panel.hidden=true;active?.removeAttribute('aria-describedby');active=null;record=null};
@@ -340,7 +340,7 @@
     const close=({restoreFocus=true}={})=>{const opener=active;editing=false;confirm(false);form.hidden=true;panel.classList.remove('is-editing');panel.setAttribute('role','tooltip');panel.removeAttribute('aria-labelledby');hide();if(restoreFocus&&opener?.isConnected){const target=opener.matches('.timeline-dashboard-node')?opener:root.querySelector(`.timeline-dashboard-node[data-project-id="${opener.dataset.projectId}"][data-node-id="${opener.dataset.nodeId}"]`);suppressFocus=true;target?.focus({preventScroll:true});suppressFocus=false}};
     const show=anchor=>{if(editing||suppressFocus||document.body.classList.contains('timeline-dragging'))return;const next=resolve(anchor);if(!next)return;hide();hideTooltip();active=anchor;record=next;panel.querySelector('[data-remark-title]').textContent=`${next.node.name} · ${next.node.date}`;preview.textContent=next.node.remark||'--暂无备注信息--';preview.classList.toggle('is-empty',!next.node.remark);anchor.setAttribute('aria-describedby',panel.id);panel.hidden=false;place()};
     const open=anchor=>{if(editing||!anchor)return;const next=resolve(anchor);if(!next||!editable(next.projectId)||next.state.submitting)return;show(anchor);if(!record)return;editing=true;record.state.armed=null;root.querySelectorAll('.is-armed').forEach(el=>{el.classList.remove('is-armed');if(!el.classList.contains('is-drag-pending'))el.classList.remove('is-emphasized')});baseline=String(record.node.remark||'');input.value=baseline;form.hidden=false;panel.classList.add('is-editing');panel.setAttribute('role','dialog');panel.setAttribute('aria-labelledby','timelineRemarkTitle');place();input.focus({preventScroll:true})};
-    const requestClose=()=>{if(!editing)return true;if(input.value!==baseline){confirm(true);return false}close();return true};
+    const requestClose=()=>{if(saving)return false;if(!editing)return true;if(input.value!==baseline){confirm(true);return false}close();return true};
     const controller={open,hide,requestClose,get editing(){return editing},get dirty(){return editing&&input.value!==baseline},destroy(){editing=false;active?.removeAttribute('aria-describedby');active=null;record=null;panel.remove();if(root.__timelineRemark===controller)delete root.__timelineRemark}};root.__timelineRemark=controller;
     root.querySelectorAll(selector).forEach(anchor=>{
       anchor.addEventListener('pointerenter',()=>show(anchor));anchor.addEventListener('pointerleave',hide);anchor.addEventListener('focus',()=>show(anchor));anchor.addEventListener('blur',hide);
@@ -348,7 +348,26 @@
       anchor.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.isComposing){event.preventDefault();event.stopPropagation();open(anchor)}});
     });
     panel.querySelector('[data-remark-cancel]').addEventListener('click',()=>close());panel.querySelector('[data-remark-discard]').addEventListener('click',()=>close());panel.querySelector('[data-remark-continue]').addEventListener('click',()=>{confirm(false);input.focus({preventScroll:true})});
-    form.addEventListener('submit',event=>{event.preventDefault();if(!editing||confirming||!editable(record.projectId)||record.state.submitting||!form.reportValidity())return;const {state,nodeId}=record,value=input.value,changed=value!==baseline;if(changed){updateNode(state,nodeId,'remark',value);state.dashboardContext={nodeId,action:'remark'}}close();if(changed){render?.();onDraft?.()}});
+
+    form.addEventListener('submit',async event=>{
+      event.preventDefault();
+      if(!editing||confirming||saving||!editable(record.projectId)||record.state.submitting||!form.reportValidity())return;
+      const {state,nodeId,projectId}=record,value=input.value,changed=value!==baseline;
+      if(onSave&&changed){
+        let errorNode=form.querySelector('[data-remark-save-error]');
+        if(!errorNode){errorNode=document.createElement('p');errorNode.dataset.remarkSaveError='';errorNode.setAttribute('role','alert');form.insertBefore(errorNode,form.querySelector('.timeline-remark-actions'))}
+        errorNode.hidden=true;errorNode.textContent='';saving=true;input.readOnly=true;
+        const buttons=[...form.querySelectorAll('button')],saveButton=form.querySelector('[data-remark-save]');
+        buttons.forEach(button=>button.disabled=true);saveButton.textContent='保存中…';
+        let saved;
+        try{saved=await onSave({projectId,nodeId,remark:value})}
+        catch(error){if(panel.isConnected){errorNode.textContent=error.message||'备注保存失败，请重试。';errorNode.hidden=false}return}
+        finally{saving=false;if(panel.isConnected){input.readOnly=false;buttons.forEach(button=>button.disabled=false);saveButton.textContent='确定'}}
+        if(panel.isConnected)close({restoreFocus:false});onSaved?.(saved);return;
+      }
+      if(changed){updateNode(state,nodeId,'remark',value);state.dashboardContext={nodeId,action:'remark'}}
+      close();if(changed){render?.();onDraft?.()}
+    });
     // Consume editor Escape before the canvas fullscreen/drag handlers can rerender it away.
     document.addEventListener('keydown',event=>{if(!editing||event.key!=='Escape'||event.isComposing)return;event.preventDefault();event.stopImmediatePropagation();if(!confirming)requestClose()},{capture:true,signal});
     panel.addEventListener('keydown',event=>{if(!editing||event.key!=='Tab')return;const controls=[...form.querySelectorAll('textarea,button')].filter(el=>!el.hidden&&!el.disabled),index=controls.indexOf(document.activeElement);if(event.shiftKey&&index<=0){event.preventDefault();controls.at(-1)?.focus()}else if(!event.shiftKey&&index===controls.length-1){event.preventDefault();controls[0]?.focus()}});
@@ -358,16 +377,16 @@
     root.addEventListener('contextmenu',hide,{capture:true,signal});root.addEventListener('pointerdown',hide,{capture:true,signal});
     signal?.addEventListener('abort',()=>controller.destroy(),{once:true});return controller;
   }
-  function bindDashboard(root,{filters={},states=new Map(),render,onSubmit,onDiscard,onUndo,onOpenSingle,onViewportChange,onRemarkDraft,editable=()=>true}={}){
+  function bindDashboard(root,{filters={},states=new Map(),render,onSubmit,onDiscard,onUndo,onOpenSingle,onViewportChange,onRemarkDraft,onRemarkSave,onRemarkSaved,editable=()=>true}={}){
     let drag=null;
     const hideNodeTooltip=bindDashboardTooltip(root);
-    const remarks=bindDashboardRemarks(root,{states,editable,render,hideTooltip:hideNodeTooltip,onDraft:onRemarkDraft});
+    const remarks=bindDashboardRemarks(root,{states,editable,render,hideTooltip:hideNodeTooltip,onDraft:onRemarkDraft,onSave:onRemarkSave,onSaved:onRemarkSaved});
     bindNodeFlagProbe(root);requestAnimationFrame(()=>layoutNodeFlags(root));window.addEventListener('resize',()=>layoutNodeFlags(root),{signal:root.__timelineAbort?.signal});
     const getState=projectId=>states.get(Number(projectId));
     const labels={single:'拖拽（仅当前节点）',cascade:'拖拽（顺延）',done:'已完成',undone:'未完成'};
     const portfolio=root.querySelector('.timeline-portfolio-card'),portfolioScroll=root.querySelector('[data-portfolio-scroll]'),portfolioChart=portfolioScroll?.querySelector('.timeline-portfolio-chart');
     let portfolioApi=null;
-    if(portfolio&&portfolioScroll&&portfolioChart){
+    if(portfolio&&portfolioScroll&&portfolioChart&&!portfolio.classList.contains('ov-inline-timeline')){
       const weekLocked=portfolio.dataset.weekLocked==='true';
       const measurePlot=()=>{const chartRect=portfolioChart.getBoundingClientRect(),axisRect=portfolioChart.querySelector('.timeline-e-axis')?.getBoundingClientRect(),leftWidth=Math.max(0,Math.round((axisRect?.left??chartRect.left+334)-chartRect.left)),rightWidth=Math.max(0,Math.round(chartRect.right-(axisRect?.right??chartRect.right-20))),available=Math.max(320,portfolioScroll.clientWidth-leftWidth-rightWidth);return{leftWidth,rightWidth,available}};
       const measured=measurePlot(),start=portfolioChart.dataset.calendarStart,end=portfolioChart.dataset.calendarEnd,fullDays=Number(portfolioChart.dataset.fullDays)||spanDays(start,end),minimum=Math.min(14,fullDays),leftWidth=measured.leftWidth,rightWidth=measured.rightWidth,available=measured.available,days=Math.max(minimum,Math.min(fullDays,Number(portfolioChart.dataset.viewportDays)||fullDays)),plotWidth=available*fullDays/days,chartWidth=leftWidth+plotWidth+rightWidth,rangeLabel=portfolio.querySelector('[data-portfolio-visible-range]');
@@ -549,7 +568,7 @@
       const projectId=Number(node.dataset.projectId),state=getState(projectId);
       if(!state?.armed||state.armed.nodeId!==Number(node.dataset.nodeId)||!editable(projectId))return;
       event.preventDefault();
-      const projectRoot=node.closest('[data-dashboard-project]'),surface=node.closest('[data-calendar-start][data-calendar-end]'),plot=node.closest('.timeline-stage-plot'),range={start:surface.dataset.calendarStart,end:surface.dataset.calendarEnd,today:surface.querySelector('.timeline-today-line').dataset.today},span=Math.max(1,Math.round((iso(range.end)-iso(range.start))/DAY)),chain=state.project.nodes.filter(item=>item.track===state.project.nodes.find(item=>Number(item.id)===Number(node.dataset.nodeId))?.track).slice().sort(compareNodes),index=chain.findIndex(item=>Number(item.id)===Number(node.dataset.nodeId)),startDate=node.dataset.nodeDate,before=chain[index-1],tailOffset=chain.length?Math.round((iso(chain.at(-1).date)-iso(startDate))/DAY):0,minDate=before?addDays(before.date,DRAG_MIN_GAP_DAYS):range.start,remaining=chain.length-index-1,maxDate=state.armed.mode==='single'?addDays(range.end,-Math.max(0,remaining*DRAG_MIN_GAP_DAYS)):addDays(range.end,-Math.max(0,tailOffset)),plotRect=plot.getBoundingClientRect(),original=state.original.nodes.find(item=>Number(item.id)===Number(node.dataset.nodeId)),canvasScroll=surface.closest('[data-portfolio-scroll]');
+      const projectRoot=node.closest('[data-dashboard-project]'),surface=node.closest('[data-calendar-start][data-calendar-end]'),plot=node.closest('.timeline-stage-plot'),range={start:surface.dataset.calendarStart,end:surface.dataset.calendarEnd,today:surface.querySelector('.timeline-today-line').dataset.today},span=Math.max(1,Math.round((iso(range.end)-iso(range.start))/DAY)),chain=state.project.nodes.filter(item=>item.track===state.project.nodes.find(item=>Number(item.id)===Number(node.dataset.nodeId))?.track).slice().sort(compareNodes),index=chain.findIndex(item=>Number(item.id)===Number(node.dataset.nodeId)),startDate=node.dataset.nodeDate,before=chain[index-1],tailOffset=chain.length?Math.round((iso(chain.at(-1).date)-iso(startDate))/DAY):0,movementRange=surface.hasAttribute('data-overview-slice')?portfolioRange([state.project],range.today):range,minDate=before?addDays(before.date,DRAG_MIN_GAP_DAYS):movementRange.start,remaining=chain.length-index-1,maxDate=state.armed.mode==='single'?addDays(movementRange.end,-Math.max(0,remaining*DRAG_MIN_GAP_DAYS)):addDays(movementRange.end,-Math.max(0,tailOffset)),plotRect=plot.getBoundingClientRect(),original=state.original.nodes.find(item=>Number(item.id)===Number(node.dataset.nodeId)),canvasScroll=surface.closest('[data-portfolio-scroll]');
       drag={projectId,nodeId:Number(node.dataset.nodeId),mode:state.armed.mode,state,projectRoot,surface,plotRect,loupe:canvasScroll?null:surface.querySelector('[data-dashboard-loupe]'),guides:canvasScroll?surface.querySelector('[data-portfolio-drag-guides]'):null,portfolioScroll:canvasScroll,startScrollLeft:canvasScroll?.scrollLeft||0,syncViewport:canvasScroll?portfolioApi?.sync:null,range,chain,index,startX:event.clientX,startDate,committedDate:original?.date||startDate,minDate,maxDate:maxDate<minDate?minDate:maxDate,pxPerDay:Math.max(.5,plotRect.width/span),snapshotDates:new Map(state.project.nodes.map(item=>[Number(item.id),item.date])),targetDate:startDate};
       document.body.classList.add('timeline-dragging');node.classList.add('is-dragging');previewDrag(event);
     }));
@@ -616,5 +635,31 @@
     else if(selected)content=mode==='editor'?renderEditor(editor?.project||selected,{state:editor,write,editable:canEdit(selected),admin,canArchive:canArchive(selected),canUnarchive:canUnarchive(selected),backMode}):renderSingle(selected,{expanded:filters.expanded||new Set(),state:dashboardStates.get(Number(selected.project_id)),editable:canEdit(selected),write,viewport:filters.viewport,viewportWidth:filters.viewportWidth,fullscreen:filters.fullscreen,canArchive:canArchive(selected),canUnarchive:canUnarchive(selected),canDelete:canEdit(selected),backMode});
     return `<section class="timeline-workspace" data-timeline-mode="${esc(mode)}"><div class="timeline-page" data-timeline-page="${esc(mode)}">${content}</div></section>`;
   }
-  return {mergeVisibleMemberOrder,bounds,dashboardRange,renderEditor,renderSingle,renderAll,renderTransfer,renderWorkspace,renderTags,renderArchived,renderCreateProjectDialog,renderCreateTagDialog,stageClass,editorState,ordered,orderedEditorNodes,moveNode,toggleDone,createNode,updateNode,removeNode,batchUpdateNodes,batchRemoveNodes,batchRequest,discard,bindEditor,bindDashboard,bindContextController,addDays,formatShanghaiTimestamp};
+
+  // 概览复用双轨、草稿及原节点操作，完整项目状态由 app 提供。
+  function renderOverviewSlice(project,range,state,editable){
+    const scale=renderPortfolioScale(range,spanDays(range.start,range.end),620,false);
+    const eligible=new Set(range.nodes.map(node=>Number(node.id)));
+    const lanes=renderProjectLanes(project,{...range,state,portfolio:true,clipRange:true,showNodeLabels:true,nodeFilter:node=>eligible.has(Number(node.id))});
+    const count=state?.draft?.size||0;
+    const actions=count&&editable?`<div class="timeline-dashboard-actions ov-inline-draft-overlay" data-single-dashboard-draft-actions role="group" aria-label="项目时间轴待提交更改"><button type="button" data-dashboard-discard="${project.project_id}">放弃</button><button type="button" class="primary" data-dashboard-submit="${project.project_id}" ${state.submitting?'disabled':''}>${state.submitting?'更新中…':`更新 ${count}`}</button></div>`:'';
+    return `<div class="timeline-portfolio-card is-single-profile ov-inline-timeline" data-canvas-profile="single"><div class="timeline-portfolio-scroll" data-portfolio-scroll${count&&editable?' inert':''}><div class="timeline-portfolio-chart" data-overview-slice data-calendar-start="${range.start}" data-calendar-end="${range.end}"><div class="timeline-portfolio-axis"><div class="timeline-portfolio-axis-label">轨道</div><div class="timeline-portfolio-axis-detail">${scale}</div></div><div class="timeline-portfolio-today"><div class="timeline-today-line" data-today="${range.today}"></div></div><div class="timeline-hover-date-guide" data-dashboard-date-guide hidden aria-hidden="true"><b></b></div><div class="timeline-portfolio-drag-guides" data-portfolio-drag-guides hidden><i class="origin"></i><i class="corridor"></i><i class="target"></i><b class="target-label"></b></div><article class="timeline-portfolio-project is-focused has-node-flags" data-dashboard-project="${project.project_id}"><div class="timeline-portfolio-meta"><span class="timeline-single-track-key"><span>主线</span><span>并行</span></span></div><div class="timeline-portfolio-lanes">${lanes}</div></article><div class="timeline-dashboard-loupe" data-dashboard-loupe hidden></div></div></div>${actions}${editable?`${contextMenu()}${dashboardInsertMenu()}${dashboardNodeEditor()}`:''}</div>`;
+  }
+  function bindOverviewPending(root,{onSubmit,onDiscard}={}){
+    const overlay=root.querySelector('.ov-inline-draft-overlay');if(!overlay)return;
+    const card=overlay.closest('.ov-inline-timeline'),signal=root.__timelineAbort.signal;
+    // 蒙版期间不绑定时间轴交互，清理 body 弹层；只让更新/放弃按钮接收输入。
+    root.__timelineRemark?.destroy();
+    const tooltip=document.querySelector('[data-timeline-node-tooltip]');if(tooltip)tooltip.hidden=true;
+    const block=event=>{
+      const action=event.target.closest('[data-dashboard-submit],[data-dashboard-discard]');
+      if(action&&overlay.contains(action)&&event.type!=='contextmenu')return;
+      event.preventDefault();event.stopImmediatePropagation();
+    };
+    for(const type of ['pointerdown','pointermove','pointerup','mousedown','mousemove','mouseup','click','dblclick','contextmenu','wheel','keydown','keyup','focusin'])card.addEventListener(type,block,{capture:true,passive:false,signal});
+    overlay.querySelector('[data-dashboard-submit]')?.addEventListener('click',event=>onSubmit?.(Number(event.currentTarget.dataset.dashboardSubmit)),{signal});
+    overlay.querySelector('[data-dashboard-discard]')?.addEventListener('click',event=>onDiscard?.(Number(event.currentTarget.dataset.dashboardDiscard)),{signal});
+  }
+
+  return {renderOverviewSlice,bindOverviewPending,mergeVisibleMemberOrder,bounds,dashboardRange,renderEditor,renderSingle,renderAll,renderTransfer,renderWorkspace,renderTags,renderArchived,renderCreateProjectDialog,renderCreateTagDialog,stageClass,editorState,ordered,orderedEditorNodes,moveNode,toggleDone,createNode,updateNode,removeNode,batchUpdateNodes,batchRemoveNodes,batchRequest,discard,bindEditor,bindDashboard,bindContextController,addDays,formatShanghaiTimestamp};
 });

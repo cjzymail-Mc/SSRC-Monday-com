@@ -66,13 +66,39 @@ async function loadOverview(){
   }
   if(timelineState.mode==='overview')renderTimeline();
 }
+async function saveOverviewRemark({projectId,nodeId,remark}){
+  const draft=timelineDraftStates.get(Number(projectId));
+  if(!draft||!timelineProjectEditable(projectId))throw new Error('当前无法编辑该项目备注。');
+  if(draft.dirty)throw new Error('请先更新或放弃该项目的其他修改。');
+  if(!draft.original.nodes.some(node=>Number(node.id)===Number(nodeId)))throw new Error('节点已不可用，请关闭后重新加载。');
+  const isolated=FlowboardTimeline.editorState(draft.original);
+  FlowboardTimeline.updateNode(isolated,nodeId,'remark',remark);
+  try{
+    const result=await api(`/api/workspaces/${state.workspace_id}/timeline/batches`,'POST',{requests:[FlowboardTimeline.batchRequest(isolated)]});
+    return result.results[0];
+  }catch(error){
+    const latest=error.status===409&&error.details?.conflicts?.[0]?.view;
+    if(latest&&Number(latest.project_id)===Number(projectId)){
+      const index=timelineState.projects.findIndex(project=>Number(project.project_id)===Number(projectId));
+      if(index>=0)timelineState.projects[index]=latest;
+      timelineDraftStates.set(Number(projectId),FlowboardTimeline.editorState(latest));
+      throw new Error('项目已被更新，你的输入已保留，请确认后重试。');
+    }
+    throw error;
+  }
+}
 function renderOverview(){
+  if($('#timelineBody')?.__timelineRemark?.editing)return;
   overviewState.tags=timelineTags.catalog?.tags||[];
   const body=$('#timelineBody'),active=document.activeElement,focusAttr=['data-overview-filter','data-overview-focus','data-overview-scope','data-overview-expand','data-overview-collapse','data-overview-advanced'].find(attr=>active?.hasAttribute(attr)),focusValue=focusAttr?active.getAttribute(focusAttr):null,searchFocused=active?.matches('[data-overview-search]'),selection=searchFocused?[active.selectionStart,active.selectionEnd]:null,scrollY=window.scrollY;
   body.__timelineAbort?.abort();body.__timelineAbort=new AbortController();
+  timelineState.projects.forEach(timelineDraftState);
+  overviewState.timelineProjects=timelineState.projects;overviewState.draftStates=timelineDraftStates;overviewState.canEditProject=timelineProjectEditable;
   body.innerHTML=FlowboardOverview.render(overviewState);
   const boundState=overviewState,reload=()=>{if(overviewState===boundState&&timelineState.mode==='overview')loadOverview()};
   FlowboardOverview.bind(body,boundState,{onChange:reload,onReload:reload,onRender:renderOverview});
+  if(body.querySelector('.ov-inline-draft-overlay'))FlowboardTimeline.bindOverviewPending(body,{onSubmit:submitTimelineDashboardDraft,onDiscard:discardTimelineDashboardDraft});
+  else if(body.querySelector('.ov-inline-timeline'))FlowboardTimeline.bindDashboard(body,{states:timelineDraftStates,render:renderTimeline,onSubmit:submitTimelineDashboardDraft,onDiscard:discardTimelineDashboardDraft,onUndo:undoTimelineDashboardBatch,onRemarkSave:saveOverviewRemark,onRemarkSaved:result=>{acceptTimelineView(result.view,result.batch_id);toast('备注已保存')},editable:timelineProjectEditable});
   if(searchFocused){const search=body.querySelector('[data-overview-search]');search?.focus({preventScroll:true});if(search&&selection)search.setSelectionRange(...selection)}
   if(!searchFocused&&focusAttr)body.querySelector(`[${focusAttr}="${CSS.escape(focusValue)}"]`)?.focus({preventScroll:true});window.scrollTo({top:scrollY,behavior:'instant'});renderTimelineChrome();
 }
@@ -282,7 +308,7 @@ async function previewTimelineImport(files,sheetName=null){
 }
 async function commitTimelineImport(){const preview=timelineTransfer.preview;if(!preview||timelineTransfer.error||timelineTransfer.busy)return;timelineTransfer.busy=true;renderTimelineTransferDialog();let committed;try{committed=await api(`/api/workspaces/${state.workspace_id}/timeline/imports/commit`,'POST',{batch_id:preview.batch_id})}catch(error){timelineTransfer={...timelineTransfer,busy:false,error:{code:error.code||'IMPORT_ERROR',message:error.message,details:error.details||{}}};renderTimelineTransferDialog();return}closeTimelineDialog({restoreFocus:false});await loadTimeline();toast(`导入完成：${committed.projects} 个项目、${committed.nodes} 个节点`)}
 async function exportTimelineWorkspace(){if(timelineTransfer.busy)return;clearTimelineExport();timelineTransfer={...timelineTransfer,busy:true,error:null};renderTimelineTransferDialog();try{const exported=await api(`/api/workspaces/${state.workspace_id}/timeline/export`,'POST',{}),bytes=base64ToBytes(exported.content_base64),digest=await sha256Hex(bytes);if(digest.toLowerCase()!==String(exported.sha256).toLowerCase()){const mismatch=new Error('服务端导出文件 SHA-256 校验失败');mismatch.code='EXPORT_SHA256_MISMATCH';throw mismatch}const url=URL.createObjectURL(new Blob([bytes],{type:exported.content_type||'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));timelineTransfer={...timelineTransfer,busy:false,exportReady:{filename:exported.filename,sha256:digest,url}};renderTimelineTransferDialog()}catch(error){timelineTransfer={...timelineTransfer,busy:false,error:{code:error.code||'EXPORT_ERROR',message:error.message,details:error.details||{}}};renderTimelineTransferDialog()}}
-function acceptTimelineView(view,batchId){const previous=timelineDraftStates.get(Number(view.project_id))||timelineState.editor,previousBatch=previous?.lastBatchId,index=timelineState.projects.findIndex(item=>item.project_id===view.project_id);if(index<0)timelineState.projects.push(view);else timelineState.projects[index]=view;const fresh=FlowboardTimeline.editorState(view);fresh.lastBatchId=batchId===undefined?previousBatch:batchId;timelineDraftStates.set(Number(view.project_id),fresh);timelineState.editor=timelineState.mode==='editor'&&Number(timelineState.selectedId)===Number(view.project_id)?fresh:null;renderTimeline()}
+function acceptTimelineView(view,batchId){const previous=timelineDraftStates.get(Number(view.project_id))||timelineState.editor,previousBatch=previous?.lastBatchId,index=timelineState.projects.findIndex(item=>item.project_id===view.project_id);if(index<0)timelineState.projects.push(view);else timelineState.projects[index]=view;const fresh=FlowboardTimeline.editorState(view);fresh.lastBatchId=batchId===undefined?previousBatch:batchId;timelineDraftStates.set(Number(view.project_id),fresh);timelineState.editor=timelineState.mode==='editor'&&Number(timelineState.selectedId)===Number(view.project_id)?fresh:null;if(timelineState.mode==='overview')loadOverview();else renderTimeline()}
 async function submitTimelineDraft(){const editor=timelineState.editor;if(!editor?.dirty||editor.submitting)return;editor.submitting=true;const button=$('[data-timeline-submit]');if(button)button.disabled=true;try{const request=FlowboardTimeline.batchRequest(editor),result=await api(`/api/workspaces/${state.workspace_id}/timeline/batches`,'POST',{requests:[request]}),row=result.results[0];acceptTimelineView(row.view,row.batch_id);toast('项目时间表已保存')}catch(error){if(error.status===409&&error.details?.conflicts?.[0]?.view){acceptTimelineView(error.details.conflicts[0].view,null);toast('版本冲突：已显示服务端最新时间表')}else{editor.submitting=false;showError(error)}}}
 async function submitTimelineDashboardDraft(projectId){const draft=timelineDraftStates.get(Number(projectId));if(!draft?.dirty||draft.submitting)return;draft.submitting=true;renderTimeline();try{const request=FlowboardTimeline.batchRequest(draft,{triggerSource:'drag'}),result=await api(`/api/workspaces/${state.workspace_id}/timeline/batches`,'POST',{requests:[request]}),row=result.results[0];acceptTimelineView(row.view,row.batch_id);toast('项目时间已更新')}catch(error){if(error.status===409&&error.details?.conflicts?.[0]?.view){acceptTimelineView(error.details.conflicts[0].view,null);toast('版本冲突：已显示服务端最新项目时间')}else{draft.submitting=false;renderTimeline();showError(error)}}}
 function discardTimelineDashboardDraft(projectId){const draft=timelineDraftStates.get(Number(projectId));if(!draft)return;const fresh=FlowboardTimeline.editorState(draft.original);fresh.lastBatchId=draft.lastBatchId;timelineDraftStates.set(Number(projectId),fresh);if(timelineState.mode==='editor'&&Number(timelineState.selectedId)===Number(projectId))timelineState.editor=fresh;renderTimeline()}

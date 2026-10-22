@@ -31,3 +31,50 @@
 .ov-avatar.avatar-blue{background:#6a8ed1}.ov-avatar.avatar-pink{background:#d77fa8}.ov-avatar.avatar-green{background:#5cae8d}.ov-avatar.avatar-purple{background:#806dcc}.ov-avatar.avatar-orange{background:#d99555}
 
 .ov-header{font-family:"DM Sans",Segoe UI,sans-serif}
+
+/* 2026-10-22 已验收的概览内嵌时间轴与名称入口。 */
+.ov-project{cursor:pointer}.ov-project[aria-expanded="true"]>td:not(.ov-status){background:#eee9fc}
+.ov-project:focus-visible{outline:2px solid #7863f5;outline-offset:-2px}
+.ov-open{color:#443980}.ov-open:hover{text-decoration:underline;color:#6253d8}
+.ov-project-name{align-items:stretch;min-height:40px}
+.ov-project>td:first-child{padding-right:0}
+.ov-project-name .ov-expand{display:grid;place-items:center;align-self:center;flex:0 0 22px;width:22px;height:28px;min-height:28px;padding:0;border-radius:4px;line-height:1}
+.ov-expand-chevron{display:block;width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transform:rotate(0deg);transform-origin:center;transition:transform .12s ease}
+.ov-expand[aria-expanded="true"] .ov-expand-chevron{transform:rotate(90deg)}
+.ov-project-link{display:flex;align-items:center;align-self:stretch;flex:1;gap:7px;padding:0 7px;border-radius:4px;transition:background-color .12s ease,color .12s ease}
+.ov-project-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ov-project-link:hover,.ov-project-link:focus-visible{background:#44424a;color:#fff;text-decoration:none}
+.ov-project-link:hover .ov-node-count,.ov-project-link:focus-visible .ov-node-count{color:#eeeaf6}
+.ov-inline-detail>td{padding:12px;background:#f9f7ff}
+.ov-inline-panel{max-width:100%;box-sizing:border-box}
+.ov-inline-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:2px 0 12px;font-size:11px;color:#8d839b;flex-wrap:wrap}
+.ov-inline-heading>div{display:flex;align-items:center;gap:8px}.ov-inline-heading strong{color:#4a415e;font-size:13px;font-weight:600}
+.ov-inline-count{border-radius:10px;padding:1px 7px;background:#eee7fc;color:#7863be;font-size:11px}
+.ov-inline-note{font-size:11px;color:#94899f;margin:10px 0 0;line-height:1.7}
+.ov-inline-empty{padding:30px 16px;text-align:center;border:1px dashed #e0d8ec;background:#fff;border-radius:7px;color:#968aa2;font-size:12px}
+.ov-inline-timeline{position:relative;box-shadow:none;border-radius:7px}
+.ov-inline-timeline .timeline-portfolio-chart{min-width:0;width:100%}
+.ov-inline-timeline.is-single-profile .timeline-portfolio-axis,.ov-inline-timeline.is-single-profile .timeline-portfolio-project{grid-template-columns:54px minmax(420px,1fr)}
+.ov-inline-timeline .timeline-portfolio-axis-label{padding:10px;font-size:11px}
+.ov-inline-timeline .timeline-portfolio-axis-detail,.ov-inline-timeline .timeline-portfolio-lanes{padding-left:16px;padding-right:16px;cursor:default}
+.ov-inline-timeline .timeline-past-mask{display:none}
+.ov-inline-timeline .timeline-stage,.ov-inline-timeline .timeline-stage-plot{cursor:default}
+.ov-inline-timeline .timeline-single-track-key{font-size:11px}
+.ov-inline-timeline .timeline-node-flag{max-width:180px}
+/* 用户现场反馈：隐藏日期标尺、轨道侧栏及标题日期整行，同时回收占位。 */
+.ov-inline-heading,.ov-inline-timeline .timeline-portfolio-axis,.ov-inline-timeline .timeline-portfolio-meta{display:none}
+.ov-inline-timeline.is-single-profile .timeline-portfolio-project{grid-template-columns:minmax(0,1fr)}
+/* 概览只保留紧凑时间轴与节点；完整界面继续由项目名称进入。 */
+.ov-inline-note{display:none}
+.ov-inline-timeline{--ov-inline-height:144px}
+.ov-inline-timeline.is-single-profile .timeline-portfolio-project,.ov-inline-timeline.is-single-profile .timeline-portfolio-lanes,.ov-inline-timeline.is-single-profile .timeline-portfolio-lanes .timeline-stage-lanes{height:var(--ov-inline-height);min-height:var(--ov-inline-height)}
+.ov-inline-timeline .timeline-portfolio-project.is-focused{box-shadow:none}
+.ov-inline-timeline.is-single-profile .timeline-portfolio-lanes .timeline-stage-lane[data-track="main"]{top:32px}
+.ov-inline-timeline.is-single-profile .timeline-portfolio-lanes .timeline-stage-lane[data-track="parallel"]{top:76px}
+.ov-inline-timeline .timeline-stage-plot::before{content:"";position:absolute;left:0;right:0;top:22px;border-top:1px solid #dce2ee;pointer-events:none}
+.ov-inline-timeline .timeline-portfolio-today{display:none}
+.ov-inline-timeline.is-single-profile .timeline-portfolio-drag-guides{left:16px;right:16px}
+.ov-inline-timeline .ov-inline-draft-overlay{position:absolute;inset:0;z-index:4000;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;width:auto;max-width:none;margin:0;padding:16px;border:0;border-radius:inherit;background:rgba(0,0,0,.68);box-shadow:none;transform:none}
+.ov-inline-timeline .ov-inline-draft-overlay button,.ov-inline-timeline .ov-inline-draft-overlay button.primary{min-width:82px;min-height:36px;padding:0 16px;font-size:13px;border:2px solid #fff;box-shadow:0 3px 0 rgba(0,0,0,.24),0 5px 12px rgba(0,0,0,.22)}
+.ov-inline-timeline .timeline-portfolio-scroll[inert],.ov-inline-timeline .timeline-portfolio-scroll[inert] *{pointer-events:none;user-select:none;touch-action:none}
+.timeline-remark-popup [data-remark-save-error]{margin:10px 0;color:#c83b4c;font-size:12px;line-height:1.6}

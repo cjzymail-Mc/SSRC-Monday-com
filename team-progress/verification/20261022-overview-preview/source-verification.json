@@ -1,0 +1,21 @@
+{
+  "node_overview": {
+    "passed": 17
+  },
+  "node_period_mask": {
+    "passed": 3
+  },
+  "node_timeline": {
+    "exit_code": 0
+  },
+  "python_overview": {
+    "passed": 9
+  },
+  "python_timeline_http": {
+    "passed": 16
+  },
+  "browser": "product source + disposable SQLite copy; dual rails, original menu, overlay interception/discard, direct remark persistence, full timeline navigation, member readonly verified",
+  "browser_suite": "affected assertions updated; syntax checked; full automated suite not run",
+  "production_service": "8080 read-only connections unsuccessful; not started/restarted",
+  "production_database": "not written; no schema change"
+}
