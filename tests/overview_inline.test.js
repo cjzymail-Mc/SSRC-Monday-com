@@ -54,10 +54,10 @@ test('pending changes make the chart inert and discard restores editable clean r
 function savingHarness(api,editable=true){
   const p=project(),drafts=new Map([[7,Timeline.editorState(p)]]),timelineState={projects:[p]};
   const source=fs.readFileSync(require.resolve('../app.js'),'utf8');
-  const start=source.indexOf('async function saveOverviewRemark('),end=source.indexOf('function renderOverview()',start);
+  const start=source.indexOf('async function saveTimelineRemark('),end=source.indexOf('function renderOverview()',start);
   const context={FlowboardTimeline:Timeline,timelineDraftStates:drafts,timelineState,timelineProjectEditable:()=>editable,state:{workspace_id:1},api};
   vm.createContext(context);vm.runInContext(source.slice(start,end),context);
-  return {save:context.saveOverviewRemark,drafts,timelineState};
+  return {save:context.saveTimelineRemark,drafts,timelineState};
 }
 
 test('remark confirmation submits only the chosen remark with the original version and leaves drafts clean',async()=>{

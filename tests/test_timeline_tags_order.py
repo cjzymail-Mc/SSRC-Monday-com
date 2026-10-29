@@ -55,6 +55,7 @@ class TimelineTagOrderServiceTests(unittest.TestCase):
         legacy = Path(self.temp.name) / "v16-shape.db"
         migrate(legacy, initial_password="test-password")
         conn = connect(legacy)
+        conn.execute("DROP TABLE timeline_member_orders")
         conn.execute("DROP TABLE timeline_order_items")
         conn.execute("DROP TABLE timeline_order_contexts")
         conn.execute("DROP TABLE timeline_project_tags")
@@ -62,6 +63,7 @@ class TimelineTagOrderServiceTests(unittest.TestCase):
         conn.execute("DELETE FROM schema_migrations WHERE version=17")
         conn.execute("DELETE FROM schema_migrations WHERE version=18")
         conn.execute("DELETE FROM schema_migrations WHERE version=19")
+        conn.execute("DELETE FROM schema_migrations WHERE version=20")
         now = "2026-08-24T00:00:00+00:00"
         conn.execute("INSERT INTO timeline_projects(workspace_id,name,created_by,created_at,updated_at) VALUES (1,'v16 存量','u1',?,?)", (now, now))
         conn.execute("PRAGMA user_version=16")
@@ -74,6 +76,7 @@ class TimelineTagOrderServiceTests(unittest.TestCase):
         self.assertEqual(conn.execute("SELECT COUNT(*) FROM schema_migrations WHERE version=17").fetchone()[0], 1)
         self.assertEqual(conn.execute("SELECT COUNT(*) FROM schema_migrations WHERE version=18").fetchone()[0], 1)
         self.assertEqual(conn.execute("SELECT COUNT(*) FROM schema_migrations WHERE version=19").fetchone()[0], 1)
+        self.assertEqual(conn.execute("SELECT COUNT(*) FROM schema_migrations WHERE version=20").fetchone()[0],1)
         self.assertEqual(conn.execute("PRAGMA user_version").fetchone()[0], SCHEMA_VERSION)
         self.assertEqual(conn.execute("PRAGMA foreign_key_check").fetchall(), [])
         conn.close()

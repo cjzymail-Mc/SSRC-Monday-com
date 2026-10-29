@@ -1,0 +1,77 @@
+{
+  "repo": "D:\\Downloads\\Mc Claude Code Workshop\\monday-com",
+  "node": {
+    "plain_assertions": 140,
+    "node_test_cases": 33,
+    "passed": 173,
+    "failed": 0
+  },
+  "browser": {
+    "passed": 16,
+    "failed": 0,
+    "seconds": 80.952,
+    "tests": [
+      "test_conflict_retains_inputs_requires_confirmation_and_preserves_other_node (test_timeline_edit_e2e.SharedTimelineEditE2E.test_conflict_retains_inputs_requires_confirmation_and_preserves_other_node) ... ok",
+      "test_editor_500_retry_duplicate_click_and_inflight_lock (test_timeline_edit_e2e.SharedTimelineEditE2E.test_editor_500_retry_duplicate_click_and_inflight_lock) ... ok",
+      "test_editor_net_changes_date_validation_leave_and_tab_shared_draft (test_timeline_edit_e2e.SharedTimelineEditE2E.test_editor_net_changes_date_validation_leave_and_tab_shared_draft) ... ok",
+      "test_other_project_remark_can_save_while_one_project_has_pending_changes (test_timeline_edit_e2e.SharedTimelineEditE2E.test_other_project_remark_can_save_while_one_project_has_pending_changes) ... ok",
+      "test_real_drag_zoomed_overlay_is_visible_and_save_roundtrips (test_timeline_edit_e2e.SharedTimelineEditE2E.test_real_drag_zoomed_overlay_is_visible_and_save_roundtrips) ... ok",
+      "test_remark_confirm_direct_save_cancel_and_reload_in_all_five_canvases (test_timeline_edit_e2e.SharedTimelineEditE2E.test_remark_confirm_direct_save_cancel_and_reload_in_all_five_canvases) ... ok",
+      "test_remark_failed_save_and_conflict_preserve_text_for_explicit_retry (test_timeline_edit_e2e.SharedTimelineEditE2E.test_remark_failed_save_and_conflict_preserve_text_for_explicit_retry) ... ok",
+      "test_week_month_last_node_pending_stays_blocked_until_discard_or_update (test_timeline_edit_e2e.SharedTimelineEditE2E.test_week_month_last_node_pending_stays_blocked_until_discard_or_update) ... ok",
+      "test_timeline_cp2_table_editor_local_draft_sort_interval_and_discard (test_timeline_e2e.TimelineProductionE2E.test_timeline_cp2_table_editor_local_draft_sort_interval_and_discard) ... ok",
+      "test_timeline_editor_batch_c_stage_track_status_delete_save_and_undo (test_timeline_e2e.TimelineProductionE2E.test_timeline_editor_batch_c_stage_track_status_delete_save_and_undo) ... ok",
+      "test_timeline_cp3_submit_mixed_batch_refresh_review_correction_and_undo (test_timeline_e2e.TimelineProductionE2E.test_timeline_cp3_submit_mixed_batch_refresh_review_correction_and_undo) ... ok",
+      "test_timeline_cp3_conflict_latest_view_zero_write_and_member_correction_denied (test_timeline_e2e.TimelineProductionE2E.test_timeline_cp3_conflict_latest_view_zero_write_and_member_correction_denied) ... ok",
+      "test_dashboard_remark_hover_pin_escape_draft_save_and_undo (test_timeline_e2e.TimelineProductionE2E.test_dashboard_remark_hover_pin_escape_draft_save_and_undo) ... ok",
+      "test_dashboard_remark_readonly_and_fullscreen_escape (test_timeline_e2e.TimelineProductionE2E.test_dashboard_remark_readonly_and_fullscreen_escape) ... ok",
+      "test_dashboard_hover_date_insert_remark_and_delete_share_draft_pipeline (test_timeline_e2e.TimelineProductionE2E.test_dashboard_hover_date_insert_remark_and_delete_share_draft_pipeline) ... ok",
+      "test_timeline_journey_edit_submit_refresh_undo (test_timeline_e2e.TimelineProductionE2E.test_timeline_journey_edit_submit_refresh_undo) ... ok"
+    ]
+  },
+  "source_files": [
+    {
+      "path": "app.js",
+      "sha256": "6d0527149aea4d62fd6e5a0d6413419d1250d5d5621fbdbe5874641b5eb5bb57"
+    },
+    {
+      "path": "timeline-ui.js",
+      "sha256": "262496d29f86f63e952afe65d6f62add56abf935a24908e6af17b2527a3a5a62"
+    },
+    {
+      "path": "timeline.css",
+      "sha256": "48c302035090967d81180e1c61288a74bbabd6b6d6b729b74e4918dce5f5a97a"
+    },
+    {
+      "path": "index.html",
+      "sha256": "8e07a6e057132326031294f39f1353f476805f14613d487dcf20c589b57f75d1"
+    },
+    {
+      "path": "tests/timeline_ui.test.js",
+      "sha256": "d6d03a2594b720a7b575af54016a36bf3f504060ac520c4a7bed5998d03be712"
+    },
+    {
+      "path": "tests/overview_inline.test.js",
+      "sha256": "9ea15f74288c48a7525eec3b78146fd2b0177afa058b281bc283d9f3349197d5"
+    },
+    {
+      "path": "tests/test_timeline_e2e.py",
+      "sha256": "16396ede1495f42929a1c6e35825c5d60fbf3b95983e0d779b6fd6c69681ac55"
+    },
+    {
+      "path": "tests/timeline_edit.test.js",
+      "sha256": "f4d5848351cc6949c7f786cc85cebd2b5af9b5cc79f7b603ad0bc933a1b5469b"
+    },
+    {
+      "path": "tests/test_timeline_edit_e2e.py",
+      "sha256": "34eee725c9ec147c302c21d3efb5859ddb8fca2f807ee54b9a8ffffe65662d8d"
+    }
+  ],
+  "syntax": "PASS",
+  "diff_check": "PASS",
+  "backend_reused_from_handoff": 51,
+  "backend_source_files_matched": 14,
+  "protected_untracked_sha256": "07008bfb5751b600e6236c857aa4c82d1d4cee52747ad1d9b2ac6ddf09218503",
+  "deployed": false,
+  "production_database_written": false
+}

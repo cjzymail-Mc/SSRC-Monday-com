@@ -43,7 +43,7 @@ class AggregationTests(unittest.TestCase):
 
 class DashboardHttpTests(unittest.TestCase):
     def setUp(self):
-        self.temp=tempfile.TemporaryDirectory();self.db=str(Path(self.temp.name)/"flowboard.db");create_legacy_database(self.db);os.environ["FLOWBOARD_INITIAL_PASSWORD"]="test-password";self.server=create_server("127.0.0.1",0,self.db);self.thread=threading.Thread(target=self.server.serve_forever,daemon=True);self.thread.start();self.port=self.server.server_address[1]
+        self.temp=tempfile.TemporaryDirectory();self.db=str(Path(self.temp.name)/"flowboard.db");create_legacy_database(self.db);migrate(self.db,initial_password="test-password");self.server=create_server("127.0.0.1",0,self.db);self.thread=threading.Thread(target=self.server.serve_forever,daemon=True);self.thread.start();self.port=self.server.server_address[1]
     def tearDown(self):self.server.shutdown();self.server.server_close();self.thread.join(timeout=2);self.temp.cleanup()
     def request(self,method,path,body=None,cookie=None,csrf=None):
         conn=http.client.HTTPConnection("127.0.0.1",self.port);headers={"Content-Type":"application/json"}

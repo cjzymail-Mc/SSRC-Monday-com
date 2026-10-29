@@ -283,6 +283,10 @@ class Gate5HomeE2E(unittest.TestCase):
         (project_id, _), _today = self.seed_cp4_dashboard_projects()
         for index in range(9):
             self.seed_timeline(created_by="u1", name=f"折叠压力项目 {index + 1:02d}")
+        # Admin cards are intentionally hidden; exercise team collapse on a real member.
+        team_project_id=self.seed_timeline(created_by="u2",name="团队下钻项目")
+        for index in range(10):
+            self.seed_timeline(created_by="u2",name=f"成员折叠压力项目 {index + 1:02d}")
         context, page = self.login("u1")
         page.locator('[data-timeline-page="home"]').wait_for()
         self.assertEqual(page.locator("#breadcrumbBoard").inner_text(), "我的工作")
@@ -307,7 +311,8 @@ class Gate5HomeE2E(unittest.TestCase):
         page.locator('[data-timeline-tab="team"]').click()
         self.assertFalse(page.locator('[data-timeline-section="team"]').is_hidden())
         self.assertGreaterEqual(page.locator(".tl-mrow").count(), 2)
-        pill = page.locator(f'[data-timeline-member-open="{project_id}"]')
+        self.assertEqual(page.locator('.tl-mrow[data-order-member="u1"]').count(),0)
+        pill = page.locator(f'[data-timeline-member-open="{team_project_id}"]')
         self.assertEqual(pill.count(), 1)
         member_toggle = page.locator('[data-timeline-member-toggle]')
         self.assertEqual(member_toggle.count(), 1)
@@ -322,7 +327,7 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertTrue(page.locator('[data-timeline-feed="team"]').is_visible())
         # 药丸下钻 → 单项目仪表盘
         self.physical_click(page, pill)
-        page.locator(f'[data-timeline-page="single"] [data-dashboard-project="{project_id}"]').wait_for()
+        page.locator(f'[data-timeline-page="single"] [data-dashboard-project="{team_project_id}"]').wait_for()
         # KPI 下钻：团队类 KPI → 团队项目标签
         page.locator('[data-timeline-mode-target="home"]').click()
         page.locator('[data-timeline-page="home"]').wait_for()
@@ -346,7 +351,7 @@ class Gate5HomeE2E(unittest.TestCase):
         node_box, bar_box = node.bounding_box(), bar.bounding_box()
         self.assertLessEqual(abs((node_box["y"] + node_box["height"] / 2) - (bar_box["y"] + bar_box["height"] / 2)), 1.5)
         source = node.locator(":scope > [data-node-tooltip-source]")
-        tip = page.locator("[data-timeline-node-tooltip]")
+        tip = page.locator("[data-dashboard-remark]")
         self.assertTrue(source.is_hidden(), "节点长名称源默认不得常驻挤压年度轴")
         self.assertTrue(tip.is_hidden(), "顶层节点提示框默认隐藏")
         self.assertIsNone(node.get_attribute("title"), "节点信息只保留自定义悬停卡，不再叠加浏览器原生 title")
@@ -356,8 +361,9 @@ class Gate5HomeE2E(unittest.TestCase):
         page.on("request", lambda request: batch_requests.append(request) if request.method == "POST" and request.url.endswith("/timeline/batches") else None)
         node.hover()
         tip.wait_for(state="visible")
+        self.assertTrue(page.locator("[data-timeline-node-tooltip]").is_hidden(),"individual nodes use the current remark portal")
         tooltip_metrics = tip.evaluate("""el => {
-          const r=el.getBoundingClientRect(), axis=document.querySelector('[data-timeline-page="single"] .timeline-portfolio-chart .timeline-e-axis')?.getBoundingClientRect(), label=el.getAttribute('data-placement');
+          const r=el.getBoundingClientRect(), axis=document.querySelector('[data-timeline-page="single"] .timeline-portfolio-chart .timeline-e-axis')?.getBoundingClientRect(), anchor=document.querySelector('.timeline-dashboard-node[aria-describedby="timelineRemarkPopup"]')?.getBoundingClientRect(),label=anchor&&r.top>=anchor.bottom?'below':'above';
           const overlaps=(a,b)=>Boolean(a&&b&&a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top);
           const previous=el.style.pointerEvents;el.style.pointerEvents='auto';
           const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);el.style.pointerEvents=previous;
@@ -395,7 +401,7 @@ class Gate5HomeE2E(unittest.TestCase):
         self.assertEqual(batch_requests, [], "拖动期间保持零网络")
         page.mouse.up()
 
-        actions = page.locator('[data-single-dashboard-draft-actions]')
+        actions = page.locator('[data-dashboard-pending]')
         actions.wait_for()
         self.assertEqual(actions.locator('button').all_inner_texts(), ['放弃', '更新 1'])
         self.assertEqual(actions.locator('[data-dashboard-undo]').count(), 0)
@@ -544,7 +550,7 @@ class Gate5HomeE2E(unittest.TestCase):
             page.mouse.down()
             page.mouse.move(box["x"] + box["width"] / 2 + 24, box["y"] + box["height"] / 2, steps=6)
             page.mouse.up()
-            actions = page.locator('[data-single-dashboard-draft-actions]')
+            actions = page.locator('[data-dashboard-pending]')
             actions.wait_for()
             self.assertEqual(actions.locator('[data-dashboard-submit]').inner_text(), "更新 1")
             with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith("/timeline/batches")) as saved:

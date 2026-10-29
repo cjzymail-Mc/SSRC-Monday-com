@@ -1,0 +1,82 @@
+{
+  "actual_repo": "D:\\Downloads\\Mc Claude Code Workshop\\monday-com",
+  "node_passed": 178,
+  "browser_passed": 22,
+  "browser_seconds": 127.809,
+  "syntax": "PASS",
+  "diff_check": "PASS",
+  "source_files": [
+    {
+      "path": "app.js",
+      "sha256": "6e8b09caf56d2795e6f08af209cb228727a528d276e0b00bebaa031007e5a2e3"
+    },
+    {
+      "path": "timeline-ui.js",
+      "sha256": "18f3bb88529e50367d19e7a789663e4ee9eff95747fbf7cbec80f36ed7f1f985"
+    },
+    {
+      "path": "timeline.css",
+      "sha256": "8979772b281c7a1f9c1923f7a6527a71e0f9306374ce347d2a49c6ecb9838c60"
+    },
+    {
+      "path": "index.html",
+      "sha256": "1e014d221b8f19495db54ccc6dd415f27023d584b017c4b37855447055f80499"
+    },
+    {
+      "path": "tests/test_timeline_e2e.py",
+      "sha256": "028961c08c6d6bd79054f314cc6523b313c3dba81a0ac866c56de5fe6877b448"
+    },
+    {
+      "path": "tests/test_timeline_edit_e2e.py",
+      "sha256": "6b6d05e03d922af05b536c575a9fae2c8d599fcd11500cb9b16c500a9632a435"
+    },
+    {
+      "path": "tests/timeline_insert.test.js",
+      "sha256": "a5ae77b02d67d6c64217c4e5318c13dd50ad070b25c184e9aea1be3fa2334a66"
+    },
+    {
+      "path": "tests/timeline_ui.test.js",
+      "sha256": "62ba02f28204e3c0101d4e17042eaf092e47c1cbc15f82390a7264a69a78533e"
+    }
+  ],
+  "tests_used_user_preview": false,
+  "before_error_layout_source_files": [
+    {
+      "path": "app.js",
+      "sha256": "6e8b09caf56d2795e6f08af209cb228727a528d276e0b00bebaa031007e5a2e3"
+    },
+    {
+      "path": "timeline-ui.js",
+      "sha256": "18f3bb88529e50367d19e7a789663e4ee9eff95747fbf7cbec80f36ed7f1f985"
+    },
+    {
+      "path": "timeline.css",
+      "sha256": "c582e1845848660534932e0dfac3c630687999ac4b7e7fcb05746ceb1299c20c"
+    },
+    {
+      "path": "index.html",
+      "sha256": "1e014d221b8f19495db54ccc6dd415f27023d584b017c4b37855447055f80499"
+    },
+    {
+      "path": "tests/test_timeline_e2e.py",
+      "sha256": "028961c08c6d6bd79054f314cc6523b313c3dba81a0ac866c56de5fe6877b448"
+    },
+    {
+      "path": "tests/test_timeline_edit_e2e.py",
+      "sha256": "501894c82291769deb05038cf4e207a6a082e7be512338368ae61f28e9e55a8a"
+    },
+    {
+      "path": "tests/timeline_insert.test.js",
+      "sha256": "a5ae77b02d67d6c64217c4e5318c13dd50ad070b25c184e9aea1be3fa2334a66"
+    },
+    {
+      "path": "tests/timeline_ui.test.js",
+      "sha256": "62ba02f28204e3c0101d4e17042eaf092e47c1cbc15f82390a7264a69a78533e"
+    }
+  ],
+  "final_error_layout_recheck": {
+    "passed": 1,
+    "log": "error-layout-final.log",
+    "production_change": "CSS error row placement only"
+  }
+}

@@ -66,7 +66,7 @@ async function loadOverview(){
   }
   if(timelineState.mode==='overview')renderTimeline();
 }
-async function saveOverviewRemark({projectId,nodeId,remark}){
+async function saveTimelineRemark({projectId,nodeId,remark}){
   const draft=timelineDraftStates.get(Number(projectId));
   if(!draft||!timelineProjectEditable(projectId))throw new Error('当前无法编辑该项目备注。');
   if(draft.dirty)throw new Error('请先更新或放弃该项目的其他修改。');
@@ -87,8 +87,30 @@ async function saveOverviewRemark({projectId,nodeId,remark}){
     throw error;
   }
 }
+async function saveTimelineInsert({projectId,values}){
+  const draft=timelineDraftStates.get(Number(projectId));
+  if(!draft||!timelineProjectEditable(projectId))throw new Error('当前无法插入该项目节点。');
+  if(draft.dirty)throw new Error('请先更新或放弃该项目的其他修改。');
+  if(draft.submitting)throw new Error('正在保存，请稍候再试。');
+  const isolated=FlowboardTimeline.editorState(draft.original);
+  FlowboardTimeline.createNode(isolated,values);
+  draft.submitting=true;
+  try{
+    const result=await api(`/api/workspaces/${state.workspace_id}/timeline/batches`,'POST',{requests:[FlowboardTimeline.batchRequest(isolated,{triggerSource:'drag'})]});
+    return result.results[0];
+  }catch(error){
+    const latest=error.status===409&&error.details?.conflicts?.find(item=>Number(item.view?.project_id)===Number(projectId))?.view;
+    if(latest){
+      const index=timelineState.projects.findIndex(project=>Number(project.project_id)===Number(projectId));
+      if(index>=0)timelineState.projects[index]=latest;
+      timelineDraftStates.set(Number(projectId),FlowboardTimeline.editorState(latest));
+      throw new Error('项目已被更新，插入内容已保留，请再次点击确认按最新版本重试。');
+    }
+    throw error;
+  }finally{draft.submitting=false}
+}
 function renderOverview(){
-  if($('#timelineBody')?.__timelineRemark?.editing)return;
+  if($('#timelineBody')?.__timelineRemark?.editing||$('#timelineBody')?.__timelineInsert?.editing)return;
   overviewState.tags=timelineTags.catalog?.tags||[];
   const body=$('#timelineBody'),active=document.activeElement,focusAttr=['data-overview-filter','data-overview-focus','data-overview-scope','data-overview-expand','data-overview-collapse','data-overview-advanced'].find(attr=>active?.hasAttribute(attr)),focusValue=focusAttr?active.getAttribute(focusAttr):null,searchFocused=active?.matches('[data-overview-search]'),selection=searchFocused?[active.selectionStart,active.selectionEnd]:null,scrollY=window.scrollY;
   body.__timelineAbort?.abort();body.__timelineAbort=new AbortController();
@@ -98,7 +120,7 @@ function renderOverview(){
   const boundState=overviewState,reload=()=>{if(overviewState===boundState&&timelineState.mode==='overview')loadOverview()};
   FlowboardOverview.bind(body,boundState,{onChange:reload,onReload:reload,onRender:renderOverview});
   if(body.querySelector('.ov-inline-draft-overlay'))FlowboardTimeline.bindOverviewPending(body,{onSubmit:submitTimelineDashboardDraft,onDiscard:discardTimelineDashboardDraft});
-  else if(body.querySelector('.ov-inline-timeline'))FlowboardTimeline.bindDashboard(body,{states:timelineDraftStates,render:renderTimeline,onSubmit:submitTimelineDashboardDraft,onDiscard:discardTimelineDashboardDraft,onUndo:undoTimelineDashboardBatch,onRemarkSave:saveOverviewRemark,onRemarkSaved:result=>{acceptTimelineView(result.view,result.batch_id);toast('备注已保存')},editable:timelineProjectEditable});
+  else if(body.querySelector('.ov-inline-timeline'))FlowboardTimeline.bindDashboard(body,{states:timelineDraftStates,render:renderTimeline,onSubmit:submitTimelineDashboardDraft,onDiscard:discardTimelineDashboardDraft,onUndo:undoTimelineDashboardBatch,onInsertSave:saveTimelineInsert,onInsertSaved:result=>{acceptTimelineView(result.view,result.batch_id);toast('节点已插入')},onRemarkSave:saveTimelineRemark,onRemarkSaved:result=>{acceptTimelineView(result.view,result.batch_id);toast('备注已保存')},editable:timelineProjectEditable});
   if(searchFocused){const search=body.querySelector('[data-overview-search]');search?.focus({preventScroll:true});if(search&&selection)search.setSelectionRange(...selection)}
   if(!searchFocused&&focusAttr)body.querySelector(`[${focusAttr}="${CSS.escape(focusValue)}"]`)?.focus({preventScroll:true});window.scrollTo({top:scrollY,behavior:'instant'});renderTimelineChrome();
 }
@@ -120,8 +142,9 @@ function timelineProjectById(value){return [...timelineState.projects,...timelin
 function timelineProjectEditable(value){const project=typeof value==='object'?value:timelineProjectById(value);return Boolean(project&&!project.read_only&&!project.archived_at&&(state.capabilities?.admin||(state.capabilities?.write&&(project.created_by===state.current_user?.id||project.created_by===state.current_user?.name))))}
 function timelineArchiveManageable(value){const project=typeof value==='object'?value:timelineProjectById(value);return Boolean(project&&(project.can_archive||project.can_unarchive))}
 function timelineHasDraft(){return [...timelineDraftStates.values()].some(draft=>draft.dirty)||Boolean(timelineState.editor?.dirty)}
-function discardAllTimelineDrafts(){const editorProjectId=Number(timelineState.editor?.project?.project_id),restored=new Map();for(const [projectId,draft] of timelineDraftStates){if(!draft?.dirty){restored.set(Number(projectId),draft);continue}const fresh=FlowboardTimeline.editorState(draft.original);fresh.lastBatchId=draft.lastBatchId;restored.set(Number(projectId),fresh);if(Number(projectId)===editorProjectId)timelineState.editor=fresh}if(timelineState.editor?.dirty&&!restored.has(editorProjectId)){const fresh=FlowboardTimeline.editorState(timelineState.editor.original);fresh.lastBatchId=timelineState.editor.lastBatchId;timelineState.editor=fresh;restored.set(editorProjectId,fresh)}timelineDraftStates=restored}
-function allowTimelineLeave(){if($('#timelineBody')?.__timelineRemark?.requestClose()===false)return false;if(!timelineHasDraft())return true;if(!confirm('有尚未提交的项目时间表草稿，确定放弃并离开？'))return false;discardAllTimelineDrafts();return true}
+function discardAllTimelineDrafts(){const editorProjectId=Number(timelineState.editor?.project?.project_id),restored=new Map();for(const [projectId,draft] of timelineDraftStates){if(!draft?.dirty){restored.set(Number(projectId),draft);continue}const fresh=FlowboardTimeline.editorState(draft.conflictView||draft.original);fresh.lastBatchId=draft.lastBatchId;restored.set(Number(projectId),fresh);if(Number(projectId)===editorProjectId)timelineState.editor=fresh}if(timelineState.editor?.dirty&&!restored.has(editorProjectId)){const fresh=FlowboardTimeline.editorState(timelineState.editor.conflictView||timelineState.editor.original);fresh.lastBatchId=timelineState.editor.lastBatchId;timelineState.editor=fresh;restored.set(editorProjectId,fresh)}timelineDraftStates=restored}
+function timelineSubmitting(){return [...timelineDraftStates.values()].some(draft=>draft.submitting)||Boolean(timelineState.editor?.submitting)}
+function allowTimelineLeave(){if(timelineSubmitting()){toast('正在保存，请稍候再离开');return false}if($('#timelineBody')?.__timelineRemark?.requestClose()===false||$('#timelineBody')?.__timelineInsert?.requestClose()===false)return false;if(!timelineHasDraft())return true;if(!confirm('有尚未提交的项目时间表草稿，确定放弃并离开？'))return false;discardAllTimelineDrafts();return true}
 let timelineLandingDone=false;
 async function loadTimelineReview(){try{const payload=await api(`/api/workspaces/${state.workspace_id}/timeline/review`);timelineState.review=payload.projects||[]}catch(_){/* 动态栏允许为空：静默降级 */}}
 async function landTimelineHome(){
@@ -141,7 +164,7 @@ async function landTimelineHome(){
 function setHomeTab(scope){timelineHomeScope=scope;saveUxPreferences();const root=$('#timelineBody');if(!root)return;root.querySelectorAll('[data-timeline-tab]').forEach(button=>button.classList.toggle('on',button.dataset.timelineTab===scope));root.querySelectorAll('[data-timeline-section]').forEach(section=>section.toggleAttribute('hidden',section.dataset.timelineSection!==scope));root.querySelectorAll('[data-timeline-feed]').forEach(list=>list.toggleAttribute('hidden',list.dataset.timelineFeed!==scope));const label=root.querySelector('[data-timeline-feed-scope]');if(label)label.textContent=scope==='mine'?'我 · 最近 6 条 · 新在上':'团队 · 最近 20 条 · 新在上';const note=root.querySelector('[data-timeline-home-note]');if(note)note.textContent=scope==='mine'?'整行点击进入项目页（单项目仪表盘 / 时间表编辑器）；日期、间隔、阶段、轨道、节点状态和备注均可在时间表中维护。':'拖动成员卡片左侧把手，只调整你自己的显示顺序；项目药丸可进入项目页，他人项目的时间表保持只读。'}
 function renderTimeline(){
   if(timelineState.mode==='overview'){renderOverview();return}
-  if($('#timelineBody')?.__timelineRemark?.editing)return;
+  if($('#timelineBody')?.__timelineRemark?.editing||$('#timelineBody')?.__timelineInsert?.editing)return;
   timelineState.projects.forEach(timelineDraftState);
   const archivedContext=timelineOrders.context.context_type==='archived',portfolioMode=timelinePortfolioModes.has(timelineState.mode),projectMode=['single','editor'].includes(timelineState.mode),selectedArchived=timelineState.archivedProjects.some(project=>Number(project.project_id)===Number(timelineState.selectedId));
   const sourceProjects=timelineState.mode==='archived'||(portfolioMode&&archivedContext)||(projectMode&&selectedArchived)?timelineState.archivedProjects:timelineState.projects;
@@ -153,8 +176,8 @@ function renderTimeline(){
   if(portfolioMode&&!archivedContext&&timelineOrders.current){const byId=new Map(timelineState.projects.map(project=>[Number(project.project_id),project]));renderProjects=timelineOrders.current.project_ids.map(id=>byId.get(Number(id))).filter(Boolean)}
   const allFilters=Object.assign(timelineFilters,{tagCatalog:timelineTags.catalog,orderContext:timelineOrders.context,archived:archivedContext,timeScope:portfolioMode?timelineState.mode:'all',canReorder:!archivedContext&&timelineFilters.sort_key==='custom'&&!timelineFilters.project_ids.length,canArchive:timelineArchiveManageable});
   body.innerHTML=FlowboardTimeline.renderWorkspace(renderProjects,{mode:timelineState.mode,selectedId:timelineState.selectedId,admin:Boolean(state.capabilities?.admin),write:Boolean(state.capabilities?.write),editor:timelineState.editor,dashboardStates:timelineDraftStates,filters:allFilters,transfer:timelineTransfer,members:state.members||[],currentUser:state.current_user||null,review:timelineState.review||null,tagsState:timelineTags,mineOrder:timelineOrders.mine,memberOrder:timelineOrders.members,backMode:timelineState.projectReturnMode});
-  if(timelineState.mode==='editor'&&timelineState.editor)FlowboardTimeline.bindEditor(body,timelineState.editor,{render:renderTimeline,onSubmit:submitTimelineDraft,onAdd:addTimelineNode,onUndo:undoTimelineBatch,onCorrect:correctTimelineInitialDate,onReview:showTimelineReview,editable:timelineProjectEditable(timelineState.selectedId)});
-  else if(timelineState.mode==='single'||timelinePortfolioModes.has(timelineState.mode))FlowboardTimeline.bindDashboard(body,{filters:timelineFilters,states:timelineDraftStates,render:renderTimeline,onSubmit:submitTimelineDashboardDraft,onDiscard:discardTimelineDashboardDraft,onUndo:undoTimelineDashboardBatch,onOpenSingle:projectId=>openTimelineMode('single',projectId,{origin:timelineState.mode}),onViewportChange:saveTimelineViewport,onRemarkDraft:()=>toast('备注已加入草稿，点击项目“更新”提交'),editable:timelineProjectEditable});
+  if(timelineState.mode==='editor'&&timelineState.editor)FlowboardTimeline.bindEditor(body,timelineState.editor,{render:renderTimeline,onSubmit:submitTimelineDraft,onAdd:addTimelineNode,onDiscard:()=>discardTimelineDashboardDraft(timelineState.selectedId),onUndo:undoTimelineBatch,onCorrect:correctTimelineInitialDate,onReview:showTimelineReview,editable:timelineProjectEditable(timelineState.selectedId)});
+  else if(timelineState.mode==='single'||timelinePortfolioModes.has(timelineState.mode))FlowboardTimeline.bindDashboard(body,{filters:timelineFilters,states:timelineDraftStates,render:renderTimeline,onSubmit:submitTimelineDashboardDraft,onDiscard:discardTimelineDashboardDraft,onUndo:undoTimelineDashboardBatch,onOpenSingle:projectId=>openTimelineMode('single',projectId,{origin:timelineState.mode}),onViewportChange:saveTimelineViewport,onInsertSave:saveTimelineInsert,onInsertSaved:result=>{acceptTimelineView(result.view,result.batch_id);toast('节点已插入')},onRemarkSave:saveTimelineRemark,onRemarkSaved:result=>{acceptTimelineView(result.view,result.batch_id);toast('备注已保存')},editable:timelineProjectEditable});
   renderTimelineChrome();
   if(timelineState.mode==='home')setHomeTab(timelineHomeScope);
 }
@@ -168,7 +191,8 @@ async function loadTimeline(){if(timelineLoadInFlight)return timelineLoadInFligh
 async function openTimeline(){try{if(!allowTimelineLeave())return;timelineNavigationChosen=true;const view=$('#timelineView');if(view&&!view.hidden&&timelineState.mode==='home')return;timelineState.mode='home';timelineState.projectReturnMode='home';await loadTimeline();showTimelineView()}catch(error){showError(error)}}
 function clearTimelineDragSelection(){for(const draft of timelineDraftStates.values()){if(!draft?.armed)continue;const nodeId=Number(draft.armed.nodeId);draft.armed=null;if(Number(draft.dashboardContext?.nodeId)===nodeId&&['single','cascade'].includes(draft.dashboardContext?.action))draft.dashboardContext=null}}
 async function openTimelineMode(mode,projectId,{origin=null}={}){
-  if($('#timelineBody')?.__timelineRemark?.requestClose()===false)return;
+  if(timelineSubmitting()){toast('正在保存，请稍候再离开');return}
+  if($('#timelineBody')?.__timelineRemark?.requestClose()===false||$('#timelineBody')?.__timelineInsert?.requestClose()===false)return;
   try{
     const previousMode=timelineState.mode,nextId=projectId?Number(projectId):timelineState.selectedId,sameProjectTabs=['single','editor'].includes(previousMode)&&['single','editor'].includes(mode)&&Number(nextId)===Number(timelineState.selectedId),leavingDirtyEditor=previousMode==='editor'&&timelineState.editor?.dirty&&!sameProjectTabs,leavingDraftContext=timelineHasDraft()&&!sameProjectTabs;
     if(leavingDraftContext&&!allowTimelineLeave())return;
@@ -252,7 +276,7 @@ async function saveMemberOrder(memberIds){
   try{const saved=await api(`/api/workspaces/${state.workspace_id}/timeline/member-order`,'PUT',{base_order_version:current.order_version,member_ids:memberIds});timelineOrders.members=saved;renderTimeline();setHomeTab('team');toast('你的团队卡片顺序已保存')}
   catch(error){timelineOrders.members=error.details?.order||await api(`/api/workspaces/${state.workspace_id}/timeline/member-order`);renderTimeline();setHomeTab('team');showError(error)}
 }
-async function selectTimelineContext(contextType,tagId){try{timelineOrders.context={context_type:contextType,tag_id:contextType==='tag'?Number(tagId):null};timelineFilters.project_ids=[];timelineFilters.focusedProjectId=null;if(contextType==='archived'){timelineOrders.current=null;await loadArchivedTimeline()}else timelineOrders.current=await loadTimelineOrder(timelineOrders.context);saveTimelineContextPreference();resetTimelineViewports();timelineFilters.viewport=loadTimelineViewport();renderTimeline()}catch(error){showError(error)}}
+async function selectTimelineContext(contextType,tagId){if(!allowTimelineLeave())return;try{timelineOrders.context={context_type:contextType,tag_id:contextType==='tag'?Number(tagId):null};timelineFilters.project_ids=[];timelineFilters.focusedProjectId=null;if(contextType==='archived'){timelineOrders.current=null;await loadArchivedTimeline()}else timelineOrders.current=await loadTimelineOrder(timelineOrders.context);saveTimelineContextPreference();resetTimelineViewports();timelineFilters.viewport=loadTimelineViewport();renderTimeline()}catch(error){showError(error)}}
 async function selectTimelineTag(tagId){try{timelineTags.selectedId=Number(tagId);timelineTags.undo=null;await loadTagMembership();renderTimeline()}catch(error){showError(error)}}
 function closeTimelineTagInline({restoreFocus=false}={}){const body=$('#timelineBody');if(!body)return;body.querySelectorAll('[data-tag-rename-form],[data-tag-delete-confirm]').forEach(node=>node.hidden=true);body.querySelectorAll('[data-tag-row]').forEach(row=>row.classList.remove('is-editing'));const opener=body.__timelineTagInlineOpener;body.__timelineTagInlineOpener=null;if(restoreFocus)opener?.focus()}
 function openTimelineTagRowInline(button,kind){const body=$('#timelineBody'),row=button.closest('[data-tag-row]'),target=row?.querySelector(kind==='rename'?'[data-tag-rename-form]':'[data-tag-delete-confirm]');if(!body||!row||!target)return;closeTimelineTagInline();body.__timelineTagInlineOpener=button;row.classList.add('is-editing');target.hidden=false;if(kind==='rename'){const tag=timelineTags.catalog?.tags.find(item=>Number(item.tag_id)===Number(button.dataset.tagRenameOpen));target.elements.name.value=tag?.name||'';requestAnimationFrame(()=>{target.elements.name.focus();target.elements.name.select()})}else requestAnimationFrame(()=>target.querySelector('[data-tag-delete]')?.focus())}
@@ -309,9 +333,31 @@ async function previewTimelineImport(files,sheetName=null){
 async function commitTimelineImport(){const preview=timelineTransfer.preview;if(!preview||timelineTransfer.error||timelineTransfer.busy)return;timelineTransfer.busy=true;renderTimelineTransferDialog();let committed;try{committed=await api(`/api/workspaces/${state.workspace_id}/timeline/imports/commit`,'POST',{batch_id:preview.batch_id})}catch(error){timelineTransfer={...timelineTransfer,busy:false,error:{code:error.code||'IMPORT_ERROR',message:error.message,details:error.details||{}}};renderTimelineTransferDialog();return}closeTimelineDialog({restoreFocus:false});await loadTimeline();toast(`导入完成：${committed.projects} 个项目、${committed.nodes} 个节点`)}
 async function exportTimelineWorkspace(){if(timelineTransfer.busy)return;clearTimelineExport();timelineTransfer={...timelineTransfer,busy:true,error:null};renderTimelineTransferDialog();try{const exported=await api(`/api/workspaces/${state.workspace_id}/timeline/export`,'POST',{}),bytes=base64ToBytes(exported.content_base64),digest=await sha256Hex(bytes);if(digest.toLowerCase()!==String(exported.sha256).toLowerCase()){const mismatch=new Error('服务端导出文件 SHA-256 校验失败');mismatch.code='EXPORT_SHA256_MISMATCH';throw mismatch}const url=URL.createObjectURL(new Blob([bytes],{type:exported.content_type||'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));timelineTransfer={...timelineTransfer,busy:false,exportReady:{filename:exported.filename,sha256:digest,url}};renderTimelineTransferDialog()}catch(error){timelineTransfer={...timelineTransfer,busy:false,error:{code:error.code||'EXPORT_ERROR',message:error.message,details:error.details||{}}};renderTimelineTransferDialog()}}
 function acceptTimelineView(view,batchId){const previous=timelineDraftStates.get(Number(view.project_id))||timelineState.editor,previousBatch=previous?.lastBatchId,index=timelineState.projects.findIndex(item=>item.project_id===view.project_id);if(index<0)timelineState.projects.push(view);else timelineState.projects[index]=view;const fresh=FlowboardTimeline.editorState(view);fresh.lastBatchId=batchId===undefined?previousBatch:batchId;timelineDraftStates.set(Number(view.project_id),fresh);timelineState.editor=timelineState.mode==='editor'&&Number(timelineState.selectedId)===Number(view.project_id)?fresh:null;if(timelineState.mode==='overview')loadOverview();else renderTimeline()}
-async function submitTimelineDraft(){const editor=timelineState.editor;if(!editor?.dirty||editor.submitting)return;editor.submitting=true;const button=$('[data-timeline-submit]');if(button)button.disabled=true;try{const request=FlowboardTimeline.batchRequest(editor),result=await api(`/api/workspaces/${state.workspace_id}/timeline/batches`,'POST',{requests:[request]}),row=result.results[0];acceptTimelineView(row.view,row.batch_id);toast('项目时间表已保存')}catch(error){if(error.status===409&&error.details?.conflicts?.[0]?.view){acceptTimelineView(error.details.conflicts[0].view,null);toast('版本冲突：已显示服务端最新时间表')}else{editor.submitting=false;showError(error)}}}
-async function submitTimelineDashboardDraft(projectId){const draft=timelineDraftStates.get(Number(projectId));if(!draft?.dirty||draft.submitting)return;draft.submitting=true;renderTimeline();try{const request=FlowboardTimeline.batchRequest(draft,{triggerSource:'drag'}),result=await api(`/api/workspaces/${state.workspace_id}/timeline/batches`,'POST',{requests:[request]}),row=result.results[0];acceptTimelineView(row.view,row.batch_id);toast('项目时间已更新')}catch(error){if(error.status===409&&error.details?.conflicts?.[0]?.view){acceptTimelineView(error.details.conflicts[0].view,null);toast('版本冲突：已显示服务端最新项目时间')}else{draft.submitting=false;renderTimeline();showError(error)}}}
-function discardTimelineDashboardDraft(projectId){const draft=timelineDraftStates.get(Number(projectId));if(!draft)return;const fresh=FlowboardTimeline.editorState(draft.original);fresh.lastBatchId=draft.lastBatchId;timelineDraftStates.set(Number(projectId),fresh);if(timelineState.mode==='editor'&&Number(timelineState.selectedId)===Number(projectId))timelineState.editor=fresh;renderTimeline()}
+function conflictRetrySummary(draft){
+  const labels={date:'日期',interval_days:'间隔',done_at:'完成状态',track:'轨道',stage:'阶段',name:'名称',remark:'备注'},latest=draft.conflictView;
+  return [...draft.draft.values()].map(change=>{const node=(latest.nodes||[]).find(item=>Number(item.id)===Number(change.node_id)),name=node?.name||draft.original.nodes.find(item=>Number(item.id)===Number(change.node_id))?.name||change.create?.name||'节点';return change.create?`新增「${name}」`:change.remove?`删除「${name}」`:`「${name}」：`+Object.entries(change.set).map(([key,value])=>`${labels[key]||key} ${JSON.stringify(node?.[key]??'')} → ${JSON.stringify(value)}`).join('；')}).join('\n');
+}
+async function submitTimelineProjectDraft(projectId,{editorMode=false}={}){
+  let draft=timelineDraftStates.get(Number(projectId));if(!draft?.dirty||draft.submitting)return;
+  if(draft.conflictView){
+    if(!timelineProjectEditable(draft.conflictView)){toast('项目当前不可编辑，本地输入仍保留。');return}
+    if(!confirm('项目已有更新。本地更改仍保留，以下是最新值与将重新应用的修改：\n\n'+conflictRetrySummary(draft)+'\n\n确认按最新版本重试？'))return;
+    try{draft=FlowboardTimeline.rebaseDraft(draft,draft.conflictView)}catch(error){showError(error);return}
+    timelineDraftStates.set(Number(projectId),draft);if(editorMode)timelineState.editor=draft;
+    if(!draft.dirty){acceptTimelineView(draft.original,undefined);toast('所需更改已存在，无需再次保存');return}
+  }
+  draft.submitting=true;renderTimeline();
+  try{
+    const request=FlowboardTimeline.batchRequest(draft,{triggerSource:editorMode?'editor':'drag'}),result=await api(`/api/workspaces/${state.workspace_id}/timeline/batches`,'POST',{requests:[request]}),row=result.results[0];acceptTimelineView(row.view,row.batch_id);toast(editorMode?'项目时间表已保存':'项目时间已更新');
+  }catch(error){
+    draft.submitting=false;const latest=error.status===409&&error.details?.conflicts?.find(item=>Number(item.view?.project_id)===Number(projectId))?.view;
+    if(latest){draft.conflictView=latest;renderTimeline();toast('版本冲突：本地更改已保留，请确认后重试或放弃更改')}
+    else{renderTimeline();showError(error)}
+  }
+}
+async function submitTimelineDraft(){const invalid=$('#timelineBody')?.querySelector('[data-editor-field]:invalid');if(invalid){invalid.reportValidity();return}const editor=timelineState.editor;if(editor)return submitTimelineProjectDraft(editor.project.project_id,{editorMode:true})}
+async function submitTimelineDashboardDraft(projectId){return submitTimelineProjectDraft(projectId)}
+function discardTimelineDashboardDraft(projectId){const draft=timelineDraftStates.get(Number(projectId));if(!draft||draft.submitting)return;const fresh=FlowboardTimeline.editorState(draft.conflictView||draft.original);fresh.lastBatchId=draft.lastBatchId;timelineDraftStates.set(Number(projectId),fresh);if(timelineState.mode==='editor'&&Number(timelineState.selectedId)===Number(projectId))timelineState.editor=fresh;const index=timelineState.projects.findIndex(project=>Number(project.project_id)===Number(projectId));if(index>=0)timelineState.projects[index]=fresh.original;renderTimeline()}
 async function undoTimelineDashboardBatch(projectId){const draft=timelineDraftStates.get(Number(projectId));if(!draft?.lastBatchId)return;try{const result=await api(`/api/workspaces/${state.workspace_id}/timeline/batches/undo`,'POST',{batch_ids:[draft.lastBatchId]});acceptTimelineView(result.results[0].view,null);toast('上次提交已撤销')}catch(error){showError(error)}}
 function addTimelineNode(){const editor=timelineState.editor;if(!editor)return;const visible=FlowboardTimeline.orderedEditorNodes(editor),selected=visible.filter(node=>editor.batchSelection?.has(Number(node.id))),anchor=selected.at(-1)||visible.at(-1),node=FlowboardTimeline.createNode(editor,{track:anchor?.track||'main',stage:anchor?.stage||'创意',name:'新节点',date:anchor?FlowboardTimeline.addDays(anchor.date,1):(editor.project.server_today||new Date().toISOString().slice(0,10)),remark:''},{afterNodeId:selected.length?anchor.id:null});editor.batchSelection?.clear();renderTimeline();const input=$(`[data-editor-field="name"][data-node-id="${node.id}"]`);input?.focus();input?.select()}
 async function undoTimelineBatch(){const editor=timelineState.editor;if(!editor?.lastBatchId)return;try{const result=await api(`/api/workspaces/${state.workspace_id}/timeline/batches/undo`,'POST',{batch_ids:[editor.lastBatchId]});acceptTimelineView(result.results[0].view,null);toast('上次提交已撤销')}catch(error){showError(error)}}

@@ -1,0 +1,36 @@
+{
+  "source_files": [
+    {
+      "path": "timeline-ui.js",
+      "sha256": "c865c46f118f705ca13442c45b9a701f88ec61c8cf52ca3558c679453a504b80"
+    },
+    {
+      "path": "timeline.css",
+      "sha256": "44f2777515dc65260ada9e5d19e3f5614b0b768c978349ec72eea187a70f5035"
+    },
+    {
+      "path": "index.html",
+      "sha256": "f4ced2defcee1df3fd3a5fa65c6973d3da326496c37aef1a977c6f8f7d9878aa"
+    },
+    {
+      "path": "tests/test_timeline_edit_e2e.py",
+      "sha256": "7369ce8cbe88fb1963189dc19603b16024e07e67be15b319701b67c7c13937fa"
+    },
+    {
+      "path": "tests/timeline_insert.test.js",
+      "sha256": "51480f73a1a3ae0268031c1cf61d8a107c9f8920be8abefaa76da44af4e20f45"
+    },
+    {
+      "path": "tests/test_timeline_e2e.py",
+      "sha256": "f89a21ef6c348a9d3f2bec7e8b5d417b013f979957d6ad0fa9b50d56bdfca6cf"
+    }
+  ],
+  "targeted_browser_passed": 3,
+  "full_regression_run": false,
+  "full_regression_pending_human_acceptance": true,
+  "syntax": "PASS",
+  "diff_check": "PASS",
+  "preview_restarted": false,
+  "real_database_written": false,
+  "deferred_legacy_layer_assertion_updated": true
+}

@@ -23,10 +23,12 @@ class OverviewE2E(unittest.TestCase):
             original=self.browser.new_context
             def context_with_controls(*args,**kwargs):
                 context=original(*args,**kwargs)
+                # Use the actual static asset without a second network fetch during page load.
+                body=(Path(__file__).resolve().parents[1]/'overview-ui.js').read_text(encoding='utf-8')
+                self.assertEqual(body.count('const secondaryControlsEnabled = false;'),1)
+                body=body.replace('const secondaryControlsEnabled = false;', 'const secondaryControlsEnabled = true;')
                 def restore_controls(route):
-                    response=route.fetch()
-                    body=response.text().replace('const secondaryControlsEnabled = false;', 'const secondaryControlsEnabled = true;')
-                    route.fulfill(response=response,body=body)
+                    route.fulfill(status=200,content_type='application/javascript; charset=utf-8',body=body)
                 context.route('**/overview-ui.js*',restore_controls)
                 return context
             switch=patch.object(self.browser,'new_context',side_effect=context_with_controls)
@@ -229,7 +231,11 @@ class OverviewE2E(unittest.TestCase):
         self.assert_clean_browser(page);context.close()
 
     def test_desktop_visual_long_list_and_narrow_table_scroll(self):
-        ids=self.seed(long_list=True);context,page=self.login('u1')
+        ids=self.seed(long_list=True)
+        # The inline chart intentionally shows overdue unfinished nodes only.
+        overdue=(datetime.now(timezone(timedelta(hours=8))).date()-timedelta(days=1)).isoformat()
+        db=connect(self.db_path);db.execute('UPDATE timeline_nodes SET date=?,initial_date=? WHERE project_id=?',(overdue,overdue,ids['long']));db.commit();db.close()
+        context,page=self.login('u1')
         page.set_viewport_size({'width':1600,'height':1000});self.open_overview(page)
         self.select(page,'completion','all')
         EVIDENCE.mkdir(parents=True,exist_ok=True)
@@ -240,7 +246,11 @@ class OverviewE2E(unittest.TestCase):
         self.assertGreater(len(name.get_attribute('title')),100)
         page.locator(f'[data-overview-expand="{ids["long"]}"]').click()
         detail=page.locator(f'#ov-detail-{ids["long"]}')
-        self.assertIn('复杂工艺说明与材料沟通记录',detail.inner_text())
+        detail.locator('.timeline-dashboard-node').first.hover()
+        popup=page.locator('[data-dashboard-remark]');popup.wait_for(state='visible')
+        self.assertIn('复杂工艺说明与材料沟通记录',popup.locator('[data-remark-preview]').inner_text())
+        self.assertEqual(detail.locator('.ov-nodes').count(),0)
+        page.mouse.move(10,10)
         page.set_viewport_size({'width':760,'height':850})
         scroller=page.locator('.ov-table-scroll').first
         self.assertTrue(scroller.evaluate('el=>el.scrollWidth>el.clientWidth'))
@@ -252,7 +262,9 @@ class OverviewE2E(unittest.TestCase):
         self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'),762)
         self.select(page,'period','all');self.select(page,'scope','mine')
         page.locator(f'[data-overview-expand="{ids["empty"]}"]').click()
-        self.assertIn('尚未录入节点',page.locator(f'#ov-detail-{ids["empty"]}').inner_text())
+        self.assertIn('没有逾期未完成的节点',page.locator(f'#ov-detail-{ids["empty"]}').inner_text())
+        self.assertEqual(page.locator(f'#ov-detail-{ids["empty"]} .timeline-dashboard-node').count(),0)
+        self.assertIn('0 节点',page.locator(f'[data-overview-project="{ids["empty"]}"] .ov-node-count').inner_text())
         self.assert_clean_browser(page);context.close()
 
 

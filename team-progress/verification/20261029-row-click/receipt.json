@@ -1,0 +1,23 @@
+{
+  "source_files": [
+    {
+      "path": "timeline-ui.js",
+      "sha256": "d24206fcc4dfbc1e3e454d0f60ec857091690eb17decb9ae76c7ef0fe3848a94"
+    },
+    {
+      "path": "index.html",
+      "sha256": "e6c52fedd18b5111ad539e8b722ac3f8939f191b1312b7e1af72c4511921f34a"
+    },
+    {
+      "path": "tests/test_timeline_row_click_e2e.py",
+      "sha256": "3552a8c7f2e0ff97ed02fad970151d65a18362dc9351dc7c76af621ad0f34864"
+    }
+  ],
+  "targeted_browser_passed": 1,
+  "full_regression_run": false,
+  "full_regression_pending_human_acceptance": true,
+  "syntax": "PASS",
+  "diff_check": "PASS",
+  "preview_restarted": false,
+  "preview_database_modified_by_tests": false
+}

@@ -31,7 +31,6 @@ class TimelineProductionE2E(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix="timeline-e2e-")
         self.db_path = str(Path(self.temp.name) / "flowboard.db")
-        os.environ["FLOWBOARD_INITIAL_PASSWORD"] = "test-password"
         migrate(self.db_path, initial_password="test-password")
         db = connect(self.db_path)
         db.execute("INSERT INTO users SELECT 'u2','u2','成员',password_hash,NULL,NULL,1,'2026-01-01T00:00:00+00:00' FROM users WHERE id='u1'")
@@ -44,16 +43,24 @@ class TimelineProductionE2E(unittest.TestCase):
         db.commit()
         db.close()
         self.server = create_server("127.0.0.1", 0, self.db_path)
+        # Test cleanup must join in-flight handlers before deleting the SQLite file.
+        self.server.daemon_threads = False
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
         self.base = f"http://127.0.0.1:{self.server.server_address[1]}"
 
     def tearDown(self):
-        self.server.shutdown()
-        self.server.server_close()
-        self.thread.join(timeout=2)
-        self.temp.cleanup()
-        os.environ.pop("FLOWBOARD_INITIAL_PASSWORD", None)
+        try:
+            # Also close contexts left behind when a test assertion or navigation fails.
+            for context in self.browser.contexts:
+                context.close()
+        finally:
+            self.server.shutdown()
+            self.server.server_close()
+            self.thread.join(timeout=2)
+            self.temp.cleanup()
+        self.assertFalse(self.thread.is_alive())
+        self.assertEqual(self.browser.contexts, [])
 
     def login(self, username):
         context = self.browser.new_context(viewport={"width": 1280, "height": 800})
@@ -617,7 +624,8 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assert_clean_browser(page)
         context.close()
 
-    def test_member_can_read_and_create_but_has_no_delete_control(self):
+    def test_member_can_create_and_delete_own_but_has_no_other_delete_control(self):
+        other_project_id=self.seed_timeline(created_by="u1",name="其他人项目")
         context, page = self.login("u2")
         page.locator("#timelineBtn").click()
         page.locator('[data-timeline-page="home"]').wait_for()
@@ -627,8 +635,10 @@ class TimelineProductionE2E(unittest.TestCase):
         page.locator('[data-timeline-page="editor"] > .timeline-project-card > header h2', has_text="成员项目").wait_for()
         page.locator('[data-timeline-mode-target="single"]').click()
         page.locator('[data-timeline-page="single"] > .timeline-project-card > header h2', has_text="成员项目").wait_for()
+        own_project_id=int(page.locator('[data-dashboard-project]').get_attribute('data-dashboard-project'))
         page.locator('[data-timeline-mode-target="home"]').click()
-        self.assertEqual(page.locator('[data-timeline-delete]').count(), 0)
+        self.assertEqual(page.locator(f'[data-timeline-delete="{own_project_id}"]').count(),1)
+        self.assertEqual(page.locator(f'[data-timeline-delete="{other_project_id}"]').count(),0)
         self.assert_clean_browser(page)
         context.close()
 
@@ -916,9 +926,12 @@ class TimelineProductionE2E(unittest.TestCase):
         with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith("/timeline/batches")) as conflict:
             self.physical_click(page, page.locator('[data-timeline-submit]'))
         self.assertEqual(conflict.value.status, 409)
-        page.locator("#toast", has_text="已显示服务端最新时间表").wait_for()
-        self.assertEqual(page.locator('[data-timeline-draft-count]').inner_text(), "0 项草稿")
+        page.locator("#toast", has_text="本地更改已保留").wait_for()
+        self.assertEqual(page.locator('[data-timeline-draft-count]').inner_text(), "1 项草稿")
+        self.assertEqual(page.locator('[data-editor-field="done_at"][data-node-id="2"]').input_value(), "true")
         self.assertEqual(self.timeline_content_hash(), stable, "409 must write no timeline content")
+        page.locator('[data-timeline-discard]').click()
+        self.assertEqual(page.locator('[data-timeline-draft-count]').inner_text(), "0 项草稿")
         self.assertEqual(page.locator('[data-timeline-page="editor"] [data-editor-row]').count(), 4)
         self.assertTrue(any("409" in message for message in page.flowboard_console_errors))
         page.flowboard_console_errors.clear()
@@ -933,8 +946,9 @@ class TimelineProductionE2E(unittest.TestCase):
 
         self.physical_click(member_page, member_page.locator('[data-timeline-mode-target="home"]'))
         member_page.locator('[data-timeline-page="home"]').wait_for()
-        self.physical_click(member_page, member_page.locator('[data-timeline-tab="team"]'))
-        self.physical_click(member_page, member_page.locator(f'[data-timeline-member-open="{project_id}"]'))
+        member_page.locator('#timelineOverviewBtn').click()
+        member_page.locator('[data-timeline-page="overview"][aria-busy="false"]').wait_for()
+        self.physical_click(member_page, member_page.locator(f'[data-overview-project="{project_id}"] [data-timeline-open="single"]'))
         member_page.locator('[data-timeline-page="single"]').wait_for()
         self.physical_click(member_page, member_page.locator('[data-timeline-mode-target="editor"]'))
         member_page.locator('.timeline-sheet-readonly').wait_for()
@@ -1220,7 +1234,7 @@ class TimelineProductionE2E(unittest.TestCase):
         page.mouse.down()
         page.mouse.move(flag_box["x"] + flag_box["width"] / 2 - 70, flag_box["y"] + flag_box["height"] / 2, steps=6)
         page.mouse.up()
-        dragged_actions = page.locator('[data-single-dashboard-draft-actions]')
+        dragged_actions = page.locator('[data-dashboard-pending]')
         dragged_actions.wait_for()
         pending_node = page.locator(f'[data-dashboard-project="{project_id}"] .timeline-dashboard-node[data-node-id="{expected_node}"]')
         pending_flag = page.locator(f'[data-dashboard-project="{project_id}"] .timeline-node-flag[data-node-id="{expected_node}"]')
@@ -1230,11 +1244,9 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertRegex(dragged_actions.locator('[data-dashboard-submit]').inner_text(), r'^更新 \d+$')
         self.physical_click(page, page.locator(f'[data-dashboard-project="{project_id}"] .timeline-portfolio-meta'), button="right")
         blocked_menu = page.locator('[data-portfolio-undo-menu]')
-        blocked_menu.wait_for(state="visible")
-        self.assertEqual(blocked_menu.locator('[data-portfolio-undo-action]').inner_text(), '请先更新或放弃草稿')
-        self.assertTrue(blocked_menu.locator('[data-portfolio-undo-action]').is_disabled())
-        page.keyboard.press('Escape')
-        blocked_menu.wait_for(state="hidden")
+        self.assertTrue(blocked_menu.is_hidden(),"the pending chart overlay blocks underlying project context actions")
+        self.assertTrue(dragged_actions.is_visible())
+        self.assertEqual(self.timeline_content_hash(),stable_hash)
         self.physical_click(page, dragged_actions.locator('[data-dashboard-discard]'))
         dragged_actions.wait_for(state="detached")
         single_card = page.locator(f'[data-dashboard-project="{project_id}"]')
@@ -1242,13 +1254,14 @@ class TimelineProductionE2E(unittest.TestCase):
         node = single_card.locator(f'.timeline-dashboard-node[data-node-id="{expected_node}"]')
         self.physical_click(page, node, button="right")
         self.physical_click(page, page.locator('[data-timeline-context] [data-draft-action="done"]'))
-        single_actions = page.locator('[data-single-dashboard-draft-actions]')
+        single_actions = page.locator('[data-dashboard-pending]')
         single_actions.wait_for()
         self.assertTrue(single_actions.is_visible())
-        dock_metrics = single_actions.evaluate("""el => { const r=el.getBoundingClientRect(),main=document.querySelector('.main-content').getBoundingClientRect(); return {position:getComputedStyle(el).position,center:r.left+r.width/2,mainCenter:main.left+main.width/2,bottom:innerHeight-r.bottom} }""")
-        self.assertEqual(dock_metrics["position"], "fixed")
-        self.assertAlmostEqual(dock_metrics["center"], dock_metrics["mainCenter"], delta=2)
-        self.assertAlmostEqual(dock_metrics["bottom"], 22, delta=2)
+        overlay_metrics=single_actions.evaluate("""el=>{const r=el.getBoundingClientRect(),s=el.closest('[data-dashboard-pending-surface]').getBoundingClientRect();return {position:getComputedStyle(el).position,left:r.left,top:r.top,width:r.width,height:r.height,surface:{left:s.left,top:s.top,width:s.width,height:s.height}}}""")
+        self.assertEqual(overlay_metrics['position'],'absolute')
+        for key in ['left','top','width','height']:self.assertAlmostEqual(overlay_metrics[key],overlay_metrics['surface'][key],delta=2)
+        self.assertEqual(single_card.locator('.timeline-stage-lanes[inert]').count(),1)
+        self.assertEqual(single_actions.locator('[data-dashboard-submit]').evaluate('e=>getComputedStyle(e).borderTopColor'),'rgb(255, 255, 255)')
         dashboard_leave_dialogs = []
         def accept_dashboard_leave(dialog):
             dashboard_leave_dialogs.append(dialog.message)
@@ -1264,9 +1277,9 @@ class TimelineProductionE2E(unittest.TestCase):
         page.locator('[data-timeline-page="all"] .timeline-dashboard-node').first.wait_for()
         baseline = len(requests)
         first_row = page.locator('[data-timeline-page="all"] [data-dashboard-project]').first
-        self.assertEqual(first_row.locator('.timeline-portfolio-actions').count(), 0)
+        self.assertEqual(first_row.locator('[data-dashboard-pending]').count(), 0)
         first_row.locator('.timeline-portfolio-meta').hover()
-        self.assertEqual(first_row.locator('.timeline-portfolio-actions').count(), 0, "hover alone must not expose all-project row actions")
+        self.assertEqual(first_row.locator('[data-dashboard-pending]').count(), 0, "hover alone must not expose all-project row actions")
         self.assertEqual(page.locator('[data-timeline-page="all"] .timeline-row-menu, [data-timeline-page="all"] [data-timeline-archive]').count(), 0)
         self.physical_click(page, first_row.locator('.timeline-portfolio-meta'), button="right")
         idle_all_menu = page.locator('[data-portfolio-undo-menu]')
@@ -1280,7 +1293,7 @@ class TimelineProductionE2E(unittest.TestCase):
         self.physical_click(page, all_node, button="right")
         self.assertEqual(page.locator('[data-timeline-page="all"] [data-timeline-context] [role="menuitem"]').count(), 6)
         self.physical_click(page, page.locator('[data-timeline-page="all"] [data-draft-action="done"]'))
-        all_actions = page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{all_project_id}"] .timeline-portfolio-actions')
+        all_actions = page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{all_project_id}"] [data-dashboard-pending]')
         all_actions.wait_for()
         self.assertTrue(all_actions.is_visible())
         self.assertEqual(all_actions.locator('button').all_inner_texts(), ['放弃', '更新 1'])
@@ -1292,11 +1305,11 @@ class TimelineProductionE2E(unittest.TestCase):
             self.physical_click(page, all_actions.locator('[data-dashboard-submit]'))
         self.assertEqual(updated.value.status, 200)
         all_actions.wait_for(state="detached")
-        self.assertEqual(page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{all_project_id}"] .timeline-portfolio-actions').count(), 0)
+        self.assertEqual(page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{all_project_id}"] [data-dashboard-pending]').count(), 0)
         page.locator('[data-timeline-page="all"] .timeline-portfolio-axis-detail').hover()
         undo_meta = page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{all_project_id}"] .timeline-portfolio-meta')
         undo_meta.hover()
-        self.assertEqual(page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{all_project_id}"] .timeline-portfolio-actions').count(), 0, "project-column hover must never reveal undo")
+        self.assertEqual(page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{all_project_id}"] [data-dashboard-pending]').count(), 0, "project-column hover must never reveal undo")
         self.physical_click(page, undo_meta, button="right")
         undo_menu = page.locator('[data-portfolio-undo-menu]')
         undo_menu.wait_for(state="visible")
@@ -1354,13 +1367,16 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertLess(editor.bounding_box()["width"], 300, "insert uses the approved D mini bubble instead of the modal-sized editor")
         self.assertEqual(editor.evaluate("el => getComputedStyle(el).backgroundColor"), "rgba(0, 0, 0, 0)")
         editor.locator('input[name="name"]').fill("右键快速节点")
-        self.physical_click(page, editor.locator('button[type="submit"]'))
+        with page.expect_response(lambda r:r.request.method=='POST' and r.url.endswith('/timeline/batches')) as inserted_commit:
+            self.physical_click(page, editor.locator('button[type="submit"]'))
+        self.assertEqual(inserted_commit.value.status,200)
         editor.wait_for(state="hidden")
-        inserted = page.locator(f'[data-dashboard-project="{project_id}"] .timeline-dashboard-node[data-node-id^="-"]')
+        inserted = page.locator(f'[data-dashboard-project="{project_id}"] .timeline-dashboard-node', has=page.locator('[data-node-tooltip-source] b',has_text="右键快速节点"))
         inserted.wait_for()
-        self.assertEqual(inserted.locator('[data-node-tooltip-source] b').inner_text(), "右键快速节点")
-        self.assertEqual(self.timeline_content_hash(), stable_hash, "quick insert must remain a local draft before update")
-
+        self.assertGreater(int(inserted.get_attribute('data-node-id')),0)
+        self.assertNotEqual(self.timeline_content_hash(),stable_hash,"quick insert persists at confirmation")
+        self.assertEqual(page.locator('[data-dashboard-pending]').count(),0)
+        stable_hash=self.timeline_content_hash()
         existing = page.locator(f'[data-dashboard-project="{project_id}"] .timeline-dashboard-node:not([data-node-id^="-"])').first
         edited_node_id = int(existing.get_attribute("data-node-id"))
         self.physical_click(page, existing, button="right")
@@ -1372,8 +1388,12 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertIn(existing.get_attribute("data-node-date"), editor.locator('[data-remark-title]').inner_text())
         self.assertEqual(editor.locator('input[name="name"]').count(), 0)
         editor.locator('textarea[name="remark"]').fill("来自仪表盘的多行备注\n第二行")
-        self.physical_click(page, editor.locator('button[type="submit"]'))
+        with page.expect_response(lambda r:r.request.method=='POST' and r.url.endswith('/timeline/batches')) as remark_commit:
+            self.physical_click(page, editor.locator('button[type="submit"]'))
+        self.assertEqual(remark_commit.value.status,200)
         editor.wait_for(state="hidden")
+        self.assertEqual(page.locator('[data-dashboard-pending]').count(),0)
+        stable_hash=self.timeline_content_hash()
 
         removable = page.locator(f'[data-dashboard-project="{project_id}"] .timeline-dashboard-node:not([data-node-id="{edited_node_id}"]):not([data-node-id^="-"])').first
         removed_node_id = int(removable.get_attribute("data-node-id"))
@@ -1394,10 +1414,10 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(remove_action.evaluate("el => getComputedStyle(el).color"), "rgb(216, 52, 69)")
         self.physical_click(page, remove_action)
         page.locator(f'[data-dashboard-project="{project_id}"] .timeline-dashboard-node[data-node-id="{removed_node_id}"]').wait_for(state="detached")
-        actions = page.locator('[data-single-dashboard-draft-actions]')
+        actions = page.locator('[data-dashboard-pending]')
         actions.wait_for()
-        self.assertEqual(actions.locator('[data-dashboard-submit]').inner_text(), "更新 3")
-        self.assertEqual(self.timeline_content_hash(), stable_hash, "remark and delete must remain local drafts before update")
+        self.assertEqual(actions.locator('[data-dashboard-submit]').inner_text(), "更新 1")
+        self.assertEqual(self.timeline_content_hash(), stable_hash, "delete must remain a local draft before update")
 
         with page.expect_response(lambda response: response.request.method == "POST" and response.url.endswith("/timeline/batches")) as submitted:
             self.physical_click(page, actions.locator('[data-dashboard-submit]'))
@@ -1460,14 +1480,14 @@ class TimelineProductionE2E(unittest.TestCase):
         node.dblclick()
         self.assertEqual(editor.input_value(), '')
         editor.fill(text)
-        popup.locator('[data-remark-save]').click()
-        self.assertEqual(self.timeline_content_hash(), stable_hash, 'confirm remains a local draft until project update')
+        with page.expect_response(lambda r: r.request.method == 'POST' and r.url.endswith('/timeline/batches')) as submitted:
+            popup.locator('[data-remark-save]').click()
+        self.assertEqual(submitted.value.status, 200)
+        self.assertNotEqual(self.timeline_content_hash(), stable_hash, 'remark confirmation persists directly')
+        self.assertEqual(page.locator('[data-dashboard-pending]').count(),0)
         node.hover()
         self.assertEqual(preview.inner_text(), text)
         self.assertEqual(preview.locator('b').count(), 0, 'remark text must never become HTML')
-        with page.expect_response(lambda r: r.request.method == 'POST' and r.url.endswith('/timeline/batches')) as submitted:
-            page.locator('[data-dashboard-submit]').click()
-        self.assertEqual(submitted.value.status, 200)
         db = connect(self.db_path)
         try:
             self.assertEqual(db.execute('SELECT remark FROM timeline_nodes WHERE id=?', (node_id,)).fetchone()['remark'], text)
@@ -1484,9 +1504,8 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(preview.inner_text(), '--暂无备注信息--')
         node.dblclick()
         editor.fill(text)
-        popup.locator('[data-remark-save]').click()
         with page.expect_response(lambda r: r.request.method == 'POST' and r.url.endswith('/timeline/batches')):
-            page.locator('[data-dashboard-submit]').click()
+            popup.locator('[data-remark-save]').click()
         page.reload()
         page.locator('#loadState', has_text='刚刚同步').wait_for()
         self.open_cp4_single(page, project_id)
@@ -1513,8 +1532,9 @@ class TimelineProductionE2E(unittest.TestCase):
     def test_dashboard_remark_readonly_and_fullscreen_escape(self):
         (project_id, _, _), _today = self.seed_cp4_dashboard_projects()
         context, page = self.login('u2')
-        page.locator('[data-timeline-tab="team"]').click()
-        self.physical_click(page, page.locator(f'[data-timeline-member-open="{project_id}"]'))
+        page.locator('#timelineOverviewBtn').click()
+        page.locator('[data-timeline-page="overview"][aria-busy="false"]').wait_for()
+        self.physical_click(page, page.locator(f'[data-overview-project="{project_id}"] [data-timeline-open="single"]'))
         page.locator('[data-timeline-page="single"]').wait_for()
         self.zoom_single_until_node_visible(page)
         node = page.locator(f'.timeline-dashboard-node[data-project-id="{project_id}"]').first
@@ -1788,7 +1808,10 @@ class TimelineProductionE2E(unittest.TestCase):
         flag_layer = focused_flag.evaluate("el => Number(getComputedStyle(el).zIndex)")
         mask_layer = overlap_project.locator('.timeline-past-mask').first.evaluate("el => Number(getComputedStyle(el).zIndex)")
         today_layer = chart.locator('.timeline-portfolio-today').evaluate("el => Number(getComputedStyle(el).zIndex)")
-        self.assertGreater(flag_layer, mask_layer)
+        if focused_flag.evaluate("el=>el.classList.contains('is-overdue')"):
+            self.assertGreater(flag_layer, mask_layer)
+        else:
+            self.assertLess(flag_layer, mask_layer)
         self.assertLess(flag_layer, today_layer)
         probe_layer = overlap_project.locator('.timeline-node-flag-hit.is-active').first.evaluate("el => Number(getComputedStyle(el).zIndex)")
         self.assertGreater(probe_layer, flag_layer)
@@ -2758,7 +2781,7 @@ class TimelineProductionE2E(unittest.TestCase):
         self.physical_click(page, node, button="right")
         self.assertEqual(page.locator('[data-timeline-context] [role="menuitem"]').count(), 6)
         self.physical_click(page, page.locator('[data-timeline-context] [data-draft-action="done"]'))
-        single_draft_actions = page.locator('[data-single-dashboard-draft-actions]')
+        single_draft_actions = page.locator('[data-dashboard-pending]')
         self.assertTrue(single_draft_actions.is_visible())
         self.assertIn("放弃", single_draft_actions.inner_text())
         self.assertIn("更新", single_draft_actions.inner_text())

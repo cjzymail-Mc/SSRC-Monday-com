@@ -1,0 +1,36 @@
+test_graph_click_targets_expand_rows_and_keep_doubleclick_and_overview (test_timeline_row_click_e2e.RowClickE2E.test_graph_click_targets_expand_rows_and_keep_doubleclick_and_overview) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 10.756s
+
+OK
+[29/Oct/2026 11:02:29] "GET / HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /styles.css?v=20260831-a HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /lifecycle.css HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /auth.css HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /dashboard.css HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /dashboard-mobile.css HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /i12.css HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /i13.css HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /overview.css?v=20261029-row-click HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /timeline.css?v=20261029-row-click HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /view-state.js HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /view-ui.js HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /schedule-ui.js HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /dashboard-ui.js HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /timeline-ui.js?v=20261029-row-click HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /overview-ui.js?v=20261029-row-click HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /i12-ui.js HTTP/1.1" 200 -
+[29/Oct/2026 11:02:29] "GET /app.js?v=20261029-row-click HTTP/1.1" 200 -
+[29/Oct/2026 11:02:30] "GET /api/session HTTP/1.1" 401 -
+[29/Oct/2026 11:02:30] "POST /api/auth/login HTTP/1.1" 200 -
+[29/Oct/2026 11:02:31] "GET /api/bootstrap HTTP/1.1" 200 -
+[29/Oct/2026 11:02:31] "POST /api/boards/1/query HTTP/1.1" 200 -
+[29/Oct/2026 11:02:31] "GET /api/workspaces/1/timeline HTTP/1.1" 200 -
+[29/Oct/2026 11:02:31] "GET /api/workspaces/1/events/stream?cursor=0 HTTP/1.1" 200 -
+[29/Oct/2026 11:02:31] "GET /api/workspaces/1/timeline/tags HTTP/1.1" 200 -
+[29/Oct/2026 11:02:31] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[29/Oct/2026 11:02:31] "GET /api/workspaces/1/timeline/member-order HTTP/1.1" 200 -
+[29/Oct/2026 11:02:31] "GET /api/workspaces/1/timeline/order?context_type=mine HTTP/1.1" 200 -
+[29/Oct/2026 11:02:31] "GET /api/workspaces/1/timeline/review HTTP/1.1" 200 -
+[29/Oct/2026 11:02:37] "GET /api/workspaces/1/timeline/overview?period=all&scope=all&q=&stage=all&track=all&completion=all&focus=all&search_in=all&tag_id=all HTTP/1.1" 200 -

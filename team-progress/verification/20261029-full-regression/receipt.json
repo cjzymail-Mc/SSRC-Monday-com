@@ -1,0 +1,31 @@
+{
+  "node": {
+    "test_files": 13,
+    "tests": 47,
+    "failures": 0,
+    "skipped": 0
+  },
+  "python": {
+    "total": 278,
+    "backend": 165,
+    "browser": 113,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "syntax_errors": [],
+  "diff_check": "PASS",
+  "source_file_count": 271,
+  "tested_source_set_sha256": "d7ceb3f886bbb341e29cdb16ae69a2df7763da4d1a78e7220b1777a84718ca91",
+  "python_partitioning": "same complete unittest discovery set, disjoint backend/browser processes",
+  "isolated_test_data": true,
+  "production_restarted": false,
+  "preview_restarted": false,
+  "build_lint": "No separate build/lint configuration; JS/Python syntax and git diff integrity checked.",
+  "test_fixture_repairs": {
+    "password_environment_sequence": 8,
+    "overview_and_import_sequence": 10,
+    "resource_lifecycle_probes": 2,
+    "all_passed": true
+  }
+}
