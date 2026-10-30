@@ -2,8 +2,11 @@
 title: Merge filtered-subset reorder into canonical full order by visible anchor
 date: 2026-08-27
 source: codex
-status: proposed
-review: pending
+status: accepted
+review: accepted
+reviewed_by: 用户拍板（2026-10-30 会话）
+applied_to: .claude/memory/filtered-subset-order-merge.md（新建卡）
+applied_date: 2026-10-30
 scope: cross-project
 applicability: shared
 producer_platform: codex

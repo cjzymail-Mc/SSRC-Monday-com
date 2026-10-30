@@ -2,8 +2,11 @@
 title: Assert user-visible state rather than stale DOM detachment after rerender
 date: 2026-08-27
 source: codex
-status: proposed
-review: pending
+status: accepted
+review: accepted
+reviewed_by: 用户拍板（2026-10-30 会话）
+applied_to: .claude/memory/browser-event-order-testing.md（追加「同族增补：重渲染后断言用户可见状态」节）
+applied_date: 2026-10-30
 scope: cross-project
 applicability: shared
 producer_platform: codex
