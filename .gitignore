@@ -31,3 +31,9 @@ team-progress/network-check-report.md
 team-progress/20261012-xy24-deployment-preflight-*.json
 team-progress/20261013-production-*.json
 team-progress/20261013-xy24-install-plan.json
+
+# 本机 claude-glm / 中央 KB 入口与 reflect 调整的施工证据（含原文快照和验收记录）
+/team-progress/20261030-claude-glm-entry-migration.md
+/team-progress/verification/20261030-claude-glm-entry/
+/team-progress/20261030-reflect-slimming.md
+/team-progress/verification/20261030-reflect-slimming/
