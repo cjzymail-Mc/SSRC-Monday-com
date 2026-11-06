@@ -31,7 +31,7 @@ class DeploymentTests(unittest.TestCase):
         self.app = self.root / "app"
         self.app.mkdir()
         shutil.copytree(ROOT / "flowboard", self.app / "flowboard", ignore=shutil.ignore_patterns("__pycache__"))
-        for name in ("flowboard_deploy.py", "server.py", "index.html", "start-flowboard.cmd", "install-flowboard.cmd", "update-flowboard.cmd"):
+        for name in ("flowboard_deploy.py", "server.py", "index.html", "sample-orders.html", "sample-orders.js", "sample-orders.css", "start-flowboard.cmd", "install-flowboard.cmd", "update-flowboard.cmd"):
             shutil.copy2(ROOT / name, self.app / name)
         (self.app / ".gitignore").write_text("__pycache__/\n*.pyc\n", encoding="utf-8")
         self.config = self.root / "host 配置.json"
@@ -91,7 +91,10 @@ class DeploymentTests(unittest.TestCase):
 
     def version_19(self):
         with closing(connect(self.data / "flowboard.db")) as conn:
+            conn.execute("DROP TABLE sample_order_files")
+            conn.execute("DROP TABLE sample_orders")
             conn.execute("DROP TABLE timeline_member_orders")
+            conn.execute("DELETE FROM schema_migrations WHERE version=21")
             conn.execute("DELETE FROM schema_migrations WHERE version=20")
             conn.execute("PRAGMA user_version=19")
             conn.commit()
@@ -160,7 +163,7 @@ class DeploymentTests(unittest.TestCase):
         record = next(json.loads(p.read_text(encoding="utf-8")) for p in self.backups.glob("deployment-*.json")
                       if json.loads(p.read_text(encoding="utf-8"))["action"] == "upgrade")
         self.assertEqual(record["schema_before"], 19)
-        self.assertEqual(record["schema_after"], 20)
+        self.assertEqual(record["schema_after"], SCHEMA_VERSION)
         self.assertEqual(verify_backup(record["backup_package"])["schema_version"], 19)
         with closing(connect(self.data / "flowboard.db")) as conn:
             self.assertEqual(conn.execute("SELECT COUNT(*) FROM tasks").fetchone()[0], 5)
@@ -184,12 +187,12 @@ class DeploymentTests(unittest.TestCase):
         self.version_19()
         database_py = self.app / "flowboard" / "database.py"
         current_source = database_py.read_text(encoding="utf-8")
-        database_py.write_text(current_source.replace("SCHEMA_VERSION = 20", "SCHEMA_VERSION = 19"), encoding="utf-8")
+        database_py.write_text(current_source.replace("SCHEMA_VERSION = 21", "SCHEMA_VERSION = 19"), encoding="utf-8")
         self.init_git()
         before = self.git("rev-parse", "HEAD")
         database_py.write_text(current_source, encoding="utf-8")
         self.git("add", ".")
-        self.git("commit", "-m", "Fixture release v20")
+        self.git("commit", "-m", "Fixture release v21")
         target = self.git("rev-parse", "HEAD")
         self.git("push", "origin", "main")
         # Rewind this disposable fixture branch to simulate the old service checkout.
@@ -202,7 +205,7 @@ class DeploymentTests(unittest.TestCase):
         record = next(json.loads(p.read_text(encoding="utf-8")) for p in self.backups.glob("deployment-*.json")
                       if json.loads(p.read_text(encoding="utf-8"))["action"] == "update")
         self.assertEqual((record["code_before"], record["code_after"]), (before, target))
-        self.assertEqual((record["schema_before"], record["schema_after"]), (19, 20))
+        self.assertEqual((record["schema_before"], record["schema_after"]), (19, SCHEMA_VERSION))
         self.assertEqual(verify_backup(record["backup_package"])["schema_version"], 19)
 
     def test_dirty_and_divergent_checkout_are_preserved(self):
@@ -216,14 +219,14 @@ class DeploymentTests(unittest.TestCase):
         before = self.git("rev-parse", "HEAD")
         self.command("update", "--config", str(self.config), "--no-start", expected=3)
         self.assertEqual(self.git("rev-parse", "HEAD"), before)
-        self.assertEqual(deploy.check_database(self.data / "flowboard.db")["schema_version"], 20)
+        self.assertEqual(deploy.check_database(self.data / "flowboard.db")["schema_version"], SCHEMA_VERSION)
 
     def test_failed_migration_retains_backup_and_does_not_start_or_reset_code(self):
         self.install()
         self.version_19()
         database_py = self.app / "flowboard" / "database.py"
         source = database_py.read_text(encoding="utf-8")
-        database_py.write_text(source.replace("SCHEMA_VERSION = 20", "SCHEMA_VERSION = 19"), encoding="utf-8")
+        database_py.write_text(source.replace("SCHEMA_VERSION = 21", "SCHEMA_VERSION = 19"), encoding="utf-8")
         self.init_git()
         before = self.git("rev-parse", "HEAD")
         broken = source.replace("def _migration_v20(conn):", "def _migration_v20(conn):\n    raise RuntimeError('fixture migration failure')")
@@ -321,7 +324,7 @@ class DeploymentTests(unittest.TestCase):
                         conn.request("GET", "/api/health")
                         response = conn.getresponse()
                         self.assertEqual(response.status, 200)
-                        self.assertEqual(json.loads(response.read())["schema_version"], 20)
+                        self.assertEqual(json.loads(response.read())["schema_version"], SCHEMA_VERSION)
                         conn.close()
                         break
                     except OSError:
