@@ -15,6 +15,7 @@ from flowboard.database import SCHEMA_VERSION, migrate
 from flowboard.service import ApiError, FlowboardService, reject_unknown, require_object, require_text
 from flowboard.timeline import TimelineService
 from flowboard.overview import project_overview
+from flowboard.sample_orders import SampleOrders
 
 
 ROOT = Path(__file__).resolve().parent
@@ -22,7 +23,7 @@ HOST = os.getenv("FLOWBOARD_HOST", "0.0.0.0")
 PORT = int(os.getenv("FLOWBOARD_PORT", "8080"))
 DB = os.getenv("FLOWBOARD_DB", str(ROOT / "flowboard.db"))
 SESSION_COOKIE = "flowboard_session"
-PUBLIC_PATHS = {"/", "/index.html", "/styles.css", "/auth.css", "/lifecycle.css", "/dashboard.css", "/dashboard-mobile.css", "/timeline.css", "/overview.css", "/overview-ui.js", "/i12.css", "/i13.css", "/view-state.js", "/view-ui.js", "/schedule-ui.js", "/dashboard-ui.js", "/timeline-ui.js", "/i12-ui.js", "/app.js"}
+PUBLIC_PATHS = {"/", "/index.html", "/styles.css", "/auth.css", "/lifecycle.css", "/dashboard.css", "/dashboard-mobile.css", "/timeline.css", "/overview.css", "/overview-ui.js", "/i12.css", "/i13.css", "/view-state.js", "/view-ui.js", "/schedule-ui.js", "/dashboard-ui.js", "/timeline-ui.js", "/i12-ui.js", "/app.js", "/sample-orders.html", "/sample-orders.js", "/sample-orders.css"}
 
 
 class PresenceRegistry:
@@ -50,6 +51,7 @@ class FlowboardHTTPServer(ThreadingHTTPServer):
 class Handler(SimpleHTTPRequestHandler):
     service = None
     timeline = None
+    sample_orders = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(ROOT), **kwargs)
@@ -81,7 +83,8 @@ class Handler(SimpleHTTPRequestHandler):
             length = int(self.headers.get("Content-Length", "0"))
         except ValueError:
             raise ApiError(400, "INVALID_REQUEST", "Content-Length 无效")
-        if length > 2_100_000:
+        limit = 45 * 1024 * 1024 if urlparse(self.path).path.endswith("/sample-orders/upload") else 2_100_000
+        if length > limit:
             raise ApiError(413, "REQUEST_TOO_LARGE", "请求内容过大")
         self._body_bytes = self.rfile.read(length)
         return self._body_bytes
@@ -125,6 +128,8 @@ class Handler(SimpleHTTPRequestHandler):
         path = parsed.path.rstrip("/") or "/"
         query = parse_qs(parsed.query)
         if method in {"POST", "PUT", "PATCH", "DELETE"}:
+            if "/sample-orders/" in path:
+                self.current_user(csrf=True)
             self.read_body_bytes()
 
         if method == "POST" and path == "/api/auth/login":
@@ -156,6 +161,28 @@ class Handler(SimpleHTTPRequestHandler):
             board_id = query.get("board_id", [None])[0]
             return 200, self.service.bootstrap(user, int(board_id) if board_id else None), None
         parts = path.strip("/").split("/")
+
+        if len(parts) >= 4 and parts[:2] == ["api", "workspaces"] and parts[3] == "sample-orders":
+            workspace_id = int(parts[2])
+            if len(parts) == 4:
+                if method == "GET":
+                    return 200, self.sample_orders.list(user, workspace_id), None
+                if method == "POST":
+                    return 201, self.sample_orders.save(user, workspace_id, data), None
+            if len(parts) == 5:
+                if parts[4] == "upload" and method == "POST":
+                    return 201, self.sample_orders.upload(user, workspace_id, data), None
+                if parts[4] == "trash" and method == "GET":
+                    return 200, self.sample_orders.list(user, workspace_id, deleted=True), None
+                if parts[4] not in {"annual.xlsx", "upload", "trash"}:
+                    if method == "GET":
+                        return 200, self.sample_orders.get(user, workspace_id, parts[4]), None
+                    if method == "PUT":
+                        return 200, self.sample_orders.save(user, workspace_id, data, parts[4]), None
+                    if method == "DELETE":
+                        return 200, self.sample_orders.delete(user, workspace_id, parts[4], data.get("version")), None
+            if len(parts) == 6 and parts[5] == "restore" and method == "POST":
+                return 200, self.sample_orders.restore(user, workspace_id, parts[4], data.get("version")), None
 
         if len(parts) == 4 and parts[:2] == ["api", "workspaces"] and parts[3] == "boards":
             workspace_id = int(parts[2])
@@ -422,6 +449,35 @@ class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         path = urlparse(self.path).path
         parts=path.strip("/").split("/")
+        if len(parts) >= 5 and parts[:2] == ["api", "workspaces"] and parts[3] == "sample-orders":
+            try:
+                user = self.current_user()
+                workspace_id = int(parts[2])
+                if len(parts) == 6 and parts[4] == "files":
+                    content_type, raw = self.sample_orders.file(user, workspace_id, parts[5])
+                    filename, inline = parts[5], content_type.startswith("image/")
+                elif len(parts) == 6 and parts[5] == "signed.xlsx":
+                    number, raw = self.sample_orders.signed(user, workspace_id, parts[4])
+                    content_type, filename, inline = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", number + "-签字单.xlsx", False
+                elif len(parts) == 5 and parts[4] == "annual.xlsx":
+                    year = parse_qs(urlparse(self.path).query).get("year", [str(time.localtime().tm_year)])[0]
+                    raw = self.sample_orders.annual(user, workspace_id, year)
+                    content_type, filename, inline = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", str(year) + "-样鞋下单统计.xlsx", False
+                else:
+                    raw = None
+                if raw is not None:
+                    self.send_response(200)
+                    self.send_header("Content-Type", content_type)
+                    self.send_header("Content-Length", str(len(raw)))
+                    self.send_header("Cache-Control", "private, no-store")
+                    self.send_header("X-Content-Type-Options", "nosniff")
+                    self.send_header("Content-Disposition", f"{'inline' if inline else 'attachment'}; filename*=UTF-8''{quote(filename, safe='')}")
+                    self.end_headers()
+                    self.wfile.write(raw)
+                    return
+            except ApiError as error:
+                self.send_json(error.status, error.payload())
+                return
         if len(parts)==5 and parts[:2]==["api","workspaces"] and parts[3:]==["events","stream"]:
             try:
                 user=self.current_user();workspace_id=int(parts[2]);query=parse_qs(urlparse(self.path).query);cursor=query.get("cursor",[self.headers.get("Last-Event-ID","0")])[0];limit=query.get("limit",[100])[0]
@@ -495,7 +551,7 @@ def create_server(host=HOST, port=PORT, db_path=DB):
     if backup:
         print(f"Pre-migration backup: {backup}")
     primary = FlowboardService(db_path)
-    handler = type("FlowboardHandler", (Handler,), {"service": primary, "timeline": TimelineService(db_path)})
+    handler = type("FlowboardHandler", (Handler,), {"service": primary, "timeline": TimelineService(db_path), "sample_orders": SampleOrders(db_path)})
     return FlowboardHTTPServer((host, port), handler)
 
 

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'">
+  <title>样鞋下单 · Flowboard</title>
+  <link rel="stylesheet" href="/sample-orders.css">
+  <script src="/sample-orders.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">样</span><div><strong>样鞋下单</strong><small>Flowboard · 共享工作区</small></div></div>
+      <div class="sidebar-label">工作区</div>
+      <nav class="nav" aria-label="主导航">
+        <button type="button" data-view="home" class="active"><span>▦</span>工作总览</button>
+        <button type="button" data-view="orders"><span>▤</span>需求单</button>
+        <button type="button" data-view="stats"><span>◫</span>年度统计</button><button type="button" data-view="trash"><span>♲</span>回收站</button>
+      </nav>
+      <a class="back-link" href="/">← 返回 Flowboard</a><div class="local-status"><span class="online-dot"></span><div><strong id="local-label">正在连接</strong><small>与工作区成员共享</small></div></div>
+    </aside>
+    <div class="main">
+      <header class="topbar"><span>科技中心 <b>›</b> <strong id="crumb">工作总览</strong></span><span class="topbar-right" id="mode-label">Flowboard 共享工作区</span></header>
+      <main id="app" class="content"><div class="loading">正在读取共享记录…</div></main>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -7,7 +7,7 @@ from pathlib import Path
 from .security import hash_password
 
 
-SCHEMA_VERSION = 20
+SCHEMA_VERSION = 21
 
 
 def utc_now():
@@ -123,6 +123,8 @@ def migrate(path, initial_password=None):
             _migration_v19(conn)
         if version < 20:
             _migration_v20(conn)
+        if version < 21:
+            _migration_v21(conn)
         conn.execute("PRAGMA journal_mode = WAL")
         conn.execute("PRAGMA foreign_keys = ON")
         return backup
@@ -1181,6 +1183,53 @@ def _migration_v20(conn):
         raise RuntimeError("foreign key check failed after v20 migration")
     if conn.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
         raise RuntimeError("database integrity check failed after v20 migration")
+
+
+def _migration_v21(conn):
+    """Shared sample shoe orders; records stay in the server database."""
+    with transaction(conn):
+        conn.execute("""CREATE TABLE sample_orders(
+            id TEXT PRIMARY KEY,
+            workspace_id INTEGER NOT NULL REFERENCES workspaces(id),
+            number TEXT NOT NULL,
+            order_date TEXT NOT NULL,
+            status TEXT NOT NULL,
+            contractor TEXT NOT NULL,
+            handover_status TEXT NOT NULL,
+            receiver TEXT NOT NULL,
+            requester TEXT NOT NULL,
+            department TEXT NOT NULL,
+            note TEXT NOT NULL,
+            scan_file TEXT NOT NULL,
+            items_json TEXT NOT NULL,
+            version INTEGER NOT NULL DEFAULT 1,
+            created_by TEXT NOT NULL REFERENCES users(id),
+            updated_by TEXT NOT NULL REFERENCES users(id),
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            deleted_at TEXT,
+            deleted_by TEXT REFERENCES users(id)
+        )""")
+        conn.execute("CREATE UNIQUE INDEX idx_sample_orders_number ON sample_orders(workspace_id,number) WHERE deleted_at IS NULL")
+        conn.execute("CREATE INDEX idx_sample_orders_workspace_date ON sample_orders(workspace_id,order_date DESC) WHERE deleted_at IS NULL")
+        conn.execute("""CREATE TABLE sample_order_files(
+            id TEXT PRIMARY KEY,
+            workspace_id INTEGER NOT NULL REFERENCES workspaces(id),
+            storage_name TEXT NOT NULL UNIQUE,
+            kind TEXT NOT NULL CHECK(kind IN ('photo','scan')),
+            size_bytes INTEGER NOT NULL,
+            sha256 TEXT NOT NULL,
+            uploaded_by TEXT NOT NULL REFERENCES users(id),
+            created_at TEXT NOT NULL
+        )""")
+        conn.execute("CREATE INDEX idx_sample_order_files_workspace ON sample_order_files(workspace_id)")
+        conn.execute("INSERT INTO schema_migrations VALUES (21,?,?,?)",
+                     ("shared sample shoe orders", "flowboard-schema-v21", utc_now()))
+        conn.execute("PRAGMA user_version = 21")
+    if conn.execute("PRAGMA foreign_key_check").fetchall():
+        raise RuntimeError("foreign key check failed after v21 migration")
+    if conn.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+        raise RuntimeError("database integrity check failed after v21 migration")
 
 
 def copy_database(source, target):

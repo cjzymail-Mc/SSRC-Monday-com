@@ -64,7 +64,12 @@ def create_backup(db_path,attachment_dir,backup_root,*,label="manual"):
         try:
             schema=conn.execute("PRAGMA user_version").fetchone()[0]
             if schema>SCHEMA_VERSION:raise OperationsError("backup schema is newer than this application")
-            rows=conn.execute("SELECT storage_name,size_bytes,sha256 FROM attachments ORDER BY storage_name").fetchall()
+            if schema >= 21:
+                rows=conn.execute("""SELECT storage_name,size_bytes,sha256 FROM attachments
+                    UNION ALL SELECT storage_name,size_bytes,sha256 FROM sample_order_files
+                    ORDER BY storage_name""").fetchall()
+            else:
+                rows=conn.execute("SELECT storage_name,size_bytes,sha256 FROM attachments ORDER BY storage_name").fetchall()
         finally:conn.close()
         attachments=[]
         for row in rows:
@@ -95,7 +100,10 @@ def verify_backup(package):
     try:
         if conn.execute("PRAGMA integrity_check").fetchone()[0]!="ok" or conn.execute("PRAGMA foreign_key_check").fetchall():raise OperationsError("backup database validation failed")
         if conn.execute("PRAGMA user_version").fetchone()[0]!=manifest["schema_version"]:raise OperationsError("manifest schema mismatch")
-        referenced={row[0] for row in conn.execute("SELECT storage_name FROM attachments")}
+        if manifest["schema_version"] >= 21:
+            referenced={row[0] for row in conn.execute("SELECT storage_name FROM attachments UNION ALL SELECT storage_name FROM sample_order_files")}
+        else:
+            referenced={row[0] for row in conn.execute("SELECT storage_name FROM attachments")}
     finally:conn.close()
     entries=manifest.get("attachments")
     if not isinstance(entries,list):raise OperationsError("invalid attachment manifest")
