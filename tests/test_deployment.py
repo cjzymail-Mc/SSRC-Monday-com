@@ -169,6 +169,51 @@ class DeploymentTests(unittest.TestCase):
             self.assertEqual(conn.execute("SELECT COUNT(*) FROM tasks").fetchone()[0], 5)
             self.assertEqual(conn.execute("SELECT COUNT(*) FROM attachments").fetchone()[0], 1)
 
+    def test_v20_start_rejected_then_upgrade_preserves_existing_data_and_backup(self):
+        self.install()
+        db = self.data / "flowboard.db"
+        with closing(connect(db)) as conn:
+            conn.execute("DROP TABLE sample_order_files")
+            conn.execute("DROP TABLE sample_orders")
+            conn.execute("DELETE FROM schema_migrations WHERE version=21")
+            conn.execute("PRAGMA user_version=20")
+            conn.commit()
+            tables = [row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")]
+            before = {table: sorted(map(tuple, conn.execute(f'SELECT * FROM "{table}"')), key=repr)
+                      for table in tables}
+        rejected = self.command("start", "--config", str(self.config), "--check", expected=3)
+        self.assertIn("Database v20; code requires v21", rejected.stderr)
+        self.assertIn("flowboard_deploy.py upgrade", rejected.stderr)
+        self.assertEqual(deploy.check_database(db, allow_older=True)["schema_version"], 20)
+        self.assertFalse(self.settings().lock.exists())
+        self.command("upgrade", "--config", str(self.config))
+        self.command("start", "--config", str(self.config), "--check")
+        with closing(connect(db)) as conn:
+            for table in tables:
+                rows = sorted(map(tuple, conn.execute(f'SELECT * FROM "{table}"')), key=repr)
+                if table == "schema_migrations":
+                    rows = [row for row in rows if row[0] <= 20]
+                self.assertEqual(rows, before[table], table)
+            self.assertEqual(conn.execute("SELECT COUNT(*) FROM sample_orders").fetchone()[0], 0)
+        record = next(json.loads(p.read_text(encoding="utf-8")) for p in self.backups.glob("deployment-*.json")
+                      if json.loads(p.read_text(encoding="utf-8"))["action"] == "upgrade")
+        self.assertEqual((record["schema_before"], record["schema_after"]), (20, 21))
+        self.assertEqual(verify_backup(record["backup_package"])["schema_version"], 20)
+        with closing(connect(Path(record["backup_package"]) / "flowboard.db")) as conn:
+            for table in tables:
+                self.assertEqual(sorted(map(tuple, conn.execute(f'SELECT * FROM "{table}"')), key=repr),
+                                 before[table], table)
+
+    @unittest.skipUnless(os.name == "nt", "Windows CMD launcher")
+    def test_cmd_failure_stays_visible_and_check_preserves_exit_code(self):
+        env = dict(self.env, FLOWBOARD_CONFIG=str(self.config), FLOWBOARD_PYTHON=sys.executable)
+        for args in ([], ["--check"]):
+            result = subprocess.run(["cmd", "/d", "/c", "start-flowboard.cmd", *args], cwd=self.app,
+                                    env=env, input="\n", capture_output=True, text=True, timeout=20)
+            self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+            self.assertIn("Host configuration not found", result.stderr)
+            self.assertEqual("Review the error above" in result.stdout, not args)
+
     def test_busy_port_and_active_host_lock_block_mutations(self):
         self.install()
         before = {p.name for p in self.backups.iterdir()}

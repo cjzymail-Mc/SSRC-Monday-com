@@ -199,8 +199,15 @@ def check_database(path, *, allow_older=False):
         conn.close()
     if integrity != "ok" or foreign_keys:
         raise DeploymentError(f"Database validation failed: integrity={integrity}; foreign keys={foreign_keys}")
-    if version > SCHEMA_VERSION or (not allow_older and version != SCHEMA_VERSION):
-        raise DeploymentError(f"Database v{version}; code requires v{SCHEMA_VERSION}. Run the update/upgrade entry point")
+    if version > SCHEMA_VERSION:
+        raise DeploymentError(f"Database v{version}; code requires v{SCHEMA_VERSION}. Use code matching the database; do not downgrade the database")
+    if not allow_older and version != SCHEMA_VERSION:
+        raise DeploymentError(
+            f"Database v{version}; code requires v{SCHEMA_VERSION}. "
+            "Code was updated but the database still needs an upgrade. "
+            "After authorizing the database migration, stop all services using it and run: "
+            "python -X utf8 flowboard_deploy.py upgrade (use the same --config if specified). "
+            "This backs up and validates the database before upgrading; then run start-flowboard.cmd again")
     if allow_older and version < 12:
         raise DeploymentError("This deployment entry point requires an existing v12+ backup; legacy migration is separate")
     return {"schema_version": version, "integrity": integrity, "foreign_key_violations": foreign_keys}
