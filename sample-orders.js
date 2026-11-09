@@ -31,8 +31,18 @@ function toast(message) {
   toast.timer = setTimeout(() => element.classList.remove('show'), 4200);
 }
 
+function newItemId() {
+  const bytes = new Uint8Array(16);
+  if (globalThis.crypto?.getRandomValues) globalThis.crypto.getRandomValues(bytes);
+  else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+  bytes[6] = (bytes[6] & 15) | 64;
+  bytes[8] = (bytes[8] & 63) | 128;
+  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+}
+
 function newItem() {
-  return {id: crypto.randomUUID(), style:'', category:'', contractor:'', sole:'', gender:'男', photo_file:'', color:'', quantity:1, size:'', purpose:'', due_date:'', remark:''};
+  return {id: newItemId(), style:'', category:'', contractor:'', sole:'', gender:'男', photo_file:'', color:'', quantity:1, size:'', purpose:'', due_date:'', remark:''};
 }
 
 function newOrder() {
@@ -248,7 +258,7 @@ app.addEventListener('click', event => {
   else if (action === 'edit') editOrder(button.dataset.id);
   else if (action === 'filter') { state.contractor = button.dataset.name; render(); }
   else if (action === 'add-item') { collectForm(); if (state.draft.items.length >= 50) return toast('每张需求单最多 50 行鞋款'); state.draft.items.push(newItem()); render(); }
-  else if (action === 'copy-item') { collectForm(); if (state.draft.items.length >= 50) return toast('每张需求单最多 50 行鞋款'); const index = Number(button.dataset.index); state.draft.items.splice(index + 1, 0, {...state.draft.items[index], id:crypto.randomUUID()}); render(); toast('已复制该款明细，请核对配色和数量'); }
+  else if (action === 'copy-item') { collectForm(); if (state.draft.items.length >= 50) return toast('每张需求单最多 50 行鞋款'); const index = Number(button.dataset.index); state.draft.items.splice(index + 1, 0, {...state.draft.items[index], id:newItemId()}); render(); toast('已复制该款明细，请核对配色和数量'); }
   else if (action === 'remove-item') { collectForm(); state.draft.items.splice(Number(button.dataset.index),1); render(); }
   else if (action === 'delete') void deleteOrder();
   else if (action === 'restore') void restoreOrder(button.dataset.id);
