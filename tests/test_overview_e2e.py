@@ -114,6 +114,8 @@ class OverviewE2E(unittest.TestCase):
 
     def test_member_readonly_and_logout_resets_overview_state(self):
         ids=self.seed();context,page=self.login('u2');self.open_overview(page)
+        self.assertEqual(page.locator('[data-overview-scope=mine]').get_attribute('aria-pressed'),'true')
+        self.select(page,'scope','all')
         page.locator(f'[data-overview-expand="{ids["risk"]}"]').click()
         self.assertEqual(page.locator(f'#ov-detail-{ids["risk"]} [data-timeline-context]').count(),0)
         page.locator(f'[data-overview-project="{ids["risk"]}"] .ov-open').click()
@@ -262,7 +264,7 @@ class OverviewE2E(unittest.TestCase):
         self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'),762)
         self.select(page,'period','all');self.select(page,'scope','mine')
         page.locator(f'[data-overview-expand="{ids["empty"]}"]').click()
-        self.assertIn('没有逾期未完成的节点',page.locator(f'#ov-detail-{ids["empty"]}').inner_text())
+        self.assertIn('尚未录入带日期的节点',page.locator(f'#ov-detail-{ids["empty"]}').inner_text())
         self.assertEqual(page.locator(f'#ov-detail-{ids["empty"]} .timeline-dashboard-node').count(),0)
         self.assertIn('0 节点',page.locator(f'[data-overview-project="{ids["empty"]}"] .ov-node-count').inner_text())
         self.assert_clean_browser(page);context.close()

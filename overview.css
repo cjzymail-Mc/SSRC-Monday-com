@@ -53,6 +53,7 @@
 .ov-inline-note{font-size:11px;color:#94899f;margin:10px 0 0;line-height:1.7}
 .ov-inline-empty{padding:30px 16px;text-align:center;border:1px dashed #e0d8ec;background:#fff;border-radius:7px;color:#968aa2;font-size:12px}
 .ov-inline-timeline{position:relative;box-shadow:none;border-radius:7px}
+.ov-inline-timeline .timeline-portfolio-scroll{overscroll-behavior-y:auto}
 .ov-inline-timeline .timeline-portfolio-chart{min-width:0;width:100%}
 .ov-inline-timeline.is-single-profile .timeline-portfolio-axis,.ov-inline-timeline.is-single-profile .timeline-portfolio-project{grid-template-columns:54px minmax(420px,1fr)}
 .ov-inline-timeline .timeline-portfolio-axis-label{padding:10px;font-size:11px}

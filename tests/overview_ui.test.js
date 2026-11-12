@@ -1,6 +1,14 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const overview=require('../overview-ui.js');
+test('login scope follows role while an ordinary refresh retains the manual scope',()=>{
+  assert.equal(overview.preferences(null,{admin:false}).scope,'mine');
+  assert.equal(overview.preferences(null,{admin:true}).scope,'all');
+  assert.equal(overview.preferences({scope:'all'},{admin:false,newLogin:true}).scope,'mine');
+  assert.equal(overview.preferences({scope:'mine'},{admin:true,newLogin:true}).scope,'all');
+  assert.equal(overview.preferences({scope:'all'},{admin:false}).scope,'all');
+  assert.equal(overview.preferences({scope:'mine'},{admin:true}).scope,'mine');
+});
 function fixture(){return {project_id:7,name:'真实项目',creator_name:'成员',creator_avatar_class:'avatar-green',current_stage:'开发',group:'attention',can_edit:false,node_count:2,done_count:1,progress:50,overdue_count:1,today_count:0,total_node_count:3,total_done_count:1,total_progress:33,next_nodes:[{name:'最早节点',date:'2026-10-01',track:'main'},{name:'同日并行',date:'2026-10-01',track:'parallel'}],matched_nodes:[{id:1,name:'主线节点',track:'main',stage:'开发',date:'2026-10-01',done_at:false,overdue:true,is_today:false,status:'进行中',remark:'真实备注'},{id:2,name:'完成节点',track:'parallel',stage:'测试',date:'2026-10-08',done_at:true,remark:''}]}}
 test('overview preserves project stage and exposes every same-day next node',()=>{const p=fixture();assert.equal(overview.status(p)[1],'逾期 1');assert.match(overview.nextLabel(p),/同日并行.*并行/);const s=overview.createState();s.status='ready';s.payload={projects:[p],counts:{projects:1,nodes:2,done:1,overdue:1},server_today:'2026-10-08'};s.expanded.add(7);const html=overview.render(s);assert.match(html,/<td class="ov-stage"><span class="ov-stage-badge ov-develop">开发<\/span><\/td>/);assert.match(html,/ov-inline-timeline/);assert.doesNotMatch(html,/data-timeline-context|class="ov-nodes"/);assert.match(html,/aria-valuenow="33"/);assert.match(html,/逾期未完成/);assert.doesNotMatch(html,/aria-label="节点 完成节点/);assert.match(html,/同日并行/)});
 test('project names node remarks and creator attributes cannot inject HTML',()=>{const p=fixture();p.name='<img src=x onerror=alert(1)>';p.creator_name='" autofocus onfocus=alert(1)';p.creator_avatar_class='avatar-green" onclick="bad';p.matched_nodes[0].remark='<script>bad()</script>';p.next_nodes[0].remark=p.matched_nodes[0].remark;const s=overview.createState();s.status='ready';s.payload={projects:[p],counts:{},server_today:'2026-10-08'};s.expanded.add(7);const html=overview.render(s);assert.ok(!html.includes('<img'));assert.ok(!html.includes('<script>'));assert.ok(!html.includes('onclick="bad'));assert.match(html,/class="ov-avatar avatar-purple"/);assert.match(html,/&lt;script&gt;/);assert.match(html,/&quot; autofocus/)});

@@ -101,9 +101,9 @@ class OverviewUXE2E(unittest.TestCase):
         self.select(page,'scope','mine');self.focus(page,'overdue')
         page.locator('#logoutBtn').click();page.locator('#loginUser').fill('u2');page.locator('#loginPassword').fill('test-password');page.locator('#loginForm button[type=submit]').click()
         page.locator('[data-timeline-page="home"]').wait_for();self.open_overview(page)
-        self.assertEqual(page.locator('[data-overview-scope=all]').get_attribute('aria-pressed'),'true')
+        self.assertEqual(page.locator('[data-overview-scope=mine]').get_attribute('aria-pressed'),'true')
         self.assertEqual(page.locator('[data-overview-focus=all]').get_attribute('aria-pressed'),'true')
-        self.assertEqual(page.locator('.ov-project').count(),6)
+        self.assertEqual(page.locator('.ov-project').count(),2)
         self.assert_clean_browser(page);context.close()
 
     def test_canvas_ranges_workbench_team_tab_and_archive_return(self):
@@ -147,7 +147,7 @@ class OverviewUXE2E(unittest.TestCase):
         self.assertTrue(page.locator('#appSidebar').evaluate('el=>el.classList.contains("is-collapsed")'))
         self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'),762)
         page.locator(f'[data-overview-expand="{ids["long"]}"]').click()
-        self.assertIn('没有逾期未完成的节点',page.locator(f'#ov-detail-{ids["long"]}').inner_text())
+        self.assertEqual(page.locator(f'#ov-detail-{ids["long"]} .timeline-dashboard-node').count(),1)
         page.locator(f'[data-overview-project="{ids["long"]}"] .ov-open').click()
         page.locator('[data-timeline-page=single]').wait_for()
         page.locator('[data-timeline-mode-target=editor]').click()
@@ -155,7 +155,7 @@ class OverviewUXE2E(unittest.TestCase):
         self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'),762)
         self.assert_clean_browser(page);context.close()
 
-    def test_single_expansion_shows_all_overdue_independent_of_filters_and_future_empty_state(self):
+    def test_single_expansion_keeps_overdue_and_shows_recent_future_nodes(self):
         ids=self.seed();context,page=self.login('u1');self.open_overview(page)
         page.set_viewport_size({'width':1280,'height':500})
         first=page.locator(f'[data-overview-expand="{ids["risk"]}"]')
@@ -176,8 +176,9 @@ class OverviewUXE2E(unittest.TestCase):
         self.assertEqual(second.get_attribute('aria-expanded'),'true')
         self.assertTrue(second.evaluate('el=>{const r=el.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight}'))
         teamDetail=page.locator(f'#ov-detail-{ids["team"]}')
-        self.assertEqual(teamDetail.locator('.timeline-dashboard-node').count(),0)
-        self.assertIn('没有逾期未完成的节点',teamDetail.inner_text())
+        self.assertEqual(teamDetail.locator('.timeline-dashboard-node').count(),2)
+        self.assertFalse(teamDetail.locator('.timeline-portfolio-today').is_visible())
+        self.assertIn('篮球鞋评审',teamDetail.inner_text())
         second.click();self.assertEqual(page.locator('.ov-detail').count(),0)
         self.assert_clean_browser(page);context.close()
 

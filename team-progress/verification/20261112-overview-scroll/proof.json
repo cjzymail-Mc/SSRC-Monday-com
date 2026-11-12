@@ -1,0 +1,16 @@
+{
+  "before": {
+    "pageY": 0,
+    "afterDown": 0,
+    "overscrollY": "contain"
+  },
+  "after": {
+    "afterDown": 360,
+    "afterUp": 0,
+    "innerY": 0,
+    "range": [
+      "2026-09-08",
+      "2026-10-18"
+    ]
+  }
+}

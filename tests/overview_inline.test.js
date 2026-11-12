@@ -27,6 +27,27 @@ test('auto fit includes all old and parallel overdue nodes while excluding done,
   assert.match(html,/data-node-id="2"[^>]*style="left:50%;/);
 });
 
+test('recent slice picks the five nearest dated nodes across completion states and both tracks',()=>{
+  const p=project();p.nodes.push({id:7,name:'近期完成',date:'2026-10-21',track:'main',done_at:true});
+  const original=p.nodes.map(n=>n.id),slice=Overview.recentSlice(p,'2026-10-22');
+  assert.deepEqual(slice.nodes.map(n=>n.id),[3,7,2,4,1]);
+  assert.deepEqual(p.nodes.map(n=>n.id),original);
+  assert.equal(slice.nodes.some(n=>!n.date),false);
+  const single=Overview.recentSlice({...p,nodes:[p.nodes[3]]},'2026-10-22');
+  const html=Timeline.renderOverviewSlice(p,single,Timeline.editorState(p),true);
+  assert.match(html,/data-node-id="4"[^>]*style="left:50%;/);
+  assert.deepEqual(Overview.recentSlice({nodes:[]},'2026-10-22').nodes,[]);
+});
+
+test('recent group renders upcoming and completed nodes while attention remains overdue only',()=>{
+  const p={...project(),group:'recent',total_node_count:6,total_done_count:1,total_progress:17,next_nodes:[],matched_nodes:project().nodes};
+  const s=Overview.createState();s.status='ready';s.payload={projects:[p],server_today:'2026-10-22'};s.expanded.add(7);
+  const html=Overview.render(s);
+  assert.match(html,/近期节点时间轴/);assert.match(html,/data-node-id="3"/);assert.match(html,/data-node-id="4"/);assert.match(html,/data-node-id="5"/);
+  p.group='attention';const attention=Overview.render(s);assert.doesNotMatch(attention,/data-node-id="3"|data-node-id="4"|data-node-id="5"/);
+  p.group='recent';p.nodes=[];p.matched_nodes=[];assert.match(Overview.render(s),/尚未录入带日期的节点/);
+});
+
 test('slice preserves both rails, stage bands and original menu without exposing hidden nodes',()=>{
   const p=project(),slice=Overview.overdueSlice(p,'2026-10-22');
   const html=Timeline.renderOverviewSlice(p,slice,Timeline.editorState(p),true);
