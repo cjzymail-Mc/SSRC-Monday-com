@@ -15,8 +15,24 @@
 .sidebar>.sidebar-collapse{position:fixed;z-index:1201;top:50vh;left:calc(var(--sidebar-current-width) - 13px);display:grid;place-items:center;width:27px;height:58px;padding:0;border:1px solid #d8deea;border-radius:999px;background:#fff;color:#66738a;box-shadow:0 5px 15px #24304a1c;cursor:pointer;touch-action:manipulation;font-size:17px;line-height:1;opacity:.72;transform:translateY(-50%);transition:left .28s cubic-bezier(.34,1.18,.64,1),opacity .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .28s cubic-bezier(.34,1.18,.64,1)}
 .sidebar>.sidebar-collapse:hover,.sidebar>.sidebar-collapse:focus-visible{border-color:#9eb5df;color:#214f9f;box-shadow:0 7px 20px #24304a29;opacity:1;outline:0;transform:translateY(-50%) scale(1.04)}
 .sidebar .nav-button{width:100%;border:0;background:transparent;text-align:left;font:inherit;cursor:pointer}
-.sidebar .nav-item.nav-child{margin-left:18px;width:calc(100% - 18px);padding-left:17px;font-size:13px}.sidebar .nav-item.nav-child .nav-icon{color:#a5adc0;font-size:13px}
-.sidebar .nav-icon{display:inline-grid;place-items:center;flex:0 0 17px}
+.sidebar .nav-item.nav-child{margin-left:18px;width:calc(100% - 18px);padding-left:17px;font-size:13px}
+/* Flowboard navigation: rounded, two-tone task and footwear icons. */
+.sidebar .nav-icon{display:inline-grid;place-items:center;width:22px;height:22px;flex:0 0 22px;color:inherit;pointer-events:none}
+.sidebar .nav-icon svg{display:block;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+.sidebar .nav-icon .nav-icon-wash{fill:currentColor;fill-opacity:.12;stroke:none}
+.sidebar .nav-icon .nav-icon-solid{fill:currentColor;stroke:none}
+.sidebar .nav-icon .nav-icon-dots{stroke-width:2.3}
+.sidebar .nav-icon-refined svg{stroke-width:1.5}
+.sidebar .nav-icon .nav-icon-surface{fill:#fdfdff}
+.sidebar .nav-icon .nav-icon-tint{fill:#a99adf;fill-opacity:.22;stroke:none}
+.sidebar .nav-icon .nav-icon-accent{stroke:#8c7ac7}
+.sidebar .nav-item:is(.active,:hover,:focus-visible) .nav-icon-accent{stroke:currentColor}
+.sidebar .nav-divider{height:0;margin:14px 11px;border:0;border-top:1px solid #e1e4ed}
+.sidebar.is-collapsed .nav-divider{margin-inline:8px}
+.sidebar .nav-item.nav-child .nav-icon svg{width:19px;height:19px}
+.sidebar .nav-item.active .nav-icon{color:var(--purple)}
+.sidebar .nav-item:hover .nav-icon,.sidebar .nav-item:focus-visible .nav-icon{color:#554ac7}
+.sidebar .nav-item.active .nav-icon-wash{fill-opacity:.2}
 .sidebar .nav-label,.sidebar .brand-label,.sidebar .workspace-label{display:inline-block;max-width:180px;overflow:hidden;opacity:1;transform:translateX(0);transition:max-width .16s ease,opacity .14s ease,transform .16s ease}
 .sidebar .nav-label{width:auto;text-align:left;font-size:14px;white-space:nowrap}
 .sidebar.is-collapsed{--sidebar-current-width:64px;width:64px;flex-basis:64px;padding-inline:8px}
@@ -26,7 +42,7 @@
 .sidebar.is-collapsed .main-nav{padding-top:20px}
 .sidebar.is-collapsed .nav-item{justify-content:center;gap:0;padding-inline:5px}
 .sidebar.is-collapsed .nav-item.nav-child{margin-left:0;width:100%;padding-inline:5px}
-.sidebar.is-collapsed .nav-icon{width:20px;flex-basis:20px}
+.sidebar.is-collapsed .nav-icon{width:22px;flex-basis:22px}
 .sidebar.is-collapsed .sidebar-bottom{padding-top:13px}
 @media(max-width:900px) and (min-width:681px){.sidebar{--sidebar-current-width:205px;flex-basis:205px}.sidebar.is-collapsed{--sidebar-current-width:64px;width:64px;flex-basis:64px}}
 @media(prefers-reduced-motion:reduce){.sidebar,.sidebar>.sidebar-collapse,.sidebar .nav-label,.sidebar .brand-label,.sidebar .workspace-label{transition-duration:1ms!important}}
