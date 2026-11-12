@@ -315,7 +315,9 @@ body.timeline-dragging{cursor:grabbing;user-select:none}
 .timeline-portfolio-status{position:absolute;right:7px;bottom:5px;border-radius:999px;background:#eef0f4;padding:2px 7px;color:#687386;font-size:8.5px;font-weight:700}
 .timeline-portfolio-project.is-archived .timeline-risk-markers{display:none}
 .timeline-archive-readonly{border-radius:999px;background:#eef0f4;padding:5px 10px;color:#687386;font-size:11px;font-weight:700}
-.timeline-past-mask{position:absolute;z-index:1100;left:0;top:0;bottom:0;display:block;background:rgba(255,255,255,.7);pointer-events:none}
+.timeline-past-mask{position:absolute;z-index:1100;left:0;top:0;bottom:0;display:block;background:var(--timeline-past-mask-color,rgba(255,255,255,.7));pointer-events:none}
+/* Cover flags outside the track plots without painting white strips over the focused row. */
+.timeline-portfolio-project.is-focused{--timeline-past-mask-color:rgba(247,250,255,.7)}
 .timeline-portfolio-lanes .timeline-stage-lane[data-track="parallel"] .timeline-stage{opacity:1}
 .timeline-portfolio-meta{border-right:1px solid #dfe5ee;border-bottom:6px solid #edf1f6;background:#fff;box-shadow:0 1px 0 rgba(29,43,67,.04)}
 .timeline-portfolio-project.is-focused .timeline-portfolio-meta{border-bottom-color:#dce6f7;background:#f7faff}
@@ -438,6 +440,7 @@ body:has(#appSidebar.is-collapsed) .timeline-editor-batch-dock{left:calc(50% + 3
 .tl-order-grip[draggable="true"]{cursor:grab}
 [data-order-project].is-dragging,[data-order-member].is-dragging{z-index:5;opacity:.32;outline:1px solid #c4cfdf;outline-offset:-1px;box-shadow:0 7px 18px rgba(30,47,76,.12);transition:opacity .09s linear}
 .timeline-order-drag-float{position:fixed!important;z-index:1600!important;margin:0!important;overflow:hidden!important;opacity:1!important;outline:1px solid #c4cfdf!important;outline-offset:-1px!important;background:#fff!important;box-shadow:0 7px 18px rgba(30,47,76,.16)!important;transform:none!important;pointer-events:none!important}
+.timeline-order-drag-float *{pointer-events:none!important}
 .timeline-order-drag-float .timeline-portfolio-meta,.timeline-order-drag-float .timeline-portfolio-lanes,.timeline-order-drag-float.tl-prow,.timeline-order-drag-float.tl-mrow{opacity:1!important;background:#fff!important}
 .tl-tag-project.is-dragging{opacity:.42;outline:2px dashed #6c5ce7;outline-offset:-2px}
 [data-order-list].is-order-sorting,[data-order-list].is-order-sorting *{cursor:grabbing!important}
@@ -515,6 +518,15 @@ body:has(#appSidebar.is-collapsed) .timeline-editor-batch-dock{left:calc(50% + 3
 .timeline-remark-popup .is-empty,.timeline-remark-popup textarea::placeholder{font-style:italic;color:#a0a9b7;opacity:1}
 .timeline-remark-popup.is-editing{pointer-events:auto;overflow:auto}
 .timeline-remark-popup.is-editing [data-remark-preview]{display:none}
+.timeline-remark-popup.is-editing [data-remark-date]{display:none}
+/* A: fixed-size flag replaces the small flag at its existing rotated pivot. */
+.timeline-node-flag.is-hover-expanded{opacity:0}
+.timeline-remark-popup:not(.is-editing){display:grid;grid-template-rows:16px 12px 28px;row-gap:2px;width:220px;height:76px;max-height:none;padding:8px 9px 8px 8px;border:0;border-left:4px solid var(--remark-flag-color,#8b96a8);border-radius:0 10px 10px 0;box-shadow:0 4px 12px #273c601a;transform:rotate(-8deg);transform-origin:left bottom;pointer-events:auto;cursor:context-menu}
+.timeline-remark-popup:not(.is-editing)[data-flag-track="parallel"]{transform-origin:left top}
+.timeline-remark-popup:not(.is-editing) h3{margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px;font-weight:600;line-height:16px}
+.timeline-remark-popup [data-remark-date]{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#8c96a7;font-size:9px;line-height:12px;font-variant-numeric:tabular-nums}
+.timeline-remark-popup:not(.is-editing) [data-remark-preview]{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;height:28px;overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere;color:#627089;font-size:10.5px;line-height:14px}
+.timeline-remark-popup:not(.is-editing) [data-remark-preview].is-empty{color:#a0a9b7}
 .timeline-remark-popup textarea{display:block;box-sizing:border-box;width:100%;height:220px;max-height:40vh;resize:vertical;padding:12px;border:1px solid #cbd3e3;border-radius:7px;background:#fafbff;color:#2b3950;font-family:inherit;font-size:14px;line-height:1.8}
 .timeline-remark-popup textarea:focus{outline:2px solid #8880d7;outline-offset:1px}
 .timeline-remark-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}

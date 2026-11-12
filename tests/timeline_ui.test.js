@@ -101,8 +101,8 @@ const compactSingle=Timeline.renderSingle(project,{today:'2026-08-04',viewport:{
 ok(compactSingle.includes('timeline-e-years')&&compactSingle.includes('timeline-e-months')&&compactSingle.includes('timeline-e-days')&&!compactSingle.includes('timeline-e-quarters')&&compactSingle.includes('data-day-density="day"')&&!compactSingle.includes('>13 四<'),'single-project calendar reuses the same colored, collision-safe year/month/day scale');
 const zoomedSingle=Timeline.renderSingle(project,{today:'2026-08-04',viewport:{center:'2026-08-05',days:14},viewportWidth:760});
 ok(zoomedSingle.includes('class="danger" data-portfolio-cancel-zoom >取消缩放</button>')&&zoomedSingle.indexOf('data-portfolio-cancel-zoom')<zoomedSingle.indexOf('data-portfolio-fullscreen'),'zoomed single-project dashboard exposes the shared red cancel-zoom action before fullscreen');
-ok((Timeline.renderSingle(project,{today:'2026-08-04'}).match(/timeline-past-mask/g)||[]).length===2,'running project masks today-left on both tracks');
-ok((Timeline.renderSingle(project,{today:'2026-09-04'}).match(/timeline-past-mask/g)||[]).length===2,'past-only project keeps today-left masks after its final node has passed');
+ok((Timeline.renderSingle(project,{today:'2026-08-04'}).match(/timeline-past-mask/g)||[]).length===1,'running project uses one today-left mask across both tracks');
+ok((Timeline.renderSingle(project,{today:'2026-09-04'}).match(/timeline-past-mask/g)||[]).length===1,'past-only project keeps the today-left mask after its final node has passed');
 const futureProject={...project,nodes:project.nodes.map(node=>({...node,date:'2026-10-04'})),stage_intervals:[]};
 ok(!Timeline.renderSingle(futureProject,{today:'2026-09-04'}).includes('timeline-past-mask'),'future-only project does not receive a today-left mask before it starts');
 const denseProject={...project,project_id:7,nodes:[{id:71,track:'main',stage:'设计',name:'白圈一',date:'2026-08-01'},{id:72,track:'main',stage:'设计',name:'白圈二',date:'2026-08-02'}],stage_intervals:[],segments:[]};

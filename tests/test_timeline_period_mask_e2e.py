@@ -36,17 +36,25 @@ class PeriodMaskE2E(unittest.TestCase):
         return page.locator(f'[data-dashboard-project="{self.project}"]')
 
     def assert_mask_geometry(self,page,row):
-        self.assertEqual(row.locator('.timeline-past-mask').count(),2)
+        self.assertEqual(row.locator('.timeline-past-mask').count(),1)
         today=page.locator('.timeline-today-line').bounding_box()['x']
+        mask=row.locator('.timeline-past-mask');box=mask.bounding_box()
+        lanes=row.locator('.timeline-stage-lanes').bounding_box()
+        self.assertAlmostEqual(box['x']+box['width'],today,delta=1)
+        self.assertAlmostEqual(box['y'],lanes['y'],delta=1)
+        self.assertAlmostEqual(box['height'],lanes['height'],delta=1)
+        for flag in row.locator('.timeline-node-flag:visible').all():
+            flag_box=flag.bounding_box()
+            self.assertGreaterEqual(flag_box['y'],box['y']-1)
+            self.assertLessEqual(flag_box['y']+flag_box['height'],box['y']+box['height']+1)
+        style=mask.evaluate('el=>({z:Number(getComputedStyle(el).zIndex),background:getComputedStyle(el).backgroundColor,pointer:getComputedStyle(el).pointerEvents})')
+        focused='is-focused' in row.get_attribute('class')
+        self.assertEqual(style['background'],'rgba(247, 250, 255, 0.7)' if focused else 'rgba(255, 255, 255, 0.7)')
+        self.assertEqual(style['pointer'],'none')
         for track in ['main','parallel']:
             plot=row.locator(f'[data-track={track}] .timeline-stage-plot')
-            mask=plot.locator('.timeline-past-mask');box=mask.bounding_box()
-            self.assertAlmostEqual(box['x']+box['width'],today,delta=1)
-            style=mask.evaluate('el=>({z:Number(getComputedStyle(el).zIndex),background:getComputedStyle(el).backgroundColor,pointer:getComputedStyle(el).pointerEvents})')
             stage=plot.locator('.timeline-stage').first
             self.assertGreater(style['z'],stage.evaluate('el=>Number(getComputedStyle(el).zIndex)'))
-            self.assertEqual(style['background'],'rgba(255, 255, 255, 0.7)')
-            self.assertEqual(style['pointer'],'none')
         self.assertEqual(row.locator('[data-node-date="2026-07-22"],[data-node-date="2026-08-01"]').count(),0)
         return today
 

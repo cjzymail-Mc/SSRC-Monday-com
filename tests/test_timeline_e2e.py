@@ -265,6 +265,25 @@ class TimelineProductionE2E(unittest.TestCase):
         page.mouse.down(button=button)
         page.mouse.up(button=button)
 
+    def hover_flag_surface(self, page, target):
+        # Leave the prior enlarged flag, then enter an actually exposed point on the next small flag.
+        page.mouse.move(10, 10)
+        page.locator('[data-dashboard-remark]').wait_for(state='hidden')
+        target.scroll_into_view_if_needed()
+        point = target.evaluate("""target => {
+          const r=target.getBoundingClientRect();
+          for(let y=Math.max(2,Math.ceil(r.top)+2);y<Math.min(innerHeight-2,r.bottom-2);y+=2){
+            for(let x=Math.max(2,Math.ceil(r.left)+2);x<Math.min(innerWidth-2,r.right-2);x+=2){
+              const hit=document.elementFromPoint(x,y)?.closest('.timeline-node-flag,.timeline-node-flag-hit');
+              if(hit?.dataset.nodeFlagKey===target.dataset.nodeFlagKey)return {x,y};
+            }
+          }
+          return null;
+        }""")
+        self.assertIsNotNone(point, 'each visible flag must have an exposed pointer surface')
+        page.mouse.move(point['x'], point['y'])
+        page.locator('[data-dashboard-remark]').wait_for(state='visible')
+
     @staticmethod
     def record_mouse_sequence(page, selector):
         page.evaluate("""selector => {
@@ -342,26 +361,9 @@ class TimelineProductionE2E(unittest.TestCase):
         week_flag = week_row.locator(f'.timeline-node-flag[data-node-flag-key="{week_key}"]')
         week_probe = week_row.locator(f'.timeline-node-flag-hit.is-active[data-node-flag-key="{week_key}"]')
         week_flag_target = week_probe if week_probe.is_visible() else week_flag
-        week_flag_target.scroll_into_view_if_needed()
-        week_target_point = week_flag_target.evaluate("""target => {
-          const rect = target.getBoundingClientRect();
-          const left = Math.max(0, Math.ceil(rect.left));
-          const right = Math.min(innerWidth - 1, Math.floor(rect.right));
-          const top = Math.max(0, Math.ceil(rect.top));
-          const bottom = Math.min(innerHeight - 1, Math.floor(rect.bottom));
-          for (let y = top + 2; y <= bottom - 2; y += 2) {
-            for (let x = left + 2; x <= right - 2; x += 2) {
-              const owner = document.elementFromPoint(x, y)?.closest('.timeline-node-flag,.timeline-node-flag-hit');
-              if (owner?.dataset.nodeFlagKey === target.dataset.nodeFlagKey) return {x, y};
-            }
-          }
-          return {x: null, y: null, rect: {left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom}, viewport: {width: innerWidth, height: innerHeight}};
-        }""")
-        self.assertIsNotNone(week_target_point["x"], week_target_point)
-        page.mouse.move(week_target_point["x"], week_target_point["y"])
-        self.assertEqual(page.evaluate("point => document.elementFromPoint(point.x, point.y)?.closest('.timeline-node-flag,.timeline-node-flag-hit')?.dataset.nodeFlagKey", week_target_point), week_key)
-        page.mouse.down(button="right")
-        page.mouse.up(button="right")
+        self.hover_flag_surface(page, week_flag_target)
+        self.assertEqual(week_flag.evaluate('el=>getComputedStyle(el).opacity'), '0')
+        self.physical_click(page, page.locator('[data-dashboard-remark]'), button='right')
         week_flag_menu = page.locator('[data-timeline-page="week"] [data-timeline-context]')
         week_flag_menu.wait_for(state="visible")
         self.assertEqual(week_flag_menu.get_attribute('data-node-id'), week_node.get_attribute('data-node-id'))
@@ -452,6 +454,7 @@ class TimelineProductionE2E(unittest.TestCase):
             with page.expect_response(lambda response: response.request.method == "PUT" and response.url.endswith("/timeline/order")) as pending:
                 page.mouse.move(source_box["x"] + source_box["width"] / 2, source_box["y"] + source_box["height"] / 2)
                 page.mouse.down()
+                self.assertTrue(page.locator('.timeline-order-drag-float').evaluate("el=>[el,...el.querySelectorAll('*')].every(item=>getComputedStyle(item).pointerEvents==='none')"), 'the visual drag copy must never intercept drop hit testing')
                 page.mouse.move(target_box["x"] + target_box["width"] / 2, target_box["y"] + 2, steps=12)
                 page.mouse.up()
             self.assertEqual(pending.value.status, 200)
@@ -948,6 +951,11 @@ class TimelineProductionE2E(unittest.TestCase):
         member_page.locator('[data-timeline-page="home"]').wait_for()
         member_page.locator('#timelineOverviewBtn').click()
         member_page.locator('[data-timeline-page="overview"][aria-busy="false"]').wait_for()
+        self.assertEqual(member_page.locator('[data-overview-scope="mine"]').get_attribute('aria-pressed'), 'true')
+        # Members now start with their own projects; select all before probing another creator's ACL.
+        with member_page.expect_response(lambda response: '/timeline/overview?' in response.url and 'scope=all' in response.url and response.status == 200):
+            member_page.locator('[data-overview-scope="all"]').click()
+        member_page.locator('[data-timeline-page="overview"][aria-busy="false"]').wait_for()
         self.physical_click(member_page, member_page.locator(f'[data-overview-project="{project_id}"] [data-timeline-open="single"]'))
         member_page.locator('[data-timeline-page="single"]').wait_for()
         self.physical_click(member_page, member_page.locator('[data-timeline-mode-target="editor"]'))
@@ -995,9 +1003,10 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertFalse(single_flag.evaluate("el => el.classList.contains('is-probed')"))
         single_probe = card.locator(f'.timeline-node-flag-hit.is-active[data-node-flag-key="{single_key}"]')
         single_flag_target = single_probe if single_probe.is_visible() else single_flag
-        single_flag_target.hover(position={"x": 4, "y": 8})
-        self.assertTrue(single_flag.evaluate("el => el.classList.contains('is-probed')"), "hovering the flag itself must promote that exact flag")
-        self.physical_click(page, single_flag_target, button="right")
+        self.hover_flag_surface(page, single_flag_target)
+        self.assertEqual(single_flag.evaluate('el=>getComputedStyle(el).opacity'), '0')
+        self.assertEqual(page.locator('[data-remark-title]').inner_text(), single_flag.locator('b').inner_text())
+        self.physical_click(page, page.locator('[data-dashboard-remark]'), button="right")
         single_flag_menu = card.locator('[data-timeline-context]')
         single_flag_menu.wait_for(state="visible")
         self.assertEqual(single_flag_menu.get_attribute('data-node-id'), single_node.get_attribute('data-node-id'))
@@ -1113,7 +1122,7 @@ class TimelineProductionE2E(unittest.TestCase):
         self.open_cp4_single(page, project_id)
         single = page.locator('[data-timeline-page="single"] .timeline-portfolio-chart')
         single.wait_for()
-        self.assertEqual(single.locator('.timeline-past-mask').count(), 2)
+        self.assertEqual(single.locator('.timeline-past-mask').count(), 1)
         single_today_x = single.locator('.timeline-today-line').bounding_box()["x"]
         for mask in single.locator('.timeline-past-mask').all():
             box = mask.bounding_box()
@@ -1128,7 +1137,7 @@ class TimelineProductionE2E(unittest.TestCase):
         self.physical_click(page, page.locator('#timelineAllBtn'))
         row = page.locator(f'[data-timeline-page="all"] [data-dashboard-project="{project_id}"]')
         row.wait_for()
-        self.assertEqual(row.locator('.timeline-past-mask').count(), 2)
+        self.assertEqual(row.locator('.timeline-past-mask').count(), 1)
         portfolio_today_x = page.locator('[data-timeline-page="all"] .timeline-today-line').bounding_box()["x"]
         for mask in row.locator('.timeline-past-mask').all():
             box = mask.bounding_box()
@@ -1446,9 +1455,22 @@ class TimelineProductionE2E(unittest.TestCase):
         node.hover()
         self.assertEqual(preview.inner_text(), '--暂无备注信息--')
         self.assertEqual(preview.evaluate('e=>getComputedStyle(e).fontStyle'), 'italic')
-        self.assertIn(node.get_attribute('data-node-date'), popup.locator('h3').inner_text())
+        self.assertEqual(node.get_attribute('data-node-date'), popup.locator('[data-remark-date]').inner_text())
+        self.assertEqual(popup.evaluate('e=>[e.offsetWidth,e.offsetHeight]'), [220,76])
+        hovered_flag = page.locator(f'.timeline-node-flag[data-project-id="{project_id}"][data-node-id="{node_id}"]')
+        self.assertEqual(hovered_flag.evaluate('e=>getComputedStyle(e).opacity'), '0')
+        popup.hover()
+        self.assertTrue(popup.is_visible(), 'the enlarged flag must stay open while reading it')
+        popup.click(button='right')
+        menu = page.locator('[data-timeline-context]')
+        self.assertTrue(menu.is_visible(), 'right-clicking the enlarged flag keeps node actions')
+        self.assertEqual(menu.get_attribute('data-node-id'), str(node_id))
+        menu.locator('[data-draft-action="remark"]').click()
+        popup.locator('[data-remark-cancel]').click()
+        node.hover()
         page.mouse.move(5, 5)
         self.assertTrue(popup.is_hidden())
+        self.assertEqual(hovered_flag.evaluate('e=>getComputedStyle(e).opacity'), '1')
         node.dblclick()
         self.assertEqual(editor.input_value(), '')
         self.assertEqual(editor.get_attribute('placeholder'), '--暂无备注信息--')
@@ -1457,7 +1479,7 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertTrue(popup.is_hidden())
         stable_hash = self.timeline_content_hash()
         node.dblclick()
-        text = '<b>备注纯文本</b>\n第二行，保留换行'
+        text = '<b>备注纯文本</b>\n第二行，保留换行' + '；长备注仍保留完整内容，只在旗帜预览中截断' * 12
         editor.fill(text)
         page.mouse.move(5, 5)
         page.keyboard.press('Escape')
@@ -1487,6 +1509,8 @@ class TimelineProductionE2E(unittest.TestCase):
         self.assertEqual(page.locator('[data-dashboard-pending]').count(),0)
         node.hover()
         self.assertEqual(preview.inner_text(), text)
+        self.assertEqual(popup.evaluate('e=>[e.offsetWidth,e.offsetHeight]'), [220,76])
+        self.assertTrue(preview.evaluate('e=>e.scrollHeight>e.clientHeight&&getComputedStyle(e).webkitLineClamp==="2"'))
         self.assertEqual(preview.locator('b').count(), 0, 'remark text must never become HTML')
         db = connect(self.db_path)
         try:
@@ -1516,7 +1540,9 @@ class TimelineProductionE2E(unittest.TestCase):
         flag = page.locator(f'.timeline-node-flag[data-project-id="{project_id}"][data-node-id="{node_id}"]')
         hit = page.locator(f'.timeline-node-flag-hit[data-project-id="{project_id}"][data-node-id="{node_id}"]')
         trigger = hit if hit.is_visible() else flag
-        trigger.dblclick(position={'x': 4, 'y': 8})
+        page.mouse.move(5,5)
+        box = trigger.bounding_box()
+        page.mouse.dblclick(box['x']+4,box['y']+8)
         self.assertEqual(editor.input_value(), text)
         popup.locator('[data-remark-cancel]').click()
         self.physical_click(page, node, button='right')
@@ -1533,6 +1559,8 @@ class TimelineProductionE2E(unittest.TestCase):
         (project_id, _, _), _today = self.seed_cp4_dashboard_projects()
         context, page = self.login('u2')
         page.locator('#timelineOverviewBtn').click()
+        page.locator('[data-timeline-page="overview"][aria-busy="false"]').wait_for()
+        page.locator('[data-overview-scope="all"]').click()
         page.locator('[data-timeline-page="overview"][aria-busy="false"]').wait_for()
         self.physical_click(page, page.locator(f'[data-overview-project="{project_id}"] [data-timeline-open="single"]'))
         page.locator('[data-timeline-page="single"]').wait_for()
@@ -1778,10 +1806,11 @@ class TimelineProductionE2E(unittest.TestCase):
             other_key = other_flag.get_attribute('data-node-flag-key')
             other_probe = overlap_project.locator(f'.timeline-node-flag-hit.is-active[data-node-flag-key="{other_key}"]')
             self.assertTrue(other_probe.is_visible(), "overlapping flags must expose a non-overlapping pointer probe")
-            other_probe.hover(position={"x": 4, "y": 8})
-            self.assertTrue(other_flag.evaluate("el => el.classList.contains('is-probed')"), "hovering a flag must promote that exact flag")
+            self.hover_flag_surface(page, other_probe)
+            self.assertEqual(other_flag.evaluate('el=>getComputedStyle(el).opacity'), '0')
+            self.assertEqual(page.locator('[data-remark-title]').inner_text(), other_flag.locator('b').inner_text())
             self.assertFalse(focused_flag.evaluate("el => el.classList.contains('is-probed')"))
-            self.physical_click(page, other_probe, button="right")
+            self.physical_click(page, page.locator('[data-dashboard-remark]'), button="right")
             flag_menu = page.locator('[data-timeline-page="all"] [data-timeline-context]')
             flag_menu.wait_for(state="visible")
             self.assertEqual(flag_menu.get_attribute('data-node-id'), other_flag.get_attribute('data-node-id'))
@@ -2108,10 +2137,10 @@ class TimelineProductionE2E(unittest.TestCase):
         single = page.locator('[data-timeline-page="single"] [data-portfolio-scroll]')
         chart = single.locator('.timeline-portfolio-chart')
         chart.wait_for()
-        self.assertEqual(chart.locator('.timeline-past-mask').count(), 2)
+        self.assertEqual(chart.locator('.timeline-past-mask').count(), 1)
         self.assertEqual(
             chart.locator('.timeline-past-mask').first.evaluate("el => getComputedStyle(el).backgroundColor"),
-            "rgba(255, 255, 255, 0.7)",
+            "rgba(247, 250, 255, 0.7)",
         )
         initial_days = float(chart.get_attribute("data-viewport-days"))
         self.assertEqual(initial_days, float(chart.get_attribute("data-full-days")))

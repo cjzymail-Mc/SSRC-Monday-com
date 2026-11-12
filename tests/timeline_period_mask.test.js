@@ -14,7 +14,7 @@ const spanning={project_id:101,name:'跨期双轨项目',nodes:[
 
 for(const timeScope of ['week','month'])test(`${timeScope}: cross-period bars keep past masks when only future nodes are visible`,()=>{
   const html=Timeline.renderAll([spanning],{timeScope,today:'2026-10-09'});
-  assert.equal((html.match(/timeline-past-mask/g)||[]).length,2);
+  assert.equal((html.match(/timeline-past-mask/g)||[]).length,1);
   assert.ok(html.includes('data-stage-interval'));
   assert.ok(!html.includes('data-node-date="2026-07-22"'));
   assert.ok(!html.includes('data-node-date="2026-08-01"'));

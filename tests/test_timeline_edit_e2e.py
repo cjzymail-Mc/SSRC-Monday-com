@@ -218,9 +218,20 @@ class SharedTimelineEditE2E(unittest.TestCase):
 
 
     def quick_insert(self,page,pid,name):
+        page.mouse.move(10,10)
         plot=page.locator(f'[data-dashboard-project="{pid}"] .timeline-stage-plot').first
-        plot.wait_for(state='visible');box=plot.bounding_box()
-        plot.click(button='right',position={'x':box['width']*.65,'y':box['height']-5})
+        plot.wait_for(state='visible');plot.scroll_into_view_if_needed()
+        point=plot.evaluate('''plot=>{
+          const r=plot.getBoundingClientRect(),y=r.bottom-5;
+          for(const ratio of [.65,.8,.4,.2,.9]){
+            const x=r.left+r.width*ratio,hit=document.elementFromPoint(x,y);
+            if(hit?.closest('.timeline-stage-plot')===plot&&!hit.closest('.timeline-dashboard-node,.timeline-node-cluster,.timeline-node-flag,.timeline-node-flag-hit'))return {x:x-r.left,y:y-r.top};
+          }
+          return null;
+        }''')
+        self.assertIsNotNone(point,'quick insert needs an exposed plot point outside existing nodes')
+        # Keep Playwright's stable/scroll wait so a queued viewport scroll cannot close the new menu.
+        plot.click(button='right',position=point)
         page.locator('[data-dashboard-insert-action]').click()
         popup=page.locator('[data-dashboard-node-editor]');popup.wait_for(state='visible')
         popup.locator('input[name="name"]').fill(name)

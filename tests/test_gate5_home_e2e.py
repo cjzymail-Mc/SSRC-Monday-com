@@ -363,19 +363,24 @@ class Gate5HomeE2E(unittest.TestCase):
         tip.wait_for(state="visible")
         self.assertTrue(page.locator("[data-timeline-node-tooltip]").is_hidden(),"individual nodes use the current remark portal")
         tooltip_metrics = tip.evaluate("""el => {
-          const r=el.getBoundingClientRect(), axis=document.querySelector('[data-timeline-page="single"] .timeline-portfolio-chart .timeline-e-axis')?.getBoundingClientRect(), anchor=document.querySelector('.timeline-dashboard-node[aria-describedby="timelineRemarkPopup"]')?.getBoundingClientRect(),label=anchor&&r.top>=anchor.bottom?'below':'above';
-          const overlaps=(a,b)=>Boolean(a&&b&&a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top);
+          const r=el.getBoundingClientRect(), anchor=document.querySelector('.timeline-dashboard-node[aria-describedby="timelineRemarkPopup"]');
+          const flag=document.querySelector(`.timeline-node-flag[data-project-id="${anchor.dataset.projectId}"][data-node-id="${anchor.dataset.nodeId}"]`), f=flag.getBoundingClientRect();
+          const angle=8*Math.PI/180, matrix=new DOMMatrixReadOnly(getComputedStyle(el).transform);
           const previous=el.style.pointerEvents;el.style.pointerEvents='auto';
           const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);el.style.pointerEvents=previous;
-          return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,viewportWidth:innerWidth,viewportHeight:innerHeight,topmost:hit===el||el.contains(hit),axisOverlap:overlaps(r,axis),placement:label,z:Number(getComputedStyle(el).zIndex)};
+          return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,viewportWidth:innerWidth,viewportHeight:innerHeight,topmost:hit===el||el.contains(hit),z:Number(getComputedStyle(el).zIndex),width:el.offsetWidth,height:el.offsetHeight,rotation:Math.atan2(matrix.b,matrix.a)*180/Math.PI,anchorDriftX:(r.left+Math.sin(angle)*el.offsetHeight)-(f.left+Math.sin(angle)*flag.offsetHeight),anchorDriftY:r.bottom-f.bottom,originalOpacity:getComputedStyle(flag).opacity};
         }""")
         self.assertTrue(tooltip_metrics["topmost"], "节点提示框必须成为点击点处的最上层绘制元素")
-        self.assertFalse(tooltip_metrics["axisOverlap"], "节点提示框不得遮挡固定年月日轴")
+        # The approved in-place flag keeps its original pivot instead of moving away from the axis.
+        self.assertEqual((tooltip_metrics["width"], tooltip_metrics["height"]), (220, 76))
+        self.assertAlmostEqual(tooltip_metrics["rotation"], -8, delta=.01)
+        self.assertAlmostEqual(tooltip_metrics["anchorDriftX"], 0, delta=1)
+        self.assertAlmostEqual(tooltip_metrics["anchorDriftY"], 0, delta=1)
+        self.assertEqual(tooltip_metrics["originalOpacity"], "0")
         self.assertGreaterEqual(tooltip_metrics["left"], 0)
         self.assertLessEqual(tooltip_metrics["right"], tooltip_metrics["viewportWidth"])
         self.assertGreaterEqual(tooltip_metrics["top"], 0)
         self.assertLessEqual(tooltip_metrics["bottom"], tooltip_metrics["viewportHeight"])
-        self.assertIn(tooltip_metrics["placement"], {"left", "right", "above", "below"})
         self.physical_click(page, node, button="right")
         menu = page.locator('[data-timeline-page="single"] [data-timeline-context]')
         menu.wait_for(state="visible")
