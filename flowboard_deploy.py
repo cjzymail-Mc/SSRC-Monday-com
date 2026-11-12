@@ -17,11 +17,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from flowboard.database import SCHEMA_VERSION, migrate
+from flowboard.desktop_activity import desktop_activity
 from flowboard.operations import create_backup, maintenance_lock, restore_backup, verify_backup
 
 
 APP_ROOT = Path(__file__).resolve().parent
 CONFIG_KEYS = {"format_version", "data_dir", "backup_dir", "host", "port", "secure_cookie", "release_ref"}
+ES_CONTINUOUS = 0x80000000
+ES_SYSTEM_REQUIRED = 0x00000001
 
 
 class DeploymentError(RuntimeError):
@@ -249,6 +252,45 @@ def git(app, *args):
     return result.stdout.strip()
 
 
+def _set_thread_execution_state(flags):
+    import ctypes
+    from ctypes import wintypes
+
+    setter = ctypes.WinDLL("kernel32").SetThreadExecutionState
+    setter.argtypes = (wintypes.DWORD,)
+    setter.restype = wintypes.DWORD
+    return setter(flags)
+
+
+@contextmanager
+def keep_system_awake():
+    """Hold an idle-sleep request on the supervisor thread until its server stops."""
+    if sys.platform != "win32":
+        yield
+        return
+    previous = 0
+    try:
+        previous = _set_thread_execution_state(ES_CONTINUOUS | ES_SYSTEM_REQUIRED)
+        if not previous:
+            raise OSError("Windows rejected the keep-awake request")
+    except (OSError, AttributeError) as error:
+        print(f"[WARNING] Could not prevent automatic sleep: {error}. The server will still start.",
+              file=sys.stderr, flush=True)
+    else:
+        print("[OK] Automatic sleep prevention enabled while Flowboard runs. The display may turn off.", flush=True)
+    try:
+        yield
+    finally:
+        if previous:
+            try:
+                # Restore on the same thread, including any pre-existing execution requirements.
+                if not _set_thread_execution_state(previous | ES_CONTINUOUS):
+                    raise OSError("Windows rejected the previous execution state")
+            except (OSError, AttributeError) as error:
+                print(f"[WARNING] Could not release sleep prevention: {error}. It ends when this launcher exits.",
+                      file=sys.stderr, flush=True)
+
+
 def start(settings, *, check_only=False):
     validation = check_database(settings.db)
     print(json.dumps({"config": str(settings.config) if settings.config else None,
@@ -259,36 +301,43 @@ def start(settings, *, check_only=False):
         assert_stopped(settings)
         settings.attachments.mkdir(parents=True, exist_ok=True)
         settings.backups.mkdir(parents=True, exist_ok=True)
-        process = subprocess.Popen([sys.executable, "-u", str(settings.app / "server.py")],
-                                   cwd=settings.app, env=settings.environment())
-        try:
-            address = "127.0.0.1" if settings.host == "0.0.0.0" else settings.host
-            opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
-            deadline = time.monotonic() + 15
-            ready = False
-            while process.poll() is None and time.monotonic() < deadline:
-                try:
-                    with opener.open(f"http://{address}:{settings.port}/api/health", timeout=1) as response:
-                        health = json.load(response)
-                    if health.get("status") == "ok" and health.get("schema_version") == SCHEMA_VERSION:
-                        ready = True
-                        break
-                except (OSError, ValueError):
-                    time.sleep(0.15)
-            if not ready:
-                raise DeploymentError("Server did not become healthy; see startup output")
-            print(f"[OK] Flowboard ready on port {settings.port}. Keep this window open; Ctrl+C stops it.", flush=True)
-            return process.wait()
-        except KeyboardInterrupt:
-            return 0
-        finally:
-            if process.poll() is None:
-                process.terminate()
-                try:
-                    process.wait(timeout=5)
-                except subprocess.TimeoutExpired:
-                    process.kill()
-                    process.wait()
+        with keep_system_awake():
+            process = subprocess.Popen([sys.executable, "-u", str(settings.app / "server.py")],
+                                       cwd=settings.app, env=settings.environment())
+            try:
+                address = "127.0.0.1" if settings.host == "0.0.0.0" else settings.host
+                opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+                deadline = time.monotonic() + 15
+                ready = False
+                while process.poll() is None and time.monotonic() < deadline:
+                    try:
+                        with opener.open(f"http://{address}:{settings.port}/api/health", timeout=1) as response:
+                            health = json.load(response)
+                        if health.get("status") == "ok" and health.get("schema_version") == SCHEMA_VERSION:
+                            ready = True
+                            break
+                    except (OSError, ValueError):
+                        time.sleep(0.15)
+                if not ready:
+                    raise DeploymentError("Server did not become healthy; see startup output")
+                refresh_desktop = desktop_activity()
+                refresh_desktop()
+                print(f"[OK] Flowboard ready on port {settings.port}. Keep this window open; Ctrl+C stops it.", flush=True)
+                while True:
+                    try:
+                        return process.wait(timeout=50)
+                    except subprocess.TimeoutExpired:
+                        refresh_desktop()
+            except KeyboardInterrupt:
+                return 0
+            finally:
+                if process.poll() is None:
+                    process.terminate()
+                    try:
+                        process.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        process.kill()
+                        process.wait()
 
 
 def install(args):

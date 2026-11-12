@@ -354,6 +354,8 @@ class DeploymentTests(unittest.TestCase):
             checked = subprocess.run(["cmd", "/d", "/c", "start-flowboard.cmd", "--check"], cwd=self.app,
                                      env=env, capture_output=True, text=True, timeout=20)
             self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+            self.assertNotIn("sleep prevention enabled", checked.stdout)
+            self.assertNotIn("lock prevention active", checked.stdout)
         output = self.root / "server-output.log"
         with output.open("w", encoding="utf-8") as stream:
             command = (["cmd", "/d", "/c", "start-flowboard.cmd"] if os.name == "nt" and action == "start" else
@@ -376,7 +378,16 @@ class DeploymentTests(unittest.TestCase):
                         time.sleep(0.1)
                 else:
                     self.fail(output.read_text(encoding="utf-8"))
-                self.command("start", "--config", str(self.config), expected=3)
+                if os.name == "nt":
+                    self.assertIn("[OK] Automatic sleep prevention enabled", output.read_text(encoding="utf-8"))
+                    # Keyboard input may be blocked on a headless/locked desktop, but the status must be explicit.
+                    deadline = time.monotonic() + 5
+                    while time.monotonic() < deadline and "Flowboard ready" not in output.read_text(encoding="utf-8"):
+                        time.sleep(0.05)
+                    self.assertIn("Automatic lock prevention", output.read_text(encoding="utf-8"))
+                rejected = self.command("start", "--config", str(self.config), expected=3)
+                self.assertNotIn("sleep prevention enabled", rejected.stdout)
+                self.assertNotIn("lock prevention active", rejected.stdout)
                 for path, expected in (("/api/bootstrap", 401), ("/api/attachments/1/content", 401), ("/flowboard.db", 404), ("/", 200)):
                     conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=2)
                     conn.request("GET", path)
