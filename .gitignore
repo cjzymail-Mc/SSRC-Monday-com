@@ -12,6 +12,9 @@ flowboard.db
 # 本机开发调试数据（由 local-test.cmd 创建，可随时删除重建）
 local-test-data/
 
+# 用户提供的防锁屏原始参考脚本（原理已由 flowboard/desktop_activity.py 实现，仅保留本机参考）
+do_not_sleep_Num.py
+
 # double-session 接力状态机（易变机器状态，不入库）
 .copilot-message.md
 .copilot-state.json
