@@ -1,0 +1,108 @@
+[
+  {
+    "type": "pointerdown",
+    "x": 123.5,
+    "y": 123,
+    "target": "<button class=\"nav-item nav-button active\" id=\"timelineBtn\" title=\"我的工作\">\n          <span class=\"nav-icon nav-icon-refined\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path d=\"M8.25 7V5.25A1.75 1.75 0 0 1 10 3.5h4a1.75 1.75 0 0 1 1.75 1.75V7\"></path><rect class=\"nav-icon-surface\" x=\"2.75\" y=\"7\" width=\"18.5\" height=\"13\" rx=\"2.5\"></rect><path class=\"nav-icon-tint\" d=\"M3.5 11.25 9 ",
+    "hit": "<button class=\"nav-item nav-button active\" id=\"timelineBtn\" title=\"我的工作\">\n          <span class=\"nav-icon nav-icon-refined\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path d=\"M8.25 7V5.25A1.75 1.75 0 0 1 10 3.5h4a1.75 1.75 0 0 1 1.75 1.75V7\"></path><rect class=\"nav-icon-surface\" ",
+    "popup": null,
+    "scope": "home"
+  },
+  {
+    "type": "pointerup",
+    "x": 123.5,
+    "y": 123,
+    "target": "<button class=\"nav-item nav-button active\" id=\"timelineBtn\" title=\"我的工作\">\n          <span class=\"nav-icon nav-icon-refined\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path d=\"M8.25 7V5.25A1.75 1.75 0 0 1 10 3.5h4a1.75 1.75 0 0 1 1.75 1.75V7\"></path><rect class=\"nav-icon-surface\" x=\"2.75\" y=\"7\" width=\"18.5\" height=\"13\" rx=\"2.5\"></rect><path class=\"nav-icon-tint\" d=\"M3.5 11.25 9 ",
+    "hit": "<button class=\"nav-item nav-button active\" id=\"timelineBtn\" title=\"我的工作\">\n          <span class=\"nav-icon nav-icon-refined\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path d=\"M8.25 7V5.25A1.75 1.75 0 0 1 10 3.5h4a1.75 1.75 0 0 1 1.75 1.75V7\"></path><rect class=\"nav-icon-surface\" ",
+    "popup": null,
+    "scope": "home"
+  },
+  {
+    "type": "click",
+    "x": 123,
+    "y": 123,
+    "target": "<button class=\"nav-item nav-button active\" id=\"timelineBtn\" title=\"我的工作\">\n          <span class=\"nav-icon nav-icon-refined\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path d=\"M8.25 7V5.25A1.75 1.75 0 0 1 10 3.5h4a1.75 1.75 0 0 1 1.75 1.75V7\"></path><rect class=\"nav-icon-surface\" x=\"2.75\" y=\"7\" width=\"18.5\" height=\"13\" rx=\"2.5\"></rect><path class=\"nav-icon-tint\" d=\"M3.5 11.25 9 ",
+    "hit": "<button class=\"nav-item nav-button active\" id=\"timelineBtn\" title=\"我的工作\">\n          <span class=\"nav-icon nav-icon-refined\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path d=\"M8.25 7V5.25A1.75 1.75 0 0 1 10 3.5h4a1.75 1.75 0 0 1 1.75 1.75V7\"></path><rect class=\"nav-icon-surface\" ",
+    "popup": null,
+    "scope": "home"
+  },
+  {
+    "type": "pointerdown",
+    "x": 606,
+    "y": 257,
+    "target": "<span class=\"tl-prow-meta\">设计 · <b class=\"tl-red\">逾期 1</b> · 临近 11/12</span>",
+    "hit": "<span class=\"tl-prow-meta\">设计 · <b class=\"tl-red\">逾期 1</b> · 临近 11/12</span>",
+    "popup": null,
+    "scope": "home"
+  },
+  {
+    "type": "pointerup",
+    "x": 606,
+    "y": 257,
+    "target": "<span class=\"tl-prow-meta\">设计 · <b class=\"tl-red\">逾期 1</b> · 临近 11/12</span>",
+    "hit": "<span class=\"tl-prow-meta\">设计 · <b class=\"tl-red\">逾期 1</b> · 临近 11/12</span>",
+    "popup": null,
+    "scope": "home"
+  },
+  {
+    "type": "click",
+    "x": 606,
+    "y": 257,
+    "target": "<span class=\"tl-prow-meta\">设计 · <b class=\"tl-red\">逾期 1</b> · 临近 11/12</span>",
+    "hit": "<span class=\"tl-prow-meta\">设计 · <b class=\"tl-red\">逾期 1</b> · 临近 11/12</span>",
+    "popup": null,
+    "scope": "home"
+  },
+  {
+    "type": "pointerdown",
+    "x": 936.6648559570312,
+    "y": 418.59375,
+    "target": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design  is-overdue  \" data-dashboard-hit-target=\"node\" data-node-id=\"1\" data-project-id=\"1\" data-node-date=\"2026-11-11\" data-node-flag-key=\"1:1\" data-node-flag-visible=\"true\" aria-label=\"节点 节点1，设计，2026-11-11；右键操作\" style=\"left:49.18032786885246%;z-index:1000\"><i></i><span data-node-t",
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design  is-overdue  \" data-dashboard-hit-target=\"node\" data-node-id=\"1\" data-project-id=\"1\" data-node-date=\"2026-11-11\" data-node-flag-key=\"1:1\" data-node-flag-visible=\"true\" aria-lab",
+    "popup": false,
+    "scope": "single"
+  },
+  {
+    "type": "pointerup",
+    "x": 936.6648559570312,
+    "y": 418.59375,
+    "target": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design  is-overdue  \" data-dashboard-hit-target=\"node\" data-node-id=\"1\" data-project-id=\"1\" data-node-date=\"2026-11-11\" data-node-flag-key=\"1:1\" data-node-flag-visible=\"true\" aria-label=\"节点 节点1，设计，2026-11-11；右键操作\" style=\"left:49.18032786885246%;z-index:1000\"><i></i><span data-node-t",
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design  is-overdue  \" data-dashboard-hit-target=\"node\" data-node-id=\"1\" data-project-id=\"1\" data-node-date=\"2026-11-11\" data-node-flag-key=\"1:1\" data-node-flag-visible=\"true\" aria-lab",
+    "popup": false,
+    "scope": "single"
+  },
+  {
+    "type": "after-contextmenu",
+    "insertHidden": true,
+    "guideHidden": false
+  },
+  {
+    "type": "contextmenu",
+    "x": 936,
+    "y": 418,
+    "target": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design  is-overdue  \" data-dashboard-hit-target=\"node\" data-node-id=\"1\" data-project-id=\"1\" data-node-date=\"2026-11-11\" data-node-flag-key=\"1:1\" data-node-flag-visible=\"true\" aria-label=\"节点 节点1，设计，2026-11-11；右键操作\" style=\"left:49.18032786885246%;z-index:1000\"><i></i><span data-node-t",
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design  is-overdue  \" data-dashboard-hit-target=\"node\" data-node-id=\"1\" data-project-id=\"1\" data-node-date=\"2026-11-11\" data-node-flag-key=\"1:1\" data-node-flag-visible=\"true\" aria-lab",
+    "popup": false,
+    "scope": "single"
+  },
+  {
+    "type": "menu-mutation",
+    "attribute": "hidden",
+    "hidden": false
+  },
+  {
+    "type": "menu-mutation",
+    "attribute": "hidden",
+    "hidden": false
+  },
+  {
+    "type": "scroll",
+    "target": "timeline-portfolio-scroll",
+    "insertHidden": false
+  },
+  {
+    "type": "menu-mutation",
+    "attribute": "hidden",
+    "hidden": true
+  }
+]

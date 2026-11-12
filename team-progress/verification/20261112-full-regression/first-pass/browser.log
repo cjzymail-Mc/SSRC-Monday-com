@@ -1,0 +1,591 @@
+test_two_users_desktop_and_mobile_collaboration_journey (test_collaboration_e2e.CollaborationE2E.test_two_users_desktop_and_mobile_collaboration_journey) ... ok
+test_all_dashboard_dense_cluster_single_drag_uses_one_day_collision_push (test_gate5_home_e2e.Gate5HomeE2E.test_all_dashboard_dense_cluster_single_drag_uses_one_day_collision_push)
+全局视图保持原缩放/聚合，但拥挤簇可代理最早节点并按 1 天碰撞顺延。 ... ok
+test_all_dashboard_project_menu_routes_back_and_uses_approved_hover_motion (test_gate5_home_e2e.Gate5HomeE2E.test_all_dashboard_project_menu_routes_back_and_uses_approved_hover_motion) ... ok
+test_drag_modes_persist_only_the_intended_dates_and_audit_roles (test_gate5_home_e2e.Gate5HomeE2E.test_drag_modes_persist_only_the_intended_dates_and_audit_roles)
+真实拖拽提交：single 只改当前节点；cascade 由服务端生成 cascaded 行。 ... ok
+test_gate5_default_lands_empty_timeline_without_projects (test_gate5_home_e2e.Gate5HomeE2E.test_gate5_default_lands_empty_timeline_without_projects)
+无时间线项目也默认进入时间管理空态，经典主页保持隐藏。 ... ok
+test_gate5_default_lands_timeline_home_when_projects_exist (test_gate5_home_e2e.Gate5HomeE2E.test_gate5_default_lands_timeline_home_when_projects_exist)
+有项目且可写：登录后默认落「我的工作」主页；经典看板区块隐藏但 #boardList 留在 DOM。 ... ok
+test_gate5_delete_last_project_leaves_home_stable (test_gate5_home_e2e.Gate5HomeE2E.test_gate5_delete_last_project_leaves_home_stable)
+删掉最后一个项目后主页稳定呈现空态，无 JS 错误。 ... ok
+test_gate5_home_kpi_tabs_feed_and_drilldown (test_gate5_home_e2e.Gate5HomeE2E.test_gate5_home_kpi_tabs_feed_and_drilldown)
+主页版式：KPI 四格 + 分区标签 + 成员长条药丸下钻 + 右栏动态随标签联动。 ... ok
+test_gate5_sidebar_collapses_to_icons_and_persists (test_gate5_home_e2e.Gate5HomeE2E.test_gate5_sidebar_collapses_to_icons_and_persists)
+长项目页中按钮仍固定在视口中部；侧栏收起后仅留图标并记住偏好。 ... ok
+test_gate5_single_dashboard_visual_alignment_and_real_drag (test_gate5_home_e2e.Gate5HomeE2E.test_gate5_single_dashboard_visual_alignment_and_real_drag)
+屏B：节点/阶段条同轴、长文案不常驻；右键一次性解锁后真实拖动、放大带、草稿与提交闭环。 ... FAIL
+test_gate5_url_board_param_cannot_restore_classic_home (test_gate5_home_e2e.Gate5HomeE2E.test_gate5_url_board_param_cannot_restore_classic_home)
+旧 ?board= 恢复参数不得重新暴露经典主页。 ... ok
+test_gate5_viewer_never_sees_classic_home_without_probe_noise (test_gate5_home_e2e.Gate5HomeE2E.test_gate5_viewer_never_sees_classic_home_without_probe_noise)
+只读成员不自动探测时间轴，经典主页仍保持彻底隐藏。 ... ok
+test_home_feed_displays_audit_time_in_beijing_timezone (test_gate5_home_e2e.Gate5HomeE2E.test_home_feed_displays_audit_time_in_beijing_timezone) ... ok
+test_sidebar_hover_treatment_is_shared_and_current_avatar_uses_name_initial (test_gate5_home_e2e.Gate5HomeE2E.test_sidebar_hover_treatment_is_shared_and_current_avatar_uses_name_initial) ... ok
+test_audit_displays_beijing_time_without_rewriting_canonical_timestamp (test_i12_e2e.I12E2E.test_audit_displays_beijing_time_without_rewriting_canonical_timestamp) ... ok
+test_two_context_realtime_fallback_notifications_search_audit_and_mobile (test_i12_e2e.I12E2E.test_two_context_realtime_fallback_notifications_search_audit_and_mobile) ... ok
+test_mobile_atomic_batch_and_admin_backup_surface (test_i13_e2e.I13E2E.test_mobile_atomic_batch_and_admin_backup_surface) ... ok
+test_desktop_visual_long_list_and_narrow_table_scroll (test_overview_e2e.OverviewE2E.test_desktop_visual_long_list_and_narrow_table_scroll) ... FAIL
+test_edit_save_return_and_draft_leave_cancel (test_overview_e2e.OverviewE2E.test_edit_save_return_and_draft_leave_cancel) ... ok
+test_filters_expansion_counts_search_and_real_navigation (test_overview_e2e.OverviewE2E.test_filters_expansion_counts_search_and_real_navigation) ... ok
+test_initial_home_load_cannot_override_user_navigation (test_overview_e2e.OverviewE2E.test_initial_home_load_cannot_override_user_navigation) ... ok
+test_loading_error_retry_empty_and_response_order (test_overview_e2e.OverviewE2E.test_loading_error_retry_empty_and_response_order) ... ok
+test_member_readonly_and_logout_resets_overview_state (test_overview_e2e.OverviewE2E.test_member_readonly_and_logout_resets_overview_state) ... ok
+test_response_from_previous_login_cannot_replace_new_session (test_overview_e2e.OverviewE2E.test_response_from_previous_login_cannot_replace_new_session) ... ok
+test_search_pending_during_filter_response_is_not_lost (test_overview_e2e.OverviewE2E.test_search_pending_during_filter_response_is_not_lost) ... ok
+test_actual_history_completion_and_reopening_are_human_readable (test_overview_minimal_e2e.OverviewMinimalE2E.test_actual_history_completion_and_reopening_are_human_readable) ... ok
+test_hidden_old_filters_are_cleared_on_refresh (test_overview_minimal_e2e.OverviewMinimalE2E.test_hidden_old_filters_are_cleared_on_refresh) ... ok
+test_hidden_toolbar_shared_heading_and_visible_shortcuts (test_overview_minimal_e2e.OverviewMinimalE2E.test_hidden_toolbar_shared_heading_and_visible_shortcuts) ... ok
+test_account_preferences_refresh_and_clear_without_persisting_search (test_overview_ux_e2e.OverviewUXE2E.test_account_preferences_refresh_and_clear_without_persisting_search) ... ok
+test_advanced_search_object_and_keyboard_horizontal_access (test_overview_ux_e2e.OverviewUXE2E.test_advanced_search_object_and_keyboard_horizontal_access) ... ok
+test_browser_reload_cancel_keeps_unsaved_editor_draft (test_overview_ux_e2e.OverviewUXE2E.test_browser_reload_cancel_keeps_unsaved_editor_draft) ... ok
+test_canvas_ranges_workbench_team_tab_and_archive_return (test_overview_ux_e2e.OverviewUXE2E.test_canvas_ranges_workbench_team_tab_and_archive_return) ... ok
+test_compact_next_note_column_urgency_and_unique_groups (test_overview_ux_e2e.OverviewUXE2E.test_compact_next_note_column_urgency_and_unique_groups) ... ok
+test_date_shortcuts_clean_header_and_column_balance (test_overview_ux_e2e.OverviewUXE2E.test_date_shortcuts_clean_header_and_column_balance) ... ok
+test_early_overview_navigation_receives_late_tag_catalog (test_overview_ux_e2e.OverviewUXE2E.test_early_overview_navigation_receives_late_tag_catalog) ... ok
+test_menu_five_modules_and_focus_progress_never_resets_to_zero (test_overview_ux_e2e.OverviewUXE2E.test_menu_five_modules_and_focus_progress_never_resets_to_zero) ... ok
+test_single_expansion_keeps_overdue_and_shows_recent_future_nodes (test_overview_ux_e2e.OverviewUXE2E.test_single_expansion_keeps_overdue_and_shows_recent_future_nodes) ... ok
+test_member_and_admin_reset_scope_on_login_but_keep_manual_choice_on_reload (test_overview_recent_e2e.OverviewRecentE2E.test_member_and_admin_reset_scope_on_login_but_keep_manual_choice_on_reload) ... ok
+test_member_recent_other_project_stays_readonly (test_overview_recent_e2e.OverviewRecentE2E.test_member_recent_other_project_stays_readonly) ... ok
+test_recent_future_completed_and_empty_projects_keep_today_axis_hidden (test_overview_recent_e2e.OverviewRecentE2E.test_recent_future_completed_and_empty_projects_keep_today_axis_hidden) ... ok
+test_approved_badges_all_stages_empty_hover_and_narrow_layout (test_overview_stage_badge_e2e.StageBadgeE2E.test_approved_badges_all_stages_empty_hover_and_narrow_layout) ... ok
+test_account_preferences_refresh_and_clear_without_persisting_search (test_overview_ux_e2e.OverviewUXE2E.test_account_preferences_refresh_and_clear_without_persisting_search) ... ok
+test_advanced_search_object_and_keyboard_horizontal_access (test_overview_ux_e2e.OverviewUXE2E.test_advanced_search_object_and_keyboard_horizontal_access) ... ok
+test_browser_reload_cancel_keeps_unsaved_editor_draft (test_overview_ux_e2e.OverviewUXE2E.test_browser_reload_cancel_keeps_unsaved_editor_draft) ... ok
+test_canvas_ranges_workbench_team_tab_and_archive_return (test_overview_ux_e2e.OverviewUXE2E.test_canvas_ranges_workbench_team_tab_and_archive_return) ... ok
+test_compact_next_note_column_urgency_and_unique_groups (test_overview_ux_e2e.OverviewUXE2E.test_compact_next_note_column_urgency_and_unique_groups) ... ok
+test_date_shortcuts_clean_header_and_column_balance (test_overview_ux_e2e.OverviewUXE2E.test_date_shortcuts_clean_header_and_column_balance) ... ok
+test_early_overview_navigation_receives_late_tag_catalog (test_overview_ux_e2e.OverviewUXE2E.test_early_overview_navigation_receives_late_tag_catalog) ... ok
+test_menu_five_modules_and_focus_progress_never_resets_to_zero (test_overview_ux_e2e.OverviewUXE2E.test_menu_five_modules_and_focus_progress_never_resets_to_zero) ... ok
+test_single_expansion_keeps_overdue_and_shows_recent_future_nodes (test_overview_ux_e2e.OverviewUXE2E.test_single_expansion_keeps_overdue_and_shows_recent_future_nodes) ... ok
+test_admin_team_card_hidden_but_my_projects_and_timeline_unchanged (test_team_cards_e2e.TeamCardsE2E.test_admin_team_card_hidden_but_my_projects_and_timeline_unchanged) ... ok
+test_visible_drag_saves_full_roster_and_restores_order_after_reload (test_team_cards_e2e.TeamCardsE2E.test_visible_drag_saves_full_roster_and_restores_order_after_reload) ... ok
+test_admin_real_entry_modes_create_delete_and_refresh_persistence (test_timeline_e2e.TimelineProductionE2E.test_admin_real_entry_modes_create_delete_and_refresh_persistence) ... ok
+test_dashboard_hover_date_insert_remark_and_delete_share_draft_pipeline (test_timeline_e2e.TimelineProductionE2E.test_dashboard_hover_date_insert_remark_and_delete_share_draft_pipeline) ... ok
+test_dashboard_remark_empty_navigation_and_logout_cleanup (test_timeline_e2e.TimelineProductionE2E.test_dashboard_remark_empty_navigation_and_logout_cleanup) ... ok
+test_dashboard_remark_hover_pin_escape_draft_save_and_undo (test_timeline_e2e.TimelineProductionE2E.test_dashboard_remark_hover_pin_escape_draft_save_and_undo) ... ok
+test_dashboard_remark_readonly_and_fullscreen_escape (test_timeline_e2e.TimelineProductionE2E.test_dashboard_remark_readonly_and_fullscreen_escape) ... ok
+test_member_can_create_and_delete_own_but_has_no_other_delete_control (test_timeline_e2e.TimelineProductionE2E.test_member_can_create_and_delete_own_but_has_no_other_delete_control) ... ok
+test_past_only_parallel_project_keeps_masks_in_single_and_portfolio (test_timeline_e2e.TimelineProductionE2E.test_past_only_parallel_project_keeps_masks_in_single_and_portfolio) ... ok
+test_project_rename_is_inline_on_home_and_single_dashboard (test_timeline_e2e.TimelineProductionE2E.test_project_rename_is_inline_on_home_and_single_dashboard) ... ok
+test_timeline_all_dashboard_filter_and_sort (test_timeline_e2e.TimelineProductionE2E.test_timeline_all_dashboard_filter_and_sort) ... ok
+test_timeline_all_dashboard_system_my_projects_context (test_timeline_e2e.TimelineProductionE2E.test_timeline_all_dashboard_system_my_projects_context) ... ok
+test_timeline_cp2_table_editor_local_draft_sort_interval_and_discard (test_timeline_e2e.TimelineProductionE2E.test_timeline_cp2_table_editor_local_draft_sort_interval_and_discard) ... ok
+test_timeline_cp3_conflict_latest_view_zero_write_and_member_correction_denied (test_timeline_e2e.TimelineProductionE2E.test_timeline_cp3_conflict_latest_view_zero_write_and_member_correction_denied) ... ERROR
+test_timeline_cp3_submit_mixed_batch_refresh_review_correction_and_undo (test_timeline_e2e.TimelineProductionE2E.test_timeline_cp3_submit_mixed_batch_refresh_review_correction_and_undo) ... ok
+test_timeline_dashboard_risk_markers (test_timeline_e2e.TimelineProductionE2E.test_timeline_dashboard_risk_markers) ... ok
+test_timeline_dashboards_share_context_controller (test_timeline_e2e.TimelineProductionE2E.test_timeline_dashboards_share_context_controller) ... ok
+test_timeline_editor_batch_c_stage_track_status_delete_save_and_undo (test_timeline_e2e.TimelineProductionE2E.test_timeline_editor_batch_c_stage_track_status_delete_save_and_undo) ... ok
+test_timeline_excel_preview_commit_real_file (test_timeline_e2e.TimelineProductionE2E.test_timeline_excel_preview_commit_real_file) ... ok
+test_timeline_export_decodes_server_bytes_and_hash (test_timeline_e2e.TimelineProductionE2E.test_timeline_export_decodes_server_bytes_and_hash) ... ok
+test_timeline_export_reimport_new_workspace (test_timeline_e2e.TimelineProductionE2E.test_timeline_export_reimport_new_workspace) ... ok
+test_timeline_import_drop_and_click_compatibility (test_timeline_e2e.TimelineProductionE2E.test_timeline_import_drop_and_click_compatibility) ... ok
+test_timeline_import_errors_are_actionable (test_timeline_e2e.TimelineProductionE2E.test_timeline_import_errors_are_actionable) ... ok
+test_timeline_import_file_safety_and_strict_headers (test_timeline_e2e.TimelineProductionE2E.test_timeline_import_file_safety_and_strict_headers) ... ok
+test_timeline_import_status_warning_and_commit_gate (test_timeline_e2e.TimelineProductionE2E.test_timeline_import_status_warning_and_commit_gate) ... ok
+test_timeline_import_warnings_multisheet_and_csv_date (test_timeline_e2e.TimelineProductionE2E.test_timeline_import_warnings_multisheet_and_csv_date) ... ok
+test_timeline_journey_dashboards (test_timeline_e2e.TimelineProductionE2E.test_timeline_journey_dashboards) ... ok
+test_timeline_journey_edit_submit_refresh_undo (test_timeline_e2e.TimelineProductionE2E.test_timeline_journey_edit_submit_refresh_undo) ... ok
+test_timeline_journey_import_export_reimport (test_timeline_e2e.TimelineProductionE2E.test_timeline_journey_import_export_reimport) ... ok
+test_timeline_light_tokens_and_redundant_labels (test_timeline_e2e.TimelineProductionE2E.test_timeline_light_tokens_and_redundant_labels) ... ok
+test_timeline_overlap_split_and_expand (test_timeline_e2e.TimelineProductionE2E.test_timeline_overlap_split_and_expand) ... ok
+test_timeline_portfolio_e_d4_p1_canvas (test_timeline_e2e.TimelineProductionE2E.test_timeline_portfolio_e_d4_p1_canvas) ... ERROR
+test_timeline_shared_calendar_and_today_marker (test_timeline_e2e.TimelineProductionE2E.test_timeline_shared_calendar_and_today_marker) ... ok
+test_timeline_sheet_selection_recovers_invalid_first_sheet (test_timeline_e2e.TimelineProductionE2E.test_timeline_sheet_selection_recovers_invalid_first_sheet) ... ok
+test_timeline_single_dashboard_structure (test_timeline_e2e.TimelineProductionE2E.test_timeline_single_dashboard_structure) ... ERROR
+test_timeline_stage_intervals_semantics (test_timeline_e2e.TimelineProductionE2E.test_timeline_stage_intervals_semantics) ... ok
+test_timeline_template_download_fill_two_projects_and_import (test_timeline_e2e.TimelineProductionE2E.test_timeline_template_download_fill_two_projects_and_import) ... ok
+test_timeline_template_hash_failure_preserves_import_preview (test_timeline_e2e.TimelineProductionE2E.test_timeline_template_hash_failure_preserves_import_preview) ... ok
+test_timeline_v18_archive_mask_cluster_single_pan_and_fullscreen (test_timeline_e2e.TimelineProductionE2E.test_timeline_v18_archive_mask_cluster_single_pan_and_fullscreen) ... ok
+test_v17_shared_tags_and_personal_all_order_real_drag (test_timeline_e2e.TimelineProductionE2E.test_v17_shared_tags_and_personal_all_order_real_drag) ... ok
+test_viewer_is_denied_by_server_and_cannot_open_timeline (test_timeline_e2e.TimelineProductionE2E.test_viewer_is_denied_by_server_and_cannot_open_timeline) ... ok
+test_week_and_month_are_shared_portfolio_scopes (test_timeline_e2e.TimelineProductionE2E.test_week_and_month_are_shared_portfolio_scopes) ... FAIL
+test_week_and_month_focused_flags_are_not_vertically_clipped (test_timeline_e2e.TimelineProductionE2E.test_week_and_month_focused_flags_are_not_vertically_clipped) ... ok
+test_week_and_month_reorder_visible_subset_updates_full_personal_order (test_timeline_e2e.TimelineProductionE2E.test_week_and_month_reorder_visible_subset_updates_full_personal_order) ... ERROR
+test_conflict_retains_inputs_requires_confirmation_and_preserves_other_node (test_timeline_edit_e2e.SharedTimelineEditE2E.test_conflict_retains_inputs_requires_confirmation_and_preserves_other_node) ... ok
+test_editor_500_retry_duplicate_click_and_inflight_lock (test_timeline_edit_e2e.SharedTimelineEditE2E.test_editor_500_retry_duplicate_click_and_inflight_lock) ... ok
+test_editor_net_changes_date_validation_leave_and_tab_shared_draft (test_timeline_edit_e2e.SharedTimelineEditE2E.test_editor_net_changes_date_validation_leave_and_tab_shared_draft) ... ok
+test_other_project_remark_can_save_while_one_project_has_pending_changes (test_timeline_edit_e2e.SharedTimelineEditE2E.test_other_project_remark_can_save_while_one_project_has_pending_changes) ... ok
+test_overdue_flag_review_matrix_reuses_drag_style_and_keeps_other_flags_masked (test_timeline_edit_e2e.SharedTimelineEditE2E.test_overdue_flag_review_matrix_reuses_drag_style_and_keeps_other_flags_masked) ... ok
+test_quick_insert_failure_conflict_retry_and_duplicate_guard (test_timeline_edit_e2e.SharedTimelineEditE2E.test_quick_insert_failure_conflict_retry_and_duplicate_guard) ... ok
+test_quick_insert_other_project_keeps_existing_draft_and_same_project_stays_blocked (test_timeline_edit_e2e.SharedTimelineEditE2E.test_quick_insert_other_project_keeps_existing_draft_and_same_project_stays_blocked) ... ok
+test_quick_insert_saves_at_checkmark_and_delete_stays_pending_in_five_canvases (test_timeline_edit_e2e.SharedTimelineEditE2E.test_quick_insert_saves_at_checkmark_and_delete_stays_pending_in_five_canvases) ... 
+  test_quick_insert_saves_at_checkmark_and_delete_stays_pending_in_five_canvases (test_timeline_edit_e2e.SharedTimelineEditE2E.test_quick_insert_saves_at_checkmark_and_delete_stays_pending_in_five_canvases) (scope='month') ... ERROR
+test_real_drag_zoomed_overlay_is_visible_and_save_roundtrips (test_timeline_edit_e2e.SharedTimelineEditE2E.test_real_drag_zoomed_overlay_is_visible_and_save_roundtrips) ... ok
+test_related_insert_remark_delete_and_drag_review_with_escape_save_lock (test_timeline_edit_e2e.SharedTimelineEditE2E.test_related_insert_remark_delete_and_drag_review_with_escape_save_lock) ... ok
+test_remark_confirm_direct_save_cancel_and_reload_in_all_five_canvases (test_timeline_edit_e2e.SharedTimelineEditE2E.test_remark_confirm_direct_save_cancel_and_reload_in_all_five_canvases) ... ok
+test_remark_failed_save_and_conflict_preserve_text_for_explicit_retry (test_timeline_edit_e2e.SharedTimelineEditE2E.test_remark_failed_save_and_conflict_preserve_text_for_explicit_retry) ... ok
+test_week_month_last_node_pending_stays_blocked_until_discard_or_update (test_timeline_edit_e2e.SharedTimelineEditE2E.test_week_month_last_node_pending_stays_blocked_until_discard_or_update) ... ok
+test_before_clipping_drops_masks_in_week_and_month (test_timeline_period_mask_e2e.PeriodMaskE2E.test_before_clipping_drops_masks_in_week_and_month) ... ERROR
+test_before_clipping_drops_masks_in_week_and_month (test_timeline_period_mask_e2e.PeriodMaskE2E.test_before_clipping_drops_masks_in_week_and_month) ... ERROR
+test_cross_period_masks_visible_in_normal_hover_focus_and_fullscreen (test_timeline_period_mask_e2e.PeriodMaskE2E.test_cross_period_masks_visible_in_normal_hover_focus_and_fullscreen) ... FAIL
+test_graph_click_targets_expand_rows_and_keep_doubleclick_and_overview (test_timeline_row_click_e2e.RowClickE2E.test_graph_click_targets_expand_rows_and_keep_doubleclick_and_overview) ... ERROR
+test_real_app_chart_views_and_dashboard_widgets (test_views_e2e.FlowboardViewsE2E.test_real_app_chart_views_and_dashboard_widgets) ... ok
+test_real_app_cross_board_mirror_formula_and_private_acl (test_views_e2e.FlowboardViewsE2E.test_real_app_cross_board_mirror_formula_and_private_acl) ... ok
+test_real_app_hierarchy_dependency_cycle_progress_and_date_policy (test_views_e2e.FlowboardViewsE2E.test_real_app_hierarchy_dependency_cycle_progress_and_date_policy) ... ok
+test_real_app_tabs_saved_resize_drag_calendar_viewer_and_mobile (test_views_e2e.FlowboardViewsE2E.test_real_app_tabs_saved_resize_drag_calendar_viewer_and_mobile) ... ok
+test_real_app_template_import_and_export (test_views_e2e.FlowboardViewsE2E.test_real_app_template_import_and_export) ... ok
+test_real_app_timeline_gantt_and_mobile_fallback (test_views_e2e.FlowboardViewsE2E.test_real_app_timeline_gantt_and_mobile_fallback) ... ok
+
+======================================================================
+ERROR: test_timeline_cp3_conflict_latest_view_zero_write_and_member_correction_denied (test_timeline_e2e.TimelineProductionE2E.test_timeline_cp3_conflict_latest_view_zero_write_and_member_correction_denied)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_timeline_e2e.py", line 951, in test_timeline_cp3_conflict_latest_view_zero_write_and_member_correction_denied
+    self.physical_click(member_page, member_page.locator(f'[data-overview-project="{project_id}"] [data-timeline-open="single"]'))
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_timeline_e2e.py", line 263, in physical_click
+    box = locator.bounding_box()
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_generated.py", line 17270, in bounding_box
+    self._sync(self._impl_obj.bounding_box(timeout=to_milliseconds(timeout)))
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_locator.py", line 133, in bounding_box
+    return await self._with_element(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_locator.py", line 114, in _with_element
+    handle = await self.element_handle(timeout=timeout)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_locator.py", line 322, in element_handle
+    handle = await self._frame.wait_for_selector(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_frame.py", line 372, in wait_for_selector
+    await self._channel.send(
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.bounding_box: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-overview-project=\"1\"] [data-timeline-open=\"single\"]")
+
+
+======================================================================
+ERROR: test_timeline_portfolio_e_d4_p1_canvas (test_timeline_e2e.TimelineProductionE2E.test_timeline_portfolio_e_d4_p1_canvas)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_timeline_e2e.py", line 1800, in test_timeline_portfolio_e_d4_p1_canvas
+    other_probe.hover(position={"x": 4, "y": 8})
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_generated.py", line 18910, in hover
+    self._sync(
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_locator.py", line 477, in hover
+    return await self._frame.hover(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_frame.py", line 746, in hover
+    await self._channel.send("hover", self._timeout, locals_to_params(locals()))
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.hover: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-dashboard-project=\"1\"]").locator(".timeline-node-flag-hit.is-active[data-node-flag-key=\"1:3\"]")
+    - locator resolved to <i data-node-id="3" aria-hidden="true" data-project-id="1" data-node-flag-key="1:3" class="timeline-node-flag-hit is-active"></i>
+  - attempting hover action
+    2 × waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="is-empty" data-remark-preview="">--暂无备注信息--</div> from <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> subtree intercepts pointer events
+    - retrying hover action
+    - waiting 20ms
+    - waiting for element to be visible and stable
+    - element is visible and stable
+    - scrolling into view if needed
+    - done scrolling
+    - <div class="is-empty" data-remark-preview="">--暂无备注信息--</div> from <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> subtree intercepts pointer events
+  2 × retrying hover action
+      - waiting 100ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div data-e-calendar="" aria-hidden="true" class="timeline-calendar"></div> from <div class="timeline-portfolio-axis">…</div> subtree intercepts pointer events
+  13 × retrying hover action
+       - waiting 500ms
+       - waiting for element to be visible and stable
+       - element is visible and stable
+       - scrolling into view if needed
+       - done scrolling
+       - performing hover action
+       - <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+     - retrying hover action
+       - waiting 500ms
+       - waiting for element to be visible and stable
+       - element is visible and stable
+       - scrolling into view if needed
+       - done scrolling
+       - performing hover action
+       - <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+     - retrying hover action
+       - waiting 500ms
+       - waiting for element to be visible and stable
+       - element is visible and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div data-e-calendar="" aria-hidden="true" class="timeline-calendar"></div> from <div class="timeline-portfolio-axis">…</div> subtree intercepts pointer events
+     - retrying hover action
+       - waiting 500ms
+       - waiting for element to be visible and stable
+       - element is visible and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div data-e-calendar="" aria-hidden="true" class="timeline-calendar"></div> from <div class="timeline-portfolio-axis">…</div> subtree intercepts pointer events
+  2 × retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+      - performing hover action
+      - <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+  - retrying hover action
+    - waiting 500ms
+
+
+======================================================================
+ERROR: test_timeline_single_dashboard_structure (test_timeline_e2e.TimelineProductionE2E.test_timeline_single_dashboard_structure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_timeline_e2e.py", line 998, in test_timeline_single_dashboard_structure
+    single_flag_target.hover(position={"x": 4, "y": 8})
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_generated.py", line 18910, in hover
+    self._sync(
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_locator.py", line 477, in hover
+    return await self._frame.hover(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_frame.py", line 746, in hover
+    await self._channel.send("hover", self._timeout, locals_to_params(locals()))
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.hover: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-timeline-page=\"single\"] > .timeline-project-card").locator(".timeline-node-flag-hit.is-active[data-node-flag-key=\"1:1\"]")
+    - locator resolved to <i data-node-id="1" aria-hidden="true" data-project-id="1" data-node-flag-key="1:1" class="timeline-node-flag-hit is-active"></i>
+  - attempting hover action
+    - waiting for element to be visible and stable
+    - element is visible and stable
+    - scrolling into view if needed
+    - done scrolling
+    - performing hover action
+    - <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+  - retrying hover action
+    - waiting for element to be visible and stable
+    - element is visible and stable
+    - scrolling into view if needed
+    - done scrolling
+    - <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+  - retrying hover action
+    - waiting 20ms
+    - waiting for element to be visible and stable
+    - element is visible and stable
+    - scrolling into view if needed
+    - done scrolling
+    - performing hover action
+    2 × <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+    - retrying hover action
+      - waiting 100ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+    4 × <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="is-empty" data-remark-preview="">--暂无备注信息--</div> from <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> subtree intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+      - performing hover action
+      - <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+    2 × <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+      - performing hover action
+    6 × <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="is-empty" data-remark-preview="">--暂无备注信息--</div> from <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> subtree intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+      - performing hover action
+    3 × <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+    2 × performing hover action
+      - <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+    2 × <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="is-empty" data-remark-preview="">--暂无备注信息--</div> from <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> subtree intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+      - performing hover action
+      - <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+    - retrying hover action
+      - waiting 500ms
+      - waiting for element to be visible and stable
+      - element is visible and stable
+      - scrolling into view if needed
+      - done scrolling
+    - <aside role="tooltip" data-flag-track="main" data-dashboard-remark="" id="timelineRemarkPopup" class="timeline-remark-popup">…</aside> intercepts pointer events
+  - retrying hover action
+    - waiting 500ms
+
+
+======================================================================
+ERROR: test_week_and_month_reorder_visible_subset_updates_full_personal_order (test_timeline_e2e.TimelineProductionE2E.test_week_and_month_reorder_visible_subset_updates_full_personal_order)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_timeline_e2e.py", line 479, in test_week_and_month_reorder_visible_subset_updates_full_personal_order
+    saved = drag_before(c, e)
+            ^^^^^^^^^^^^^^^^^
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_timeline_e2e.py", line 452, in drag_before
+    with page.expect_response(lambda response: response.request.method == "PUT" and response.url.endswith("/timeline/order")) as pending:
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_sync_base.py", line 85, in __exit__
+    self._event.value
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_sync_base.py", line 59, in value
+    raise exception
+playwright._impl._errors.TimeoutError: Timeout 30000ms exceeded while waiting for event "response"
+
+======================================================================
+ERROR: test_quick_insert_saves_at_checkmark_and_delete_stays_pending_in_five_canvases (test_timeline_edit_e2e.SharedTimelineEditE2E.test_quick_insert_saves_at_checkmark_and_delete_stays_pending_in_five_canvases) (scope='month')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_timeline_edit_e2e.py", line 239, in test_quick_insert_saves_at_checkmark_and_delete_stays_pending_in_five_canvases
+    name='直接插入-'+scope;popup=self.quick_insert(page,pid,name)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_timeline_edit_e2e.py", line 224, in quick_insert
+    page.locator('[data-dashboard-insert-action]').click()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_generated.py", line 17422, in click
+    self._sync(
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_locator.py", line 163, in click
+    return await self._frame._click(self._selector, strict=True, **params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_frame.py", line 569, in _click
+    await self._channel.send("click", self._timeout, locals_to_params(locals()))
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-dashboard-insert-action]")
+    - locator resolved to <button type="button" role="menuitem" data-dashboard-insert-action="">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not visible
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not visible
+    - retrying click action
+      - waiting 100ms
+    57 × waiting for element to be visible, enabled and stable
+       - element is not visible
+     - retrying click action
+       - waiting 500ms
+
+
+======================================================================
+ERROR: test_before_clipping_drops_masks_in_week_and_month (test_timeline_period_mask_e2e.PeriodMaskE2E.test_before_clipping_drops_masks_in_week_and_month)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_timeline_period_mask_e2e.py", line 64, in test_before_clipping_drops_masks_in_week_and_month
+    page.reload();page.locator('[data-timeline-page=home]').wait_for()
+    ^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_generated.py", line 9658, in reload
+    self._sync(
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_page.py", line 565, in reload
+    await self._channel.send(
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Page.reload: Timeout 30000ms exceeded.
+Call log:
+  - waiting for navigation until "load"
+    - navigated to "http://127.0.0.1:62291/"
+
+
+======================================================================
+ERROR: test_before_clipping_drops_masks_in_week_and_month (test_timeline_period_mask_e2e.PeriodMaskE2E.test_before_clipping_drops_masks_in_week_and_month)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_timeline_e2e.py", line 56, in tearDown
+    context.close()
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_generated.py", line 14966, in close
+    return mapping.from_maybe_impl(self._sync(self._impl_obj.close(reason=reason)))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_browser_context.py", line 577, in close
+    await self.request.dispose(reason=reason)
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_fetch.py", line 117, in dispose
+    await self._channel.send("dispose", None, {"reason": reason})
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+FileNotFoundError: BrowserContext.close: [Errno 2] No such file or directory: 'D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\local-test-data\\20261112-full-regression\\snapshot\\team-progress\\verification\\20261009-period-mask\\baseline\\timeline-ui.js'
+
+======================================================================
+ERROR: test_graph_click_targets_expand_rows_and_keep_doubleclick_and_overview (test_timeline_row_click_e2e.RowClickE2E.test_graph_click_targets_expand_rows_and_keep_doubleclick_and_overview)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_timeline_row_click_e2e.py", line 36, in test_graph_click_targets_expand_rows_and_keep_doubleclick_and_overview
+    page.wait_for_function('id=>!document.querySelector(`[data-dashboard-project="${id}"]`).classList.contains("is-focused")',arg=pid)
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_generated.py", line 12436, in wait_for_function
+    self._sync(
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_page.py", line 1136, in wait_for_function
+    return await self._main_frame.wait_for_function(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_frame.py", line 910, in wait_for_function
+    await self._channel.send("waitForFunction", self._timeout, params)
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\xy198\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Page.wait_for_function: Timeout 5000ms exceeded.
+
+======================================================================
+FAIL: test_gate5_single_dashboard_visual_alignment_and_real_drag (test_gate5_home_e2e.Gate5HomeE2E.test_gate5_single_dashboard_visual_alignment_and_real_drag)
+屏B：节点/阶段条同轴、长文案不常驻；右键一次性解锁后真实拖动、放大带、草稿与提交闭环。
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_gate5_home_e2e.py", line 373, in test_gate5_single_dashboard_visual_alignment_and_real_drag
+    self.assertFalse(tooltip_metrics["axisOverlap"], "节点提示框不得遮挡固定年月日轴")
+AssertionError: True is not false : 节点提示框不得遮挡固定年月日轴
+
+======================================================================
+FAIL: test_desktop_visual_long_list_and_narrow_table_scroll (test_overview_e2e.OverviewE2E.test_desktop_visual_long_list_and_narrow_table_scroll)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_overview_e2e.py", line 267, in test_desktop_visual_long_list_and_narrow_table_scroll
+    self.assertIn('没有逾期未完成的节点',page.locator(f'#ov-detail-{ids["empty"]}').inner_text())
+AssertionError: '没有逾期未完成的节点' not found in '尚未录入带日期的节点'
+
+======================================================================
+FAIL: test_week_and_month_are_shared_portfolio_scopes (test_timeline_e2e.TimelineProductionE2E.test_week_and_month_are_shared_portfolio_scopes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_timeline_e2e.py", line 360, in test_week_and_month_are_shared_portfolio_scopes
+    self.assertIsNotNone(week_target_point["x"], week_target_point)
+AssertionError: unexpectedly None : {'x': None, 'y': None, 'rect': {'left': 822.841064453125, 'right': 899.9829711914062, 'top': 224.22125244140625, 'bottom': 262}, 'viewport': {'width': 1280, 'height': 800}}
+
+======================================================================
+FAIL: test_cross_period_masks_visible_in_normal_hover_focus_and_fullscreen (test_timeline_period_mask_e2e.PeriodMaskE2E.test_cross_period_masks_visible_in_normal_hover_focus_and_fullscreen)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Downloads\Mc Claude Code Workshop\monday-com\local-test-data\20261112-full-regression\snapshot\tests\test_timeline_e2e.py", line 63, in tearDown
+    self.assertEqual(self.browser.contexts, [])
+AssertionError: Lists differ: [<BrowserContext browser=<Browser type=<Br[141 chars]96>>] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+<BrowserContext browser=<Browser type=<BrowserType name=chromium executable_path=C:\Users\xy198\AppData\Local\ms-playwright\chromium-1223\chrome-win64\chrome.exe> version=148.0.7778.96>>
+
+- [<BrowserContext browser=<Browser type=<BrowserType name=chromium executable_path=C:\Users\xy198\AppData\Local\ms-playwright\chromium-1223\chrome-win64\chrome.exe> version=148.0.7778.96>>]
++ []
+
+----------------------------------------------------------------------
+Ran 116 tests in 1275.032s
+
+FAILED (failures=4, errors=8)

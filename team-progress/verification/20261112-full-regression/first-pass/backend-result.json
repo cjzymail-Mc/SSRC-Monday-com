@@ -1,0 +1,18 @@
+{
+  "run": 189,
+  "expected": 189,
+  "failures": [],
+  "errors": [
+    [
+      "test_timeline.TimelineCoreTests.test_member_order_v20_migration_backup_and_restore",
+      "Traceback (most recent call last):\n  File \"D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\local-test-data\\20261112-full-regression\\snapshot\\tests\\test_timeline.py\", line 1124, in test_member_order_v20_migration_backup_and_restore\n    backup = migrate(path)\n             ^^^^^^^^^^^^^\n  File \"D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\local-test-data\\20261112-full-regression\\snapshot\\flowboard\\database.py\", line 127, in migrate\n    _migration_v21(conn)\n  File \"D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\local-test-data\\20261112-full-regression\\snapshot\\flowboard\\database.py\", line 1191, in _migration_v21\n    conn.execute(\"\"\"CREATE TABLE sample_orders(\nsqlite3.OperationalError: table sample_orders already exists\n"
+    ],
+    [
+      "test_timeline_tags_order.TimelineTagOrderServiceTests.test_v16_to_latest_preserves_existing_timeline_rows_and_is_idempotent",
+      "Traceback (most recent call last):\n  File \"D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\local-test-data\\20261112-full-regression\\snapshot\\tests\\test_timeline_tags_order.py\", line 71, in test_v16_to_latest_preserves_existing_timeline_rows_and_is_idempotent\n    backup = migrate(legacy)\n             ^^^^^^^^^^^^^^^\n  File \"D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\local-test-data\\20261112-full-regression\\snapshot\\flowboard\\database.py\", line 127, in migrate\n    _migration_v21(conn)\n  File \"D:\\Downloads\\Mc Claude Code Workshop\\monday-com\\local-test-data\\20261112-full-regression\\snapshot\\flowboard\\database.py\", line 1191, in _migration_v21\n    conn.execute(\"\"\"CREATE TABLE sample_orders(\nsqlite3.OperationalError: table sample_orders already exists\n"
+    ]
+  ],
+  "skipped": [],
+  "elapsed_seconds": 248.24877452850342,
+  "success": false
+}

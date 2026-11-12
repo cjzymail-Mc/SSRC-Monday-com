@@ -1,0 +1,43 @@
+{
+  "status": "PASS_ALL_COVERED",
+  "node": {
+    "executed": 50,
+    "passed": 50,
+    "files": 13
+  },
+  "backend": {
+    "executed": 189,
+    "passed": 189
+  },
+  "browser": {
+    "complete_run_executed": 116,
+    "unique_ids": 107,
+    "complete_run_passed": 114,
+    "complete_run_failed": [
+      "test_timeline_edit_e2e.SharedTimelineEditE2E.test_quick_insert_failure_conflict_retry_and_duplicate_guard",
+      "test_timeline_edit_e2e.SharedTimelineEditE2E.test_quick_insert_saves_at_checkmark_and_delete_stays_pending_in_five_canvases"
+    ],
+    "after_test_helper_correction": {
+      "executed": 4,
+      "passed": 4,
+      "test_ids": [
+        "test_timeline_edit_e2e.SharedTimelineEditE2E.test_quick_insert_failure_conflict_retry_and_duplicate_guard",
+        "test_timeline_edit_e2e.SharedTimelineEditE2E.test_quick_insert_other_project_keeps_existing_draft_and_same_project_stays_blocked",
+        "test_timeline_edit_e2e.SharedTimelineEditE2E.test_quick_insert_saves_at_checkmark_and_delete_stays_pending_in_five_canvases",
+        "test_timeline_edit_e2e.SharedTimelineEditE2E.test_related_insert_remark_delete_and_drag_review_with_escape_save_lock"
+      ]
+    },
+    "all_unique_ids_have_pass_evidence": true,
+    "unresolved": []
+  },
+  "skipped": 0,
+  "source_files": 102,
+  "changed_since_complete_run": [
+    "tests/test_timeline_edit_e2e.py"
+  ],
+  "product_source_unchanged_after_complete_run": true,
+  "final_workspace_matches_snapshot": true,
+  "final_manifest_sha256": "741f006fbc5c8a494e1b368846dbe0d99963db331de6246707fb38994844f0a4",
+  "production_database_written": false,
+  "commit_push_performed": false
+}

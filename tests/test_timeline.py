@@ -1115,8 +1115,10 @@ class TimelineCoreTests(unittest.TestCase):
         database.copy_database(self.db, path)
         db = connect(path)
         try:
+            db.execute("DROP TABLE sample_order_files")
+            db.execute("DROP TABLE sample_orders")
             db.execute("DROP TABLE timeline_member_orders")
-            db.execute("DELETE FROM schema_migrations WHERE version=20")
+            db.execute("DELETE FROM schema_migrations WHERE version>=20")
             db.execute("PRAGMA user_version=19")
             db.commit()
         finally:

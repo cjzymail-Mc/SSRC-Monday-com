@@ -55,6 +55,9 @@ class TimelineTagOrderServiceTests(unittest.TestCase):
         legacy = Path(self.temp.name) / "v16-shape.db"
         migrate(legacy, initial_password="test-password")
         conn = connect(legacy)
+        conn.execute("DROP TABLE sample_order_files")
+        conn.execute("DROP TABLE sample_orders")
+        conn.execute("DELETE FROM schema_migrations WHERE version=21")
         conn.execute("DROP TABLE timeline_member_orders")
         conn.execute("DROP TABLE timeline_order_items")
         conn.execute("DROP TABLE timeline_order_contexts")

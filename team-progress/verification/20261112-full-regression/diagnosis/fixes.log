@@ -1,0 +1,8 @@
+test_week_and_month_reorder_visible_subset_updates_full_personal_order (test_timeline_e2e.TimelineProductionE2E.test_week_and_month_reorder_visible_subset_updates_full_personal_order) ... ok
+test_quick_insert_saves_at_checkmark_and_delete_stays_pending_in_five_canvases (test_timeline_edit_e2e.SharedTimelineEditE2E.test_quick_insert_saves_at_checkmark_and_delete_stays_pending_in_five_canvases) ... ok
+test_graph_click_targets_expand_rows_and_keep_doubleclick_and_overview (test_timeline_row_click_e2e.RowClickE2E.test_graph_click_targets_expand_rows_and_keep_doubleclick_and_overview) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 51.630s
+
+OK

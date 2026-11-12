@@ -1,0 +1,410 @@
+[
+  {
+    "type": "pointerdown",
+    "x": 123.5,
+    "y": 211,
+    "target": "<span class=\"nav-label\">项目时间轴</span>",
+    "hit": "<span class=\"nav-label\">项目时间轴</span>",
+    "popup": null,
+    "scope": null
+  },
+  {
+    "type": "pointerup",
+    "x": 123.5,
+    "y": 211,
+    "target": "<span class=\"nav-label\">项目时间轴</span>",
+    "hit": "<span class=\"nav-label\">项目时间轴</span>",
+    "popup": null,
+    "scope": null
+  },
+  {
+    "type": "click",
+    "x": 123,
+    "y": 211,
+    "target": "<span class=\"nav-label\">项目时间轴</span>",
+    "hit": "<span class=\"nav-label\">项目时间轴</span>",
+    "popup": null,
+    "scope": null
+  },
+  {
+    "type": "pointerdown",
+    "x": 132.5,
+    "y": 255,
+    "target": "<button class=\"nav-item nav-button nav-child\" id=\"timelineWeekBtn\" title=\"本周\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" width=\"16\" height=\"15.5\" rx=\"2.5\"></rect><path d=\"M8 3v4M16 3v4M4 9h16M8 17h3\"></path><rect class=\"nav-ic",
+    "hit": "<button class=\"nav-item nav-button nav-child\" id=\"timelineWeekBtn\" title=\"本周\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" width",
+    "popup": false,
+    "scope": "all"
+  },
+  {
+    "type": "pointerup",
+    "x": 132.5,
+    "y": 255,
+    "target": "<button class=\"nav-item nav-button nav-child\" id=\"timelineWeekBtn\" title=\"本周\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" width=\"16\" height=\"15.5\" rx=\"2.5\"></rect><path d=\"M8 3v4M16 3v4M4 9h16M8 17h3\"></path><rect class=\"nav-ic",
+    "hit": "<button class=\"nav-item nav-button nav-child\" id=\"timelineWeekBtn\" title=\"本周\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" width",
+    "popup": false,
+    "scope": "all"
+  },
+  {
+    "type": "click",
+    "x": 132,
+    "y": 255,
+    "target": "<button class=\"nav-item nav-button nav-child\" id=\"timelineWeekBtn\" title=\"本周\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" width=\"16\" height=\"15.5\" rx=\"2.5\"></rect><path d=\"M8 3v4M16 3v4M4 9h16M8 17h3\"></path><rect class=\"nav-ic",
+    "hit": "<button class=\"nav-item nav-button nav-child\" id=\"timelineWeekBtn\" title=\"本周\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" width",
+    "popup": false,
+    "scope": "all"
+  },
+  {
+    "type": "pointerdown",
+    "x": 275,
+    "y": 325,
+    "target": "<button type=\"button\" class=\"tl-order-grip\" draggable=\"true\" aria-label=\"拖拽调整个人顺序\" tabindex=\"-1\">⋮⋮</button>",
+    "hit": "<button type=\"button\" class=\"tl-order-grip\" draggable=\"true\" aria-label=\"拖拽调整个人顺序\" tabindex=\"-1\">⋮⋮</button>",
+    "popup": false,
+    "scope": "week"
+  },
+  {
+    "type": "drag-move",
+    "x": 316.3333435058594,
+    "y": 315.4166564941406,
+    "hit": "<div class=\"timeline-portfolio-meta\"><button type=\"button\" class=\"tl-order-grip\" draggable=\"true\" aria-label=\"拖拽调整个人顺序\" tabindex=\"-1\">⋮⋮</button><strong>锚点 E</strong><small class=\"timeline-portfolio-detail\">当前 设计 · 临近 2026-11-12</small><span class=\"timeline-portfolio-risk\" tabindex=\"0\" aria-label=\"项",
+    "drag": {
+      "inside": true,
+      "moved": false,
+      "anchor": null
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 357.6666564941406,
+    "y": 305.8333435058594,
+    "hit": "<div class=\"timeline-portfolio-meta\"><button type=\"button\" class=\"tl-order-grip\" draggable=\"true\" aria-label=\"拖拽调整个人顺序\" tabindex=\"-1\">⋮⋮</button><strong>锚点 E</strong><small class=\"timeline-portfolio-detail\">当前 设计 · 临近 2026-11-12</small><span class=\"timeline-portfolio-risk\" tabindex=\"0\" aria-label=\"项",
+    "drag": {
+      "inside": true,
+      "moved": false,
+      "anchor": null
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 399,
+    "y": 296.25,
+    "hit": "<div class=\"timeline-portfolio-meta\"><button type=\"button\" class=\"tl-order-grip\" draggable=\"true\" aria-label=\"拖拽调整个人顺序\" tabindex=\"-1\">⋮⋮</button><strong>锚点 C</strong><small class=\"timeline-portfolio-detail\">当前 设计 · 临近 2026-11-12</small><span class=\"timeline-portfolio-risk\" tabindex=\"0\" aria-label=\"项",
+    "drag": {
+      "inside": true,
+      "moved": false,
+      "anchor": null
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 440.3333435058594,
+    "y": 286.6666564941406,
+    "hit": "<div class=\"timeline-portfolio-meta\"><button type=\"button\" class=\"tl-order-grip\" draggable=\"true\" aria-label=\"拖拽调整个人顺序\" tabindex=\"-1\">⋮⋮</button><strong>锚点 C</strong><small class=\"timeline-portfolio-detail\">当前 设计 · 临近 2026-11-12</small><span class=\"timeline-portfolio-risk\" tabindex=\"0\" aria-label=\"项",
+    "drag": {
+      "inside": true,
+      "moved": false,
+      "anchor": null
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 481.6666564941406,
+    "y": 277.0833435058594,
+    "hit": "<div class=\"timeline-portfolio-lanes\" data-dashboard-pending-surface=\"3\"><div class=\"timeline-stage-lanes\"><div class=\"timeline-stage-lane \" data-track=\"main\" data-overlap-rows=\"1\"><div class=\"timeline-track-label is-portfolio-label\"></div><div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><b",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 3
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 523,
+    "y": 267.5,
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"3\" data-project-id=\"3\" data-node-date=\"2026-11-12\" aria-label=\"节点 节点 C，设计，2026-11-12；右键操作\" style=\"left:42.857142857142854%;z",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 3
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 564.3333129882812,
+    "y": 257.9166564941406,
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"3\" data-project-id=\"3\" data-node-date=\"2026-11-12\" aria-label=\"节点 节点 C，设计，2026-11-12；右键操作\" style=\"left:42.857142857142854%;z",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 3
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 605.6666870117188,
+    "y": 248.3333282470703,
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"></div>",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 3
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 647,
+    "y": 238.75,
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"></div>",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 3
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 688.3333129882812,
+    "y": 229.1666717529297,
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"1\" data-project-id=\"1\" data-node-date=\"2026-11-12\" aria-label=\"节点 节点 A，设计，2026-11-12；右键操作\" style=\"left:42.857142857142854%;z",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 1
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 729.6666870117188,
+    "y": 219.5833282470703,
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"1\" data-project-id=\"1\" data-node-date=\"2026-11-12\" aria-label=\"节点 节点 A，设计，2026-11-12；右键操作\" style=\"left:42.857142857142854%;z",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 1
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 771,
+    "y": 210,
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"5\" data-project-id=\"5\" data-node-date=\"2026-11-12\" aria-label=\"节点 节点 E，设计，2026-11-12；右键操作\" style=\"left:42.857142857142854%;z",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 1
+    }
+  },
+  {
+    "type": "pointerup",
+    "x": 771,
+    "y": 210,
+    "target": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"5\" data-project-id=\"5\" data-node-date=\"2026-11-12\" aria-label=\"节点 节点 E，设计，2026-11-12；右键操作\" style=\"left:42.857142857142854%;z-index:1000\"><i></i><span data-node-tooltip-source=\"\" aria-hidden=\"true\"><b>节点 E</b><small>设计 · 2026",
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"5\" data-project-id=\"5\" data-node-date=\"2026-11-12\" aria-label=\"节点 节点 E，设计，2026-11-12；右键操作\" style=\"left:42.857142857142854%;z",
+    "popup": false,
+    "scope": "week"
+  },
+  {
+    "type": "pointerdown",
+    "x": 123.5,
+    "y": 211,
+    "target": "<span class=\"nav-label\">项目时间轴</span>",
+    "hit": "<span class=\"nav-label\">项目时间轴</span>",
+    "popup": false,
+    "scope": "week"
+  },
+  {
+    "type": "pointerup",
+    "x": 123.5,
+    "y": 211,
+    "target": "<span class=\"nav-label\">项目时间轴</span>",
+    "hit": "<span class=\"nav-label\">项目时间轴</span>",
+    "popup": false,
+    "scope": "week"
+  },
+  {
+    "type": "click",
+    "x": 123,
+    "y": 211,
+    "target": "<span class=\"nav-label\">项目时间轴</span>",
+    "hit": "<span class=\"nav-label\">项目时间轴</span>",
+    "popup": false,
+    "scope": "week"
+  },
+  {
+    "type": "pointerdown",
+    "x": 132.5,
+    "y": 299,
+    "target": "<button class=\"nav-item nav-button nav-child\" id=\"timelineMonthBtn\" title=\"本月\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" width=\"16\" height=\"15.5\" rx=\"2.5\"></rect><path d=\"M8 3v4M16 3v4M4 9h16\"></path><path class=\"nav-icon-dot",
+    "hit": "<button class=\"nav-item nav-button nav-child\" id=\"timelineMonthBtn\" title=\"本月\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" widt",
+    "popup": false,
+    "scope": "all"
+  },
+  {
+    "type": "pointerup",
+    "x": 132.5,
+    "y": 299,
+    "target": "<button class=\"nav-item nav-button nav-child\" id=\"timelineMonthBtn\" title=\"本月\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" width=\"16\" height=\"15.5\" rx=\"2.5\"></rect><path d=\"M8 3v4M16 3v4M4 9h16\"></path><path class=\"nav-icon-dot",
+    "hit": "<button class=\"nav-item nav-button nav-child\" id=\"timelineMonthBtn\" title=\"本月\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" widt",
+    "popup": false,
+    "scope": "all"
+  },
+  {
+    "type": "click",
+    "x": 132,
+    "y": 299,
+    "target": "<button class=\"nav-item nav-button nav-child\" id=\"timelineMonthBtn\" title=\"本月\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" width=\"16\" height=\"15.5\" rx=\"2.5\"></rect><path d=\"M8 3v4M16 3v4M4 9h16\"></path><path class=\"nav-icon-dot",
+    "hit": "<button class=\"nav-item nav-button nav-child\" id=\"timelineMonthBtn\" title=\"本月\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" widt",
+    "popup": false,
+    "scope": "all"
+  },
+  {
+    "type": "pointerdown",
+    "x": 275,
+    "y": 325,
+    "target": "<button type=\"button\" class=\"tl-order-grip\" draggable=\"true\" aria-label=\"拖拽调整个人顺序\" tabindex=\"-1\">⋮⋮</button>",
+    "hit": "<button type=\"button\" class=\"tl-order-grip\" draggable=\"true\" aria-label=\"拖拽调整个人顺序\" tabindex=\"-1\">⋮⋮</button>",
+    "popup": false,
+    "scope": "month"
+  },
+  {
+    "type": "drag-move",
+    "x": 316.3333435058594,
+    "y": 315.4166564941406,
+    "hit": "<div class=\"timeline-portfolio-meta\"><button type=\"button\" class=\"tl-order-grip\" draggable=\"true\" aria-label=\"拖拽调整个人顺序\" tabindex=\"-1\">⋮⋮</button><strong>锚点 C</strong><small class=\"timeline-portfolio-detail\">当前 设计 · 临近 2026-11-12</small><span class=\"timeline-portfolio-risk\" tabindex=\"0\" aria-label=\"项",
+    "drag": {
+      "inside": true,
+      "moved": false,
+      "anchor": null
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 357.6666564941406,
+    "y": 305.8333435058594,
+    "hit": "<div class=\"timeline-portfolio-meta\"><button type=\"button\" class=\"tl-order-grip\" draggable=\"true\" aria-label=\"拖拽调整个人顺序\" tabindex=\"-1\">⋮⋮</button><strong>锚点 C</strong><small class=\"timeline-portfolio-detail\">当前 设计 · 临近 2026-11-12</small><span class=\"timeline-portfolio-risk\" tabindex=\"0\" aria-label=\"项",
+    "drag": {
+      "inside": true,
+      "moved": false,
+      "anchor": null
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 399,
+    "y": 296.25,
+    "hit": "<div class=\"timeline-portfolio-meta\"><button type=\"button\" class=\"tl-order-grip\" draggable=\"true\" aria-label=\"拖拽调整个人顺序\" tabindex=\"-1\">⋮⋮</button><strong>锚点 A</strong><small class=\"timeline-portfolio-detail\">当前 设计 · 临近 2026-11-12</small><span class=\"timeline-portfolio-risk\" tabindex=\"0\" aria-label=\"项",
+    "drag": {
+      "inside": true,
+      "moved": false,
+      "anchor": null
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 440.3333435058594,
+    "y": 286.6666564941406,
+    "hit": "<div class=\"timeline-portfolio-meta\"><button type=\"button\" class=\"tl-order-grip\" draggable=\"true\" aria-label=\"拖拽调整个人顺序\" tabindex=\"-1\">⋮⋮</button><strong>锚点 A</strong><small class=\"timeline-portfolio-detail\">当前 设计 · 临近 2026-11-12</small><span class=\"timeline-portfolio-risk\" tabindex=\"0\" aria-label=\"项",
+    "drag": {
+      "inside": true,
+      "moved": false,
+      "anchor": null
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 481.6666564941406,
+    "y": 277.0833435058594,
+    "hit": "<div class=\"timeline-portfolio-lanes\" data-dashboard-pending-surface=\"1\"><div class=\"timeline-stage-lanes\"><div class=\"timeline-stage-lane \" data-track=\"main\" data-overlap-rows=\"1\"><div class=\"timeline-track-label is-portfolio-label\"></div><div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><b",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 1
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 523,
+    "y": 267.5,
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"1\" data-project-id=\"1\" data-node-date=\"2026-11-12\" aria-label=\"节点 节点 A，设计，2026-11-12；右键操作\" style=\"left:36.666666666666664%;z",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 1
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 564.3333129882812,
+    "y": 257.9166564941406,
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"3\" data-project-id=\"3\" data-node-date=\"2026-11-12\" aria-label=\"节点 节点 C，设计，2026-11-12；右键操作\" style=\"left:36.666666666666664%;z",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 1
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 605.6666870117188,
+    "y": 248.3333282470703,
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"></div>",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 1
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 647,
+    "y": 238.75,
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"></div>",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 1
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 688.3333129882812,
+    "y": 229.1666717529297,
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"5\" data-project-id=\"5\" data-node-date=\"2026-11-12\" aria-label=\"节点 节点 E，设计，2026-11-12；右键操作\" style=\"left:36.666666666666664%;z",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 5
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 729.6666870117188,
+    "y": 219.5833282470703,
+    "hit": "<div class=\"timeline-stage-plot\" style=\"--overlap-rows:1\"><button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"5\" data-project-id=\"5\" data-node-date=\"2026-11-12\" aria-label=\"节点 节点 E，设计，2026-11-12；右键操作\" style=\"left:36.666666666666664%;z",
+    "drag": {
+      "inside": true,
+      "moved": true,
+      "anchor": 5
+    }
+  },
+  {
+    "type": "drag-move",
+    "x": 771,
+    "y": 210,
+    "hit": "<button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"3\" data-project-id=\"3\" data-node-date=\"2026-11-12\" aria-label=\"节点 节点 C，设计，2026-11-12；右键操作\" style=\"left:36.666666666666664%;z-index:1000\"><i></i><span data-node-tooltip-source=\"\" aria",
+    "drag": {
+      "inside": false,
+      "moved": true,
+      "anchor": 5
+    }
+  },
+  {
+    "type": "pointerup",
+    "x": 771,
+    "y": 210,
+    "target": "<button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"3\" data-project-id=\"3\" data-node-date=\"2026-11-12\" aria-label=\"节点 节点 C，设计，2026-11-12；右键操作\" style=\"left:36.666666666666664%;z-index:1000\"><i></i><span data-node-tooltip-source=\"\" aria-hidden=\"true\"><b>节点 C</b><small>设计 · 2026-11-12</small></span></button>",
+    "hit": "<button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"3\" data-project-id=\"3\" data-node-date=\"2026-11-12\" aria-label=\"节点 节点 C，设计，2026-11-12；右键操作\" style=\"left:36.666666666666664%;z-index:1000\"><i></i><span data-node-tooltip-source=\"\" aria",
+    "popup": false,
+    "scope": "month"
+  }
+]

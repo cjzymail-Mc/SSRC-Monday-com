@@ -1,0 +1,56 @@
+[
+  {
+    "type": "pointerdown",
+    "x": 132.5,
+    "y": 299,
+    "target": "<button class=\"nav-item nav-button nav-child\" id=\"timelineMonthBtn\" title=\"本月\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" width=\"16\" height=\"15.5\" rx=\"2.5\"></rect><path d=\"M8 3v4M16 3v4M4 9h16\"></path><path class=\"nav-icon-dot",
+    "hit": "<button class=\"nav-item nav-button nav-child\" id=\"timelineMonthBtn\" title=\"本月\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" widt",
+    "popup": null,
+    "scope": "home"
+  },
+  {
+    "type": "pointerup",
+    "x": 132.5,
+    "y": 299,
+    "target": "<button class=\"nav-item nav-button nav-child\" id=\"timelineMonthBtn\" title=\"本月\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" width=\"16\" height=\"15.5\" rx=\"2.5\"></rect><path d=\"M8 3v4M16 3v4M4 9h16\"></path><path class=\"nav-icon-dot",
+    "hit": "<button class=\"nav-item nav-button nav-child\" id=\"timelineMonthBtn\" title=\"本月\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" widt",
+    "popup": null,
+    "scope": "home"
+  },
+  {
+    "type": "click",
+    "x": 132,
+    "y": 299,
+    "target": "<button class=\"nav-item nav-button nav-child\" id=\"timelineMonthBtn\" title=\"本月\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" width=\"16\" height=\"15.5\" rx=\"2.5\"></rect><path d=\"M8 3v4M16 3v4M4 9h16\"></path><path class=\"nav-icon-dot",
+    "hit": "<button class=\"nav-item nav-button nav-child\" id=\"timelineMonthBtn\" title=\"本月\" aria-pressed=\"false\">\n            <span class=\"nav-icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" focusable=\"false\"><path class=\"nav-icon-wash\" d=\"M4 9h16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2Z\"></path><rect x=\"4\" y=\"5\" widt",
+    "popup": null,
+    "scope": "home"
+  },
+  {
+    "type": "pointerdown",
+    "x": 995,
+    "y": 227,
+    "target": "<button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"4\" data-project-id=\"1\" data-node-date=\"2026-11-21\" aria-label=\"节点 直接插入-single，设计，2026-11-21；右键操作\" style=\"left:66.66666666666666%;z-index:997\" aria-describedby=\"timelineRemarkPopup\"><i></i><span data-node-tooltip-source=\"\" aria-hidden=\"true\"><b>直接插入-single</b><small>设计 · 2026-11-21<",
+    "hit": "<button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"4\" data-project-id=\"1\" data-node-date=\"2026-11-21\" aria-label=\"节点 直接插入-single，设计，2026-11-21；右键操作\" style=\"left:66.66666666666666%;z-index:997\" aria-describedby=\"timelineRemarkPopup\"><",
+    "popup": true,
+    "scope": "month"
+  },
+  {
+    "type": "pointerup",
+    "x": 995,
+    "y": 227,
+    "target": "<button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"4\" data-project-id=\"1\" data-node-date=\"2026-11-21\" aria-label=\"节点 直接插入-single，设计，2026-11-21；右键操作\" style=\"left:66.66666666666666%;z-index:997\" aria-describedby=\"timelineRemarkPopup\"><i></i><span data-node-tooltip-source=\"\" aria-hidden=\"true\"><b>直接插入-single</b><small>设计 · 2026-11-21<",
+    "hit": "<button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"4\" data-project-id=\"1\" data-node-date=\"2026-11-21\" aria-label=\"节点 直接插入-single，设计，2026-11-21；右键操作\" style=\"left:66.66666666666666%;z-index:997\" aria-describedby=\"timelineRemarkPopup\"><",
+    "popup": true,
+    "scope": "month"
+  },
+  {
+    "type": "contextmenu",
+    "x": 995,
+    "y": 227,
+    "target": "<button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"4\" data-project-id=\"1\" data-node-date=\"2026-11-21\" aria-label=\"节点 直接插入-single，设计，2026-11-21；右键操作\" style=\"left:66.66666666666666%;z-index:997\" aria-describedby=\"timelineRemarkPopup\"><i></i><span data-node-tooltip-source=\"\" aria-hidden=\"true\"><b>直接插入-single</b><small>设计 · 2026-11-21<",
+    "hit": "<button type=\"button\" class=\"timeline-dashboard-node stage-design    \" data-dashboard-hit-target=\"node\" data-node-id=\"4\" data-project-id=\"1\" data-node-date=\"2026-11-21\" aria-label=\"节点 直接插入-single，设计，2026-11-21；右键操作\" style=\"left:66.66666666666666%;z-index:997\" aria-describedby=\"timelineRemarkPopup\"><",
+    "popup": true,
+    "scope": "month"
+  }
+]

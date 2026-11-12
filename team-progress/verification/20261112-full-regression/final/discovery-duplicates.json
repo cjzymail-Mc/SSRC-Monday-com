@@ -1,0 +1,11 @@
+[
+  "test_overview_ux_e2e.OverviewUXE2E.test_account_preferences_refresh_and_clear_without_persisting_search",
+  "test_overview_ux_e2e.OverviewUXE2E.test_advanced_search_object_and_keyboard_horizontal_access",
+  "test_overview_ux_e2e.OverviewUXE2E.test_browser_reload_cancel_keeps_unsaved_editor_draft",
+  "test_overview_ux_e2e.OverviewUXE2E.test_canvas_ranges_workbench_team_tab_and_archive_return",
+  "test_overview_ux_e2e.OverviewUXE2E.test_compact_next_note_column_urgency_and_unique_groups",
+  "test_overview_ux_e2e.OverviewUXE2E.test_date_shortcuts_clean_header_and_column_balance",
+  "test_overview_ux_e2e.OverviewUXE2E.test_early_overview_navigation_receives_late_tag_catalog",
+  "test_overview_ux_e2e.OverviewUXE2E.test_menu_five_modules_and_focus_progress_never_resets_to_zero",
+  "test_overview_ux_e2e.OverviewUXE2E.test_single_expansion_keeps_overdue_and_shows_recent_future_nodes"
+]

@@ -1,0 +1,26 @@
+--- a/tests/test_timeline.py
++++ b/tests/test_timeline.py
+@@ -1115,8 +1115,10 @@
+         database.copy_database(self.db, path)
+         db = connect(path)
+         try:
++            db.execute("DROP TABLE sample_order_files")
++            db.execute("DROP TABLE sample_orders")
+             db.execute("DROP TABLE timeline_member_orders")
+-            db.execute("DELETE FROM schema_migrations WHERE version=20")
++            db.execute("DELETE FROM schema_migrations WHERE version>=20")
+             db.execute("PRAGMA user_version=19")
+             db.commit()
+         finally:
+--- a/tests/test_timeline_tags_order.py
++++ b/tests/test_timeline_tags_order.py
+@@ -55,6 +55,9 @@
+         legacy = Path(self.temp.name) / "v16-shape.db"
+         migrate(legacy, initial_password="test-password")
+         conn = connect(legacy)
++        conn.execute("DROP TABLE sample_order_files")
++        conn.execute("DROP TABLE sample_orders")
++        conn.execute("DELETE FROM schema_migrations WHERE version=21")
+         conn.execute("DROP TABLE timeline_member_orders")
+         conn.execute("DROP TABLE timeline_order_items")
+         conn.execute("DROP TABLE timeline_order_contexts")

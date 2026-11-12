@@ -1,0 +1,9 @@
+test_quick_insert_failure_conflict_retry_and_duplicate_guard (test_timeline_edit_e2e.SharedTimelineEditE2E.test_quick_insert_failure_conflict_retry_and_duplicate_guard) ... ok
+test_quick_insert_other_project_keeps_existing_draft_and_same_project_stays_blocked (test_timeline_edit_e2e.SharedTimelineEditE2E.test_quick_insert_other_project_keeps_existing_draft_and_same_project_stays_blocked) ... ok
+test_quick_insert_saves_at_checkmark_and_delete_stays_pending_in_five_canvases (test_timeline_edit_e2e.SharedTimelineEditE2E.test_quick_insert_saves_at_checkmark_and_delete_stays_pending_in_five_canvases) ... ok
+test_related_insert_remark_delete_and_drag_review_with_escape_save_lock (test_timeline_edit_e2e.SharedTimelineEditE2E.test_related_insert_remark_delete_and_drag_review_with_escape_save_lock) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 40.993s
+
+OK
